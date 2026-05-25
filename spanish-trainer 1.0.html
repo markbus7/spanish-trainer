@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>español trainer v1.0</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:#0f0f0f;color:#e8e0d0;font-family:'DM Mono','Courier New',monospace;overflow:hidden;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:#0f0f0f;}
+::-webkit-scrollbar-thumb{background:#3a3a3a;border-radius:2px;}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:960px;margin:0 auto;}
+
+/* HEADER */
+#header{padding:12px 16px 0;border-bottom:1px solid #1e1e1e;flex-shrink:0;}
+#header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.logo{font-family:'Fraunces',serif;font-size:20px;font-weight:300;}
+.logo em{color:#c8a96e;font-style:italic;}
+.logo-sub{font-size:9px;color:#444;letter-spacing:0.12em;margin-top:1px;}
+#header-right{display:flex;align-items:center;gap:14px;}
+.counter-box{text-align:right;}
+.counter-num{font-size:18px;color:#c8a96e;font-weight:500;}
+.counter-label{font-size:9px;color:#444;letter-spacing:0.08em;}
+.progress-bar-wrap{text-align:right;}
+.progress-bar-label{font-size:10px;color:#555;margin-bottom:3px;}
+.progress-bar-track{width:80px;height:3px;background:#1e1e1e;border-radius:2px;}
+.progress-bar-fill{height:100%;background:#c8a96e;border-radius:2px;transition:width 0.4s;}
+.toggle-wrap{display:flex;align-items:center;gap:7px;}
+.toggle-label{font-size:10px;letter-spacing:0.1em;}
+.toggle-track{width:44px;height:22px;background:#252525;border-radius:11px;position:relative;cursor:pointer;border:1px solid #3a3a3a;transition:background 0.2s;}
+.toggle-track.on{background:#1e2e1e;border-color:#3a5a3a;}
+.toggle-thumb{width:16px;height:16px;background:#888;border-radius:8px;position:absolute;top:2px;left:2px;transition:left 0.2s,background 0.2s;}
+.toggle-track.on .toggle-thumb{left:24px;background:#6ab06a;}
+#tabs{display:flex;border-top:1px solid #1a1a1a;margin-top:4px;}
+.tab-btn{background:none;border:none;cursor:pointer;padding:8px 12px;font-family:inherit;font-size:11px;letter-spacing:0.08em;transition:all 0.15s;color:#555;border-bottom:2px solid transparent;}
+.tab-btn.active{color:#c8a96e;border-bottom:2px solid #c8a96e;}
+.tab-btn:hover:not(.active){color:#888;}
+
+/* PANELS */
+#panels{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.panel{display:none;flex:1;overflow-y:auto;flex-direction:column;}
+.panel.active{display:flex;}
+
+/* TEACHER BANNER */
+.teacher-banner{margin:16px 16px 0;background:#111;border:1px solid #2a2a1e;border-radius:6px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;}
+.teacher-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.teacher-text{flex:1;}
+.teacher-message{font-size:13px;color:#e0d8c8;line-height:1.6;}
+.teacher-sub{font-size:10px;color:#555;margin-top:4px;letter-spacing:0.06em;}
+
+/* PATH CARDS */
+.path-section{padding:14px 16px 0;}
+.path-section-title{font-size:9px;letter-spacing:0.15em;color:#444;margin-bottom:10px;}
+.path-cards{display:flex;flex-direction:column;gap:8px;}
+.path-card{border-radius:5px;padding:14px 16px;cursor:pointer;transition:all 0.15s;border:1px solid;}
+.path-card:hover{transform:translateY(-1px);}
+.path-card.primary{background:#1a1e12;border-color:#3a4a2a;}
+.path-card.primary:hover{border-color:#5a6a4a;}
+.path-card.secondary{background:#111;border-color:#1e1e1e;}
+.path-card.secondary:hover{border-color:#3a3a3a;}
+.path-card.locked{background:#0d0d0d;border-color:#161616;cursor:default;opacity:0.5;}
+.path-card.locked:hover{transform:none;}
+.path-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.path-card-title{font-size:13px;color:#e0d8c8;}
+.path-card.primary .path-card-title{color:#c8a96e;}
+.path-card-badge{font-size:9px;border-radius:2px;padding:2px 6px;letter-spacing:0.06em;}
+.badge-recommended{background:#1e2e1e;border:1px solid #2d4a2d;color:#6ab06a;}
+.badge-locked{background:#1a1a1a;border:1px solid #2a2a2a;color:#444;}
+.badge-optional{background:#1a1a2e;border:1px solid #2a2a4e;color:#6060c8;}
+.path-card-sub{font-size:11px;color:#555;line-height:1.5;}
+
+/* EXERCISE MENU */
+.ex-section{padding:14px 16px 0;}
+.ex-section-label{font-size:9px;letter-spacing:0.15em;color:#444;margin-bottom:10px;}
+.ex-menu-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#111;border:1px solid #1e1e1e;border-radius:4px;cursor:pointer;transition:border-color 0.15s;margin-bottom:6px;}
+.ex-menu-item:hover{border-color:#3a3a3a;}
+.ex-menu-item.recommended{border-color:#2d3a20;background:#111810;}
+.ex-menu-item.weak{border-color:#3a2020;background:#120f0f;}
+.ex-menu-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot-default{background:#2a2a2a;}
+.dot-recommended{background:#6ab06a;}
+.dot-weak{background:#d06060;}
+.dot-done{background:#3a5a3a;}
+.ex-menu-info{flex:1;}
+.ex-menu-title{font-size:12px;color:#e0d8c8;margin-bottom:1px;}
+.ex-menu-sub{font-size:10px;color:#444;}
+.ex-menu-status{font-size:9px;letter-spacing:0.06em;color:#444;}
+
+/* EXERCISE ACTIVE */
+#ex-active{display:none;flex-direction:column;flex:1;padding:16px;gap:12px;overflow-y:auto;}
+#ex-active.visible{display:flex;}
+.ex-back{background:none;border:none;color:#555;font-family:inherit;font-size:11px;cursor:pointer;letter-spacing:0.08em;text-align:left;padding:0;margin-bottom:4px;}
+.ex-back:hover{color:#888;}
+.ex-header{display:flex;flex-direction:column;gap:3px;}
+.ex-title{font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:#e8e0d0;}
+.ex-progress{font-size:10px;color:#555;letter-spacing:0.08em;}
+.ex-question{background:#161616;border:1px solid #242424;border-radius:4px;padding:16px;font-size:14px;color:#e0d8c8;line-height:1.7;}
+.ex-question em{color:#c8a96e;font-style:normal;}
+.ex-input{background:#111;border:1px solid #2a2a2a;border-radius:4px;color:#e0d8c8;font-size:14px;padding:10px 12px;font-family:inherit;width:100%;}
+.ex-input:focus{outline:none;border-color:#c8a96e;}
+.ex-input.correct{border-color:#3a5a3a;background:#1a2a1a;}
+.ex-input.wrong{border-color:#5a2a2a;background:#2a1a1a;}
+.ex-feedback{padding:10px 14px;border-radius:4px;font-size:12px;line-height:1.6;display:none;}
+.ex-feedback.correct{background:#1a2a1a;border:1px solid #2d4a2d;color:#6ab06a;display:block;}
+.ex-feedback.wrong{background:#2a1a1a;border:1px solid #4a2d2d;color:#d06060;display:block;}
+.ex-btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+.ex-btn{border-radius:4px;padding:10px 18px;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:0.08em;border:1px solid;transition:all 0.15s;}
+.ex-btn-check{background:#1e2e1e;border-color:#3a5a3a;color:#6ab06a;}
+.ex-btn-next{background:#1e1e2e;border-color:#3a3a5a;color:#8080c8;}
+.mc-option{background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px 14px;cursor:pointer;font-size:13px;color:#888;transition:all 0.15s;width:100%;}
+.mc-option:hover{border-color:#3a3a3a;color:#e0d8c8;}
+.mc-option.correct{border-color:#3a5a3a;background:#1a2a1a;color:#6ab06a;}
+.mc-option.wrong{border-color:#5a2a2a;background:#2a1a1a;color:#d06060;}
+.mc-option.reveal{border-color:#3a5a3a;background:#1a2a1a;color:#6ab06a;}
+.mc-option:disabled{cursor:default;}
+.flashcard{background:#161616;border:1px solid #242424;border-radius:4px;padding:30px 20px;text-align:center;cursor:pointer;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;}
+.flashcard-word{font-size:24px;color:#e0d8c8;font-family:'Fraunces',serif;font-weight:300;}
+.flashcard-hint{font-size:10px;color:#444;letter-spacing:0.1em;}
+.flashcard-back{display:none;flex-direction:column;gap:6px;align-items:center;}
+.flashcard-back.visible{display:flex;}
+.flashcard-translation{font-size:16px;color:#c8a96e;}
+.flashcard-example{font-size:11px;color:#555;font-style:italic;}
+.fc-btn-row{display:flex;gap:8px;width:100%;}
+.fc-btn-know{flex:1;background:#1a2a1a;border:1px solid #2d4a2d;color:#6ab06a;border-radius:4px;padding:10px;cursor:pointer;font-family:inherit;font-size:11px;}
+.fc-btn-again{flex:1;background:#2a1a1a;border:1px solid #4a2d2d;color:#d06060;border-radius:4px;padding:10px;cursor:pointer;font-family:inherit;font-size:11px;}
+
+/* DIAGNOSTIC RESULTS */
+.diag-results{display:flex;flex-direction:column;gap:10px;}
+.diag-category{background:#111;border:1px solid #1e1e1e;border-radius:4px;padding:12px 14px;}
+.diag-cat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.diag-cat-name{font-size:12px;color:#e0d8c8;}
+.diag-cat-score{font-size:12px;}
+.diag-bar-track{height:4px;background:#1e1e1e;border-radius:2px;margin-bottom:6px;}
+.diag-bar-fill{height:100%;border-radius:2px;transition:width 0.6s;}
+.diag-cat-verdict{font-size:10px;color:#555;}
+.diag-focus-box{background:#1a1e12;border:1px solid #3a4a2a;border-radius:4px;padding:14px 16px;}
+.diag-focus-title{font-size:9px;letter-spacing:0.12em;color:#c8a96e;margin-bottom:6px;}
+.diag-focus-text{font-size:13px;color:#e0d8c8;line-height:1.6;}
+
+/* CHAT */
+#chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px;}
+.empty-state{text-align:center;padding:60px 20px;color:#2a2a2a;}
+.empty-title{font-family:'Fraunces',serif;font-size:26px;font-weight:300;font-style:italic;margin-bottom:6px;}
+.empty-sub{font-size:10px;letter-spacing:0.1em;}
+.msg-user{display:flex;justify-content:flex-end;animation:slideIn 0.2s ease;}
+.msg-user-bubble{max-width:72%;background:#1a1a2e;border:1px solid #2a2a4e;border-radius:4px 4px 0 4px;padding:10px 14px;font-size:13px;line-height:1.6;color:#c8c0e0;}
+.msg-ai{display:flex;flex-direction:column;gap:8px;animation:slideIn 0.25s ease;}
+.msg-ai-bubble{max-width:78%;background:#161616;border:1px solid #242424;border-radius:4px 4px 4px 0;padding:12px 16px;font-size:13px;line-height:1.7;color:#e0d8c8;}
+.strength-tags{display:flex;flex-wrap:wrap;gap:4px;}
+.strength-tag{display:inline-block;background:#1a2a1a;border:1px solid #2d4a2d;color:#6ab06a;border-radius:2px;padding:1px 7px;font-size:10px;}
+.taller-block{background:#111;border:1px solid #1e1e1e;border-radius:4px;padding:12px 14px;max-width:86%;}
+.taller-label{font-size:9px;letter-spacing:0.15em;color:#555;margin-bottom:10px;}
+.taller-item{border-left:2px solid #c8a96e;padding-left:10px;margin-bottom:8px;}
+.taller-orig{color:#d06060;text-decoration:line-through;font-size:12px;}
+.taller-fix{color:#6ab06a;font-size:12px;}
+.taller-exp{font-size:11px;color:#666;line-height:1.5;margin-top:2px;}
+.dots-wrap{display:flex;gap:4px;padding:6px 0;}
+.dot{width:6px;height:6px;background:#c8a96e;border-radius:50%;animation:pulse 1.2s ease-in-out infinite;}
+.dot:nth-child(2){animation-delay:0.2s;}
+.dot:nth-child(3){animation-delay:0.4s;}
+.report-generating{background:#1a1a12;border:1px solid #3a3a20;border-radius:4px;padding:12px 16px;font-size:12px;color:#c8a96e;}
+#chat-input-area{border-top:1px solid #1a1a1a;padding:12px 16px;display:flex;gap:10px;align-items:flex-end;flex-shrink:0;}
+#chat-textarea{flex:1;background:#111;border:1px solid #242424;border-radius:4px;color:#e0d8c8;font-size:14px;padding:10px 12px;font-family:inherit;line-height:1.6;resize:none;}
+#chat-textarea:focus{outline:none;border-color:#3a3a3a;}
+#send-btn{background:#1e2e1e;border:1px solid #3a5a3a;color:#6ab06a;border-radius:4px;padding:10px 16px;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:0.08em;white-space:nowrap;}
+#send-btn:disabled{background:#1a1a1a;border-color:#242424;color:#333;cursor:default;}
+#key-screen{display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;gap:16px;flex:1;}
+#key-screen.visible{display:flex;}
+.key-title{font-family:'Fraunces',serif;font-size:20px;font-weight:300;font-style:italic;color:#c8a96e;}
+.key-sub{font-size:11px;color:#555;text-align:center;line-height:1.7;max-width:340px;}
+#key-input{background:#111;border:1px solid #2a2a2a;border-radius:4px;color:#e0d8c8;font-size:13px;padding:10px 14px;font-family:inherit;width:100%;max-width:400px;}
+#key-input:focus{outline:none;border-color:#c8a96e;}
+#key-save-btn{background:#1e2e1e;border:1px solid #3a5a3a;color:#6ab06a;border-radius:4px;padding:10px 24px;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:0.08em;}
+.key-note{font-size:10px;color:#333;text-align:center;max-width:340px;line-height:1.6;}
+#chat-view{display:none;flex-direction:column;flex:1;overflow:hidden;}
+
+/* VOCAB */
+#vocab-panel{padding:16px;gap:8px;}
+.vocab-label{font-size:9px;letter-spacing:0.15em;color:#444;margin-bottom:4px;}
+.vocab-row{background:#111;border:1px solid #1e1e1e;border-radius:4px;padding:10px 14px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:4px;}
+.vocab-used{color:#888;font-size:12px;min-width:100px;}
+.vocab-better{color:#6ab06a;font-size:13px;min-width:100px;}
+.vocab-meaning{color:#444;font-size:11px;}
+.vocab-empty{color:#333;font-size:13px;padding:20px 0;}
+
+/* PROGRESS */
+#progress-panel{padding:16px;gap:16px;}
+.profile-card{background:#111;border:1px solid #2a2a1e;border-radius:4px;padding:14px;margin-bottom:4px;}
+.profile-label{font-size:9px;letter-spacing:0.15em;color:#c8a96e;margin-bottom:10px;}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;}
+.profile-section-title{font-size:9px;color:#444;letter-spacing:0.1em;margin-bottom:5px;}
+.profile-strength{font-size:11px;color:#6ab06a;margin-bottom:2px;}
+.profile-weak{font-size:11px;margin-bottom:2px;}
+.priority-high{color:#d06060;}
+.priority-medium{color:#c8a96e;}
+.priority-low{color:#6ab06a;}
+.profile-footer{border-top:1px solid #1e1e1e;padding-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;}
+.profile-level{font-size:11px;color:#666;}
+.profile-next{font-size:11px;color:#c8a96e;}
+.lesson-card{background:#111;border:1px solid #1e1e1e;border-radius:4px;padding:14px;margin-bottom:4px;}
+.lesson-header{display:flex;justify-content:space-between;margin-bottom:8px;}
+.lesson-num{font-size:10px;letter-spacing:0.12em;color:#555;}
+.lesson-date{font-size:10px;color:#333;}
+.lesson-summary{font-size:12px;color:#888;line-height:1.6;margin-bottom:10px;}
+.lesson-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.lesson-strong{font-size:11px;color:#6ab06a;margin-bottom:2px;}
+.weak-card{background:#161616;border:1px solid #2a2a2a;border-radius:3px;padding:6px 8px;margin-bottom:4px;}
+.weak-area{font-size:11px;color:#c8a96e;margin-bottom:2px;}
+.weak-tip{font-size:10px;color:#555;}
+.progress-empty{color:#333;font-size:13px;padding:20px 0;}
+
+/* FOOTER */
+#footer{border-top:1px solid #141414;padding:7px 16px;display:flex;gap:12px;justify-content:flex-end;flex-shrink:0;}
+.footer-btn{background:none;border:none;color:#2e2e2e;font-size:10px;cursor:pointer;font-family:inherit;letter-spacing:0.08em;}
+.footer-btn:hover{color:#555;}
+.footer-label{color:#2e2e2e;font-size:10px;cursor:pointer;letter-spacing:0.08em;}
+
+/* GRAMMAR REF */
+.ref-card{background:#111;border:1px solid #1e1e1e;border-radius:4px;padding:14px;margin-bottom:8px;}
+.ref-title{font-size:13px;color:#c8a96e;margin-bottom:10px;letter-spacing:0.04em;}
+.ref-line{font-size:12px;color:#777;line-height:1.7;padding:2px 0 2px 8px;border-left:1px solid #2a2a2a;}
+
+@keyframes slideIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:0.2;}50%{opacity:1;}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div id="header-top">
+      <div>
+        <div class="logo">español <em>trainer</em></div>
+        <div class="logo-sub">LATIN AMERICAN · DUTCH NATIVE · v1.0</div>
+      </div>
+      <div id="header-right">
+        <div class="toggle-wrap">
+          <span class="toggle-label" id="lbl-es" style="color:#555">ES</span>
+          <div class="toggle-track" id="lang-toggle" onclick="toggleLang()"><div class="toggle-thumb"></div></div>
+          <span class="toggle-label" id="lbl-en" style="color:#6ab06a">EN</span>
+        </div>
+        <div class="counter-box">
+          <div class="counter-num" id="exchange-count">0</div>
+          <div class="counter-label">EXCHANGES</div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-label" id="progress-label">5 to report</div>
+          <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="tabs">
+      <button class="tab-btn active" onclick="switchTab('exercises')">oefenen</button>
+      <button class="tab-btn" onclick="switchTab('chat')">conversación</button>
+      <button class="tab-btn" onclick="switchTab('vocab')" id="vocab-tab-btn">vocabulario (0)</button>
+      <button class="tab-btn" onclick="switchTab('progress')" id="progress-tab-btn">progreso (0)</button>
+    </div>
+  </div>
+
+  <div id="panels">
+
+    <!-- EXERCISES PANEL -->
+    <div class="panel active" id="panel-exercises">
+      <div id="exercises-home" style="overflow-y:auto;padding-bottom:20px;">
+
+        <!-- Teacher banner -->
+        <div class="teacher-banner">
+          <div class="teacher-icon">👨‍🏫</div>
+          <div class="teacher-text">
+            <div class="teacher-message" id="teacher-msg">Welkom! Start with the diagnostic — it takes about 10 minutes and tells you exactly where to focus your energy.</div>
+            <div class="teacher-sub" id="teacher-sub">NO DIAGNOSTIC DONE YET</div>
+          </div>
+        </div>
+
+        <!-- Paths -->
+        <div class="path-section">
+          <div class="path-section-title">WHERE DO YOU WANT TO START?</div>
+          <div class="path-cards">
+            <div class="path-card primary" onclick="startExercise('diagnostic')">
+              <div class="path-card-top">
+                <div class="path-card-title">📋 Diagnose jezelf</div>
+                <span class="path-card-badge badge-recommended" id="diag-badge">AANBEVOLEN</span>
+              </div>
+              <div class="path-card-sub">40 questions across all areas. Takes ~10 min. I'll tell you exactly where to focus.</div>
+            </div>
+            <div class="path-card secondary" onclick="startGuidedSequence()">
+              <div class="path-card-top">
+                <div class="path-card-title">📚 Alles oefenen</div>
+                <span class="path-card-badge badge-optional">STRUCTURED</span>
+              </div>
+              <div class="path-card-sub">Work through all exercises in a logical order: vocab → ser/estar → tenses → por/para → subjunctive.</div>
+            </div>
+            <div class="path-card secondary" id="advised-path" onclick="startAdvisedSession()">
+              <div class="path-card-top">
+                <div class="path-card-title">🎯 Geadviseerde sessie</div>
+                <span class="path-card-badge badge-locked" id="advised-badge">NEEDS PROFILE</span>
+              </div>
+              <div class="path-card-sub" id="advised-sub">Complete the diagnostic or a few AI lessons first. Then I'll build a session around your weak spots.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Individual exercises -->
+        <div class="ex-section">
+          <div class="ex-section-label">OR PICK AN EXERCISE</div>
+          <div id="ex-menu"></div>
+        </div>
+
+      </div>
+
+      <!-- Active exercise view -->
+      <div id="ex-active"></div>
+    </div>
+
+    <!-- CHAT PANEL -->
+    <div class="panel" id="panel-chat" style="flex-direction:column;">
+      <div id="key-screen">
+        <div class="key-title">API sleutel nodig</div>
+        <div class="key-sub">Paste your Anthropic API key to enable the AI conversation. Saved locally on your device only.</div>
+        <input type="password" id="key-input" placeholder="sk-ant-...">
+        <button id="key-save-btn" onclick="saveKey()">Opslaan</button>
+        <div class="key-note">Get your key at console.anthropic.com → API Keys. Your key never leaves your device except directly to Anthropic.</div>
+      </div>
+      <div id="chat-view">
+        <div id="chat-messages">
+          <div class="empty-state">
+            <div class="empty-title">¿De qué quieres hablar?</div>
+            <div class="empty-sub">WRITE ANYTHING IN SPANISH TO BEGIN</div>
+          </div>
+        </div>
+        <div id="chat-input-area">
+          <textarea id="chat-textarea" rows="2" placeholder="Escribe en español..." onkeydown="handleChatKey(event)"></textarea>
+          <button id="send-btn" onclick="sendMessage()">enviar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VOCAB PANEL -->
+    <div class="panel" id="panel-vocab" style="padding:16px;gap:8px;">
+      <div class="vocab-label">VOCABULARY COLLECTED</div>
+      <div id="vocab-list"><div class="vocab-empty">No vocabulary yet. Start a conversation.</div></div>
+    </div>
+
+    <!-- PROGRESS PANEL -->
+    <div class="panel" id="panel-progress" style="padding:16px;gap:16px;">
+      <div id="progress-list"><div class="progress-empty">No lesson reports yet. Complete 5 exchanges to generate your first report.</div></div>
+    </div>
+
+  </div>
+
+  <div id="footer">
+    <button class="footer-btn" onclick="clearSession()">clear session</button>
+    <button class="footer-btn" onclick="exportData()">export</button>
+    <label class="footer-label">import<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+    <button class="footer-btn" onclick="changeKey()" style="color:#1a1a1a;">change key</button>
+  </div>
+</div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────
+let state = {
+  messages: [], vocab: [], exchangeCount: 0,
+  lessonReports: [], profile: null, langMode: 'EN',
+  diagResults: null, exProgress: {}
+};
+
+function saveState(){ try{ localStorage.setItem('spanish_v3', JSON.stringify(state)); }catch(e){} }
+function loadState(){ try{ const s=localStorage.getItem('spanish_v3'); if(s) Object.assign(state, JSON.parse(s)); }catch(e){} }
+function getKey(){ return localStorage.getItem('spanish_api_key')||''; }
+function saveKey(){
+  const k=document.getElementById('key-input').value.trim();
+  if(!k.startsWith('sk-')){ alert('Key should start with sk-ant-'); return; }
+  localStorage.setItem('spanish_api_key',k);
+  showChatView();
+}
+function changeKey(){ localStorage.removeItem('spanish_api_key'); showKeyScreen(); switchTab('chat'); }
+
+loadState();
+try { updateHeader(); } catch(e){}
+try { updateVocabPanel(); } catch(e){}
+try { updateProgressPanel(); } catch(e){}
+try { updateExMenu(); } catch(e){}
+try { updateTeacher(); } catch(e){}
+try { setLangUI(); } catch(e){}
+// Chat init deferred to when user taps the tab
+
+// ── TABS ─────────────────────────────────────────────────
+let chatInitialized=false;
+function switchTab(name){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['exercises','chat','vocab','progress'][i]===name);
+  });
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if(name==='chat'&&!chatInitialized){
+    chatInitialized=true;
+    try{if(getKey())showChatView();else showKeyScreen();}catch(e){}
+    try{renderMessages();}catch(e){}
+  }
+}
+
+// ── LANG ─────────────────────────────────────────────────
+function toggleLang(){
+  state.langMode=state.langMode==='EN'?'ES':'EN';
+  setLangUI(); saveState();
+}
+function setLangUI(){
+  const on=state.langMode==='EN';
+  document.getElementById('lang-toggle').classList.toggle('on',on);
+  document.getElementById('lbl-es').style.color=on?'#555':'#c8a96e';
+  document.getElementById('lbl-en').style.color=on?'#6ab06a':'#555';
+}
+
+// ── HEADER ───────────────────────────────────────────────
+function updateHeader(){
+  document.getElementById('exchange-count').textContent=state.exchangeCount;
+  const toNext=5-(state.exchangeCount%5);
+  document.getElementById('progress-label').textContent=toNext+' to report';
+  document.getElementById('progress-fill').style.width=((5-toNext)/5*100)+'%';
+  document.getElementById('vocab-tab-btn').textContent='vocabulario ('+state.vocab.length+')';
+  document.getElementById('progress-tab-btn').textContent='progreso ('+state.lessonReports.length+')';
+}
+
+// ── TEACHER BANNER ───────────────────────────────────────
+function updateTeacher(){
+  const msg=document.getElementById('teacher-msg');
+  const sub=document.getElementById('teacher-sub');
+  const advisedPath=document.getElementById('advised-path');
+  const advisedBadge=document.getElementById('advised-badge');
+  const advisedSub=document.getElementById('advised-sub');
+  const diagBadge=document.getElementById('diag-badge');
+
+  if(!state.diagResults && !state.profile){
+    msg.textContent='Welkom! Start with the diagnostic — it takes about 10 minutes and tells you exactly where to focus your energy.';
+    sub.textContent='NO DIAGNOSTIC DONE YET';
+    advisedPath.classList.add('locked');
+    advisedBadge.textContent='NEEDS PROFILE'; advisedBadge.className='path-card-badge badge-locked';
+    diagBadge.textContent='AANBEVOLEN'; diagBadge.className='path-card-badge badge-recommended';
+  } else if(state.diagResults && !state.profile){
+    const weakest=getWeakestArea();
+    msg.textContent='Diagnostic done! Your weakest area is '+weakest.name+'. I\'ve queued up the right exercise. Do that first, then come back and try again.';
+    sub.textContent='DIAGNOSTIC DONE · '+state.diagResults.date;
+    advisedPath.classList.remove('locked');
+    advisedBadge.textContent='READY'; advisedBadge.className='path-card-badge badge-recommended';
+    advisedSub.textContent='Based on your diagnostic: focus on '+weakest.name+' today.';
+    diagBadge.textContent='REDO'; diagBadge.className='path-card-badge badge-optional';
+  } else if(state.profile){
+    const focus=state.profile.nextFocus||'keep practicing';
+    msg.textContent='Based on your AI lesson history: '+focus+'. Your advised session is ready.';
+    sub.textContent='PROFILE ACTIVE · LESSON '+state.lessonReports.length;
+    advisedPath.classList.remove('locked');
+    advisedBadge.textContent='READY'; advisedBadge.className='path-card-badge badge-recommended';
+    advisedSub.textContent=state.profile.nextFocus||'Focused session based on your lesson history.';
+    diagBadge.textContent='REDO'; diagBadge.className='path-card-badge badge-optional';
+  }
+}
+
+// ── EXERCISE MENU ────────────────────────────────────────
+const EX_DEFS=[
+  {id:'serEstar',   title:'Ser vs Estar',         sub:'40 sentences · choose the right verb',        area:'ser_estar'},
+  {id:'porPara',    title:'Por vs Para',           sub:'30 sentences · fill in the right preposition', area:'por_para'},
+  {id:'fillBlank',  title:'Fill in the blank',     sub:'Grammar gaps: tense, agreement, preposition',  area:'tenses'},
+  {id:'conjugation',title:'Conjugación verbal',    sub:'Present, preterite, imperfect, subjunctive',   area:'conjugation'},
+  {id:'flashcards', title:'Flashcards',            sub:'50 LatAm vocabulary words',                    area:'vocabulary'},
+  {id:'translation',title:'Translation prompts',   sub:'Dutch/English → Spanish, self-check',          area:'tenses'},
+  {id:'grammarRef', title:'Grammar reference',     sub:'Quick lookup cards — no scoring',              area:null},
+];
+
+function updateExMenu(){
+  const el=document.getElementById('ex-menu');
+  let html='';
+  EX_DEFS.forEach(def=>{
+    const status=getExStatus(def);
+    let cls='ex-menu-item'; let dotCls='ex-menu-dot dot-default'; let statusTxt='';
+    if(status==='recommended'){ cls+=' recommended'; dotCls='ex-menu-dot dot-recommended'; statusTxt='FOCUS THIS'; }
+    else if(status==='weak'){ cls+=' weak'; dotCls='ex-menu-dot dot-weak'; statusTxt='NEEDS WORK'; }
+    else if(status==='done'){ dotCls='ex-menu-dot dot-done'; statusTxt='done'; }
+    html+=`<div class="${cls}" onclick="startExercise('${def.id}')">
+      <div class="${dotCls}"></div>
+      <div class="ex-menu-info">
+        <div class="ex-menu-title">${def.title}</div>
+        <div class="ex-menu-sub">${def.sub}</div>
+      </div>
+      ${statusTxt?`<div class="ex-menu-status">${statusTxt}</div>`:''}
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+function getExStatus(def){
+  if(!def.area) return 'default';
+  const weakest=getWeakestArea();
+  if(weakest && weakest.id===def.area) return 'recommended';
+  if(state.diagResults){
+    const cat=state.diagResults.categories.find(c=>c.id===def.area);
+    if(cat && cat.pct<60) return 'weak';
+    if(cat && cat.pct>=80) return 'done';
+  }
+  if(state.profile){
+    const pw=state.profile.persistentWeaknesses||[];
+    if(pw.some(w=>w.area&&w.area.toLowerCase().includes(def.area.replace('_',' ')))) return 'weak';
+  }
+  return 'default';
+}
+
+function getWeakestArea(){
+  const areas=[
+    {id:'ser_estar',name:'Ser / Estar'},
+    {id:'por_para',name:'Por / Para'},
+    {id:'tenses',name:'Verb tenses'},
+    {id:'conjugation',name:'Conjugation'},
+    {id:'vocabulary',name:'Vocabulary'},
+  ];
+  let worst=null; let worstPct=101;
+  if(state.diagResults){
+    state.diagResults.categories.forEach(c=>{
+      if(c.pct<worstPct){ worstPct=c.pct; worst=areas.find(a=>a.id===c.id)||null; }
+    });
+  }
+  if(state.profile){
+    const pw=(state.profile.persistentWeaknesses||[]).filter(w=>w.priority==='high');
+    if(pw.length) worst=areas.find(a=>pw[0].area&&pw[0].area.toLowerCase().includes(a.id.replace('_',' ')))||worst;
+  }
+  return worst;
+}
+
+// ── GUIDED SEQUENCE ──────────────────────────────────────
+const GUIDED_ORDER=['flashcards','serEstar','conjugation','fillBlank','porPara','translation'];
+let guidedIdx=0;
+function startGuidedSequence(){
+  guidedIdx=0;
+  startExercise(GUIDED_ORDER[guidedIdx]);
+}
+function nextGuided(){
+  guidedIdx=(guidedIdx+1)%GUIDED_ORDER.length;
+  startExercise(GUIDED_ORDER[guidedIdx]);
+}
+
+// ── ADVISED SESSION ──────────────────────────────────────
+function startAdvisedSession(){
+  const w=getWeakestArea();
+  if(!w){ alert('Complete the diagnostic first.'); return; }
+  const map={ser_estar:'serEstar',por_para:'porPara',tenses:'fillBlank',conjugation:'conjugation',vocabulary:'flashcards'};
+  startExercise(map[w.id]||'fillBlank');
+}
+
+// ── EXERCISE SHELL ───────────────────────────────────────
+let exState={};
+
+function showExActive(){
+  document.getElementById('exercises-home').style.display='none';
+  const el=document.getElementById('ex-active');
+  el.style.display='flex'; el.style.flexDirection='column'; el.style.flex='1';
+  el.style.overflowY='auto'; el.style.padding='16px'; el.style.gap='12px';
+}
+function closeExercise(){
+  document.getElementById('exercises-home').style.display='block';
+  const el=document.getElementById('ex-active');
+  el.style.display='none'; el.innerHTML='';
+  updateExMenu(); updateTeacher();
+}
+
+function startExercise(type){
+  exState={type, index:0, score:0, correct:0, total:0};
+  showExActive();
+  if(type==='diagnostic') buildDiagnostic();
+  else if(type==='conjugation') buildConjugation();
+  else if(type==='serEstar') buildFillChoice(SER_ESTAR_DATA,'Ser vs Estar','ser_estar');
+  else if(type==='fillBlank') buildFillChoice(FILL_BLANK_DATA,'Fill in the blank','tenses');
+  else if(type==='porPara') buildMC(POR_PARA_MC,'Por vs Para','por_para');
+  else if(type==='flashcards') buildFlashcard();
+  else if(type==='translation') buildTranslation();
+  else if(type==='grammarRef') buildGrammarRef();
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── DIAGNOSTIC ───────────────────────────────────────────
+const DIAG_QUESTIONS=[
+  // ser/estar (8)
+  {q:'Ella ___ médica.',options:['es','está','son','están'],answer:'es',cat:'ser_estar'},
+  {q:'El café ___ frío.',options:['es','está','son','están'],answer:'está',cat:'ser_estar'},
+  {q:'¿Dónde ___ el banco?',options:['es','está','son','están'],answer:'está',cat:'ser_estar'},
+  {q:'Nosotros ___ de Colombia.',options:['somos','estamos','son','están'],answer:'somos',cat:'ser_estar'},
+  {q:'La puerta ___ abierta.',options:['es','está','ser','estar'],answer:'está',cat:'ser_estar'},
+  {q:'Hoy ___ lunes.',options:['es','está','ser','estar'],answer:'es',cat:'ser_estar'},
+  {q:'Él ___ muy cansado.',options:['es','está','ser','estar'],answer:'está',cat:'ser_estar'},
+  {q:'Este libro ___ aburrido.',options:['es','está','ser','estar'],answer:'es',cat:'ser_estar'},
+  // por/para (8)
+  {q:'Lo hice ___ amor.',options:['por','para'],answer:'por',cat:'por_para'},
+  {q:'Este regalo es ___ ti.',options:['por','para'],answer:'para',cat:'por_para'},
+  {q:'Gracias ___ tu ayuda.',options:['por','para'],answer:'por',cat:'por_para'},
+  {q:'Necesito terminar ___ el viernes.',options:['por','para'],answer:'para',cat:'por_para'},
+  {q:'Camino ___ el parque.',options:['por','para'],answer:'por',cat:'por_para'},
+  {q:'Trabajo ___ una empresa holandesa.',options:['por','para'],answer:'para',cat:'por_para'},
+  {q:'Estudio ___ aprender.',options:['por','para'],answer:'para',cat:'por_para'},
+  {q:'Lo vendí ___ cien euros.',options:['por','para'],answer:'por',cat:'por_para'},
+  // tenses (8)
+  {q:'Ayer ___ (ir/yo) al mercado.',options:['fui','iba','voy','iré'],answer:'fui',cat:'tenses'},
+  {q:'Cuando era niño, ___ (vivir/yo) en Rotterdam.',options:['viví','vivía','vivo','viviré'],answer:'vivía',cat:'tenses'},
+  {q:'Él ___ (dormir) cuando llamé.',options:['durmió','dormía','duerme','dormirá'],answer:'dormía',cat:'tenses'},
+  {q:'Espero que tú ___ (llegar) a tiempo.',options:['llega','llegues','llegaste','llegas'],answer:'llegues',cat:'tenses'},
+  {q:'Tan pronto como ___ (llegar/él), llámame.',options:['llega','llegue','llegó','llegará'],answer:'llegue',cat:'tenses'},
+  {q:'Hace dos años que ___ (vivir/yo) aquí.',options:['viví','vivía','vivo','he vivido'],answer:'vivo',cat:'tenses'},
+  {q:'Si tuviera dinero, ___ a México.',options:['viajaré','viajaría','viaje','viajo'],answer:'viajaría',cat:'tenses'},
+  {q:'Me alegra que ___ (estar/tú) bien.',options:['estás','estés','estuviste','estarás'],answer:'estés',cat:'tenses'},
+  // conjugation (8)
+  {q:'yo ___ (tener)',options:['tengo','tienes','tiene','tienen'],answer:'tengo',cat:'conjugation'},
+  {q:'ellos ___ (ir) — preterite',options:['fueron','iban','van','irán'],answer:'fueron',cat:'conjugation'},
+  {q:'tú ___ (ser) — imperfect',options:['eres','fuiste','eras','serías'],answer:'eras',cat:'conjugation'},
+  {q:'nosotros ___ (hacer) — preterite',options:['hacemos','hicimos','hacíamos','haríamos'],answer:'hicimos',cat:'conjugation'},
+  {q:'yo ___ (estar) — preterite',options:['estaba','estuve','estoy','estaré'],answer:'estuve',cat:'conjugation'},
+  {q:'él ___ (poder) — present',options:['puede','pudo','podía','pueda'],answer:'puede',cat:'conjugation'},
+  {q:'tú ___ (querer) — present',options:['queres','quieres','querías','quisieras'],answer:'quieres',cat:'conjugation'},
+  {q:'yo ___ (decir) — present',options:['deco','digo','dices','dice'],answer:'digo',cat:'conjugation'},
+  // vocabulary (8)
+  {q:'"Manejar" in LatAm means:',options:['to manage','to drive','to handle','to send'],answer:'to drive',cat:'vocabulary'},
+  {q:'"Plata" in LatAm informal means:',options:['silver','plate','money','plate of food'],answer:'money',cat:'vocabulary'},
+  {q:'"Ahorita" in Mexican Spanish means:',options:['later','never','right now / in a moment','yesterday'],answer:'right now / in a moment',cat:'vocabulary'},
+  {q:'"Chévere" (Colombia/Venezuela) means:',options:['expensive','hot','cool / great','tired'],answer:'cool / great',cat:'vocabulary'},
+  {q:'"Carro" in LatAm refers to:',options:['cart','car','carriage','train'],answer:'car',cat:'vocabulary'},
+  {q:'"Departamento" in LatAm means:',options:['department store','government dept','apartment','office'],answer:'apartment',cat:'vocabulary'},
+  {q:'Which is LatAm for "computer"?',options:['ordenador','computadora','máquina','teclado'],answer:'computadora',cat:'vocabulary'},
+  {q:'"De una" in Colombian slang means:',options:['one by one','for sure / let\'s do it','slowly','once'],answer:'for sure / let\'s do it',cat:'vocabulary'},
+];
+
+let diagAnswers=[];
+
+function buildDiagnostic(){
+  exState.questions=[...DIAG_QUESTIONS].sort(()=>Math.random()-0.5);
+  exState.index=0; diagAnswers=[];
+  showDiagQuestion();
+}
+
+function showDiagQuestion(){
+  const q=exState.questions[exState.index];
+  const total=exState.questions.length;
+  const el=document.getElementById('ex-active');
+  const pct=Math.round(exState.index/total*100);
+  el.innerHTML=`
+    <button class="ex-back" onclick="closeExercise()">← back</button>
+    <div class="ex-header">
+      <div class="ex-title">Diagnose</div>
+      <div class="ex-progress">Question ${exState.index+1} of ${total}</div>
+    </div>
+    <div style="height:3px;background:#1e1e1e;border-radius:2px;"><div style="width:${pct}%;height:100%;background:#c8a96e;border-radius:2px;transition:width 0.3s;"></div></div>
+    <div class="ex-question">${esc(q.q)}</div>
+    <div style="display:flex;flex-direction:column;gap:8px;" id="mc-opts">
+      ${q.options.map((o,i)=>`<button class="mc-option" onclick="diagAnswer(${i})">${esc(o)}</button>`).join('')}
+    </div>
+    <div class="ex-feedback" id="ex-fb"></div>
+    <button class="ex-btn ex-btn-next" id="next-btn" onclick="diagNext()" style="display:none;">next →</button>
+  `;
+}
+
+function diagAnswer(i){
+  const q=exState.questions[exState.index];
+  const chosen=q.options[i];
+  const correct=chosen===q.answer;
+  diagAnswers.push({cat:q.cat, correct});
+  const opts=document.querySelectorAll('.mc-option');
+  opts.forEach(b=>{ b.disabled=true; b.onclick=null; });
+  opts[i].classList.add(correct?'correct':'wrong');
+  if(!correct) opts[q.options.indexOf(q.answer)].classList.add('reveal');
+  const fb=document.getElementById('ex-fb');
+  fb.className='ex-feedback '+(correct?'correct':'wrong');
+  fb.textContent=correct?'✓ Correcto!':'✗ Answer: '+q.answer;
+  document.getElementById('next-btn').style.display='block';
+}
+
+function diagNext(){
+  exState.index++;
+  if(exState.index>=exState.questions.length){ showDiagResults(); return; }
+  showDiagQuestion();
+}
+
+function showDiagResults(){
+  const cats=[
+    {id:'ser_estar',name:'Ser / Estar'},
+    {id:'por_para',name:'Por / Para'},
+    {id:'tenses',name:'Verb Tenses'},
+    {id:'conjugation',name:'Conjugation'},
+    {id:'vocabulary',name:'Vocabulary'},
+  ];
+  const scores={}; const totals={};
+  cats.forEach(c=>{ scores[c.id]=0; totals[c.id]=0; });
+  diagAnswers.forEach(a=>{ totals[a.cat]++; if(a.correct) scores[a.cat]++; });
+  const results=cats.map(c=>({
+    id:c.id, name:c.name,
+    score:scores[c.id], total:totals[c.id],
+    pct:totals[c.id]?Math.round(scores[c.id]/totals[c.id]*100):0
+  }));
+  results.sort((a,b)=>a.pct-b.pct);
+  const weakest=results[0];
+
+  state.diagResults={
+    date:new Date().toLocaleDateString(),
+    categories:results,
+    weakestId:weakest.id
+  };
+  saveState();
+
+  const el=document.getElementById('ex-active');
+  let html=`
+    <button class="ex-back" onclick="closeExercise()">← back</button>
+    <div class="ex-title">Diagnose resultaat</div>
+    <div class="diag-focus-box">
+      <div class="diag-focus-title">TEACHER'S RECOMMENDATION</div>
+      <div class="diag-focus-text">Your weakest area is <strong>${esc(weakest.name)}</strong> (${weakest.pct}%). Start there. I've marked the right exercise for you in the menu.</div>
+    </div>
+    <div class="diag-results">`;
+  results.forEach(r=>{
+    const color=r.pct>=80?'#6ab06a':r.pct>=60?'#c8a96e':'#d06060';
+    const verdict=r.pct>=80?'Strong — keep it up':r.pct>=60?'Decent — room to improve':'Needs work — focus here';
+    html+=`<div class="diag-category">
+      <div class="diag-cat-top"><span class="diag-cat-name">${esc(r.name)}</span><span class="diag-cat-score" style="color:${color}">${r.score}/${r.total}</span></div>
+      <div class="diag-bar-track"><div class="diag-bar-fill" style="width:${r.pct}%;background:${color};"></div></div>
+      <div class="diag-cat-verdict">${verdict}</div>
+    </div>`;
+  });
+  html+=`</div>
+    <button class="ex-btn ex-btn-next" onclick="closeExercise()">Back to menu →</button>`;
+  el.innerHTML=html;
+  updateTeacher(); updateExMenu();
+}
+
+// ── SER/ESTAR FILL ───────────────────────────────────────
+const SER_ESTAR_DATA=[
+  {sentence:'Ella ___ médica.',answer:'es',hint:'permanent profession'},
+  {sentence:'El café ___ frío.',answer:'está',hint:'temporary state'},
+  {sentence:'Nosotros ___ de Colombia.',answer:'somos',hint:'origin'},
+  {sentence:'¿Dónde ___ el baño?',answer:'está',hint:'location of a thing'},
+  {sentence:'La reunión ___ en la sala.',answer:'está',hint:'location of an event'},
+  {sentence:'Hoy ___ lunes.',answer:'es',hint:'day/date'},
+  {sentence:'Él ___ muy cansado.',answer:'está',hint:'temporary condition'},
+  {sentence:'La casa ___ grande.',answer:'es',hint:'characteristic'},
+  {sentence:'¿Cómo ___ tú?',answer:'estás',hint:'how are you feeling'},
+  {sentence:'El examen ___ fácil.',answer:'es',hint:'inherent quality'},
+  {sentence:'La puerta ___ abierta.',answer:'está',hint:'state/condition'},
+  {sentence:'Mi hermano ___ alto.',answer:'es',hint:'physical characteristic'},
+  {sentence:'La sopa ___ caliente.',answer:'está',hint:'temporary temperature'},
+  {sentence:'Yo ___ muy ocupado hoy.',answer:'estoy',hint:'temporary state'},
+  {sentence:'Ella ___ aburrida.',answer:'está',hint:'feeling bored (temporary)'},
+  {sentence:'Este libro ___ aburrido.',answer:'es',hint:'inherent quality of the book'},
+  {sentence:'¿De dónde ___ ustedes?',answer:'son',hint:'origin'},
+  {sentence:'La fruta ___ madura.',answer:'está',hint:'state of ripeness'},
+  {sentence:'El problema ___ difícil.',answer:'es',hint:'inherent quality'},
+  {sentence:'Yo ___ listo para salir.',answer:'estoy',hint:'ready (temporary state)'},
+  {sentence:'Él ___ listo — muy inteligente.',answer:'es',hint:'clever (characteristic)'},
+  {sentence:'La ciudad ___ sucia.',answer:'está',hint:'temporary condition'},
+  {sentence:'El agua ___ fría.',answer:'está',hint:'temporary state'},
+  {sentence:'Nosotros ___ amigos.',answer:'somos',hint:'relationship'},
+  {sentence:'La fiesta ___ en mi casa.',answer:'está',hint:'event location'},
+  {sentence:'Hoy ___ muy tarde.',answer:'es',hint:'time expression'},
+  {sentence:'Ella ___ triste.',answer:'está',hint:'emotional state'},
+  {sentence:'Este plato ___ delicioso.',answer:'está',hint:'taste/condition'},
+  {sentence:'Mi trabajo ___ interesante.',answer:'es',hint:'characteristic'},
+  {sentence:'La ventana ___ rota.',answer:'está',hint:'resulting state'},
+  {sentence:'El precio ___ alto.',answer:'es',hint:'characteristic'},
+  {sentence:'La reunión ___ a las tres.',answer:'es',hint:'scheduled time'},
+  {sentence:'Él ___ nervioso antes del examen.',answer:'está',hint:'temporary emotional state'},
+  {sentence:'___ importante estudiar.',answer:'Es',hint:'impersonal expression'},
+  {sentence:'El cielo ___ nublado.',answer:'está',hint:'temporary weather'},
+  {sentence:'Ella ___ embarazada.',answer:'está',hint:'condition'},
+  {sentence:'Este barrio ___ peligroso.',answer:'es',hint:'inherent characteristic'},
+  {sentence:'La tienda ___ cerrada.',answer:'está',hint:'current state'},
+  {sentence:'Ellos ___ casados.',answer:'están',hint:'relationship status'},
+  {sentence:'El río ___ contaminado.',answer:'está',hint:'current condition'},
+];
+
+const FILL_BLANK_DATA=[
+  {sentence:'Ayer ___ (ir/yo) al mercado.',answer:'fui',explanation:'preterite of ir'},
+  {sentence:'Cuando era niño, ___ (vivir/yo) en Rotterdam.',answer:'vivía',explanation:'imperfect for habitual past'},
+  {sentence:'Espero que tú ___ (llegar) a tiempo.',answer:'llegues',explanation:'subjunctive after esperar que'},
+  {sentence:'Ella lleva tres años ___ (estudiar) español.',answer:'estudiando',explanation:'llevar + gerund'},
+  {sentence:'No hay nadie que ___ (saber) la respuesta.',answer:'sepa',explanation:'subjunctive after negative antecedent'},
+  {sentence:'Si tuviera dinero, ___ (viajar/yo) a México.',answer:'viajaría',explanation:'conditional in si clause result'},
+  {sentence:'Él ___ (dormir) cuando llamé.',answer:'dormía',explanation:'imperfect for interrupted action'},
+  {sentence:'Nosotros ___ (llegar) tarde a la reunión.',answer:'llegamos',explanation:'preterite for completed action'},
+  {sentence:'Necesito un técnico que ___ (hablar) holandés.',answer:'hable',explanation:'subjunctive for hypothetical person'},
+  {sentence:'Me alegra que ___ (estar/tú) bien.',answer:'estés',explanation:'subjunctive after emotional reaction'},
+  {sentence:'Ella se fue sin ___ (decir) nada.',answer:'decir',explanation:'infinitive after sin'},
+  {sentence:'Hace dos años que ___ (vivir/yo) aquí.',answer:'vivo',explanation:'hace + present for ongoing action'},
+  {sentence:'___ (haber) muchas personas en la plaza.',answer:'Había',explanation:'imperfect for scene-setting'},
+  {sentence:'Tan pronto como ___ (llegar/él), llámame.',answer:'llegue',explanation:'subjunctive in time clauses about future'},
+  {sentence:'Salimos ___ (por/para) Madrid mañana.',answer:'para',explanation:'para = destination'},
+  {sentence:'Lo hice ___ (por/para) ti.',answer:'por',explanation:'por = on behalf of'},
+  {sentence:'Pagué veinte euros ___ (por/para) el libro.',answer:'por',explanation:'por = exchange'},
+  {sentence:'Trabajo ___ (por/para) una empresa holandesa.',answer:'para',explanation:'para = employed by'},
+  {sentence:'Estudia mucho ___ (por/para) el examen.',answer:'para',explanation:'para = in preparation for'},
+  {sentence:'Lo mandé ___ (por/para) correo.',answer:'por',explanation:'por = means/method'},
+];
+
+// ── POR/PARA MULTIPLE CHOICE ─────────────────────────────
+const POR_PARA_MC=[
+  {q:'Lo hice ___ amor.',options:['por','para'],answer:'por',explanation:'por = cause/reason/motivation'},
+  {q:'Este regalo es ___ ti.',options:['por','para'],answer:'para',explanation:'para = intended recipient'},
+  {q:'Camino ___ el parque cada mañana.',options:['por','para'],answer:'por',explanation:'por = movement through/along'},
+  {q:'Necesito terminar esto ___ el viernes.',options:['por','para'],answer:'para',explanation:'para = deadline'},
+  {q:'Gracias ___ tu ayuda.',options:['por','para'],answer:'por',explanation:'por = thanks for (reason)'},
+  {q:'Trabajo ___ una empresa de logística.',options:['por','para'],answer:'para',explanation:'para = employed by'},
+  {q:'Te llamé ___ teléfono.',options:['por','para'],answer:'por',explanation:'por = means of communication'},
+  {q:'Lo hicieron ___ nosotros.',options:['por','para'],answer:'por',explanation:'por = on behalf of'},
+  {q:'Salimos ___ Amsterdam.',options:['por','para'],answer:'para',explanation:'para = destination'},
+  {q:'Compré flores ___ mi madre.',options:['por','para'],answer:'para',explanation:'para = intended for'},
+  {q:'Lo vendí ___ cien euros.',options:['por','para'],answer:'por',explanation:'por = exchange/price'},
+  {q:'___ ser holandés, hablas bien español.',options:['Por','Para'],answer:'Para',explanation:'para = considering/given that'},
+  {q:'Estudié ___ dos horas.',options:['por','para'],answer:'por',explanation:'por = duration'},
+  {q:'Estoy aquí ___ aprender.',options:['por','para'],answer:'para',explanation:'para = purpose/goal'},
+  {q:'Ella habló ___ todos.',options:['por','para'],answer:'por',explanation:'por = on behalf of'},
+  {q:'___ mí, el café es esencial.',options:['Por','Para'],answer:'Para',explanation:'para = in my opinion'},
+  {q:'Lo terminé ___ las tres.',options:['por','para'],answer:'para',explanation:'para = by a certain time'},
+  {q:'Me dieron un premio ___ mi trabajo.',options:['por','para'],answer:'por',explanation:'por = in recognition of'},
+  {q:'¿Puedes venir ___ las seis?',options:['por','para'],answer:'para',explanation:'para = by/around that time'},
+  {q:'Lucharon ___ la libertad.',options:['por','para'],answer:'por',explanation:'por = in favor of / for a cause'},
+  {q:'Este medicamento es ___ el dolor.',options:['por','para'],answer:'para',explanation:'para = intended use'},
+  {q:'La reunión es ___ mañana.',options:['por','para'],answer:'para',explanation:'para = scheduled for'},
+  {q:'Habla despacio ___ que entienda.',options:['por','para'],answer:'para',explanation:'para que = so that'},
+  {q:'Lo cambié ___ otro modelo.',options:['por','para'],answer:'por',explanation:'por = exchange'},
+  {q:'Estoy nervioso ___ el examen.',options:['por','para'],answer:'por',explanation:'por = cause of feeling'},
+  {q:'Quiero algo ___ comer.',options:['por','para'],answer:'para',explanation:'para = purpose'},
+  {q:'Mandé el correo ___ error.',options:['por','para'],answer:'por',explanation:'por = by accident'},
+  {q:'El paquete fue enviado ___ correo.',options:['por','para'],answer:'por',explanation:'por = means/method'},
+  {q:'Viajé ___ tren.',options:['por','para'],answer:'por',explanation:'por = means of transport'},
+  {q:'Gracias ___ todo.',options:['por','para'],answer:'por',explanation:'por = reason/cause'},
+];
+
+// ── CONJUGATION ──────────────────────────────────────────
+const CONJ_DATA=[
+  {verb:'hablar',tense:'present',forms:{yo:'hablo',tú:'hablas',él:'habla',nosotros:'hablamos',ellos:'hablan'}},
+  {verb:'comer',tense:'present',forms:{yo:'como',tú:'comes',él:'come',nosotros:'comemos',ellos:'comen'}},
+  {verb:'vivir',tense:'present',forms:{yo:'vivo',tú:'vives',él:'vive',nosotros:'vivimos',ellos:'viven'}},
+  {verb:'ser',tense:'present',forms:{yo:'soy',tú:'eres',él:'es',nosotros:'somos',ellos:'son'}},
+  {verb:'estar',tense:'present',forms:{yo:'estoy',tú:'estás',él:'está',nosotros:'estamos',ellos:'están'}},
+  {verb:'tener',tense:'present',forms:{yo:'tengo',tú:'tienes',él:'tiene',nosotros:'tenemos',ellos:'tienen'}},
+  {verb:'ir',tense:'present',forms:{yo:'voy',tú:'vas',él:'va',nosotros:'vamos',ellos:'van'}},
+  {verb:'poder',tense:'present',forms:{yo:'puedo',tú:'puedes',él:'puede',nosotros:'podemos',ellos:'pueden'}},
+  {verb:'querer',tense:'present',forms:{yo:'quiero',tú:'quieres',él:'quiere',nosotros:'queremos',ellos:'quieren'}},
+  {verb:'hacer',tense:'present',forms:{yo:'hago',tú:'haces',él:'hace',nosotros:'hacemos',ellos:'hacen'}},
+  {verb:'decir',tense:'present',forms:{yo:'digo',tú:'dices',él:'dice',nosotros:'decimos',ellos:'dicen'}},
+  {verb:'saber',tense:'present',forms:{yo:'sé',tú:'sabes',él:'sabe',nosotros:'sabemos',ellos:'saben'}},
+  {verb:'hablar',tense:'preterite',forms:{yo:'hablé',tú:'hablaste',él:'habló',nosotros:'hablamos',ellos:'hablaron'}},
+  {verb:'comer',tense:'preterite',forms:{yo:'comí',tú:'comiste',él:'comió',nosotros:'comimos',ellos:'comieron'}},
+  {verb:'ir',tense:'preterite',forms:{yo:'fui',tú:'fuiste',él:'fue',nosotros:'fuimos',ellos:'fueron'}},
+  {verb:'ser',tense:'preterite',forms:{yo:'fui',tú:'fuiste',él:'fue',nosotros:'fuimos',ellos:'fueron'}},
+  {verb:'tener',tense:'preterite',forms:{yo:'tuve',tú:'tuviste',él:'tuvo',nosotros:'tuvimos',ellos:'tuvieron'}},
+  {verb:'hacer',tense:'preterite',forms:{yo:'hice',tú:'hiciste',él:'hizo',nosotros:'hicimos',ellos:'hicieron'}},
+  {verb:'estar',tense:'preterite',forms:{yo:'estuve',tú:'estuviste',él:'estuvo',nosotros:'estuvimos',ellos:'estuvieron'}},
+  {verb:'hablar',tense:'imperfect',forms:{yo:'hablaba',tú:'hablabas',él:'hablaba',nosotros:'hablábamos',ellos:'hablaban'}},
+  {verb:'comer',tense:'imperfect',forms:{yo:'comía',tú:'comías',él:'comía',nosotros:'comíamos',ellos:'comían'}},
+  {verb:'ser',tense:'imperfect',forms:{yo:'era',tú:'eras',él:'era',nosotros:'éramos',ellos:'eran'}},
+  {verb:'ir',tense:'imperfect',forms:{yo:'iba',tú:'ibas',él:'iba',nosotros:'íbamos',ellos:'iban'}},
+  {verb:'tener',tense:'imperfect',forms:{yo:'tenía',tú:'tenías',él:'tenía',nosotros:'teníamos',ellos:'tenían'}},
+  {verb:'hablar',tense:'subjunctive',forms:{yo:'hable',tú:'hables',él:'hable',nosotros:'hablemos',ellos:'hablen'}},
+  {verb:'comer',tense:'subjunctive',forms:{yo:'coma',tú:'comas',él:'coma',nosotros:'comamos',ellos:'coman'}},
+  {verb:'tener',tense:'subjunctive',forms:{yo:'tenga',tú:'tengas',él:'tenga',nosotros:'tengamos',ellos:'tengan'}},
+  {verb:'ir',tense:'subjunctive',forms:{yo:'vaya',tú:'vayas',él:'vaya',nosotros:'vayamos',ellos:'vayan'}},
+  {verb:'estar',tense:'subjunctive',forms:{yo:'esté',tú:'estés',él:'esté',nosotros:'estemos',ellos:'estén'}},
+  {verb:'ser',tense:'subjunctive',forms:{yo:'sea',tú:'seas',él:'sea',nosotros:'seamos',ellos:'sean'}},
+];
+
+function buildConjugation(){
+  const item=CONJ_DATA[exState.index%CONJ_DATA.length];
+  const pronouns=Object.keys(item.forms);
+  const pronoun=pronouns[Math.floor(Math.random()*pronouns.length)];
+  exState.currentAnswer=item.forms[pronoun];
+  const el=document.getElementById('ex-active');
+  el.innerHTML=`
+    <button class="ex-back" onclick="closeExercise()">← back</button>
+    <div class="ex-header">
+      <div class="ex-title">Conjugación</div>
+      <div class="ex-progress">${exState.index+1} / ${CONJ_DATA.length} · ${item.tense} · score: ${exState.correct}/${exState.index}</div>
+    </div>
+    <div class="ex-question">${esc(pronoun)} — <em>${esc(item.verb)}</em> (${esc(item.tense)})</div>
+    <input class="ex-input" id="ex-ans" placeholder="escribe la forma..." onkeydown="if(event.key==='Enter')checkConj()">
+    <div class="ex-feedback" id="ex-fb"></div>
+    <div class="ex-btn-row">
+      <button class="ex-btn ex-btn-check" onclick="checkConj()">check</button>
+      <button class="ex-btn ex-btn-next" id="next-btn" onclick="nextConj()" style="display:none">next →</button>
+    </div>`;
+  setTimeout(()=>document.getElementById('ex-ans')?.focus(),100);
+}
+
+function checkConj(){
+  const inp=document.getElementById('ex-ans');
+  const fb=document.getElementById('ex-fb');
+  if(!inp||!fb) return;
+  const val=inp.value.trim().toLowerCase();
+  const correct=exState.currentAnswer.toLowerCase();
+  const ok=val===correct;
+  if(ok) exState.correct++;
+  inp.classList.add(ok?'correct':'wrong');
+  fb.className='ex-feedback '+(ok?'correct':'wrong');
+  fb.textContent=ok?'✓ Correcto!':'✗ Correct form: '+exState.currentAnswer;
+  inp.disabled=true;
+  document.getElementById('next-btn').style.display='inline-block';
+}
+
+function nextConj(){
+  exState.index=(exState.index+1)%CONJ_DATA.length;
+  buildConjugation();
+}
+
+// ── FILL IN THE BLANK ────────────────────────────────────
+function buildFillChoice(data,title,area){
+  const shuffled=[...data].sort(()=>Math.random()-0.5);
+  exState.data=shuffled; exState.index=0; exState.area=area; exState.title=title;
+  showFillItem();
+}
+
+function showFillItem(){
+  const item=exState.data[exState.index];
+  const el=document.getElementById('ex-active');
+  el.innerHTML=`
+    <button class="ex-back" onclick="closeExercise()">← back</button>
+    <div class="ex-header">
+      <div class="ex-title">${esc(exState.title)}</div>
+      <div class="ex-progress">${exState.index+1} / ${exState.data.length}</div>
+    </div>
+    <div class="ex-question">${esc(item.sentence).replace('___','<em>___</em>')}</div>
+    ${item.hint?`<div style="font-size:10px;color:#444;font-style:italic;padding:2px 0;">hint: ${esc(item.hint)}</div>`:''}
+    <input class="ex-input" id="ex-ans" placeholder="fill in..." onkeydown="if(event.key==='Enter')checkFill()">
+    <div class="ex-feedback" id="ex-fb"></div>
+    <div class="ex-btn-row">
+      <button class="ex-btn ex-btn-check" onclick="checkFill()">check</button>
+      <button class="ex-btn ex-btn-next" id="next-btn" onclick="nextFill()" style="display:none">next →</button>
+    </div>`;
+  setTimeout(()=>document.getElementById('ex-ans')?.focus(),100);
+}
+
+function checkFill(){
+  const inp=document.getElementById('ex-ans');
+  const fb=document.getElementById('ex-fb');
+  if(!inp||!fb) return;
+  const val=inp.value.trim().toLowerCase().replace(/[¿¡]/g,'');
+  const correct=exState.data[exState.index].answer.toLowerCase().replace(/[¿¡]/g,'');
+  const ok=val===correct;
+  inp.classList.add(ok?'correct':'wrong');
+  fb.className='ex-feedback '+(ok?'correct':'wrong');
+  fb.innerHTML=ok?'✓ Correcto! '+(exState.data[exState.index].explanation||''):'✗ Answer: <strong>'+esc(exState.data[exState.index].answer)+'</strong><br><span style="font-size:10px;">'+esc(exState.data[exState.index].explanation||'')+'</span>';
+  inp.disabled=true;
+  document.getElementById('next-btn').style.display='inline-block';
+}
+
+function nextFill(){
+  exState.index=(exState.index+1)%exState.data.length;
+  showFillItem();
+}
+
+// ── MULTIPLE CHOICE (POR/PARA) ───────────────────────────
+function buildMC(data,title,area){
+  const shuffled=[...data].sort(()=>Math.random()-0.5);
+  exState.data=shuffled; exState.index=0; exState.area=area; exState.title=title;
+  showMCItem();
+}
+
+function showMCItem(){
+  const item=exState.data[exState.index];
+  const el=document.getElementById('ex-active');
+  el.innerHTML=`
+    <button class="ex-back" onclick="closeExercise()">← back</button>
+    <div class="ex-header">
+      <div class="ex-title">${esc(exState.title)}</div>
+      <div class="ex-progress">${exState.index+1} / ${exState.data.length}</div>
+    </div>
+    <div class="ex-question">${esc(item.q)}</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${item.options.map((o,i)=>`<button class="mc-option" onclick="checkMC(${i})">${esc(o)}</button>`).join('')}
+    </div>
+    <div class="ex-feedback" id="ex-fb"></div>
+    <button class="ex-btn ex-btn-next" id="next-btn" onclick="nextMC()" style="display:none">next →</button>`;
+}
+
+function checkMC(i){
+  const item=exState.data[exState.index];
+  const chosen=item.options[i];
+  const ok=chosen===item.answer;
+  const opts=document.querySelectorAll('.mc-option');
+  opts.forEach(b=>{ b.disabled=true; b.onclick=null; });
+  opts[i].classList.add(ok?'correct':'wrong');
+  if(!ok) opts[item.options.indexOf(item.answer)].classList.add('reveal');
+  const fb=document.getElementById('ex-fb');
+  fb.className='ex-feedback '+(ok?'correct':'wrong');
+  fb.textContent=(ok?'✓ Correcto! ':'✗ Answer: '+item.answer+' — ')+(item.explanation||'');
+  document.getElementById('next-btn').style.display='block';
+}
+
+function nextMC(){
+  exState.index=(exState.index+1)%exState.data.length;
+  showMCItem();
+}
+
+// ── FLASHCARDS ───────────────────────────────────────────
+const FC_DATA=[
+  {word:'ahorita',translation:'right now / in a moment (Mexico)',example:'Ahorita vengo.'},
+  {word:'plata',translation:'money (LatAm informal)',example:'No tengo plata.'},
+  {word:'chévere',translation:'cool / great (Colombia, Venezuela)',example:'¡Qué chévere!'},
+  {word:'lindo/a',translation:'pretty / cute / nice',example:'¡Qué lindo día!'},
+  {word:'bacán',translation:'cool / awesome (Andean countries)',example:'Eso es bacán.'},
+  {word:'cuadra',translation:'city block',example:'Vive a dos cuadras.'},
+  {word:'manejar',translation:'to drive (LatAm) — not conducir',example:'¿Sabes manejar?'},
+  {word:'celular',translation:'mobile phone',example:'¿Cuál es tu celular?'},
+  {word:'departamento',translation:'apartment (LatAm) — not piso',example:'Vivo en un departamento.'},
+  {word:'carro',translation:'car (LatAm) — not coche',example:'Mi carro está en el taller.'},
+  {word:'computadora',translation:'computer (LatAm) — not ordenador',example:'¿Tienes computadora?'},
+  {word:'fresa',translation:'snobby / preppy (Mexico slang)',example:'Es muy fresa.'},
+  {word:'macanudo',translation:'great / excellent (Argentina)',example:'Todo estuvo macanudo.'},
+  {word:'palta',translation:'avocado (South America) — not aguacate',example:'Quiero palta en el sándwich.'},
+  {word:'torta',translation:'sandwich (Mexico) / cake (elsewhere)',example:'Una torta de pollo, por favor.'},
+  {word:'neta',translation:'truth / real talk (Mexico)',example:'La neta, no sé.'},
+  {word:'chamba',translation:'work / job (Mexico, Peru)',example:'Tengo mucha chamba.'},
+  {word:'güey / wey',translation:'dude (Mexico, casual)',example:'¿Qué onda, güey?'},
+  {word:'onda',translation:'vibe / scene / what\'s up',example:'¿Qué onda?'},
+  {word:'al tiro',translation:'right away (Chile)',example:'Voy al tiro.'},
+  {word:'cachai',translation:'you get it? / right? (Chile)',example:'Es complicado, ¿cachai?'},
+  {word:'pibe',translation:'kid / dude (Argentina)',example:'Ese pibe sabe mucho.'},
+  {word:'laburo',translation:'work / job (Argentina)',example:'Tengo laburo todo el día.'},
+  {word:'andar',translation:'to be (in a state)',example:'Ando bien, gracias.'},
+  {word:'vaina',translation:'thing / situation (Colombia, Venezuela)',example:'¿Qué vaina es esa?'},
+  {word:'estar pilas',translation:'to be alert / on the ball (Colombia)',example:'Hay que estar pilas.'},
+  {word:'de una',translation:'for sure / let\'s do it (Colombia)',example:'¿Vamos? — ¡De una!'},
+  {word:'cuate',translation:'buddy / twin (Mexico)',example:'Es mi cuate de infancia.'},
+  {word:'chido/a',translation:'cool (Mexico)',example:'Ese lugar está muy chido.'},
+  {word:'mande',translation:'pardon? / yes? (Mexico polite)',example:'¿Mande? No escuché.'},
+  {word:'oiga',translation:'excuse me / hey (polite)',example:'Oiga, ¿me puede ayudar?'},
+  {word:'jitomate',translation:'tomato (Mexico) — not tomate',example:'Pon más jitomate.'},
+  {word:'elevador',translation:'elevator (LatAm) — not ascensor',example:'El elevador está roto.'},
+  {word:'camión',translation:'bus (Mexico) — not autobús',example:'Tomo el camión al trabajo.'},
+  {word:'tomar',translation:'to take / to drink',example:'Toma el bus / Toma café.'},
+  {word:'qué pena',translation:'what a shame / I\'m embarrassed (Colombia)',example:'Qué pena, no pude ir.'},
+  {word:'encargo',translation:'errand / something to pick up',example:'Tengo un encargo para ti.'},
+  {word:'chambear',translation:'to work (Mexico)',example:'Hay que chambear.'},
+  {word:'parchar',translation:'to hang out (Colombia)',example:'¿Parcheamos hoy?'},
+  {word:'coger',translation:'AVOID in LatAm (vulgar) — use tomar instead',example:'Use tomar in LatAm.'},
+  {word:'flaco/a',translation:'buddy / dude (Argentina affectionate)',example:'¿Cómo andás, flaco?'},
+  {word:'antojo',translation:'craving / street food snack',example:'Tengo un antojo de tacos.'},
+  {word:'mordida',translation:'bribe (Mexico informal)',example:'Le dieron una mordida.'},
+  {word:'tianguis',translation:'open-air market (Mexico)',example:'Compré en el tianguis.'},
+  {word:'alberca',translation:'swimming pool (Mexico) — not piscina',example:'La alberca está cerrada.'},
+  {word:'popote',translation:'straw (Mexico) — not pajita',example:'Dame un popote.'},
+  {word:'fregado/a',translation:'messed up / in trouble (Mexico)',example:'Estoy bien fregado.'},
+  {word:'chaqueta',translation:'jacket (LatAm) — NOT rude like in Spain',example:'Trae tu chaqueta.'},
+  {word:'a huevo',translation:'hell yes / for sure (Mexico vulgar-casual)',example:'¿Vamos? — ¡A huevo!'},
+  {word:'¿mande?',translation:'sorry? / pardon? (Mexico polite)',example:'¿Mande? No te escuché.'},
+];
+
+function buildFlashcard(){
+  const shuffled=[...FC_DATA].sort(()=>Math.random()-0.5);
+  exState.data=shuffled; exState.index=0; exState.known=0; exState.again=0;
+  showFC();
+}
+
+function showFC(){
+  const item=exState.data[exState.index];
+  const el=document.getElementById('ex-active');
+  el.innerHTML=`
+    <button class="ex-back" onclick="closeExercise()">← back</button>
+    <div class="ex-header">
+      <div class="ex-title">Flashcards</div>
+      <div class="ex-progress">${exState.index+1} / ${exState.data.length} · ✓${exState.known} again:${exState.again}</div>
+    </div>
+    <div class="flashcard" onclick="revealFC()">
+      <div class="flashcard-word">${esc(item.word)}</div>
+      <div class="flashcard-hint">tap to reveal</div>
+      <div class="flashcard-back" id="fc-back">
+        <div class="flashcard-translation">${esc(item.translation)}</div>
+        <div class="flashcard-example">${esc(item.example)}</div>
+      </div>
+    </div>
+    <div class="fc-btn-row" id="fc-btns" style="display:none">
+      <button class="fc-btn-again" onclick="fcAns(false)">✗ again</button>
+      <button class="fc-btn-know" onclick="fcAns(true)">✓ got it</button>
+    </div>`;
+}
+
+function revealFC(){
+  document.getElementById('fc-back')?.classList.add('visible');
+  const btns=document.getElementById('fc-btns');
+  if(btns) btns.style.display='flex';
+  const hint=document.querySelector('.flashcard-hint');
+  if(hint) hint.style.display='none';
+}
+
+function fcAns(known){
+  if(known) exState.known++; else exState.again++;
+  exState.index=(exState.index+1)%exState.data.length;
+  showFC();
+}
+
+// ── TRANSLATION ──────────────────────────────────────────
+const TRANS_DATA=[
+  {from:'I went to the market yesterday.',to:'Fui al mercado ayer.',lang:'EN'},
+  {from:'She has been living here for three years.',to:'Ella lleva tres años viviendo aquí.',lang:'EN'},
+  {from:'I hope you arrive on time.',to:'Espero que llegues a tiempo.',lang:'EN'},
+  {from:'When I was a child I lived in the Netherlands.',to:'Cuando era niño vivía en los Países Bajos.',lang:'EN'},
+  {from:'Ik wil dat jij me helpt.',to:'Quiero que me ayudes.',lang:'NL'},
+  {from:'Ze vertelde me dat ze moe was.',to:'Me dijo que estaba cansada.',lang:'NL'},
+  {from:'If I had more time, I would travel more.',to:'Si tuviera más tiempo, viajaría más.',lang:'EN'},
+  {from:'He was sleeping when I called.',to:'Él dormía cuando llamé.',lang:'EN'},
+  {from:'Ik werk voor een logistiek bedrijf.',to:'Trabajo para una empresa de logística.',lang:'NL'},
+  {from:'I need someone who speaks Spanish.',to:'Necesito a alguien que hable español.',lang:'EN'},
+  {from:'We left without saying goodbye.',to:'Nos fuimos sin despedirnos.',lang:'EN'},
+  {from:'Heb je al gegeten?',to:'¿Ya comiste?',lang:'NL'},
+  {from:'The meeting is at three o\'clock.',to:'La reunión es a las tres.',lang:'EN'},
+  {from:'I\'ve already been here for two hours.',to:'Ya llevo dos horas aquí.',lang:'EN'},
+  {from:'Ze is zo moe dat ze niet kan slapen.',to:'Está tan cansada que no puede dormir.',lang:'NL'},
+  {from:'Call me as soon as you arrive.',to:'Llámame en cuanto llegues.',lang:'EN'},
+  {from:'I\'m glad you\'re feeling better.',to:'Me alegra que te sientas mejor.',lang:'EN'},
+  {from:'Ik reed door de stad.',to:'Manejé por la ciudad.',lang:'NL'},
+  {from:'This package is for you.',to:'Este paquete es para ti.',lang:'EN'},
+  {from:'I sold my bike for 150 euros.',to:'Vendí mi bicicleta por 150 euros.',lang:'EN'},
+];
+
+function buildTranslation(){
+  const shuffled=[...TRANS_DATA].sort(()=>Math.random()-0.5);
+  exState.data=shuffled; exState.index=0;
+  showTrans();
+}
+
+function showTrans(){
+  const item=exState.data[exState.index];
+  const el=document.getElementById('ex-active');
+  el.innerHTML=`
+    <button class="ex-back" onclick="closeExercise()">← back</button>
+    <div class="ex-header">
+      <div class="ex-title">Translation</div>
+      <div class="ex-progress">${exState.index+1} / ${exState.data.length}</div>
+    </div>
+    <div class="ex-question"><span style="font-size:9px;color:#555;letter-spacing:0.1em;">${item.lang}</span><br>${esc(item.from)}</div>
+    <textarea class="ex-input" id="ex-ans" rows="2" placeholder="escribe tu traducción..."></textarea>
+    <div class="ex-feedback" id="ex-fb"></div>
+    <div class="ex-btn-row">
+      <button class="ex-btn ex-btn-check" onclick="checkTrans()">check</button>
+      <button class="ex-btn ex-btn-next" id="next-btn" onclick="nextTrans()" style="display:none">next →</button>
+    </div>`;
+  setTimeout(()=>document.getElementById('ex-ans')?.focus(),100);
+}
+
+function checkTrans(){
+  const fb=document.getElementById('ex-fb');
+  const inp=document.getElementById('ex-ans');
+  if(!fb||!inp) return;
+  fb.className='ex-feedback correct';
+  fb.innerHTML='Reference: <strong>'+esc(exState.data[exState.index].to)+'</strong><br><span style="font-size:10px;color:#555;">Did your translation convey the same meaning?</span>';
+  inp.disabled=true;
+  document.getElementById('next-btn').style.display='inline-block';
+}
+
+function nextTrans(){
+  exState.index=(exState.index+1)%exState.data.length;
+  showTrans();
+}
+
+// ── GRAMMAR REF ──────────────────────────────────────────
+const GRAM_REF=[
+  {title:'Ser vs Estar',lines:[
+    'SER: permanent/defining — identity, origin, profession, time, material, ownership',
+    'ESTAR: temporary/changing — location, emotion, condition, ongoing actions',
+    'Ser: "Soy holandés." · "Es médico." · "Son las tres." · "La mesa es de madera."',
+    'Estar: "Estoy cansado." · "¿Dónde está el banco?" · "El café está frío."',
+    'Watch out: "Es aburrido" (boring person) vs "Está aburrido" (bored right now)',
+  ]},
+  {title:'Preterite vs Imperfect',lines:[
+    'PRETERITE: completed action, specific time — "Ayer fui al mercado."',
+    'IMPERFECT: habitual past, background/scene — "De niño vivía en Rotterdam."',
+    'Interrupted action: imperfect (background) + preterite (interruption)',
+    '"Dormía cuando sonó el teléfono." — was sleeping when the phone rang',
+    'Key imperfect signals: siempre, todos los días, mientras, cuando (habitual)',
+  ]},
+  {title:'Subjunctive basics',lines:[
+    'Use after: desire, emotion, doubt, impersonal expressions, certain conjunctions',
+    'Desire: "Quiero que vengas." · "Espero que llegues."',
+    'Emotion: "Me alegra que estés bien." · "Es una lástima que no puedas."',
+    'Doubt/negation: "No creo que sea verdad." · "No hay nadie que sepa."',
+    'Time (future): "Cuando llegues, llámame." · "Tan pronto como termines."',
+  ]},
+  {title:'Por vs Para',lines:[
+    'POR: cause/reason, exchange, duration, means, on behalf of, movement through',
+    'PARA: purpose/goal, destination, deadline, recipient, employer, opinion',
+    'Por: "Lo hice por amor." · "Pagué 20€ por el libro." · "Gracias por todo."',
+    'Para: "Estudio para aprender." · "Salgo para México." · "Trabajo para FedEx."',
+    'Tricky: "Lo hizo por mí" (on my behalf) vs "Lo hizo para mí" (intended for me)',
+  ]},
+];
+
+function buildGrammarRef(){
+  const el=document.getElementById('ex-active');
+  let html=`<button class="ex-back" onclick="closeExercise()">← back</button><div class="ex-title" style="margin-bottom:4px;">Grammar Reference</div>`;
+  GRAM_REF.forEach(c=>{
+    html+=`<div class="ref-card"><div class="ref-title">${esc(c.title)}</div>`;
+    c.lines.forEach(l=>{ html+=`<div class="ref-line">${esc(l)}</div>`; });
+    html+=`</div>`;
+  });
+  el.innerHTML=html;
+}
+
+// ── CHAT ─────────────────────────────────────────────────
+const SYS=`You are a Latin American Spanish conversation partner and language coach for a Dutch native speaker (Mark, 31) who thinks in English and wants to improve his Spanish grammar and vocabulary. He talks with Latin American Spanish speakers.
+
+CONVERSATION RULES:
+- Always respond in Latin American Spanish (ustedes not vosotros, tú as default, neutral LatAm vocabulary)
+- Keep responses natural, conversational, 3-6 sentences max
+- Match his interests: cycling, trading, cooking, work logistics
+
+TALLER RULES:
+- Flag 1-3 grammar or vocabulary points MAX after your response
+- For vocabulary: flag workarounds where a cleaner LatAm word exists
+- Be encouraging but honest
+
+LANGUAGE MODE: passed in each message. Obey strictly:
+- mode "ES": entire response including taller in Spanish
+- mode "EN": Spanish conversation, English taller explanations
+
+OUTPUT FORMAT — respond ONLY with valid JSON, no markdown fences:
+{"response":"...","taller":[{"original":"...","corrected":"...","explanation":"..."}],"vocab":[{"used":"...","better":"...","meaning":"..."}],"strengths":["..."]}
+
+Empty arrays if nothing to flag. strengths always has at least one item.`;
+
+async function callAPI(messages,system){
+  const key=getKey();
+  const body={model:'claude-sonnet-4-20250514',max_tokens:1000,messages};
+  if(system) body.system=system;
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify(body)
+  });
+  if(!res.ok){ const e=await res.json(); throw new Error(e.error?.message||'API error'); }
+  const d=await res.json();
+  return d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+}
+
+function showKeyScreen(){ document.getElementById('key-screen').classList.add('visible'); document.getElementById('chat-view').style.display='none'; }
+function showChatView(){ document.getElementById('key-screen').classList.remove('visible'); document.getElementById('chat-view').style.display='flex'; }
+function handleChatKey(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } }
+
+function renderMessages(){
+  const c=document.getElementById('chat-messages');
+  if(!c) return;
+  if(!state.messages.length){
+    c.innerHTML='<div class="empty-state"><div class="empty-title">¿De qué quieres hablar?</div><div class="empty-sub">WRITE ANYTHING IN SPANISH TO BEGIN</div></div>';
+    return;
+  }
+  c.innerHTML='';
+  state.messages.forEach(m=>{
+    const d=document.createElement('div');
+    if(m.role==='user'){
+      d.className='msg-user';
+      d.innerHTML=`<div class="msg-user-bubble">${esc(m.text)}</div>`;
+    } else {
+      d.className='msg-ai';
+      let html=`<div class="msg-ai-bubble">${esc(m.response)}</div>`;
+      if(m.strengths?.length) html+='<div class="strength-tags">'+m.strengths.map(s=>`<span class="strength-tag">✓ ${esc(s)}</span>`).join('')+'</div>';
+      if(m.taller?.length){
+        html+='<div class="taller-block"><div class="taller-label">TALLER</div>';
+        m.taller.forEach(t=>{
+          html+=`<div class="taller-item"><span class="taller-orig">${esc(t.original)}</span><span style="color:#555;margin:0 6px">→</span><span class="taller-fix">${esc(t.corrected)}</span><div class="taller-exp">${esc(t.explanation)}</div></div>`;
+        });
+        html+='</div>';
+      }
+      d.innerHTML=html;
+    }
+    c.appendChild(d);
+  });
+  c.scrollTop=c.scrollHeight;
+}
+
+function setLoading(on){
+  document.getElementById('send-btn').disabled=on;
+  const existing=document.getElementById('dots-ind');
+  if(on&&!existing){
+    const d=document.createElement('div'); d.id='dots-ind'; d.className='dots-wrap';
+    d.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+    const c=document.getElementById('chat-messages'); c.appendChild(d); c.scrollTop=99999;
+  } else if(!on&&existing){ existing.remove(); }
+}
+
+async function sendMessage(){
+  const ta=document.getElementById('chat-textarea');
+  const text=ta.value.trim(); if(!text) return;
+  ta.value='';
+  state.messages.push({role:'user',text});
+  renderMessages(); setLoading(true);
+  try{
+    const apiMsgs=state.messages.map(m=>({
+      role:m.role==='user'?'user':'assistant',
+      content:m.role==='user'?`[Language mode: ${state.langMode}]\n${m.text}`:JSON.stringify({response:m.response,taller:m.taller,vocab:m.vocab,strengths:m.strengths})
+    }));
+    const raw=await callAPI(apiMsgs,SYS);
+    const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    state.messages.push({role:'assistant',response:parsed.response,taller:parsed.taller||[],vocab:parsed.vocab||[],strengths:parsed.strengths||[]});
+    if(parsed.vocab?.length){
+      const ex=new Set(state.vocab.map(v=>v.used));
+      parsed.vocab.filter(v=>!ex.has(v.used)).forEach(v=>state.vocab.push(v));
+    }
+    state.exchangeCount++;
+    setLoading(false); renderMessages(); updateHeader(); updateVocabPanel(); saveState();
+    if(state.exchangeCount%5===0) await generateReport();
+  } catch(e){
+    setLoading(false);
+    state.messages.push({role:'assistant',response:'Error: '+e.message,taller:[],vocab:[],strengths:[]});
+    renderMessages();
+  }
+}
+
+async function generateReport(){
+  const el=document.createElement('div'); el.className='report-generating'; el.textContent='⟳ Generating lesson report...';
+  document.getElementById('chat-messages').appendChild(el);
+  try{
+    const slice=state.messages.slice(-10);
+    const hist=slice.map(m=>`[${m.role==='user'?'Student':'AI'}]: ${m.role==='user'?m.text:m.response}`).join('\n');
+    const lang=state.langMode==='EN'?'Write the report in English':'Escribe el informe en español';
+    const rRaw=await callAPI([{role:'user',content:`Spanish language learning analyst. Lesson history (5 exchanges).\n${lang}\nHistory:\n${hist}\n\nJSON only:\n{"lessonNumber":0,"strongPoints":["..."],"weakPoints":[{"area":"...","detail":"...","tip":"..."}],"summary":"..."}`}],null);
+    const report=JSON.parse(rRaw.replace(/```json|```/g,'').trim());
+    report.lessonNumber=state.lessonReports.length+1;
+    report.timestamp=new Date().toISOString();
+    state.lessonReports.push(report);
+    const pRaw=await callAPI([{role:'user',content:`Spanish learning analyst. All reports:\n${JSON.stringify(state.lessonReports)}\n${lang}\n\nJSON only:\n{"totalLessons":0,"coreStrengths":["..."],"persistentWeaknesses":[{"area":"...","frequency":"...","priority":"high/medium/low"}],"vocabularyGrowth":"...","overallLevel":"beginner/lower-intermediate/intermediate/upper-intermediate/advanced","nextFocus":"..."}`}],null);
+    state.profile=JSON.parse(pRaw.replace(/```json|```/g,'').trim());
+    el.remove(); updateHeader(); updateProgressPanel(); updateTeacher(); updateExMenu(); saveState(); switchTab('progress');
+  } catch(e){ el.textContent='Could not generate report: '+e.message; setTimeout(()=>el.remove(),4000); }
+}
+
+// ── VOCAB PANEL ──────────────────────────────────────────
+function updateVocabPanel(){
+  const el=document.getElementById('vocab-list');
+  if(!state.vocab.length){ el.innerHTML='<div class="vocab-empty">No vocabulary yet. Start a conversation.</div>'; return; }
+  el.innerHTML=state.vocab.map(v=>`<div class="vocab-row"><span class="vocab-used">${esc(v.used)}</span><span style="color:#444;font-size:11px">→</span><span class="vocab-better">${esc(v.better)}</span><span class="vocab-meaning">${esc(v.meaning)}</span></div>`).join('');
+}
+
+// ── PROGRESS PANEL ───────────────────────────────────────
+function updateProgressPanel(){
+  const el=document.getElementById('progress-list');
+  let html='';
+  if(state.diagResults){
+    html+=`<div style="background:#111;border:1px solid #2a2a1e;border-radius:4px;padding:14px;margin-bottom:4px;">
+      <div style="font-size:9px;letter-spacing:0.12em;color:#c8a96e;margin-bottom:10px;">DIAGNOSTIC · ${esc(state.diagResults.date)}</div>`;
+    state.diagResults.categories.forEach(c=>{
+      const color=c.pct>=80?'#6ab06a':c.pct>=60?'#c8a96e':'#d06060';
+      html+=`<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px;"><span style="color:#888">${esc(c.name)}</span><span style="color:${color}">${c.score}/${c.total} (${c.pct}%)</span></div>`;
+    });
+    html+=`</div>`;
+  }
+  if(state.profile){
+    html+=`<div class="profile-card">
+      <div class="profile-label">LEARNER PROFILE · ${state.profile.totalLessons} LESSONS</div>
+      <div class="profile-grid">
+        <div><div class="profile-section-title">STRENGTHS</div>${(state.profile.coreStrengths||[]).map(s=>`<div class="profile-strength">✓ ${esc(s)}</div>`).join('')}</div>
+        <div><div class="profile-section-title">WEAK AREAS</div>${(state.profile.persistentWeaknesses||[]).map(w=>`<div class="profile-weak"><span class="priority-${w.priority}">● </span><span style="color:#888">${esc(w.area)}</span></div>`).join('')}</div>
+      </div>
+      <div class="profile-footer"><div class="profile-level">${(state.profile.overallLevel||'').toUpperCase()}</div><div class="profile-next">Next: ${esc(state.profile.nextFocus||'')}</div></div>
+    </div>`;
+  }
+  if(!state.lessonReports.length&&!state.diagResults){
+    html='<div class="progress-empty">No data yet. Do the diagnostic or complete 5 AI exchanges.</div>';
+  }
+  [...state.lessonReports].reverse().forEach(r=>{
+    html+=`<div class="lesson-card">
+      <div class="lesson-header"><div class="lesson-num">LESSON ${r.lessonNumber}</div><div class="lesson-date">${r.timestamp?new Date(r.timestamp).toLocaleDateString():''}</div></div>
+      <div class="lesson-summary">${esc(r.summary||'')}</div>
+      <div class="lesson-grid">
+        <div><div style="font-size:9px;color:#444;letter-spacing:0.1em;margin-bottom:4px;">STRONG</div>${(r.strongPoints||[]).map(s=>`<div class="lesson-strong">✓ ${esc(s)}</div>`).join('')}</div>
+        <div><div style="font-size:9px;color:#444;letter-spacing:0.1em;margin-bottom:4px;">NEEDS WORK</div>${(r.weakPoints||[]).map(w=>`<div class="weak-card"><div class="weak-area">${esc(w.area)}</div><div class="weak-tip">${esc(w.tip)}</div></div>`).join('')}</div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+// ── FOOTER ───────────────────────────────────────────────
+function clearSession(){
+  if(!confirm('Clear chat history? Diagnostic, reports and profile are kept.')) return;
+  state.messages=[]; state.exchangeCount=0;
+  renderMessages(); updateHeader(); saveState();
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='spanish_trainer_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+}
+function importData(e){
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      Object.assign(state,JSON.parse(ev.target.result));
+      renderMessages(); updateHeader(); updateVocabPanel(); updateProgressPanel(); updateExMenu(); updateTeacher(); saveState();
+    } catch(err){ alert('Invalid file'); }
+  };
+  r.readAsText(file);
+}
+</script>
+</body>
+</html>
