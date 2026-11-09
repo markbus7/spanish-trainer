@@ -1,0 +1,10 @@
+{
+  "name": "espanol-latino",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Leer Latijns-Amerikaans Spaans stap voor stap, van A1 tot C2.",
+  "scripts": {
+    "test": "node tests/run.js",
+    "start": "python3 -m http.server 8080"
+  }
+}
