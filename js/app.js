@@ -599,7 +599,8 @@
       const f = e.target.files[0]; if (!f) return;
       try { Store.import(await f.text()); S.toast('✅ Back-up teruggezet'); applyTheme(); render(); } catch (err) { S.toast('⚠️ ' + err.message); }
     } });
-    return h('div', { class: 'card' }, h('p', { class: 'small muted' }, 'Je voortgang staat alleen op dit apparaat. Maak af en toe een back-up, of zet hem over naar een ander apparaat.'),
+    const where = S.Sync && S.Sync.enabled() ? 'Je voortgang wordt via GitHub gesynchroniseerd tussen je apparaten (zie Instellingen). Een back-up maken kan altijd nog.' : 'Je voortgang staat alleen op dit apparaat. Maak af en toe een back-up, of zet synchroniseren via GitHub aan bij Instellingen.';
+    return h('div', { class: 'card' }, h('p', { class: 'small muted' }, where),
       h('div', { class: 'row gap wrap' },
         h('button', { class: 'btn ghost', type: 'button', onclick: () => {
           const data = JSON.parse(Store.export()); data.settings.aiKey = '';
@@ -717,14 +718,56 @@
       label('API-sleutel', keyIn), label('Model', modelSel),
       h('div', { class: 'row gap' }, h('button', { class: 'btn ghost', type: 'button', onclick: async () => { set('aiKey', keyIn.value.trim()); testOut.textContent = 'Testen…'; try { const t = await S.AI.test(); testOut.textContent = '✅ Werkt: ' + t; } catch (e) { testOut.textContent = '⚠️ ' + e.message; } } }, 'Test verbinding'), testOut),
       s.aiKey ? h('button', { class: 'btn link', type: 'button', onclick: () => { set('aiKey', ''); render(); } }, 'Sleutel verwijderen') : null)));
+    wrap.append(section('☁️ Synchroniseren (optioneel)', syncCard()));
     wrap.append(section('Lessen', h('div', { class: 'card form' },
       toggle('Alle units ontgrendelen', 'Vrij door de stof bladeren, zonder volgorde.', s.unlockAll, v => set('unlockAll', v)),
       h('a', { class: 'btn ghost', href: '#/toets' }, '🧭 Plaatsingstoets opnieuw doen'))));
-    wrap.append(section('Gegevens', dataTools(), h('div', { class: 'card' }, h('button', { class: 'btn danger', type: 'button', onclick: () => S.confirm('Alles wissen?', 'Al je voortgang, woorden en statistieken worden verwijderd. Dit kan niet ongedaan worden gemaakt. Maak eerst een back-up!', 'Alles wissen', () => { Store.reset(); location.hash = '#/hoy'; render(); }) }, '🗑 Voortgang wissen'))));
+    wrap.append(section('Gegevens', dataTools(), h('div', { class: 'card' }, h('button', { class: 'btn danger', type: 'button', onclick: () => S.confirm('Alles wissen?', 'Al je voortgang, woorden en statistieken worden verwijderd' + (S.Sync && S.Sync.enabled() ? ', ook op je andere gekoppelde apparaten' : '') + '. Dit kan niet ongedaan worden gemaakt. Maak eerst een back-up!', 'Alles wissen', () => { Store.reset(); location.hash = '#/hoy'; render(); }) }, '🗑 Voortgang wissen'))));
     wrap.append(h('p', { class: 'muted small center' }, 'Español Latino · lesstof A1–A2 · ' + C.all().length + ' units · ' + C.all().reduce((a, u) => a + u.vocab.length, 0) + ' woorden · ' + Object.keys(S.conj.VERBS).length + ' werkwoorden'));
     return wrap;
   };
   routes.ajustes.tab = 'progreso';
+  function ago(t) {
+    if (!t) return 'nog nooit';
+    const m = Math.round((Date.now() - t) / 60000);
+    return m < 1 ? 'zojuist' : m < 60 ? m + ' min geleden' : m < 1440 ? Math.round(m / 60) + ' uur geleden' : new Date(t).toLocaleDateString('nl-NL');
+  }
+  function syncCard() {
+    const Sync = S.Sync; const card = h('div', { class: 'card form sync-card' }); let msg = '';
+    const draw = () => {
+      const s = Sync.status(); card.innerHTML = '';
+      if (!s.enabled) {
+        const tokIn = h('input', { class: 'input', type: 'password', placeholder: 'github_pat_… of ghp_…', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
+        const out = h('p', { class: 'small' + (msg ? ' warn' : ''), role: 'status' }, msg);
+        const btn = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
+          btn.disabled = true; out.textContent = 'Verbinden…'; msg = '';
+          try { const r = await Sync.connect(tokIn.value); S.toast('☁️ Verbonden als @' + r.login); render(); }
+          catch (e) { msg = '⚠️ ' + e.message; draw(); }
+        } }, 'Verbinden');
+        card.append(
+          h('p', { class: 'small muted' }, 'Wil je op je iPad, telefoon en computer met dezelfde voortgang verder? Koppel dan een GitHub-token. Je voortgang wordt dan in een geheime gist op je eigen GitHub-account bewaard en op elk apparaat automatisch bijgewerkt.'),
+          h('ol', { class: 'small steps-list' },
+            h('li', null, 'Open ', h('a', { href: 'https://github.com/settings/personal-access-tokens/new', target: '_blank', rel: 'noopener' }, 'github.com › Fine-grained token'), '.'),
+            h('li', null, 'Geef het een naam (bijv. «Español Latino») en kies een vervaldatum.'),
+            h('li', null, 'Bij ', h('b', null, 'Account permissions'), ' zet je ', h('b', null, 'Gists'), ' op ', h('b', null, 'Read and write'), '. Meer is niet nodig.'),
+            h('li', null, 'Maak het token aan, kopieer het en plak het hieronder. Doe dit op elk apparaat.')),
+          label('GitHub-token', tokIn), h('div', { class: 'row gap wrap' }, btn), out,
+          h('p', { class: 'small muted' }, 'Het token blijft alleen in deze browser en gaat rechtstreeks naar GitHub. Het komt nooit in je voortgang, back-ups of de gist. Je AI-sleutel wordt niet gesynchroniseerd.'));
+        return;
+      }
+      const state = s.busy ? '🔄 Bezig met synchroniseren…' : s.error ? '⚠️ ' + s.error : s.pending ? '⏳ Wijzigingen worden zo geüpload' : '✅ Bijgewerkt ' + ago(s.last);
+      card.append(
+        h('div', { class: 'row gap between wrap' }, h('div', null, h('b', null, 'Verbonden met GitHub'), h('small', { class: 'muted', style: { display: 'block' } }, s.login ? '@' + s.login : '')), h('span', { class: 'small' + (s.error ? ' warn' : '') }, state)),
+        h('p', { class: 'small muted' }, 'Je voortgang wordt automatisch opgehaald als je de app opent en geüpload na het oefenen. Oefen je op twee apparaten tegelijk? Dan worden woorden, units en statistieken samengevoegd.'),
+        h('div', { class: 'row gap wrap' },
+          h('button', { class: 'btn ghost', type: 'button', disabled: s.busy ? true : null, onclick: () => Sync.syncNow().then(() => S.toast('☁️ Gesynchroniseerd')).catch(e => S.toast('⚠️ ' + e.message)) }, '🔄 Nu synchroniseren'),
+          s.gistId && s.login ? h('a', { class: 'btn link', href: 'https://gist.github.com/' + s.login + '/' + s.gistId, target: '_blank', rel: 'noopener' }, 'Bekijk gist') : null,
+          h('button', { class: 'btn link', type: 'button', onclick: () => S.confirm('Ontkoppelen?', 'Dit apparaat stopt met synchroniseren en vergeet het token. Je voortgang blijft op dit apparaat én in de gist staan.', 'Ontkoppelen', () => { Sync.disconnect(); render(); }) }, 'Ontkoppelen')));
+    };
+    draw();
+    const off = Sync.onChange(() => { if (!card.isConnected) { off(); return; } if (!card.contains(document.activeElement)) draw(); });
+    return card;
+  }
   function label(t, el) { return h('label', { class: 'field' }, h('span', null, t), el); }
   function toggle(t, sub, val, fn) {
     return h('label', { class: 'switch-row' }, h('div', { class: 'grow' }, h('b', null, t), sub ? h('small', { class: 'muted' }, sub) : null),
@@ -741,6 +784,7 @@
     applyTheme(); Speech.init();
     window.addEventListener('hashchange', render);
     render();
+    if (S.Sync) S.Sync.init();
     if ('serviceWorker' in navigator && /^https:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
   }
   S.P = P;

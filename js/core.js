@@ -37,7 +37,7 @@
   const KEY = 'spt.v1';
   function defaults() {
     return {
-      v: 1, created: Date.now(), name: '',
+      v: 1, created: Date.now(), updated: 0, epoch: 0, name: '',
       settings: {
         goal: 20, explain: 'auto', strictAccents: false, voice: '', rate: 0.9, sound: true, theme: 'auto',
         aiKey: '', aiModel: 'claude-opus-5-5', autoSpeak: true, tutorVoice: false, unlockAll: false, region: 'latam'
@@ -65,16 +65,24 @@
       } catch (e) { this.ok = false; }
       return this.state;
     },
-    save() {
+    save(opts) {
+      if (!(opts && opts.quiet)) this.state.updated = Date.now();
       try { localStorage.setItem(KEY, JSON.stringify(this.state)); this.ok = true; } catch (e) { this.ok = false; }
+      if (!(opts && opts.quiet) && S.Sync) S.Sync.changed();
     },
     export() { return JSON.stringify(this.state, null, 1); },
     import(text) {
       const data = JSON.parse(text);
       if (!data || typeof data !== 'object' || !data.settings) throw new Error('Geen geldig back-upbestand');
-      this.state = merge(defaults(), data); this.save();
+      const key = this.state.settings.aiKey;
+      this.state = merge(defaults(), data); this.state.settings.aiKey = key;
+      this.state.epoch = Date.now(); // bewuste vervanging: wint bij synchroniseren
+      this.save();
     },
-    reset() { const key = this.state.settings.aiKey; this.state = defaults(); this.state.settings.aiKey = key; this.save(); },
+    reset() { const key = this.state.settings.aiKey; this.state = defaults(); this.state.settings.aiKey = key; this.state.epoch = Date.now(); this.save(); },
+    /* Twee versies van de voortgang samenvoegen (voor synchronisatie tussen apparaten).
+       Idempotent: twee keer samenvoegen geeft hetzelfde resultaat, dus niets wordt dubbel geteld. */
+    mergeStates(local, remote) { return mergeStates(local, remote); },
     today() {
       const k = U.todayKey();
       if (!this.state.days[k]) this.state.days[k] = { min: 0, xp: 0, items: 0, ok: 0, done: {} };
@@ -104,6 +112,69 @@
   };
   S.Store = Store;
 
+  function mergeStates(local, remote) {
+    const clone = x => JSON.parse(JSON.stringify(x));
+    const A = merge(defaults(), clone(local || {})), B = merge(defaults(), clone(remote || {}));
+    const aiKey = A.settings.aiKey;
+    // na wissen of back-up terugzetten wint de nieuwste "epoch" in zijn geheel
+    if ((A.epoch || 0) !== (B.epoch || 0)) {
+      const w = (A.epoch || 0) > (B.epoch || 0) ? A : B;
+      w.settings.aiKey = aiKey; return w;
+    }
+    const aNewer = (A.updated || 0) >= (B.updated || 0);
+    const N = aNewer ? A : B, O = aNewer ? B : A;
+    const out = clone(N);
+    const max = (x, y) => Math.max(x || 0, y || 0);
+    out.created = Math.min(A.created || Date.now(), B.created || Date.now());
+    out.updated = max(A.updated, B.updated);
+    out.settings.aiKey = aiKey;
+    if (!N.placement.done && O.placement.done) out.placement = clone(O.placement);
+    if (!out.name && O.name) out.name = O.name;
+    // units: stappen en status samenvoegen
+    for (const id in O.units) {
+      const o = O.units[id], n = out.units[id];
+      if (!n) { out.units[id] = clone(o); continue; }
+      n.steps = n.steps || {};
+      for (const k in o.steps || {}) if (o.steps[k] && !n.steps[k]) n.steps[k] = o.steps[k];
+      n.best = max(n.best, o.best); n.done = !!(n.done || o.done);
+      if (o.tested || n.tested) n.tested = true;
+    }
+    for (const id in O.levels) {
+      const o = O.levels[id], n = out.levels[id];
+      if (!n) { out.levels[id] = clone(o); continue; }
+      n.passed = !!(n.passed || o.passed); n.best = max(n.best, o.best);
+    }
+    // herhaalsysteem: per kaart de meest recent geoefende versie
+    const stamp = c => c.t || c.s || 0;
+    for (const id in O.srs) {
+      const o = O.srs[id], n = out.srs[id];
+      if (!n || stamp(o) > stamp(n) || (stamp(o) === stamp(n) && (o.r || 0) + (o.l || 0) > (n.r || 0) + (n.l || 0))) out.srs[id] = clone(o);
+    }
+    for (const id in O.tags) {
+      const o = O.tags[id], n = out.tags[id];
+      if (!n) { out.tags[id] = clone(o); continue; }
+      n.ok = max(n.ok, o.ok); n.no = max(n.no, o.no); n.last = max(n.last, o.last);
+    }
+    for (const k in O.skills) {
+      const o = O.skills[k], n = out.skills[k] || (out.skills[k] = { ok: 0, no: 0 });
+      n.ok = max(n.ok, o.ok); n.no = max(n.no, o.no);
+    }
+    for (const k in O.days) {
+      const o = O.days[k], n = out.days[k];
+      if (!n) { out.days[k] = clone(o); continue; }
+      for (const f of ['min', 'xp', 'items', 'ok']) n[f] = max(n[f], o[f]);
+      n.done = Object.assign({}, o.done || {}, n.done || {});
+    }
+    out.xp = max(A.xp, B.xp);
+    const sa = A.streak, sb = B.streak;
+    const later = (sa.last || '') > (sb.last || '') ? sa : (sb.last || '') > (sa.last || '') ? sb : (sa.cur >= sb.cur ? sa : sb);
+    out.streak = { cur: later.cur, last: later.last, best: Math.max(sa.best || 0, sb.best || 0, later.cur || 0) };
+    out.badges = [...new Set([...(N.badges || []), ...(O.badges || [])])];
+    out.done = Object.assign({}, O.done || {}, N.done || {});
+    if (!out.current) out.current = O.current;
+    return out;
+  }
+
   /* ================= Herhaalsysteem (vereenvoudigd SM-2, per dag) ================= */
   const SRS = {
     add(id, firstInterval = 1) {
@@ -117,6 +188,7 @@
       const db = Store.state.srs; const c = db[id];
       if (!c) return;
       const today = U.dayIndex();
+      c.t = Date.now();
       if (ok) {
         if (c.d > today) return; // vroeg geoefend: geen sprong
         c.r++;

@@ -38,6 +38,14 @@ De instelling *Automatisch* geeft uitleg in het Nederlands tot en met A2. Vanaf 
 
 De sleutel wordt alleen in je eigen browser bewaard en gaat rechtstreeks naar Anthropic. Hij komt nooit in een back-up terecht.
 
+## Voortgang synchroniseren tussen apparaten (optioneel)
+Wil je op iPad, telefoon en computer met dezelfde voortgang verder? Koppel dan een GitHub-token. De app bewaart je voortgang in een **geheime gist** op je eigen GitHub-account.
+
+1. Maak een [fine-grained token](https://github.com/settings/personal-access-tokens/new) aan. Zet bij *Account permissions* alleen **Gists** op *Read and write*. Een klassiek token met de scope `gist` werkt ook.
+2. Ga in de app naar ⚙️ **Instellingen → Synchroniseren** en plak het token. Doe dit op elk apparaat.
+
+De app haalt je voortgang op als je hem opent en uploadt hem kort na het oefenen. Heb je op twee apparaten geoefend, dan worden woorden, units en statistieken samengevoegd. Het token blijft alleen in de browser van dat apparaat. Het komt nooit in de voortgang, in back-ups of in de gist. Je AI-sleutel wordt niet gesynchroniseerd.
+
 ## Routekaart
 - ✅ **Fase 1:** basis, plaatsingstoets, herhaalsysteem, A1 + A2 compleet, AI-docent
 - ⏳ **Fase 2:** B1 (subjuntivo, condicional, meningen en argumenteren)
