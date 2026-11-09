@@ -290,11 +290,14 @@
       let s = 0;
       if (l === 'es-mx') s = 100; else if (l === 'es-us') s = 95; else if (l === 'es-419') s = 92;
       else if (/es-(co|ar|cl|pe|ve|uy|cr|ec|gt|pa|pr|do|bo|py|sv|hn|ni|cu)/.test(l)) s = 85; else if (l === 'es-es') s = 30; else s = 50;
-      if (/google|natural|premium|enhanced|neural/i.test(v.name)) s += 8;
+      if (/google|natural|premium|enhanced|neural|siri|mejorad/i.test(v.name)) s += 8;
+      // Apple-effectstemmen (iOS/macOS) klinken robotachtig of grappig: alleen als niets anders er is
+      if (/\b(eddy|flo|grandma|grandpa|abuel[ao]|reed|rocko|sandy|shelley|bad news|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|albert|fred|junior|kathy|ralph)\b/i.test(v.name)) s -= 70;
       if (/paulina|juan|sabina|monica|mónica/i.test(v.name) && l !== 'es-es') s += 3;
       return s;
     },
     voice() {
+      if (!this.voices.length && 'speechSynthesis' in window) this.voices = speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang));
       const want = Store.state.settings.voice;
       if (want) { const v = this.voices.find(x => x.voiceURI === want || x.name === want); if (v) return v; }
       return this.voices.slice().sort((a, b) => this.rank(b) - this.rank(a))[0] || null;
