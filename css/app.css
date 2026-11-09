@@ -333,3 +333,5 @@ input[type=range] { width: 100%; accent-color: var(--teal); }
   .prompt { font-size: 1.8rem; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+.steps-list { margin: .2rem 0 .4rem; padding-left: 1.3rem; } .steps-list li { margin: .25rem 0; }
