@@ -820,6 +820,7 @@
   function boot() {
     Store.load();
     applyTheme(); Speech.init();
+    const ver = document.getElementById('tb-ver'); if (ver) ver.textContent = appVersion();
     window.addEventListener('hashchange', render);
     render();
     if (S.Sync) S.Sync.init();
