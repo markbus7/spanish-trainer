@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/extra.js', 'js/gen.js']) {
+for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/extra.js', 'js/gen.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -65,7 +65,7 @@ ok(C('ano', ['año']).warn === 'enye', 'ñ-waarschuwing');
 
 /* ---------- lesstof ---------- */
 const units = S.C.all();
-ok(units.length === 20, 'aantal units = ' + units.length);
+ok(units.length === 22, 'aantal units = ' + units.length);
 const ids = new Set();
 const tags = S.C.TAGS;
 for (const u of units) {
@@ -106,6 +106,11 @@ for (const u of units) {
   u.dialogue.lines.forEach((l, i) => ok(l.length === 3 && l.every(Boolean), where + ' dialoogregel ' + i));
   ok(u.dialogue.q.length >= 3 && u.dialogue.q.every(q => new Set(q.o).size === q.o.length), where + ' dialoogvragen');
   ok(u.culture && u.culture.html, where + ' cultuur');
+  ok(u.reading && u.reading.t && u.reading.p.length >= 3, where + ' leestekst');
+  if (u.reading) {
+    u.reading.p.forEach((pp, i) => ok(pp.length === 2 && pp.every(x => typeof x === 'string' && x.trim()), where + ' leestekst alinea ' + i));
+    ok(u.reading.q.length >= 3 && u.reading.q.every(q => q.t === 'mc' && new Set(q.o).size === q.o.length), where + ' leesvragen');
+  }
   ok(u.say.length >= 2 && u.task && u.task.model && u.scenario && u.scenario.role, where + ' toepassen');
   (u.verbs || []).forEach(v => ok(S.conj.info(v), where + ' werkwoord onbekend: ' + v));
   (u.tenses || []).forEach(t => ok(S.conj.TENSES[t], where + ' tijd onbekend: ' + t));

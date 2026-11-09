@@ -247,6 +247,14 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .dl.right .bubble { border-radius: 16px 16px 4px 16px; background: var(--accent-soft); border-color: transparent; }
 .dl .who { font-size: .72rem; font-weight: 700; color: var(--muted); } .dl .icon-btn { margin: 0; }
 .dl.active .bubble { outline: 3px solid var(--gold); }
+.reading .rd-body { display: flex; flex-direction: column; gap: .7rem; margin-top: 1rem; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: .9rem 1rem; }
+.rd-p { display: flex; gap: .5rem; align-items: flex-start; }
+.rd-p .icon-btn { margin: 0; flex: none; }
+.rd-text { flex: 1; cursor: pointer; min-width: 0; }
+.rd-text p { margin: 0; line-height: 1.6; font-size: 1.05rem; font-weight: 500; }
+.rd-text .nl { margin-top: .3rem; font-size: .9rem; color: var(--muted); }
+.rd-gl { margin-top: .8rem; } .rd-gl summary { cursor: pointer; font-weight: 700; }
+.rd-gl ul { margin: .5rem 0 0; padding-left: 1.2rem; line-height: 1.6; }
 .nl.hidden { display: none; }
 .write-area { margin-top: .6rem; min-height: 140px; resize: vertical; }
 .task { font-weight: 600; }

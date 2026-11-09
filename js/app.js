@@ -353,6 +353,7 @@
     const tabs = [['📖 Grammatica', () => h('div', null, u.grammar.map(g => S.Lesson.grammarBlock(g)))],
       ['🃏 Woorden', () => wordList(u)],
       ['💬 Dialoog', () => dialogueRead(u)],
+      ['📰 Lezen', () => u.reading ? readingRead(u) : h('p', null, '—')],
       ['🌎 Cultuur', () => u.culture ? h('div', { class: 'info' }, h('h2', null, u.culture.t), h('div', { class: 'prose', html: u.culture.html })) : h('p', null, '—')]];
     const tabBar = h('div', { class: 'tabs', role: 'tablist' }); const pane = h('div', { class: 'tab-pane' });
     let curTab = 0; try { curTab = +(sessionStorage.getItem('spt.utab') || 0); } catch (e) { /* */ }
@@ -381,6 +382,12 @@
     const d = u.dialogue;
     return h('div', { class: 'dl-list read' }, h('p', { class: 'muted small' }, d.place + ' — ' + d.t),
       d.lines.map(([who, es, nl]) => h('div', { class: 'dl-read' }, S.Lesson.speakBtn(es), h('div', null, h('b', null, who + ': '), h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl)))));
+  }
+
+  function readingRead(u) {
+    const r = u.reading;
+    return h('div', { class: 'dl-list read' }, h('p', { class: 'muted small' }, (r.type || 'Lectura') + ' — ' + r.t),
+      r.p.map(([es, nl]) => h('div', { class: 'dl-read' }, S.Lesson.speakBtn(es), h('div', null, h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl)))));
   }
 
   /* ================= PRÁCTICA ================= */

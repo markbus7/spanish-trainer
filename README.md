@@ -16,8 +16,8 @@ npm start            # = python3 -m http.server 8080 → http://localhost:8080
 
 | Onderdeel | Inhoud |
 |---|---|
-| **Curriculum** | 20 units (A1 en A2), elk met 6 stappen: *Woorden 1 · Woorden 2 · Grammatica · Dialoog · Toepassen · Unittoets* |
-| **Lesstof** | ±580 woorden, ±300 oefeningen, 20 dialogen uit 10 landen, uitleg in het Nederlands |
+| **Curriculum** | 22 units (10 × A1, 12 × A2), elk met 7 stappen: *Woorden 1 · Woorden 2 · Grammatica · Dialoog · Lezen · Toepassen · Unittoets* |
+| **Lesstof** | ±1.000 woorden, ±440 oefeningen, 22 dialogen en 22 leesteksten uit 12 landen, uitleg in het Nederlands |
 | **Plaatsingstoets** | Adaptief (A1 → B2). Bepaalt je startpunt. |
 | **Herhaalsysteem** | Spaced repetition voor woorden, grammatica én werkwoorden. Wat je fout doet, komt sneller terug. |
 | **Oefenvormen** | meerkeuze, invullen, vertalen, zinnen bouwen, paren koppelen, dictee, uitspraak (spraakherkenning), schrijfopdrachten |
@@ -66,9 +66,12 @@ js/lesson.js        lesmotor (alle oefenvormen)
 js/ai.js            AI-docent (Claude API)
 js/app.js           schermen en navigatie
 content/a1.js       lesstof A1 · content/a2.js lesstof A2 · content/extra.js toets, regio’s, rollenspellen
+content/*-plus.js   aanvullingen per unit (extra woorden, oefeningen, leesteksten)
 ```
 
 Een nieuw niveau voeg je toe door een bestand `content/b1.js` aan te maken in hetzelfde formaat en het in `index.html` en `sw.js` op te nemen.
+
+Wil je een bestaande unit aanvullen, gebruik dan `S.extendUnit(id, { vocab, ex, reading })` (zie `content/a1-plus.js`). Woorden en oefeningen komen dan altijd achteraan. Voeg ze nooit in het midden toe: de herhaling onthoudt ze op volgnummer.
 
 ```bash
 npm test             # controleert alle lesstof, vervoegingen en de antwoordcontrole
