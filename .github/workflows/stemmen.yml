@@ -4,7 +4,7 @@ name: Stemmen maken
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, 'claude/**']
     paths: ['content/**', 'js/conjugate.js', 'js/curriculum.js', 'tools/**', '.github/workflows/stemmen.yml']
 permissions:
   contents: write
