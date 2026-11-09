@@ -57,6 +57,7 @@ Gewone HTML, CSS en JavaScript. Er is geen build-stap en er zijn geen dependenci
 
 ```
 index.html          app-shell
+js/version.js       versienummer (zie hieronder)
 css/app.css         ontwerp (licht/donker)
 js/core.js          opslag, herhaalsysteem, antwoordcontrole, spraak
 js/conjugate.js     vervoegingsmachine
@@ -69,6 +70,8 @@ content/a1.js       lesstof A1 · content/a2.js lesstof A2 · content/extra.js t
 ```
 
 Een nieuw niveau voeg je toe door een bestand `content/b1.js` aan te maken in hetzelfde formaat en het in `index.html` en `sw.js` op te nemen.
+
+**Versienummer.** Verhoog bij elke wijziging die live gaat het nummer en de datum in `js/version.js`, en het nummer in `package.json` (de test controleert dat ze gelijk zijn). Het nummer staat in ⚙️ Instellingen › Over de app, met een knop *Controleren op updates*. De service worker gebruikt het als cachenaam, dus een nieuw nummer ruimt de oude offline-cache op.
 
 ```bash
 npm test             # controleert alle lesstof, vervoegingen en de antwoordcontrole
