@@ -222,7 +222,8 @@
       section('Waar begin je?',
         h('button', { class: 'choice primary', type: 'button', onclick: () => go(() => { location.hash = '#/toets'; }) }, h('b', null, '🧭 Plaatsingstoets (aanbevolen)'), h('span', null, '±8 minuten. Ik bepaal je niveau en zet je op de juiste plek. Ideaal als je denkt dat je A1 of A2 bent.')),
         h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.all()[0].id) }, h('b', null, '🌱 Vanaf het begin (A1)'), h('span', null, 'Je begint bij unit 1. Units die je al kent, kun je snel afronden met «Ik ken dit al».')),
-        C.unitsOf('A2').length ? h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf('A2')[0].id) }, h('b', null, '🚀 Begin bij A2'), h('span', null, 'Je kunt je al redden in de presente en wilt de verleden tijden leren.')) : null),
+        C.unitsOf('A2').length ? h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf('A2')[0].id) }, h('b', null, '🚀 Begin bij A2'), h('span', null, 'Je kunt je al redden in de presente en wilt de verleden tijden leren.')) : null,
+        C.unitsOf('B1').length ? h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf('B1')[0].id) }, h('b', null, '🌠 Begin bij B1'), h('span', null, 'Je kent de verleden tijden en wilt de subjuntivo, de condicional en argumenteren leren.')) : null),
       h('p', { class: 'muted small center' }, '🔒 Je voortgang wordt alleen op dit apparaat bewaard. Via Voortgang kun je een back-up maken.'));
   };
 
@@ -280,7 +281,7 @@
   /* ================= RUTA ================= */
   routes.ruta = function () {
     const wrap = h('div', { class: 'page' });
-    wrap.append(h('h1', null, 'Tu ruta'), h('p', { class: 'muted' }, 'Van beginner tot meesterschap. Elke unit: woorden → grammatica → dialoog → toepassen → toets.'));
+    wrap.append(h('h1', null, 'Tu ruta'), h('p', { class: 'muted' }, 'Van beginner tot meesterschap. Elke unit: woorden → grammatica → dialoog → lezen → toepassen → toets.'));
     const cur = P.current();
     C.LEVELS.forEach(L => {
       const us = C.unitsOf(L.id); const avail = us.length > 0;
@@ -663,6 +664,12 @@
     let start, text;
     if (!scores.A2 && (scores.A1 || 0) < 6) { start = C.all()[0].id; text = (scores.A1 || 0) >= 4 ? 'Je kent al een flink deel van A1. Begin bij unit 1; units die je al beheerst, rond je snel af met «Ik ken dit al».' : 'Je begint bij A1, unit 1. ¡Vamos!'; }
     else if ((scores.A2 || 0) < 6) { start = C.unitsOf('A2')[0].id; text = 'Je beheerst A1. Je begint bij A2, unit 1: de verleden tijden. A1 blijft beschikbaar om te herhalen.'; }
+    else if (C.unitsOf('B1').length) {
+      start = C.unitsOf('B1')[0].id;
+      text = (scores.B1 || 0) >= 6
+        ? 'Sterk! Je zit op B1-niveau of hoger. Je begint bij B1, unit 1. Ken je een unit al, doe dan meteen de toets («Ik ken dit al»). Zo vind je snel je gaten.'
+        : 'Je beheerst A2. Je begint bij B1, unit 1: de subjuntivo. A1 en A2 blijven beschikbaar om te herhalen.';
+    }
     else {
       start = C.unitsOf('A2')[C.unitsOf('A2').length - 1].id;
       text = (scores.B1 || 0) >= 6

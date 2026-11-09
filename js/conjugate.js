@@ -16,7 +16,9 @@
     fut:   { es: 'futuro simple',          nl: 'toekomende tijd',             level: 'A2' },
     imper: { es: 'imperativo',             nl: 'gebiedende wijs',             level: 'A2' },
     cond:  { es: 'condicional',            nl: 'voorwaardelijke wijs',        level: 'B1' },
-    subj:  { es: 'presente de subjuntivo', nl: 'aanvoegende wijs',            level: 'B1' }
+    subj:  { es: 'presente de subjuntivo', nl: 'aanvoegende wijs',            level: 'B1' },
+    plus:  { es: 'pretérito pluscuamperfecto', nl: 'voltooid verleden tijd (había + -do)', level: 'B1' },
+    neg:   { es: 'imperativo negativo',    nl: 'ontkennende gebiedende wijs (no + …)', level: 'B1' }
   };
 
   /* stem: 'ie' | 'ue' | 'i' | 'uue' (jugar)
@@ -106,7 +108,18 @@
     alquilar: { nl: 'huren' }, reservar: { nl: 'reserveren' }, enviar: { nl: 'sturen' }, contestar: { nl: 'antwoorden' },
     tomarse: { nl: 'innemen (medicijn)' }, cuidar: { nl: 'zorgen voor' }, doblar: { nl: 'afslaan' }, girar: { nl: 'draaien, afslaan' },
     prestar: { nl: 'uitlenen' }, regalar: { nl: 'cadeau geven' }, explicar: { nl: 'uitleggen' }, mandar: { nl: 'sturen' },
-    crecer: { nl: 'groeien', yo: 'crezco' }, nacer: { nl: 'geboren worden', yo: 'nazco' }
+    crecer: { nl: 'groeien', yo: 'crezco' }, nacer: { nl: 'geboren worden', yo: 'nazco' },
+    // ---------- B1 ----------
+    sugerir: { nl: 'voorstellen', stem: 'ie' }, invertir: { nl: 'investeren', stem: 'ie' }, resolver: { nl: 'oplossen', stem: 'ue', part: 'resuelto' },
+    proteger: { nl: 'beschermen', yo: 'protejo' }, preocuparse: { nl: 'zich zorgen maken' }, alegrarse: { nl: 'blij zijn' }, enojarse: { nl: 'boos worden' },
+    casarse: { nl: 'trouwen' }, mudarse: { nl: 'verhuizen' }, molestar: { nl: 'storen, ergeren' }, dudar: { nl: 'twijfelen' }, permitir: { nl: 'toestaan' },
+    reciclar: { nl: 'recyclen' }, contaminar: { nl: 'vervuilen' }, votar: { nl: 'stemmen' }, opinar: { nl: 'vinden, een mening hebben' }, apoyar: { nl: 'steunen' },
+    mejorar: { nl: 'verbeteren' }, avisar: { nl: 'laten weten, waarschuwen' }, llamar: { nl: 'bellen, roepen' }, preguntar: { nl: 'vragen' }, responder: { nl: 'antwoorden' },
+    ahorrar: { nl: 'sparen' }, acabar: { nl: 'eindigen; net (acabar de)' }, dejar: { nl: 'laten; achterlaten; stoppen (dejar de)' }, conseguir: { nl: 'krijgen, bereiken', stem: 'i', yo: 'consigo' },
+    ponerse: { nl: 'worden (tijdelijk); aantrekken', yo: 'pongo', fs: 'pondr', tu: 'pon', part: 'puesto', pret: ['puse','pusiste','puso','pusimos','pusieron'] },
+    enamorarse: { nl: 'verliefd worden' }, beneficiar: { nl: 'ten goede komen aan' }, limitar: { nl: 'beperken' },
+    proponer: { nl: 'voorstellen', yo: 'propongo', fs: 'propondr', tu: 'propón', part: 'propuesto', pret: ['propuse','propusiste','propuso','propusimos','propusieron'] },
+    volverse: { nl: 'worden (blijvend)', stem: 'ue', part: 'vuelto' }, darse: { nl: 'zich geven (darse cuenta)', pres: ['doy','das','da','damos','dan'], pret: ['di','diste','dio','dimos','dieron'], subj: ['dé','des','dé','demos','den'] }
   };
 
   const END = {
@@ -217,6 +230,12 @@
       case 'cond': return withRefl(v, futuro(v, COND));
       case 'subj': return withRefl(v, subjuntivo(v));
       case 'perf': { const p = participio(v); return withRefl(v, VERBS.haber.pres.map(h => h + ' ' + p)); }
+      case 'plus': { const p = participio(v); return withRefl(v, imperfecto(parse('haber')).map(h => h + ' ' + p)); }
+      case 'neg': {
+        if (v.data.noImper) return null;
+        const s = withRefl(v, subjuntivo(v));
+        return [null, 'no ' + s[1], 'no ' + s[2], null, 'no ' + s[4]];
+      }
       case 'prog': { const g = gerundio(v); return withRefl(v, VERBS.estar.pres.map(h => h + ' ' + g)); }
       case 'ira':  return withRefl(v, VERBS.ir.pres.map(h => h + ' a ' + v.base));
       case 'imper': {
@@ -245,9 +264,9 @@
     }
     return alts;
   }
-  function personsFor(tense) { return tense === 'imper' ? [1, 2, 4] : [0, 1, 2, 3, 4]; }
+  function personsFor(tense) { return tense === 'imper' || tense === 'neg' ? [1, 2, 4] : [0, 1, 2, 3, 4]; }
   function personLabel(tense, p) {
-    if (tense === 'imper') return ['', 'tú', 'usted', '', 'ustedes'][p];
+    if (tense === 'imper' || tense === 'neg') return ['', 'tú', 'usted', '', 'ustedes'][p];
     return PERSONS[p];
   }
   function info(inf) { return VERBS[inf] || VERBS[parse(inf).base] || null; }

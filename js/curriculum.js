@@ -30,7 +30,10 @@
     'future': 'futuro simple', 'por-para': 'por vs. para', 'imperative': 'imperativo', 'vocab': 'woordenschat', 'yo-irregular': 'onregelmatige yo-vorm',
     'frequency': 'frequentie', 'muy-mucho': 'muy vs. mucho', 'conj': 'vervoegen',
     'negation': 'ontkenning (nada, nadie, nunca)', 'prep-pron': 'para mí, conmigo', 'connectors': 'verbindingswoorden', 'relative': 'que / lo que / donde',
-    'se-impersonal': 'se impersonal', 'periphrasis': 'acabar de, volver a, dejar de'
+    'se-impersonal': 'se impersonal', 'periphrasis': 'acabar de, volver a, dejar de',
+    'subj-wish': 'subjuntivo: wensen en verzoeken', 'subj-opinion': 'subjuntivo: mening en twijfel', 'subj-emotion': 'subjuntivo: gevoelens',
+    'subj-time': 'cuando + subjuntivo', 'subj-purpose': 'para que / antes de que', 'conditional': 'condicional', 'pluperfect': 'pluscuamperfecto',
+    'neg-imperative': 'ontkennende imperativo', 'reported': 'indirecte rede', 'si-clause': 'si-zinnen', 'become': 'worden (ponerse, volverse…)', 'argument': 'argumenteren'
   };
 
   const units = [];

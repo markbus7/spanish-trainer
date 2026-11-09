@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/extra.js', 'js/gen.js']) {
+for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/extra.js', 'js/gen.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -65,7 +65,7 @@ ok(C('ano', ['año']).warn === 'enye', 'ñ-waarschuwing');
 
 /* ---------- lesstof ---------- */
 const units = S.C.all();
-ok(units.length === 22, 'aantal units = ' + units.length);
+ok(units.length === 32, 'aantal units = ' + units.length);
 const ids = new Set();
 const tags = S.C.TAGS;
 for (const u of units) {
@@ -124,7 +124,8 @@ for (const u of units) {
 }
 ['A1', 'A2', 'B1', 'B2'].forEach(l => ok(S.placement.filter(q => q.lv === l).length === 8, 'plaatsingstoets ' + l));
 S.placement.forEach((q, i) => ok(new Set(q.o).size === q.o.length, 'plaatsingsvraag ' + i));
-ok(S.Gen.levelExam('A1').items.length >= 20 && S.Gen.levelExam('A2').items.length >= 20, 'niveau-examens');
+ok(['A1', 'A2', 'B1'].every(l => S.Gen.levelExam(l).items.length >= 20), 'niveau-examens');
+ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
 
 /* ---------- samenvoegen bij synchroniseren ---------- */
 {
