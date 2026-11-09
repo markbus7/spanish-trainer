@@ -277,13 +277,44 @@
   /* ================= Spraak ================= */
   const Speech = {
     voices: [], ready: false,
+    /* Opnames: vaste lesstof is vooraf ingesproken (audio/<sleutel>.mp3, zie tools/). Anders de stem van het apparaat. */
+    clips: null, el: null,
+    clean(t) { return String(t).normalize('NFC').replace(/\s*\/\s*/g, ', ').replace(/\s+/g, ' ').trim(); },
+    key(t) {
+      const s = this.clean(t).toLowerCase();
+      let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+      for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+      h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+      h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+      return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+    },
+    loadClips() {
+      if (typeof fetch !== 'function' || typeof Audio !== 'function') return;
+      fetch('audio/index.json').then(r => r.ok ? r.json() : null).then(j => { if (j && j.clips) this.clips = new Set(j.clips); }).catch(() => { /* geen opnames */ });
+    },
+    hasClip(text) { return !!(this.clips && Store.state.settings.clips !== false && text && this.clips.has(this.key(text))); },
+    playClip(text, opt) {
+      return new Promise((res, rej) => {
+        const a = this.el || (this.el = new Audio());
+        let done = false;
+        const end = ok => { if (done) return; done = true; a.onended = a.onerror = null; if (this._end === end) this._end = null; ok ? res() : rej(); };
+        this._end = end; // stop() rondt het lopende fragment af
+        a.src = 'audio/' + this.key(text) + '.mp3';
+        a.preservesPitch = true; a.webkitPreservesPitch = true;
+        a.defaultPlaybackRate = a.playbackRate = Math.max(0.5, Math.min(1.5, (opt.slow ? 0.7 : 1) * (Store.state.settings.rate || 0.9) / 0.9));
+        a.onended = () => end(true); a.onerror = () => end(false);
+        const p = a.play(); if (p && p.catch) p.catch(err => end(err && err.name === 'AbortError'));
+        setTimeout(() => end(true), 60000);
+      });
+    },
     init() {
+      this.loadClips();
       if (!('speechSynthesis' in window)) return;
       const load = () => { this.voices = speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)); this.ready = true; };
       load();
       speechSynthesis.addEventListener ? speechSynthesis.addEventListener('voiceschanged', load) : (speechSynthesis.onvoiceschanged = load);
     },
-    canSpeak() { return 'speechSynthesis' in window; },
+    canSpeak() { return 'speechSynthesis' in window || !!this.clips; },
     canListen() { return !!(window.SpeechRecognition || window.webkitSpeechRecognition); },
     rank(v) {
       const l = v.lang.replace('_', '-').toLowerCase();
@@ -303,7 +334,12 @@
       return this.voices.slice().sort((a, b) => this.rank(b) - this.rank(a))[0] || null;
     },
     say(text, opt = {}) {
-      if (!this.canSpeak() || !text) return Promise.resolve();
+      if (!text) return Promise.resolve();
+      if (this.hasClip(text)) { this.stop(); return this.playClip(text, opt).catch(() => this.speak(text, opt)); }
+      return this.speak(text, opt);
+    },
+    speak(text, opt = {}) {
+      if (!('speechSynthesis' in window)) return Promise.resolve();
       return new Promise(res => {
         try {
           speechSynthesis.cancel();
@@ -317,7 +353,7 @@
         } catch (e) { res(); }
       });
     },
-    stop() { try { speechSynthesis.cancel(); } catch (e) { /* */ } },
+    stop() { try { speechSynthesis.cancel(); } catch (e) { /* */ } try { this.el && this.el.pause(); } catch (e) { /* */ } if (this._end) this._end(true); },
     listen() {
       const R = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!R) return Promise.reject(new Error('Spraakherkenning wordt niet ondersteund in deze browser'));

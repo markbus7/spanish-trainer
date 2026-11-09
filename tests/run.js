@@ -150,6 +150,27 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
   ok(Object.keys(M(r, b).units).length === 0 && Object.keys(M(b, r).units).length === 0, 'merge: wissen (epoch) wint');
 }
 
+/* ---------- opnames: alles wat een les voorleest, moet in de inspreeklijst staan ---------- */
+{
+  const list = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/tts-texts.js')], { maxBuffer: 64 << 20 }).toString());
+  const have = new Set(list.map(x => x.k));
+  ok(list.every(x => x.k === S.Speech.key(x.text) && /^es-[A-Z]{2}-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
+  ok(S.Speech.key('¿Cómo  está usted?') === S.Speech.key('¿cómo está usted?'), 'opnames: sleutel negeert hoofdletters en spaties');
+  const miss = new Set();
+  const want = t => { if (t && !have.has(S.Speech.key(t))) miss.add(t); };
+  for (const u of units) for (const st of S.Gen.STEPS) {
+    for (const it of S.Gen.stepSession(u, st.id).items) {
+      want(it.audio); if (it.speakPrompt) want(it.prompt); if (it.kind === 'listen' || it.kind === 'speak') want(it.text);
+      if (it.word) want(it.word.es); if (it.pairs) it.pairs.forEach(p => want(p[0]));
+      const exp = it.answer || (it.answers && it.answers[0]);
+      if (it.sentence) want(it.sentence.replace('___', exp)); else if (it.speakAnswer) want(exp);
+      if (it.conj) want(it.person + ' ' + exp);
+    }
+    u.dialogue.lines.forEach(l => want(l[1])); u.reading.p.forEach(p => want(p[0]));
+  }
+  ok(!miss.size, 'opnames: ' + miss.size + ' teksten ontbreken, bv. ' + [...miss].slice(0, 5).join(' | '));
+}
+
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);

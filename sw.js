@@ -1,5 +1,5 @@
 /* Service worker: offline gebruik. Verhoog VERSION bij elke release. */
-const VERSION = 'espanol-latino-v6';
+const VERSION = 'espanol-latino-v7';
 const ASSETS = ['./', 'index.html', 'css/app.css', 'js/core.js', 'js/sync.js', 'js/conjugate.js', 'js/curriculum.js', 'js/gen.js', 'js/ai.js', 'js/lesson.js', 'js/app.js',
   'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/extra.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())); });

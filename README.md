@@ -32,6 +32,11 @@ npm start            # = python3 -m http.server 8080 → http://localhost:8080
 ### Uitleg in jouw taal, steeds meer Spaans
 De instelling *Automatisch* geeft uitleg in het Nederlands tot en met A2. Vanaf B1 schakelt de app steeds meer over op Spaans. Je kunt dit zelf aanpassen bij Instellingen.
 
+## Stemmen
+Alle vaste lesstof is ingesproken met natuurlijke neurale stemmen uit Latijns-Amerika: woorden, voorbeeldzinnen, dialogen, leesteksten en vervoegingen. Elke dialoog gebruikt een stem uit het land waar hij zich afspeelt. De opnames staan in `audio/`. Wat niet is ingesproken, zoals de antwoorden van de AI-docent, leest je apparaat zelf voor.
+
+De opnames maakt de GitHub-actie **Stemmen maken** met de gratis voorleesstemmen van Microsoft Edge (`edge-tts`, geen sleutel nodig). Hij draait vanzelf als de lesstof op `main` verandert. Je kunt hem ook zelf starten via *Actions → Stemmen maken → Run workflow*. Hij spreekt alleen nieuwe teksten in en ruimt opnames op die niet meer gebruikt worden. Let op: dit is geen officiële dienst van Microsoft. Als hij ooit stopt, blijven de bestaande opnames gewoon werken.
+
 ## AI-docent instellen (optioneel)
 1. Maak een API-sleutel aan op [console.anthropic.com](https://console.anthropic.com). Je betaalt per gebruik.
 2. Ga in de app naar ⚙️ **Instellingen → AI-docent** en plak je sleutel.
@@ -67,6 +72,8 @@ js/ai.js            AI-docent (Claude API)
 js/app.js           schermen en navigatie
 content/a1.js       lesstof A1 · content/a2.js lesstof A2 · content/extra.js toets, regio’s, rollenspellen
 content/*-plus.js   aanvullingen per unit (extra woorden, oefeningen, leesteksten)
+tools/tts-*.{js,py} teksten verzamelen en inspreken (zie .github/workflows/stemmen.yml)
+audio/              ingesproken opnames (audio/<sleutel>.mp3 + index.json)
 ```
 
 Een nieuw niveau voeg je toe door een bestand `content/b1.js` aan te maken in hetzelfde formaat en het in `index.html` en `sw.js` op te nemen.
