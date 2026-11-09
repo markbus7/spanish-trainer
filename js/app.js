@@ -748,9 +748,8 @@
         card.append(
           h('p', { class: 'small muted' }, 'Wil je op je iPad, telefoon en computer met dezelfde voortgang verder? Koppel dan een GitHub-token. Je voortgang wordt dan in een geheime gist op je eigen GitHub-account bewaard en op elk apparaat automatisch bijgewerkt.'),
           h('ol', { class: 'small steps-list' },
-            h('li', null, 'Open ', h('a', { href: 'https://github.com/settings/personal-access-tokens/new', target: '_blank', rel: 'noopener' }, 'github.com › Fine-grained token'), '.'),
-            h('li', null, 'Geef het een naam (bijv. «Español Latino») en kies een vervaldatum.'),
-            h('li', null, 'Bij ', h('b', null, 'Account permissions'), ' zet je ', h('b', null, 'Gists'), ' op ', h('b', null, 'Read and write'), '. Meer is niet nodig.'),
+            h('li', null, 'Open ', h('a', { href: 'https://github.com/settings/personal-access-tokens/new?name=Espa%C3%B1ol%20Latino%20sync&description=Voortgang%20synchroniseren%20(alleen%20gists)&expires_in=366&gists=write', target: '_blank', rel: 'noopener' }, 'deze link naar GitHub'), '. Naam, vervaldatum (1 jaar) en het juiste recht staan al ingevuld.'),
+            h('li', null, 'Controleer dat bij ', h('b', null, 'Account permissions'), ' alleen ', h('b', null, 'Gists'), ' op ', h('b', null, 'Read and write'), ' staat. Meer is niet nodig.'),
             h('li', null, 'Maak het token aan, kopieer het en plak het hieronder. Doe dit op elk apparaat.')),
           label('GitHub-token', tokIn), h('div', { class: 'row gap wrap' }, btn), out,
           h('p', { class: 'small muted' }, 'Het token blijft alleen in deze browser en gaat rechtstreeks naar GitHub. Het komt nooit in je voortgang, back-ups of de gist. Je AI-sleutel wordt niet gesynchroniseerd.'));
