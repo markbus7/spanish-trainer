@@ -41,7 +41,7 @@ De sleutel wordt alleen in je eigen browser bewaard en gaat rechtstreeks naar An
 ## Voortgang synchroniseren tussen apparaten (optioneel)
 Wil je op iPad, telefoon en computer met dezelfde voortgang verder? Koppel dan een GitHub-token. De app bewaart je voortgang in een **geheime gist** op je eigen GitHub-account.
 
-1. Maak een [fine-grained token](https://github.com/settings/personal-access-tokens/new) aan. Zet bij *Account permissions* alleen **Gists** op *Read and write*. Een klassiek token met de scope `gist` werkt ook.
+1. Maak een [fine-grained token](https://github.com/settings/personal-access-tokens/new?name=Espa%C3%B1ol%20Latino%20sync&description=Voortgang%20synchroniseren%20(alleen%20gists)&expires_in=366&gists=write) aan (naam, vervaldatum en recht staan al ingevuld). Zet bij *Account permissions* alleen **Gists** op *Read and write*. Een klassiek token met de scope `gist` werkt ook.
 2. Ga in de app naar ⚙️ **Instellingen → Synchroniseren** en plak het token. Doe dit op elk apparaat.
 
 De app haalt je voortgang op als je hem opent en uploadt hem kort na het oefenen. Heb je op twee apparaten geoefend, dan worden woorden, units en statistieken samengevoegd. Het token blijft alleen in de browser van dat apparaat. Het komt nooit in de voortgang, in back-ups of in de gist. Je AI-sleutel wordt niet gesynchroniseerd.
