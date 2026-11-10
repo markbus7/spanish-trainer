@@ -738,7 +738,8 @@
       toggle('Alle units ontgrendelen', 'Vrij door de stof bladeren, zonder volgorde.', s.unlockAll, v => set('unlockAll', v)),
       h('a', { class: 'btn ghost', href: '#/toets' }, '🧭 Plaatsingstoets opnieuw doen'))));
     wrap.append(section('Gegevens', dataTools(), h('div', { class: 'card' }, h('button', { class: 'btn danger', type: 'button', onclick: () => S.confirm('Alles wissen?', 'Al je voortgang, woorden en statistieken worden verwijderd' + (S.Sync && S.Sync.enabled() ? ', ook op je andere gekoppelde apparaten' : '') + '. Dit kan niet ongedaan worden gemaakt. Maak eerst een back-up!', 'Alles wissen', () => { Store.reset(); location.hash = '#/hoy'; render(); }) }, '🗑 Voortgang wissen'))));
-    wrap.append(h('p', { class: 'muted small center' }, 'Español Latino · lesstof A1–A2 · ' + C.all().length + ' units · ' + C.all().reduce((a, u) => a + u.vocab.length, 0) + ' woorden · ' + Object.keys(S.conj.VERBS).length + ' werkwoorden'));
+    wrap.append(section('ℹ️ Over de app', versionCard()));
+    wrap.append(h('p', { class: 'muted small center' }, 'Español Latino ' + appVersion() + ' · lesstof A1–A2 · ' + C.all().length + ' units · ' + C.all().reduce((a, u) => a + u.vocab.length, 0) + ' woorden · ' + Object.keys(S.conj.VERBS).length + ' werkwoorden'));
     return wrap;
   };
   routes.ajustes.tab = 'progreso';
@@ -782,6 +783,43 @@
     const off = Sync.onChange(() => { if (!card.isConnected) { off(); return; } if (!card.contains(document.activeElement)) draw(); });
     return card;
   }
+  /* ---------- versie en updates ---------- */
+  const V = self.SPT_VERSION || { number: '?', date: '' };
+  function appVersion() { return 'v' + V.number; }
+  function versionDate(d) { return d ? new Date(d + 'T12:00:00').toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) : ''; }
+  async function latestVersion() {
+    const r = await fetch('js/version.js?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('Kon de nieuwste versie niet ophalen (' + r.status + ').');
+    const t = await r.text(); const n = /number:\s*'([^']+)'/.exec(t), d = /date:\s*'([^']+)'/.exec(t);
+    if (!n) throw new Error('Onbekend versiebestand.');
+    return { number: n[1], date: d ? d[1] : '' };
+  }
+  async function updateNow() {
+    try { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) await reg.update(); } catch (e) { /* geen service worker: gewoon herladen */ }
+    location.reload();
+  }
+  function versionCard() {
+    const out = h('p', { class: 'small', role: 'status' });
+    const btn = h('button', { class: 'btn ghost', type: 'button', onclick: async () => {
+      btn.disabled = true; out.className = 'small'; out.textContent = 'Controleren…';
+      try {
+        const L = await latestVersion();
+        if (L.number === V.number) out.textContent = '✅ Je hebt de nieuwste versie.';
+        else {
+          out.textContent = '';
+          out.append('🆕 Versie ' + L.number + (L.date ? ' (' + versionDate(L.date) + ')' : '') + ' staat klaar. ',
+            h('button', { class: 'btn primary', type: 'button', onclick: updateNow }, 'Nu bijwerken'));
+        }
+      } catch (e) { out.className = 'small warn'; out.textContent = '⚠️ ' + (navigator.onLine === false ? 'Je bent offline. Probeer het later opnieuw.' : e.message); }
+      btn.disabled = false;
+    } }, '🔄 Controleren op updates');
+    return h('div', { class: 'card form' },
+      h('div', { class: 'row gap between wrap' },
+        h('div', null, h('b', null, 'Versie ' + V.number), h('small', { class: 'muted', style: { display: 'block' } }, versionDate(V.date))),
+        btn),
+      out,
+      h('p', { class: 'small muted' }, 'Na een update zie je hier een hoger versienummer. Staat er nog het oude nummer? Tik dan op «Controleren op updates».'));
+  }
   function label(t, el) { return h('label', { class: 'field' }, h('span', null, t), el); }
   function toggle(t, sub, val, fn) {
     return h('label', { class: 'switch-row' }, h('div', { class: 'grow' }, h('b', null, t), sub ? h('small', { class: 'muted' }, sub) : null),
@@ -796,10 +834,11 @@
   function boot() {
     Store.load();
     applyTheme(); Speech.init();
+    const ver = document.getElementById('tb-ver'); if (ver) ver.textContent = appVersion();
     window.addEventListener('hashchange', render);
     render();
     if (S.Sync) S.Sync.init();
-    if ('serviceWorker' in navigator && /^https:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
+    if ('serviceWorker' in navigator && /^https:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js?v=' + encodeURIComponent(V.number)).catch(() => {});
   }
   S.P = P;
   document.addEventListener('DOMContentLoaded', boot);

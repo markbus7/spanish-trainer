@@ -62,6 +62,7 @@ Gewone HTML, CSS en JavaScript. Er is geen build-stap en er zijn geen dependenci
 
 ```
 index.html          app-shell
+js/version.js       versienummer (zie hieronder)
 css/app.css         ontwerp (licht/donker)
 js/core.js          opslag, herhaalsysteem, antwoordcontrole, spraak
 js/conjugate.js     vervoegingsmachine
@@ -79,6 +80,8 @@ audio/              ingesproken opnames (audio/<sleutel>.mp3 + index.json)
 Een nieuw niveau voeg je toe door een bestand `content/b1.js` aan te maken in hetzelfde formaat en het in `index.html` en `sw.js` op te nemen.
 
 Wil je een bestaande unit aanvullen, gebruik dan `S.extendUnit(id, { vocab, ex, reading })` (zie `content/a1-plus.js`). Woorden en oefeningen komen dan altijd achteraan. Voeg ze nooit in het midden toe: de herhaling onthoudt ze op volgnummer.
+
+**Versienummer.** Verhoog bij elke wijziging die live gaat het nummer en de datum in `js/version.js`, en het nummer in `package.json` (de test controleert dat ze gelijk zijn). Het nummer staat in ⚙️ Instellingen › Over de app, met een knop *Controleren op updates*. De service worker gebruikt het als cachenaam, dus een nieuw nummer ruimt de oude offline-cache op.
 
 ```bash
 npm test             # controleert alle lesstof, vervoegingen en de antwoordcontrole

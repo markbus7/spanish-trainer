@@ -5,7 +5,7 @@
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
-ctx.window = ctx; ctx.globalThis = ctx;
+ctx.window = ctx; ctx.globalThis = ctx; ctx.self = ctx;
 const files = fs.readFileSync(path.join(root, 'index.html'), 'utf8').match(/src="((?:js|content)\/[^"]+\.js)"/g).map(s => s.slice(5, -1))
   .filter(f => !/(app|lesson|ai|sync)\.js$/.test(f));
 for (const f of files) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });

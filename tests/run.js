@@ -171,6 +171,20 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
   ok(!miss.size, 'opnames: ' + miss.size + ' teksten ontbreken, bv. ' + [...miss].slice(0, 5).join(' | '));
 }
 
+/* ---------- versie en offline-cache ---------- */
+{
+  const vctx = vm.createContext({}); vctx.self = vctx;
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/version.js'), 'utf8'), vctx);
+  const V = vctx.SPT_VERSION || {};
+  ok(/^\d+\.\d+\.\d+$/.test(V.number || ''), 'versie: nummer heeft de vorm 1.2.3');
+  ok(/^\d{4}-\d{2}-\d{2}$/.test(V.date || '') && !isNaN(Date.parse(V.date)), 'versie: geldige datum');
+  ok(String(require(path.join(root, 'package.json')).version) === V.number, 'versie: package.json en js/version.js gelijk');
+  const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8'), html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  ok(sw.includes("importScripts('js/version.js')"), 'sw.js haalt versie uit js/version.js');
+  const assets = (/const ASSETS = \[([^\]]*)\]/.exec(sw) || [, ''])[1];
+  for (const src of [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1])) ok(assets.includes("'" + src + "'"), 'sw.js cachet ' + src);
+}
+
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);
