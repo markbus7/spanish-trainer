@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/extra.js', 'js/gen.js']) {
+for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/extra.js', 'js/gen.js', 'js/games.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -169,6 +169,54 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
     u.dialogue.lines.forEach(l => want(l[1])); u.reading.p.forEach(p => want(p[0]));
   }
   ok(!miss.size, 'opnames: ' + miss.size + ' teksten ontbreken, bv. ' + [...miss].slice(0, 5).join(' | '));
+}
+
+/* ---------- woordspellen ---------- */
+{
+  const G = S.Games.gen;
+  ok(S.Games.GAMES.length === 5, 'spellen: vijf spellen');
+  ok(G.plain('Niño está') === 'NIÑO ESTA' && G.plain('pingüino') === 'PINGUINO', 'spellen: accenten weg, ñ blijft');
+  const gw = G.gameWord({ id: 'w|x|0', unit: 'x', es: 'el perro / la perra', nl: 'hond / teef' });
+  ok(gw.key === 'perro' && gw.letters === 'PERRO' && gw.say === 'el perro' && gw.nl === 'hond', 'spellen: lidwoord eraf, voorleesvorm blijft');
+  ok(G.gameWord({ id: 'a', es: '¿cómo estás?', nl: '' }).key === 'cómo estás', 'spellen: vraagtekens eraf');
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (const u of units) {
+    const ws = S.C.words(u).map(G.gameWord).filter(Boolean);
+    // woordzoeker: elk geplaatst woord staat echt in het veld
+    const grid = ws.filter(w => G.FIT.grid(w, 11)).slice(0, 9);
+    if (grid.length >= 4) {
+      const P = G.wordSearch(grid, 12, { rnd, reverse: true });
+      ok(P.placed.length >= Math.min(grid.length, 6), 'woordzoeker ' + u.id + ': genoeg woorden geplaatst');
+      ok(P.placed.every(p => p.cells.map(([r, c]) => P.grid[r][c]).join('') === p.w.letters), 'woordzoeker ' + u.id + ': letters kloppen');
+      ok(P.grid.every(r => r.every(x => /^[A-ZÑ]$/.test(x))), 'woordzoeker ' + u.id + ': veld helemaal gevuld');
+    }
+    // kruiswoord: kruisingen kloppen en elke rij van 2+ letters is een woord uit de lijst
+    const cw = ws.filter(w => G.FIT.grid(w, 9));
+    if (cw.length >= 4) {
+      const P = G.crossword(cw, { rnd, want: 9, maxW: 13, maxH: 11 });
+      const cell = {};
+      let clash = false;
+      P.words.forEach(p => p.cells.forEach(([r, c], i) => { const k = r + ',' + c; if (cell[k] && cell[k] !== p.w.letters[i]) clash = true; cell[k] = p.w.letters[i]; }));
+      ok(!clash, 'kruiswoord ' + u.id + ': kruisingen kloppen');
+      ok(P.words.length >= 3 && P.cols <= 13 && P.rows <= 11, 'kruiswoord ' + u.id + ': ' + P.words.length + ' woorden in ' + P.cols + '×' + P.rows);
+      const runs = [], names = new Set(P.words.map(p => p.d + p.r + ',' + p.c + p.w.letters));
+      for (const d of ['h', 'v']) for (let a = 0; a < (d === 'h' ? P.rows : P.cols); a++) {
+        let run = '', st = null;
+        for (let b = 0; b <= (d === 'h' ? P.cols : P.rows); b++) {
+          const [r, c] = d === 'h' ? [a, b] : [b, a]; const x = cell[r + ',' + c];
+          if (x) { if (!run) st = [r, c]; run += x; } else { if (run.length > 1) runs.push(d + st[0] + ',' + st[1] + run); run = ''; }
+        }
+      }
+      ok(runs.every(x => names.has(x)), 'kruiswoord ' + u.id + ': geen losse lettercombinaties');
+      ok(new Set(P.words.map(p => p.n)).size <= P.words.length && P.words.every(p => p.n >= 1), 'kruiswoord ' + u.id + ': nummering');
+    }
+    // husselaar: altijd dezelfde letters, nooit al goed
+    ws.filter(G.FIT.phrase).forEach(w => {
+      const k = w.key.replace(/ /g, ''), s = G.scramble(k, rnd).join('');
+      ok([...s].sort().join('') === [...k].sort().join('') && (s !== k || new Set(k).size < 2), 'husselaar: ' + w.key);
+    });
+  }
+  ok(['A1', 'A2', 'B1'].every(l => G.poolFor(l, x => G.FIT.grid(x, 10)).length >= 60), 'spellen: genoeg puzzelwoorden per niveau');
 }
 
 /* ---------- versie en offline-cache ---------- */

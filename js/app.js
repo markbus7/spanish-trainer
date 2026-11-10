@@ -42,6 +42,7 @@
     'unit1': ['🏅', 'Eerste unit', 'Je eerste unit gehaald'], 'perfect': ['💯', 'Foutloos', 'Een unittoets 100% gehaald'],
     'A1': ['🥉', 'A1 behaald', 'Niveau-examen A1 gehaald'], 'A2': ['🥈', 'A2 behaald', 'Niveau-examen A2 gehaald'],
     'ai': ['🤖', 'Eerste gesprek', 'Een gesprek met de AI-docent gevoerd'], 'goal': ['🎯', 'Dagdoel', 'Je dagdoel gehaald'],
+    'game': ['🎲', 'Speler', 'Je eerste woordspel uitgespeeld'], 'games10': ['🧩', 'Puzzelaar', '10 woordspellen uitgespeeld'],
     'early': ['🌅', 'Vroege vogel', 'Geoefend vóór 8:00'], 'night': ['🦉', 'Nachtuil', 'Geoefend na 23:00']
   };
   function award(id) {
@@ -131,6 +132,19 @@
     });
   }
   S.runSession = runSession;
+  /* Voor activiteiten buiten de lessen om (woordspellen): XP, tijd, streak en badges. */
+  S.App = {
+    finishActivity({ xp = 0, minutes = 0, game = null } = {}) {
+      Store.addXP(xp); addTime(minutes);
+      if (xp || game) Store.touchStreak();
+      if (game) {
+        const d = Store.today(); d.done.games = true;
+        const n = st().done.games = (st().done.games || 0) + 1;
+        award('game'); if (n >= 10) award('games10');
+      }
+      checkBadges(); Store.save();
+    }
+  };
 
   function startStep(u, stepId) {
     const session = Gen.stepSession(u, stepId);
@@ -266,7 +280,8 @@
     wrap.append(section('Extra oefenen', h('div', { class: 'quick' },
       quick('⚡', 'Woordensprint', '2 min', () => runSession(Gen.sprint(30))),
       quick('🧩', 'Werkwoorden', '20 vragen', () => { location.hash = '#/practica'; }),
-      quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10))))));
+      quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10))),
+      quick('🎲', 'Woordspellen', 'puzzels en memory', () => { location.hash = '#/juegos'; }))));
     if (!Store.ok) wrap.append(h('p', { class: 'warn' }, '⚠️ Je browser staat opslaan niet toe (privévenster?). Je voortgang wordt niet bewaard.'));
     return wrap;
   };
@@ -426,6 +441,9 @@
       weak.map(([t, v]) => h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, C.tag(t)), h('span', { class: 'muted small' }, Math.round(v.ok / (v.ok + v.no) * 100) + '% goed'))),
       h('button', { class: 'btn primary wide', type: 'button', onclick: () => { const ses = Gen.weakTraining(weak.map(w => w[0])); if (!ses.items.length) { S.toast('Nog geen oefeningen voor deze onderwerpen'); return; } runSession(ses); } }, 'Oefen deze onderwerpen'))
       : h('p', { class: 'muted' }, 'Nog geen zwakke punten gevonden. Blijf oefenen, dan zie je hier waar je extra aandacht aan kunt geven.')));
+    wrap.append(section('🎲 Woordspellen', h('div', { class: 'quick' },
+      S.Games.GAMES.map(g => quick(g.icon, g.es, g.nl, () => S.Games.start(g.id))),
+      quick('🗂️', 'Alle spellen', 'kies je woorden', () => { location.hash = '#/juegos'; }))));
     wrap.append(section('Meer', h('div', { class: 'quick' },
       quick('⚡', 'Woordensprint', '2 minuten', () => runSession(Gen.sprint(30))),
       quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10))),
@@ -458,6 +476,8 @@
     return wrap;
   };
   routes.tablas.tab = 'practica';
+  routes.juegos = () => S.Games.page();
+  routes.juegos.tab = 'practica';
 
   /* ================= DOCENTE (AI) ================= */
   const chat = { mode: 'roleplay', scenario: null, messages: [], busy: false, ctrl: null };
