@@ -122,6 +122,24 @@
       h('div', { class: 'dl-list' }, lines));
   };
 
+  R.reading = (it, ctx) => {
+    const r = it.reading; ctx.free();
+    let showAll = false;
+    const paras = r.p.map(([es, nl]) => {
+      const tr = h('div', { class: 'nl hidden' }, nl);
+      const p = h('div', { class: 'rd-p' }, h('div', { class: 'rd-text', onclick: () => tr.classList.toggle('hidden') }, h('p', { class: 'es', lang: 'es' }, es), tr), speakBtn(es));
+      p._tr = tr; return p;
+    });
+    const trBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => { showAll = !showAll; paras.forEach(p => p._tr.classList.toggle('hidden', !showAll)); trBtn.textContent = showAll ? '🙈 Verberg vertaling' : '👁 Toon vertaling'; } }, '👁 Toon vertaling');
+    ctx.onLeave(() => Speech.stop());
+    return h('div', { class: 'reading' },
+      h('div', { class: 'eyebrow' }, '📖 ' + (r.type || 'Lectura')), h('h2', null, r.t),
+      h('p', { class: 'muted small' }, 'Lees eerst zonder vertaling. Tik op een alinea als je vastloopt.'),
+      h('div', { class: 'row gap wrap' }, trBtn),
+      h('div', { class: 'rd-body' }, paras),
+      r.gl && r.gl.length ? h('details', { class: 'rd-gl' }, h('summary', null, '📝 Woordjes bij de tekst'), h('ul', null, r.gl.map(([es, nl]) => h('li', null, h('b', { lang: 'es' }, es), ' — ' + nl)))) : null);
+  };
+
   R.mc = (it, ctx) => {
     const qKey = Q_MAP[it.q];
     const head = it.sentence ? T('fill') : (qKey ? T(qKey) : null);

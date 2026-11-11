@@ -42,6 +42,7 @@
     'unit1': ['🏅', 'Eerste unit', 'Je eerste unit gehaald'], 'perfect': ['💯', 'Foutloos', 'Een unittoets 100% gehaald'],
     'A1': ['🥉', 'A1 behaald', 'Niveau-examen A1 gehaald'], 'A2': ['🥈', 'A2 behaald', 'Niveau-examen A2 gehaald'],
     'ai': ['🤖', 'Eerste gesprek', 'Een gesprek met de AI-docent gevoerd'], 'goal': ['🎯', 'Dagdoel', 'Je dagdoel gehaald'],
+    'game': ['🎲', 'Speler', 'Je eerste woordspel uitgespeeld'], 'games10': ['🧩', 'Puzzelaar', '10 woordspellen uitgespeeld'],
     'early': ['🌅', 'Vroege vogel', 'Geoefend vóór 8:00'], 'night': ['🦉', 'Nachtuil', 'Geoefend na 23:00']
   };
   function award(id) {
@@ -131,6 +132,19 @@
     });
   }
   S.runSession = runSession;
+  /* Voor activiteiten buiten de lessen om (woordspellen): XP, tijd, streak en badges. */
+  S.App = {
+    finishActivity({ xp = 0, minutes = 0, game = null } = {}) {
+      Store.addXP(xp); addTime(minutes);
+      if (xp || game) Store.touchStreak();
+      if (game) {
+        const d = Store.today(); d.done.games = true;
+        const n = st().done.games = (st().done.games || 0) + 1;
+        award('game'); if (n >= 10) award('games10');
+      }
+      checkBadges(); Store.save();
+    }
+  };
 
   function startStep(u, stepId) {
     const session = Gen.stepSession(u, stepId);
@@ -222,7 +236,8 @@
       section('Waar begin je?',
         h('button', { class: 'choice primary', type: 'button', onclick: () => go(() => { location.hash = '#/toets'; }) }, h('b', null, '🧭 Plaatsingstoets (aanbevolen)'), h('span', null, '±8 minuten. Ik bepaal je niveau en zet je op de juiste plek. Ideaal als je denkt dat je A1 of A2 bent.')),
         h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.all()[0].id) }, h('b', null, '🌱 Vanaf het begin (A1)'), h('span', null, 'Je begint bij unit 1. Units die je al kent, kun je snel afronden met «Ik ken dit al».')),
-        C.unitsOf('A2').length ? h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf('A2')[0].id) }, h('b', null, '🚀 Begin bij A2'), h('span', null, 'Je kunt je al redden in de presente en wilt de verleden tijden leren.')) : null),
+        C.unitsOf('A2').length ? h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf('A2')[0].id) }, h('b', null, '🚀 Begin bij A2'), h('span', null, 'Je kunt je al redden in de presente en wilt de verleden tijden leren.')) : null,
+        C.unitsOf('B1').length ? h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf('B1')[0].id) }, h('b', null, '🌠 Begin bij B1'), h('span', null, 'Je kent de verleden tijden en wilt de subjuntivo, de condicional en argumenteren leren.')) : null),
       h('p', { class: 'muted small center' }, '🔒 Je voortgang wordt alleen op dit apparaat bewaard. Via Voortgang kun je een back-up maken.'));
   };
 
@@ -265,7 +280,8 @@
     wrap.append(section('Extra oefenen', h('div', { class: 'quick' },
       quick('⚡', 'Woordensprint', '2 min', () => runSession(Gen.sprint(30))),
       quick('🧩', 'Werkwoorden', '20 vragen', () => { location.hash = '#/practica'; }),
-      quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10))))));
+      quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10))),
+      quick('🎲', 'Woordspellen', 'puzzels en memory', () => { location.hash = '#/juegos'; }))));
     if (!Store.ok) wrap.append(h('p', { class: 'warn' }, '⚠️ Je browser staat opslaan niet toe (privévenster?). Je voortgang wordt niet bewaard.'));
     return wrap;
   };
@@ -280,7 +296,7 @@
   /* ================= RUTA ================= */
   routes.ruta = function () {
     const wrap = h('div', { class: 'page' });
-    wrap.append(h('h1', null, 'Tu ruta'), h('p', { class: 'muted' }, 'Van beginner tot meesterschap. Elke unit: woorden → grammatica → dialoog → toepassen → toets.'));
+    wrap.append(h('h1', null, 'Tu ruta'), h('p', { class: 'muted' }, 'Van beginner tot meesterschap. Elke unit: woorden → grammatica → dialoog → lezen → toepassen → toets.'));
     const cur = P.current();
     C.LEVELS.forEach(L => {
       const us = C.unitsOf(L.id); const avail = us.length > 0;
@@ -353,6 +369,7 @@
     const tabs = [['📖 Grammatica', () => h('div', null, u.grammar.map(g => S.Lesson.grammarBlock(g)))],
       ['🃏 Woorden', () => wordList(u)],
       ['💬 Dialoog', () => dialogueRead(u)],
+      ['📰 Lezen', () => u.reading ? readingRead(u) : h('p', null, '—')],
       ['🌎 Cultuur', () => u.culture ? h('div', { class: 'info' }, h('h2', null, u.culture.t), h('div', { class: 'prose', html: u.culture.html })) : h('p', null, '—')]];
     const tabBar = h('div', { class: 'tabs', role: 'tablist' }); const pane = h('div', { class: 'tab-pane' });
     let curTab = 0; try { curTab = +(sessionStorage.getItem('spt.utab') || 0); } catch (e) { /* */ }
@@ -381,6 +398,12 @@
     const d = u.dialogue;
     return h('div', { class: 'dl-list read' }, h('p', { class: 'muted small' }, d.place + ' — ' + d.t),
       d.lines.map(([who, es, nl]) => h('div', { class: 'dl-read' }, S.Lesson.speakBtn(es), h('div', null, h('b', null, who + ': '), h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl)))));
+  }
+
+  function readingRead(u) {
+    const r = u.reading;
+    return h('div', { class: 'dl-list read' }, h('p', { class: 'muted small' }, (r.type || 'Lectura') + ' — ' + r.t),
+      r.p.map(([es, nl]) => h('div', { class: 'dl-read' }, S.Lesson.speakBtn(es), h('div', null, h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl)))));
   }
 
   /* ================= PRÁCTICA ================= */
@@ -418,6 +441,9 @@
       weak.map(([t, v]) => h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, C.tag(t)), h('span', { class: 'muted small' }, Math.round(v.ok / (v.ok + v.no) * 100) + '% goed'))),
       h('button', { class: 'btn primary wide', type: 'button', onclick: () => { const ses = Gen.weakTraining(weak.map(w => w[0])); if (!ses.items.length) { S.toast('Nog geen oefeningen voor deze onderwerpen'); return; } runSession(ses); } }, 'Oefen deze onderwerpen'))
       : h('p', { class: 'muted' }, 'Nog geen zwakke punten gevonden. Blijf oefenen, dan zie je hier waar je extra aandacht aan kunt geven.')));
+    wrap.append(section('🎲 Woordspellen', h('div', { class: 'quick' },
+      S.Games.GAMES.map(g => quick(g.icon, g.es, g.nl, () => S.Games.start(g.id))),
+      quick('🗂️', 'Alle spellen', 'kies je woorden', () => { location.hash = '#/juegos'; }))));
     wrap.append(section('Meer', h('div', { class: 'quick' },
       quick('⚡', 'Woordensprint', '2 minuten', () => runSession(Gen.sprint(30))),
       quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10))),
@@ -450,6 +476,8 @@
     return wrap;
   };
   routes.tablas.tab = 'practica';
+  routes.juegos = () => S.Games.page();
+  routes.juegos.tab = 'practica';
 
   /* ================= DOCENTE (AI) ================= */
   const chat = { mode: 'roleplay', scenario: null, messages: [], busy: false, ctrl: null };
@@ -656,6 +684,12 @@
     let start, text;
     if (!scores.A2 && (scores.A1 || 0) < 6) { start = C.all()[0].id; text = (scores.A1 || 0) >= 4 ? 'Je kent al een flink deel van A1. Begin bij unit 1; units die je al beheerst, rond je snel af met «Ik ken dit al».' : 'Je begint bij A1, unit 1. ¡Vamos!'; }
     else if ((scores.A2 || 0) < 6) { start = C.unitsOf('A2')[0].id; text = 'Je beheerst A1. Je begint bij A2, unit 1: de verleden tijden. A1 blijft beschikbaar om te herhalen.'; }
+    else if (C.unitsOf('B1').length) {
+      start = C.unitsOf('B1')[0].id;
+      text = (scores.B1 || 0) >= 6
+        ? 'Sterk! Je zit op B1-niveau of hoger. Je begint bij B1, unit 1. Ken je een unit al, doe dan meteen de toets («Ik ken dit al»). Zo vind je snel je gaten.'
+        : 'Je beheerst A2. Je begint bij B1, unit 1: de subjuntivo. A1 en A2 blijven beschikbaar om te herhalen.';
+    }
     else {
       start = C.unitsOf('A2')[C.unitsOf('A2').length - 1].id;
       text = (scores.B1 || 0) >= 6
@@ -704,7 +738,8 @@
     fillVoices(); setTimeout(fillVoices, 700);
     const rate = h('input', { type: 'range', min: 0.6, max: 1.2, step: 0.05, value: s.rate, oninput: e => set('rate', +e.target.value) });
     wrap.append(section('Stem & uitspraak', h('div', { class: 'card form' },
-      Speech.canSpeak() ? label('Voorleesstem', voiceSel) : h('p', { class: 'warn' }, 'Je browser ondersteunt geen voorlezen.'),
+      Speech.clips ? toggle('Ingesproken opnames gebruiken', '🎧 ' + Speech.clips.size.toLocaleString('nl-NL') + ' woorden en zinnen zijn ingesproken met natuurlijke Latijns-Amerikaanse stemmen. Wat niet is ingesproken, leest je apparaat zelf voor.', s.clips !== false, v => set('clips', v)) : null,
+      Speech.canSpeak() ? label(Speech.clips ? 'Stem van het apparaat (voor de rest)' : 'Voorleesstem', voiceSel) : h('p', { class: 'warn' }, 'Je browser ondersteunt geen voorlezen.'),
       label('Spreeksnelheid', rate),
       h('button', { class: 'btn ghost', type: 'button', onclick: () => Speech.say('¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.') }, '🔊 Test de stem'),
       h('p', { class: 'small muted' }, Speech.voices.some(v => Speech.rank(v) >= 85) ? '✅ Er is een Latijns-Amerikaanse stem gevonden.' : 'Tip: installeer in de instellingen van je apparaat een Spaanse stem (Mexico of VS). Op een iPhone: Instellingen › Toegankelijkheid › Gesproken materiaal › Stemmen › Spaans (Mexico).'),
@@ -723,7 +758,8 @@
       toggle('Alle units ontgrendelen', 'Vrij door de stof bladeren, zonder volgorde.', s.unlockAll, v => set('unlockAll', v)),
       h('a', { class: 'btn ghost', href: '#/toets' }, '🧭 Plaatsingstoets opnieuw doen'))));
     wrap.append(section('Gegevens', dataTools(), h('div', { class: 'card' }, h('button', { class: 'btn danger', type: 'button', onclick: () => S.confirm('Alles wissen?', 'Al je voortgang, woorden en statistieken worden verwijderd' + (S.Sync && S.Sync.enabled() ? ', ook op je andere gekoppelde apparaten' : '') + '. Dit kan niet ongedaan worden gemaakt. Maak eerst een back-up!', 'Alles wissen', () => { Store.reset(); location.hash = '#/hoy'; render(); }) }, '🗑 Voortgang wissen'))));
-    wrap.append(h('p', { class: 'muted small center' }, 'Español Latino · lesstof A1–A2 · ' + C.all().length + ' units · ' + C.all().reduce((a, u) => a + u.vocab.length, 0) + ' woorden · ' + Object.keys(S.conj.VERBS).length + ' werkwoorden'));
+    wrap.append(section('ℹ️ Over de app', versionCard()));
+    wrap.append(h('p', { class: 'muted small center' }, 'Español Latino ' + appVersion() + ' · lesstof A1–A2 · ' + C.all().length + ' units · ' + C.all().reduce((a, u) => a + u.vocab.length, 0) + ' woorden · ' + Object.keys(S.conj.VERBS).length + ' werkwoorden'));
     return wrap;
   };
   routes.ajustes.tab = 'progreso';
@@ -767,6 +803,43 @@
     const off = Sync.onChange(() => { if (!card.isConnected) { off(); return; } if (!card.contains(document.activeElement)) draw(); });
     return card;
   }
+  /* ---------- versie en updates ---------- */
+  const V = self.SPT_VERSION || { number: '?', date: '' };
+  function appVersion() { return 'v' + V.number; }
+  function versionDate(d) { return d ? new Date(d + 'T12:00:00').toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) : ''; }
+  async function latestVersion() {
+    const r = await fetch('js/version.js?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('Kon de nieuwste versie niet ophalen (' + r.status + ').');
+    const t = await r.text(); const n = /number:\s*'([^']+)'/.exec(t), d = /date:\s*'([^']+)'/.exec(t);
+    if (!n) throw new Error('Onbekend versiebestand.');
+    return { number: n[1], date: d ? d[1] : '' };
+  }
+  async function updateNow() {
+    try { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) await reg.update(); } catch (e) { /* geen service worker: gewoon herladen */ }
+    location.reload();
+  }
+  function versionCard() {
+    const out = h('p', { class: 'small', role: 'status' });
+    const btn = h('button', { class: 'btn ghost', type: 'button', onclick: async () => {
+      btn.disabled = true; out.className = 'small'; out.textContent = 'Controleren…';
+      try {
+        const L = await latestVersion();
+        if (L.number === V.number) out.textContent = '✅ Je hebt de nieuwste versie.';
+        else {
+          out.textContent = '';
+          out.append('🆕 Versie ' + L.number + (L.date ? ' (' + versionDate(L.date) + ')' : '') + ' staat klaar. ',
+            h('button', { class: 'btn primary', type: 'button', onclick: updateNow }, 'Nu bijwerken'));
+        }
+      } catch (e) { out.className = 'small warn'; out.textContent = '⚠️ ' + (navigator.onLine === false ? 'Je bent offline. Probeer het later opnieuw.' : e.message); }
+      btn.disabled = false;
+    } }, '🔄 Controleren op updates');
+    return h('div', { class: 'card form' },
+      h('div', { class: 'row gap between wrap' },
+        h('div', null, h('b', null, 'Versie ' + V.number), h('small', { class: 'muted', style: { display: 'block' } }, versionDate(V.date))),
+        btn),
+      out,
+      h('p', { class: 'small muted' }, 'Na een update zie je hier een hoger versienummer. Staat er nog het oude nummer? Tik dan op «Controleren op updates».'));
+  }
   function label(t, el) { return h('label', { class: 'field' }, h('span', null, t), el); }
   function toggle(t, sub, val, fn) {
     return h('label', { class: 'switch-row' }, h('div', { class: 'grow' }, h('b', null, t), sub ? h('small', { class: 'muted' }, sub) : null),
@@ -781,10 +854,11 @@
   function boot() {
     Store.load();
     applyTheme(); Speech.init();
+    const ver = document.getElementById('tb-ver'); if (ver) ver.textContent = appVersion();
     window.addEventListener('hashchange', render);
     render();
     if (S.Sync) S.Sync.init();
-    if ('serviceWorker' in navigator && /^https:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
+    if ('serviceWorker' in navigator && /^https:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js?v=' + encodeURIComponent(V.number)).catch(() => {});
   }
   S.P = P;
   document.addEventListener('DOMContentLoaded', boot);

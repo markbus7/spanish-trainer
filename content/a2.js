@@ -745,4 +745,213 @@
     task: { nl: 'Schrijf een recept van een gerecht dat jij goed kunt maken, of een routebeschrijving van het station naar je huis. Gebruik minstens 6 imperativos.', model: 'Para hacer una tortilla de papas: primero, pela y corta las papas. Luego fríelas en aceite. Bate cuatro huevos y agrega sal. Mezcla todo y ponlo en la sartén. Después de cinco minutos, dale la vuelta. ¡Sírvela caliente!' },
     scenario: { nl: 'Een Mexicaanse oma leert je koken, en vraagt daarna jou om een recept uit je eigen land.', role: 'Eres la abuela Lupe, una abuela mexicana de Puebla, cariñosa y mandona. Das instrucciones de cocina con imperativo (tú), usas diminutivos (poquito, finito) y luego pides al estudiante que te explique una receta de su país.', goal: 'Volg en geef instructies met de imperativo.' }
   });
+  /* ───────────────────────── A2 · 11 ───────────────────────── */
+  U({
+    id: 'a2-11', level: 'A2', icon: '🔎', title: '¿Alguien ha visto mi mochila?', nl: 'Ontkenning, iets/niets, iemand/niemand en conmigo',
+    goals: ['Dubbele ontkenning gebruiken: no … nada, no … nadie, no … nunca', 'Algo/nada, alguien/nadie en algún/ningún onderscheiden', 'Para mí, contigo, conmigo en «van wie is het?» (mío, tuyo)'],
+    vocab: [
+      ['algo', 'iets'], ['nada', 'niets'], ['alguien', 'iemand'], ['nadie', 'niemand'], ['algún / alguna', 'een of ander, enig'], ['ningún / ninguna', 'geen enkel(e)'],
+      ['ni … ni …', 'noch … noch …'], ['ni siquiera', 'zelfs niet'], ['cualquier', 'om het even welk'], ['cualquier cosa', 'wat dan ook'],
+      ['en algún lado', 'ergens', 'ook: en alguna parte'], ['en ningún lado', 'nergens', 'ook: en ninguna parte'], ['conmigo', 'met mij'], ['contigo', 'met jou'],
+      ['para mí', 'voor mij'], ['sin ti', 'zonder jou'], ['entre tú y yo', 'tussen jou en mij'], ['según', 'volgens'],
+      ['mío / mía', 'van mij'], ['tuyo / tuya', 'van jou'], ['suyo / suya', 'van hem / haar / u / hen'], ['de nadie', 'van niemand'],
+      ['la oficina de objetos perdidos', 'het bureau voor gevonden voorwerpen'], ['la terminal (de buses)', 'het busstation'], ['el / la chofer', 'de chauffeur', 'LatAm: klemtoon op cho-; ES: chófer'],
+      ['el asiento', 'de stoel (in bus, vliegtuig)'], ['atrás', 'achterin, achter'], ['adelante', 'voorin, vooruit'], ['revisar', 'nakijken, controleren'],
+      ['el bolsillo', 'de (broek)zak'], ['los lentes', 'de bril', 'ES: las gafas · AR: los anteojos'], ['la cédula', 'de identiteitskaart', 'CO · PA · EC · VE · CR'],
+      ['la sombrilla', 'de paraplu', 'CO · PA (ook: el paraguas)'], ['¡no puede ser!', 'dat kan niet waar zijn!'], ['¡ni modo!', 'jammer dan, niks aan te doen', 'MX · Midden-Amerika'],
+      ['la vaina', 'het ding, gedoe', 'PA · CO · VE (informeel)'], ['¡xopá!', 'hoi, hoe is ’t?', 'PA (¿qué pasó? achterstevoren)'], ['tranquilo, no pasa nada', 'rustig maar, er is niets aan de hand']
+    ],
+    grammar: [
+      { t: 'Dubbele ontkenning', es: 'La doble negación',
+        html: `<p>In het Spaans is een <b>dubbele ontkenning</b> heel normaal en zelfs verplicht. Staat <i>nada, nadie, nunca, ningún</i> of <i>tampoco</i> <b>na</b> het werkwoord, dan zet je <b>no</b> vóór het werkwoord.</p>
+<p>Staat het ontkennende woord <b>vóór</b> het werkwoord, dan laat je <i>no</i> weg: <i>Nadie vino.</i> = <i>No vino nadie.</i> · <i>Nunca como carne.</i> = <i>No como carne nunca.</i></p>`,
+        table: [['bevestigend', 'ontkennend'], ['algo — iets', 'no … nada — niets'], ['alguien — iemand', 'no … nadie — niemand'], ['siempre — altijd', 'no … nunca — nooit'], ['también — ook', 'no … tampoco — ook niet'], ['o … o — of … of', 'no … ni … ni — noch … noch']],
+        ex: [['No conozco a nadie aquí.', 'Ik ken hier niemand.'], ['No quiero nada, gracias.', 'Ik hoef niets, dank je.'], ['Nadie me llamó.', 'Niemand heeft me gebeld.']],
+        sum: '«No veo nada» es correcto: en español la doble negación es normal.' },
+      { t: 'Algún en ningún', es: 'Algún / ningún',
+        html: `<p><b>Alguno</b> en <b>ninguno</b> passen zich aan het zelfstandig naamwoord aan. Vóór een mannelijk enkelvoudig woord vallen ze af tot <b>algún</b> en <b>ningún</b>: <i>¿Tienes algún libro? — No, no tengo ningún libro.</i></p>
+<p><b>Ninguno</b> gebruik je bijna altijd in het enkelvoud: <i>No tengo ningún amigo allá</i> (niet <s>ningunos amigos</s>).</p>
+<p>Zonder zelfstandig naamwoord: <i>¿Hay alguna farmacia por aquí? — No, no hay ninguna.</i></p>
+<p>📌 <b>A</b> vóór personen: <i>¿Ves a alguien? — No, no veo a nadie.</i></p>` },
+      { t: 'Para mí, conmigo en «van wie is het?»', es: 'Pronombres con preposición y posesivos',
+        html: `<p>Na een voorzetsel gebruik je <b>mí</b> en <b>ti</b>, bij de rest het gewone voornaamwoord: <i>para mí, para ti, para él, para ustedes</i>. Let op het accent: <i>mí</i> (mij) tegenover <i>mi</i> (mijn).</p>
+<p>Met <b>con</b> zijn er twee speciale vormen: <b>conmigo</b> (met mij) en <b>contigo</b> (met jou). <i>¿Vienes conmigo? — Sí, voy contigo.</i></p>
+<p>Na <b>entre</b> en <b>según</b> gebruik je <i>yo</i> en <i>tú</i>: <i>entre tú y yo, según tú</i>.</p>
+<p>Wil je zeggen <b>van wie</b> iets is, dan gebruik je de lange vorm na ser: <i>¿Es tuya esta mochila? — Sí, es mía.</i> Deze vorm past zich aan het ding aan: <i>mío, mía, míos, mías</i>.</p>`,
+        table: [['', 'na een voorzetsel', 'van wie?'], ['yo', 'para mí · conmigo', 'mío / mía'], ['tú', 'para ti · contigo', 'tuyo / tuya'], ['él / ella / usted', 'para él / ella / usted', 'suyo / suya'], ['nosotros', 'para nosotros', 'nuestro / nuestra'], ['ellos / ustedes', 'para ellos / ustedes', 'suyo / suya']] }
+    ],
+    verbs: ['encontrar', 'perder', 'conocer', 'saber', 'entender', 'oír', 'olvidar', 'buscar'], tenses: ['pres', 'pret'],
+    dialogue: {
+      t: 'La mochila perdida', place: 'Ciudad de Panamá 🇵🇦',
+      lines: [
+        ['Mark', 'Disculpe, ¿alguien ha traído una mochila azul?', 'Pardon, heeft iemand een blauwe rugzak gebracht?'],
+        ['Yarisel', 'A ver… No, hoy nadie ha traído ninguna mochila azul.', 'Even kijken… Nee, vandaag heeft niemand een blauwe rugzak gebracht.'],
+        ['Mark', '¡No puede ser! Tengo todo ahí: el pasaporte, la billetera, los lentes…', 'Dat kan niet waar zijn! Alles zit erin: mijn paspoort, mijn portemonnee, mijn bril…'],
+        ['Yarisel', 'Tranquilo, no pasa nada. ¿Dónde la dejó?', 'Rustig maar, er is niets aan de hand. Waar heeft u hem laten liggen?'],
+        ['Mark', 'En el bus de Boquete. Me senté atrás y no hablé con nadie.', 'In de bus uit Boquete. Ik zat achterin en heb met niemand gepraat.'],
+        ['Yarisel', '¿Viajaba con alguien?', 'Reisde u met iemand?'],
+        ['Mark', 'No, viajo solo. Y nunca pierdo nada, de verdad.', 'Nee, ik reis alleen. En ik verlies nooit iets, echt waar.'],
+        ['Yarisel', 'Espere… Ahí viene el chofer con algo. ¿Es suya esta mochila?', 'Wacht even… Daar komt de chauffeur met iets aan. Is deze rugzak van u?'],
+        ['Mark', '¡Sí, es mía! Muchísimas gracias. Mire, esto es para usted, para un café.', 'Ja, die is van mij! Heel erg bedankt. Kijk, dit is voor u, voor een kopje koffie.'],
+        ['Yarisel', 'No, no, para mí no es nada. Es mi trabajo. Pero revise que no falte nada, ¿sí?', 'Nee, nee, voor mij is het niets. Het is mijn werk. Maar kijk even na of er niets ontbreekt, oké?'],
+        ['Mark', 'Todo está aquí. ¡Ni siquiera abrieron la mochila!', 'Alles is er. Ze hebben de rugzak niet eens opengemaakt!']
+      ],
+      q: [
+        { t: 'mc', q: '¿Qué perdió Mark?', o: ['Una mochila azul', 'Un boleto de bus', 'Una maleta negra'] },
+        { t: 'mc', q: '¿Dónde dejó Mark la mochila?', o: ['En el bus de Boquete', 'En el aeropuerto', 'En un restaurante'] },
+        { t: 'mc', q: '¿Quién trae la mochila?', o: ['El chofer', 'Un turista', 'Nadie'] }
+      ]
+    },
+    culture: { t: 'Panamá en «nee» zeggen', html: `<p>🇵🇦 In Panama betaal je met de <b>Amerikaanse dollar</b> (daar heet hij ook <i>balboa</i>). Een bus heet er vaak <i>diablo rojo</i>: oude, felgekleurde Amerikaanse schoolbussen. Typisch Panamees zijn <i>¡xopá!</i> (hoi) en <i>la vaina</i> (het ding, het gedoe), dat je ook in Colombia en Venezuela veel hoort.</p>
+<p>🙅 In veel Latijns-Amerikaanse landen zeggen mensen niet graag hard <b>nee</b>. Vaak hoor je een zachter antwoord: <i>«Ahorita no, pero…»</i>, <i>«Déjame ver»</i>, <i>«Tal vez»</i> of <i>«Lo voy a pensar»</i>. Dat betekent meestal toch: nee.</p>
+<p>🙏 Iemand een fooi of iets kleins aanbieden voor hulp is beleefd. Wordt het geweigerd met <i>«No es nada»</i>, dan bedank je gewoon hartelijk.</p>` },
+    ex: [
+      { t: 'cloze', s: 'No hay ___ en la oficina.', a: ['nadie'], o: ['nadie', 'alguien', 'nada'], nl: 'Er is niemand op kantoor.', tag: 'negation' },
+      { t: 'cloze', s: '¿Quieres ___ de tomar?', a: ['algo'], o: ['algo', 'nada', 'alguien'], nl: 'Wil je iets drinken?', tag: 'negation' },
+      { t: 'cloze', s: 'No quiero ___, gracias.', a: ['nada'], o: ['nada', 'algo', 'nunca'], nl: 'Ik hoef niets, dank je.', tag: 'negation' },
+      { t: 'cloze', s: '___ me llamó ayer.', a: ['Nadie'], o: ['Nadie', 'No nadie', 'Nada'], nl: 'Niemand heeft me gisteren gebeld.', x: 'Staat nadie vóór het werkwoord, dan geen no.', tag: 'negation' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['No conozco a nadie.', 'No conozco nadie.', 'Conozco a nadie.'], x: 'Dubbele ontkenning + a vóór personen.', tag: 'negation' },
+      { t: 'cloze', s: '¿Tienes ___ libro en español?', a: ['algún'], o: ['algún', 'alguno', 'alguna'], nl: 'Heb je een boek in het Spaans?', x: 'Vóór een mannelijk enkelvoudig woord: algún.', tag: 'negation' },
+      { t: 'cloze', s: 'No hay ___ farmacia abierta.', a: ['ninguna'], o: ['ninguna', 'ningún', 'nada'], nl: 'Er is geen enkele apotheek open.', tag: 'negation' },
+      { t: 'cloze', s: '¿Vienes ___ al cine?', a: ['conmigo'], o: ['conmigo', 'con mí', 'con yo'], nl: 'Ga je met mij mee naar de bioscoop?', tag: 'prep-pron' },
+      { t: 'cloze', s: 'Este regalo es para ___.', a: ['ti'], o: ['ti', 'tú', 'te'], nl: 'Dit cadeau is voor jou.', tag: 'prep-pron' },
+      { t: 'cloze', s: 'Entre tú y ___, no me gusta su novio.', a: ['yo'], o: ['yo', 'mí', 'me'], nl: 'Onder ons gezegd, ik vind haar vriend niet leuk.', x: 'Na entre gebruik je yo en tú.', tag: 'prep-pron' },
+      { t: 'cloze', s: '¿Es tuya esta sombrilla? — Sí, es ___.', a: ['mía'], o: ['mía', 'mío', 'mi'], nl: 'Is deze paraplu van jou? — Ja, hij is van mij.', tag: 'possessive' },
+      { t: 'mc', q: '«Ik drink nooit koffie» kan op twee manieren. Welke is FOUT?', o: ['No nunca tomo café.', 'Nunca tomo café.', 'No tomo café nunca.'], tag: 'negation' },
+      { t: 'tr', nl: 'Ik heb niets gezien.', a: ['No vi nada.', 'No he visto nada.', 'Yo no vi nada.'], tag: 'negation' },
+      { t: 'tr', nl: 'Niemand begrijpt me.', a: ['Nadie me entiende.', 'No me entiende nadie.'], tag: 'negation' },
+      { t: 'tr', nl: 'Wil je met mij dansen?', a: ['¿Quieres bailar conmigo?', '¿Bailas conmigo?'], tag: 'prep-pron' },
+      { t: 'tr', nl: 'Ik heb noch tijd noch geld.', a: ['No tengo ni tiempo ni dinero.', 'No tengo ni tiempo ni plata.'], tag: 'negation' },
+      { t: 'order', s: 'No hay nadie en la terminal.', nl: 'Er is niemand op het busstation.', tag: 'negation' },
+      { t: 'match', p: [['algo', 'iets'], ['nada', 'niets'], ['alguien', 'iemand'], ['nadie', 'niemand'], ['nunca', 'nooit']], tag: 'negation' }
+    ],
+    say: [['No conozco a nadie aquí.', 'Ik ken hier niemand.'], ['¿Alguien ha visto mi mochila?', 'Heeft iemand mijn rugzak gezien?'], ['¿Vienes conmigo?', 'Ga je met me mee?'], ['Sí, es mía. ¡Muchas gracias!', 'Ja, die is van mij. Heel erg bedankt!']],
+    task: { nl: 'Je bent iets kwijtgeraakt op reis. Schrijf een bericht voor een Facebookgroep: wat ben je kwijt, waar en wanneer, en wat zat erin? Gebruik minstens drie ontkenningen (nada, nadie, nunca, ningún).', model: '¡Hola a todos! Ayer perdí mi mochila negra en el bus de Panamá a Boquete. No tiene nada de valor, pero mi cédula está adentro. Nadie en la terminal la ha visto y no tengo ningún otro documento. ¿Alguien la encontró? ¡Mil gracias!' },
+    scenario: { nl: 'Je bent je tas kwijt en je vraagt het na bij het bureau voor gevonden voorwerpen in Panama-Stad.', role: 'Eres Yarisel, empleada de la oficina de objetos perdidos en la terminal de buses de Albrook, en Ciudad de Panamá. Eres amable pero un poco lenta. Usas «¡xopá!» y «la vaina». Haces preguntas: qué perdió, dónde, cuándo, cómo es, qué tiene adentro. Al principio no encuentras nada.', goal: 'Beschrijf wat je kwijt bent en gebruik ontkenningen (nada, nadie, ningún).' },
+    reading: {
+      t: 'Objetos perdidos', type: 'Berichten in een buurtgroep',
+      p: [
+        ['¡Xopá, vecinos! Ayer encontré unos lentes en la parada de bus de la Vía España. Pregunté en las tiendas, pero nadie sabe de quién son. Si son suyos, escríbanme.',
+          'Hoi buren! Gisteren vond ik een bril bij de bushalte aan de Vía España. Ik heb het in de winkels gevraagd, maar niemand weet van wie hij is. Als hij van u is, schrijf me dan.'],
+        ['Hola a todos. Perdí a mi perro Rocky el domingo en el parque Omar. Es pequeño y café. No tiene collar. Lo busqué en todos lados, pero no lo encontré en ningún lado.',
+          'Hallo allemaal. Ik ben zondag mijn hond Rocky kwijtgeraakt in het Omarpark. Hij is klein en bruin. Hij heeft geen halsband. Ik heb overal gezocht, maar ik heb hem nergens gevonden.'],
+        ['¿Alguien ha visto una sombrilla verde? La dejé en el asiento de un taxi el viernes. Ya sé que nunca la voy a recuperar, pero era de mi abuela. ¡Ni modo!',
+          'Heeft iemand een groene paraplu gezien? Ik liet hem vrijdag op de stoel van een taxi liggen. Ik weet al dat ik hem nooit terugkrijg, maar hij was van mijn oma. Jammer dan!'],
+        ['¡Buenas noticias! Rocky ya está en casa conmigo. Una señora lo encontró y me llamó. Gracias a todos por compartir el mensaje.',
+          'Goed nieuws! Rocky is weer thuis bij mij. Een mevrouw vond hem en belde me. Iedereen bedankt voor het delen van het bericht.']
+      ],
+      gl: [['de quién', 'van wie'], ['el collar', 'de halsband'], ['recuperar', 'terugkrijgen'], ['las buenas noticias', 'het goede nieuws']],
+      q: [
+        { t: 'mc', q: '¿Qué encontró la primera persona?', o: ['Unos lentes', 'Un perro', 'Una sombrilla'] },
+        { t: 'mc', q: '¿Dónde perdió su perro la segunda persona?', o: ['En el parque Omar', 'En un taxi', 'En la parada de bus'] },
+        { t: 'mc', q: '¿Por qué es importante la sombrilla verde?', o: ['Era de su abuela', 'Es muy cara', 'Es nueva'] },
+        { t: 'mc', q: '¿Qué pasó al final con Rocky?', o: ['Una señora lo encontró', 'Nadie lo encontró', 'Se fue a vivir con la abuela'] }
+      ]
+    }
+  });
+
+  /* ───────────────────────── A2 · 12 ───────────────────────── */
+  U({
+    id: 'a2-12', level: 'A2', icon: '🌴', title: 'Aquí se vive bien', nl: 'Zinnen verbinden, que / lo que / donde en se impersonal',
+    goals: ['Redenen, tegenstellingen en gevolgen geven (porque, aunque, así que)', 'Zinnen verbinden met que, lo que, donde en quien', 'Algemene uitspraken doen met se (aquí se habla español)'],
+    vocab: [
+      ['porque', 'omdat, want'], ['como', 'aangezien (aan het begin van de zin)'], ['por eso', 'daarom'], ['así que', 'dus'], ['aunque', 'hoewel, ook al'],
+      ['sino', 'maar (wel), maar juist'], ['además', 'bovendien'], ['o sea', 'dat wil zeggen, dus'], ['por un lado … por otro lado', 'aan de ene kant … aan de andere kant'],
+      ['sobre todo', 'vooral'], ['lo que', 'wat (dat wat)'], ['lo que más me gusta', 'wat ik het leukst vind'], ['donde', 'waar (betrekkelijk)'], ['quien', 'die (persoon, na voorzetsel)'],
+      ['el malecón', 'de boulevard langs de zee'], ['la zona colonial', 'de koloniale binnenstad'], ['el colmado', 'de buurtwinkel', 'DO (Dominicaanse Republiek)'],
+      ['la guagua', 'de bus', 'DO · Cuba · Puerto Rico · Canarische Eilanden'], ['el apagón', 'de stroomstoring'], ['la bachata', 'bachata (muziek en dans)'], ['el merengue', 'merengue'],
+      ['el dominó', 'domino'], ['¡qué lo qué!', 'hoe is ’t?', 'DO (informeel)'], ['chévere', 'tof, leuk', 'Caribisch gebied · CO · VE'], ['la gente', 'de mensen', 'enkelvoud: la gente es…'],
+      ['acostumbrarse a…', 'wennen aan…'], ['mudarse a…', 'verhuizen naar…'], ['el ritmo de vida', 'het levenstempo'], ['relajado / relajada', 'ontspannen'],
+      ['tranquilo, sin prisa', 'rustig aan, zonder haast'], ['se dice que…', 'men zegt dat…'], ['se prohíbe…', 'het is verboden te…'], ['se vende', 'te koop'], ['se alquila', 'te huur'],
+      ['vale la pena', 'het is de moeite waard'], ['al principio', 'in het begin']
+    ],
+    grammar: [
+      { t: 'Zinnen verbinden', es: 'Los conectores',
+        html: `<p><b>Porque</b> geeft een reden en staat midden in de zin: <i>No salgo porque llueve.</i> Wil je de reden juist <b>vooraan</b> zetten, gebruik dan <b>como</b>: <i>Como llueve, no salgo.</i></p>
+<p><b>Por eso</b> (daarom) en <b>así que</b> (dus) geven een gevolg: <i>Llueve, así que no salgo.</i></p>
+<p><b>Aunque</b> (hoewel, ook al) geeft een tegenstelling: <i>Aunque hace calor, me encanta vivir aquí.</i></p>
+<p><b>Sino</b> gebruik je na een ontkenning om iets te verbeteren: <i>No es cubano, sino dominicano.</i> (niet …, maar wél …)</p>`,
+        table: [['functie', 'woorden'], ['reden', 'porque · como · ya que'], ['gevolg', 'por eso · así que · entonces'], ['tegenstelling', 'pero · aunque · en cambio · sin embargo'], ['toevoeging', 'y · además · también'], ['verbetering', 'no … sino …']],
+        ex: [['Como no tenía plata, me quedé en casa.', 'Omdat ik geen geld had, bleef ik thuis.'], ['Aunque es pequeña, la ciudad tiene mucha vida.', 'Hoewel de stad klein is, is er veel leven.']] },
+      { t: 'Que, lo que, donde, quien', es: 'Los relativos',
+        html: `<p><b>Que</b> is het gewone betrekkelijk voornaamwoord, voor personen én dingen: <i>El chico que vive aquí</i> (de jongen die hier woont), <i>el libro que leo</i> (het boek dat ik lees).</p>
+<p><b>Lo que</b> betekent <i>wat</i> of <i>datgene wat</i>, als je geen zelfstandig naamwoord noemt: <i>Lo que más me gusta es el mar.</i> · <i>No entiendo lo que dices.</i></p>
+<p><b>Donde</b> gebruik je voor een plaats: <i>el barrio donde vivo</i>. Na een voorzetsel bij personen gebruik je vaak <b>quien</b>: <i>la amiga con quien viajé</i>.</p>
+<p>⚠️ Zonder accent! Met accent zijn het vraagwoorden: <i>¿qué?, ¿dónde?, ¿quién?</i></p>`,
+        sum: '«Lo que» = «la cosa que»: Lo que necesito es descansar.' },
+      { t: 'Se impersonal: men, je', es: 'El «se» impersonal',
+        html: `<p>Voor algemene uitspraken (<i>men</i>, <i>je</i>, <i>ze</i>) gebruik je <b>se + werkwoord in de 3e persoon</b>: <i>Aquí se vive bien.</i> (Hier leef je goed.) · <i>¿Cómo se dice…?</i> (Hoe zeg je…?)</p>
+<p>Staat er een zelfstandig naamwoord in het meervoud bij, dan gaat het werkwoord ook in het meervoud: <i>Se habla español</i>, maar <i>Se venden casas</i>.</p>
+<p>Je ziet dit vaak op bordjes: <i>Se vende</i> (te koop), <i>Se alquila</i> (te huur), <i>Se prohíbe fumar</i> (verboden te roken), <i>Se busca mesero</i>.</p>`,
+        table: [['enkelvoud', 'meervoud'], ['se vende carro', 'se venden carros'], ['se habla inglés', 'se hablan varios idiomas'], ['se necesita ayuda', 'se necesitan voluntarios']] }
+    ],
+    verbs: ['vivir', 'hablar', 'vender', 'alquilar', 'necesitar', 'decir', 'comer'], tenses: ['pres', 'imp'],
+    dialogue: {
+      t: 'Un paseo por la Zona Colonial', place: 'Santo Domingo 🇩🇴',
+      lines: [
+        ['Yokasta', '¡Qué lo qué, Mark! ¿Cómo te va en Santo Domingo?', 'Hé Mark, hoe is ’t? Hoe gaat het in Santo Domingo?'],
+        ['Mark', 'Muy bien, aunque todavía no me acostumbro al calor.', 'Heel goed, al ben ik nog niet gewend aan de hitte.'],
+        ['Yokasta', 'Normal. Como vienes de Holanda, para ti todo es muy caliente.', 'Logisch. Aangezien je uit Nederland komt, is alles voor jou heel warm.'],
+        ['Mark', 'Sí. Pero lo que más me gusta es la gente. Todo el mundo habla contigo.', 'Ja. Maar wat ik het leukst vind, zijn de mensen. Iedereen praat met je.'],
+        ['Yokasta', 'Es verdad. Aquí se vive en la calle. Mira, esa es la casa donde nació mi abuelo.', 'Dat is waar. Hier leef je op straat. Kijk, dat is het huis waar mijn opa geboren is.'],
+        ['Mark', '¡Qué bonita! ¿Y qué es ese lugar con tanta música?', 'Wat mooi! En wat is die plek met zoveel muziek?'],
+        ['Yokasta', 'Es un colmado. Se compra de todo, se juega dominó y se baila bachata.', 'Dat is een buurtwinkel. Je koopt er van alles, je speelt domino en je danst bachata.'],
+        ['Mark', 'O sea, no es solo una tienda, sino un lugar para estar con los vecinos.', 'Dus het is niet alleen een winkel, maar een plek om met de buren samen te zijn.'],
+        ['Yokasta', '¡Exacto! Por eso el colmado es tan importante aquí.', 'Precies! Daarom is de buurtwinkel hier zo belangrijk.'],
+        ['Mark', 'Una pregunta: ¿cómo se dice «bus» aquí?', 'Een vraag: hoe zeg je hier «bus»?'],
+        ['Yokasta', '¡Guagua! Y la guagua que va al malecón pasa por aquí. ¡Vamos!', 'Guagua! En de bus die naar de boulevard gaat, komt hier langs. Kom op!']
+      ],
+      q: [
+        { t: 'mc', q: '¿A qué no se acostumbra Mark todavía?', o: ['Al calor', 'A la comida', 'A la música'] },
+        { t: 'mc', q: '¿Qué le gusta más a Mark de Santo Domingo?', o: ['La gente', 'El calor', 'El malecón'] },
+        { t: 'mc', q: '¿Qué se hace en un colmado?', o: ['Se compra, se juega dominó y se baila', 'Solo se compra comida', 'Se estudia'] }
+      ]
+    },
+    culture: { t: 'Het Caribische Spaans', html: `<p>🇩🇴🇨🇺🇵🇷 In het Caribisch gebied klinkt het Spaans snel en zangerig. Een <b>s</b> aan het eind van een lettergreep wordt vaak ingeslikt: <i>¿Cómo estás?</i> klinkt als <i>«¿Cómo ehtá?»</i>, en <i>los dos</i> als <i>«lo do»</i>. Op Puerto Rico klinkt de <b>r</b> soms als een <b>l</b>: <i>«Puelto Lico»</i>.</p>
+<p>🚌 <i>Guagua</i> (bus) gebruik je in de Dominicaanse Republiek, Cuba en Puerto Rico. Het woord kom je ook tegen op de Canarische Eilanden. Let op: in Chili betekent <i>guagua</i> juist <b>baby</b>!</p>
+<p>🏪 De <b>colmado</b> is de buurtwinkel, en die is veel meer dan een winkel: er klinkt muziek, mensen drinken er iets en spelen domino. Je kunt er ook <i>fiao</i> (op de pof) kopen.</p>` },
+    ex: [
+      { t: 'cloze', s: 'No salgo ___ llueve mucho.', a: ['porque'], o: ['porque', 'como', 'así que'], nl: 'Ik ga niet naar buiten, want het regent hard.', tag: 'connectors' },
+      { t: 'cloze', s: '___ no tenía plata, me quedé en casa.', a: ['Como'], o: ['Como', 'Porque', 'Aunque'], nl: 'Omdat ik geen geld had, bleef ik thuis.', x: 'Reden vooraan in de zin: como.', tag: 'connectors' },
+      { t: 'cloze', s: '___ hace mucho calor, me encanta vivir aquí.', a: ['Aunque'], o: ['Aunque', 'Porque', 'Por eso'], nl: 'Hoewel het heel warm is, woon ik hier heel graag.', tag: 'connectors' },
+      { t: 'cloze', s: 'Estaba cansado, ___ me acosté temprano.', a: ['así que'], o: ['así que', 'aunque', 'como'], nl: 'Ik was moe, dus ik ging vroeg naar bed.', tag: 'connectors' },
+      { t: 'cloze', s: 'No es cubana, ___ dominicana.', a: ['sino'], o: ['sino', 'pero', 'si no'], nl: 'Ze is niet Cubaans, maar Dominicaans.', tag: 'connectors' },
+      { t: 'cloze', s: 'El chico ___ vive arriba es músico.', a: ['que'], o: ['que', 'quien', 'lo que'], nl: 'De jongen die boven woont, is muzikant.', tag: 'relative' },
+      { t: 'cloze', s: 'No entiendo ___ dices.', a: ['lo que'], o: ['lo que', 'que', 'qué lo'], nl: 'Ik begrijp niet wat je zegt.', tag: 'relative' },
+      { t: 'cloze', s: 'Este es el barrio ___ crecí.', a: ['donde'], o: ['donde', 'que', 'dónde'], nl: 'Dit is de wijk waar ik ben opgegroeid.', tag: 'relative' },
+      { t: 'cloze', s: 'La amiga con ___ viajé vive en Santiago.', a: ['quien'], o: ['quien', 'que', 'lo que'], nl: 'De vriendin met wie ik reisde, woont in Santiago.', tag: 'relative' },
+      { t: 'cloze', s: 'En esta tienda se ___ celulares.', a: ['venden'], o: ['venden', 'vende', 'vendemos'], nl: 'In deze winkel worden mobieltjes verkocht.', x: 'Meervoud (celulares) → se venden.', tag: 'se-impersonal' },
+      { t: 'cloze', s: 'Aquí se ___ muy bien.', h: 'comer', a: ['come'], nl: 'Hier eet je heel goed.', tag: 'se-impersonal' },
+      { t: 'mc', q: 'Wat betekent het bordje «Se alquila»?', o: ['Te huur', 'Te koop', 'Gesloten'], tag: 'se-impersonal' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['Lo que más me gusta es la playa.', 'Que más me gusta es la playa.', 'El que más me gusta es la playa.'], tag: 'relative' },
+      { t: 'tr', nl: 'Hoe zeg je «bus» in de Dominicaanse Republiek?', a: ['¿Cómo se dice «bus» en la República Dominicana?', '¿Cómo se dice bus en República Dominicana?', '¿Cómo se dice bus en la República Dominicana?'], tag: 'se-impersonal' },
+      { t: 'tr', nl: 'Wat ik nodig heb, is vakantie.', a: ['Lo que necesito son vacaciones.', 'Lo que yo necesito son vacaciones.'], tag: 'relative' },
+      { t: 'tr', nl: 'Hoewel het klein is, is het een mooi huis.', a: ['Aunque es pequeña, es una casa bonita.', 'Aunque es pequeña, es una casa linda.', 'Aunque es pequeña, es una linda casa.', 'Aunque es pequeña, es una bonita casa.'], tag: 'connectors' },
+      { t: 'order', s: 'Lo que más me gusta es la gente.', nl: 'Wat ik het leukst vind, zijn de mensen.', tag: 'relative' },
+      { t: 'match', p: [['porque', 'omdat'], ['aunque', 'hoewel'], ['así que', 'dus'], ['por eso', 'daarom'], ['además', 'bovendien']], tag: 'connectors' }
+    ],
+    say: [['Lo que más me gusta es la gente.', 'Wat ik het leukst vind, zijn de mensen.'], ['Aunque hace calor, me encanta vivir aquí.', 'Hoewel het warm is, woon ik hier heel graag.'], ['¿Cómo se dice «bus» aquí?', 'Hoe zeg je hier «bus»?'], ['Como no tenía plata, me quedé en casa.', 'Omdat ik geen geld had, bleef ik thuis.']],
+    task: { nl: 'Beschrijf de stad of het dorp waar je woont voor iemand die erheen wil verhuizen. Wat doe je er (se …)? Wat vind je het leukst (lo que …)? Gebruik minstens vier verbindingswoorden: porque, aunque, así que, por eso, además.', model: 'Vivo en Utrecht, una ciudad donde se usa mucho la bicicleta. Lo que más me gusta es el centro, porque es pequeño y muy bonito. Aunque llueve mucho, la gente es simpática. Además, se come bien y hay muchos cafés. Por eso creo que vale la pena vivir aquí.' },
+    scenario: { nl: 'Je dominicaanse vriendin Yokasta vraagt waarom je naar Santo Domingo bent verhuisd en wat je ervan vindt.', role: 'Eres Yokasta, una dominicana de 32 años, alegre y habladora, que vive en la Zona Colonial de Santo Domingo. Usas «¡qué lo qué!», «chévere» y «guagua». Preguntas al estudiante por qué se mudó, qué le gusta y qué no, y comparas con la vida en Holanda.', goal: 'Geef redenen en tegenstellingen (porque, como, aunque, así que) en gebruik lo que.' },
+    reading: {
+      t: 'Cinco años en Santo Domingo', type: 'Interview',
+      p: [
+        ['Pieter es holandés y vive en Santo Domingo desde hace cinco años. Trabaja en un hotel de la Zona Colonial. Le preguntamos cómo es la vida en la isla.',
+          'Pieter is Nederlander en woont al vijf jaar in Santo Domingo. Hij werkt in een hotel in de koloniale binnenstad. We vroegen hem hoe het leven op het eiland is.'],
+        ['«Me mudé aquí porque me enamoré de una dominicana. Al principio fue difícil, ya que no hablaba bien español y los dominicanos hablan rapidísimo. Además, se comen la s.»',
+          '«Ik ben hierheen verhuisd omdat ik verliefd werd op een Dominicaanse. In het begin was het moeilijk, want ik sprak niet goed Spaans en Dominicanen praten supersnel. Bovendien slikken ze de s in.»'],
+        ['«Lo que más me gusta es el ritmo de vida: aquí la gente es relajada y siempre tiene tiempo para hablar. En cambio, lo que menos me gusta son los apagones. Como hace tanto calor, sin aire acondicionado no se puede dormir.»',
+          '«Wat ik het leukst vind, is het levenstempo: de mensen hier zijn ontspannen en hebben altijd tijd om te praten. Wat ik daarentegen het minst leuk vind, zijn de stroomstoringen. Omdat het zo warm is, kun je zonder airco niet slapen.»'],
+        ['«¿Si volvería a Holanda? No, aunque a veces extraño a mi familia. Aquí se vive bien y la playa está a media hora. ¡Vale la pena!»',
+          '«Of ik terug zou gaan naar Nederland? Nee, al mis ik soms mijn familie. Hier leef je goed en het strand is op een halfuur. Het is de moeite waard!»']
+      ],
+      gl: [['enamorarse de', 'verliefd worden op'], ['ya que', 'aangezien, want'], ['comerse la s', 'de s inslikken'], ['el aire acondicionado', 'de airco']],
+      q: [
+        { t: 'mc', q: '¿Por qué se mudó Pieter a Santo Domingo?', o: ['Porque se enamoró de una dominicana', 'Porque encontró trabajo en un hotel', 'Porque no le gusta Holanda'] },
+        { t: 'mc', q: '¿Por qué fue difícil al principio?', o: ['No hablaba bien español', 'No tenía trabajo', 'No le gustaba la playa'] },
+        { t: 'mc', q: '¿Qué es lo que menos le gusta?', o: ['Los apagones', 'La gente', 'El ritmo de vida'] },
+        { t: 'mc', q: '¿Va a volver a Holanda?', o: ['No, aunque a veces extraña a su familia', 'Sí, el próximo año', 'Sí, porque hace mucho calor'] }
+      ]
+    }
+  });
 })(window.SPT);

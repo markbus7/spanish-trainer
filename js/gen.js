@@ -73,6 +73,7 @@
     { id: 'vocab2', icon: '🃏', nl: 'Woorden 2', es: 'Vocabulario 2', min: 7 },
     { id: 'grammar', icon: '🧩', nl: 'Grammatica', es: 'Gramática', min: 10 },
     { id: 'dialogue', icon: '💬', nl: 'Dialoog', es: 'Diálogo', min: 7 },
+    { id: 'read', icon: '📖', nl: 'Lezen', es: 'Lectura', min: 6 },
     { id: 'apply', icon: '🎙️', nl: 'Toepassen', es: 'Práctica libre', min: 8 },
     { id: 'test', icon: '🏁', nl: 'Unittoets', es: 'Examen', min: 6 }
   ];
@@ -117,6 +118,15 @@
     sl.slice(3, 5).forEach(({ l }) => items.push(speakItem(l[1], l[2])));
     return { title: u.title + ' · Dialoog', items, mode: 'learn' };
   }
+  function readingSession(u) {
+    const r = u.reading;
+    const items = [{ kind: 'reading', reading: r }];
+    r.q.forEach(q => items.push({ ...normEx(q, null, null, { noSrs: true, skill: 'read' }), skill: 'read', tag: 'vocab' }));
+    const sents = r.p.flatMap(([es, nl]) => { const e = es.split(/(?<=[.!?»])\s+/), n = nl.split(/(?<=[.!?»])\s+/); return e.length === n.length ? e.map((x, i) => [x.replace(/[«»]/g, "").trim(), n[i].replace(/[«»]/g, "").trim()]) : []; })
+      .filter(([es]) => { const n = es.split(' ').length; return n >= 4 && n <= 10; });
+    U.sample(sents, 2).forEach(([es, nl]) => items.push(listenItem(es, nl)));
+    return { title: u.title + ' · Lezen', items, mode: 'learn' };
+  }
   function applySession(u) {
     const items = [];
     if (u.culture) items.push({ kind: 'info', culture: u.culture });
@@ -136,6 +146,7 @@
     U.sample(conj, 3).forEach(([v, t]) => { const it = conjItem(v, t); if (it) items.push(it); });
     const sl = U.shuffle(shortLines(u));
     if (sl[0]) items.push(listenItem(sl[0].l[1], sl[0].l[2]));
+    if (u.reading) { const q = U.pick(u.reading.q); items.push({ ...normEx(q, null, null, { noSrs: true }), q: '«' + u.reading.t + '» — ' + q.q, skill: 'read', tag: 'vocab' }); }
     return { title: u.title + ' · Unittoets', items: U.shuffle(items.filter(Boolean)), mode: 'test', pass: 0.8 };
   }
   function stepSession(u, step) {
@@ -144,6 +155,7 @@
       case 'vocab2': return vocabSession(u, 2);
       case 'grammar': return grammarSession(u);
       case 'dialogue': return dialogueSession(u);
+      case 'read': return readingSession(u);
       case 'apply': return applySession(u);
       case 'test': return unitTest(u);
     }

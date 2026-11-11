@@ -28,7 +28,12 @@
     'pret-imp': 'indefinido vs. imperfecto', 'perfect': 'pretérito perfecto', 'doler': 'doler / gezondheid',
     'obligation': 'tener que / hay que / deber', 'object-pron': 'lijdend/meewerkend vnw.', 'comparatives': 'vergelijkingen',
     'future': 'futuro simple', 'por-para': 'por vs. para', 'imperative': 'imperativo', 'vocab': 'woordenschat', 'yo-irregular': 'onregelmatige yo-vorm',
-    'frequency': 'frequentie', 'muy-mucho': 'muy vs. mucho', 'conj': 'vervoegen'
+    'frequency': 'frequentie', 'muy-mucho': 'muy vs. mucho', 'conj': 'vervoegen',
+    'negation': 'ontkenning (nada, nadie, nunca)', 'prep-pron': 'para mí, conmigo', 'connectors': 'verbindingswoorden', 'relative': 'que / lo que / donde',
+    'se-impersonal': 'se impersonal', 'periphrasis': 'acabar de, volver a, dejar de',
+    'subj-wish': 'subjuntivo: wensen en verzoeken', 'subj-opinion': 'subjuntivo: mening en twijfel', 'subj-emotion': 'subjuntivo: gevoelens',
+    'subj-time': 'cuando + subjuntivo', 'subj-purpose': 'para que / antes de que', 'conditional': 'condicional', 'pluperfect': 'pluscuamperfecto',
+    'neg-imperative': 'ontkennende imperativo', 'reported': 'indirecte rede', 'si-clause': 'si-zinnen', 'become': 'worden (ponerse, volverse…)', 'argument': 'argumenteren'
   };
 
   const units = [];
@@ -36,6 +41,15 @@
   S.addUnit = function (u) {
     u.ex = u.ex || []; u.vocab = u.vocab || []; u.grammar = u.grammar || []; u.say = u.say || [];
     units.push(u); byId[u.id] = u;
+  };
+  /* Aanvulling op een bestaande unit. Woorden en oefeningen worden ALTIJD achteraan toegevoegd:
+     de herhaling onthoudt ze op volgnummer (w|unit|i, x|unit|i), dus invoegen in het midden zou voortgang verschuiven. */
+  S.extendUnit = function (id, add) {
+    const u = byId[id]; if (!u) throw new Error('extendUnit: onbekende unit ' + id);
+    ['vocab', 'ex', 'say', 'goals'].forEach(k => { if (add[k]) u[k] = (u[k] || []).concat(add[k]); });
+    if (add.grammar) u.grammar = u.grammar.concat(add.grammar);
+    if (add.verbs) u.verbs = [...new Set((u.verbs || []).concat(add.verbs))];
+    if (add.reading) u.reading = add.reading;
   };
   S.placement = [];
   S.scenarios = [];

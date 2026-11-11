@@ -1,6 +1,6 @@
 # 🌎 Español Latino
 
-Een complete leerapp voor **Latijns-Amerikaans Spaans**, gebouwd voor Nederlandstaligen. Je leert stap voor stap van **A1 naar B1**, en daarna verder tot **C2**.
+Een complete leerapp voor **Latijns-Amerikaans Spaans**, gebouwd voor Nederlandstaligen. Je leert stap voor stap van **A1 tot en met B1**, en daarna verder tot **C2**.
 
 ## Hoe gebruik je het?
 
@@ -16,12 +16,13 @@ npm start            # = python3 -m http.server 8080 → http://localhost:8080
 
 | Onderdeel | Inhoud |
 |---|---|
-| **Curriculum** | 20 units (A1 en A2), elk met 6 stappen: *Woorden 1 · Woorden 2 · Grammatica · Dialoog · Toepassen · Unittoets* |
-| **Lesstof** | ±580 woorden, ±300 oefeningen, 20 dialogen uit 10 landen, uitleg in het Nederlands |
+| **Curriculum** | 32 units (10 × A1, 12 × A2, 10 × B1), elk met 7 stappen: *Woorden 1 · Woorden 2 · Grammatica · Dialoog · Lezen · Toepassen · Unittoets* |
+| **Lesstof** | ±1.370 woorden, ±600 oefeningen, 32 dialogen en 32 leesteksten uit 15 landen, uitleg in het Nederlands (vanaf B1 met Spaanse samenvatting) |
 | **Plaatsingstoets** | Adaptief (A1 → B2). Bepaalt je startpunt. |
 | **Herhaalsysteem** | Spaced repetition voor woorden, grammatica én werkwoorden. Wat je fout doet, komt sneller terug. |
 | **Oefenvormen** | meerkeuze, invullen, vertalen, zinnen bouwen, paren koppelen, dictee, uitspraak (spraakherkenning), schrijfopdrachten |
-| **Werkwoordtrainer** | Vervoegingsmachine voor 140+ werkwoorden in 10 tijden, plus naslagtabellen |
+| **Woordspellen** | *Sopa de letras* (woordzoeker), *Crucigrama* (kruiswoord), *Revoltijo* (letterhusselaar), *El volcán* (raad het woord) en *Parejas* (memory). Woorden uit je eigen units, een heel niveau of één unit; wat in de herhaling klaarstaat komt eerst, en elk woord telt mee in de herhaling |
+| **Werkwoordtrainer** | Vervoegingsmachine voor 170+ werkwoorden in 12 tijden, plus naslagtabellen |
 | **Regio’s** | Mexico, Colombia, Argentinië/Uruguay, Chili, Andes, Caribisch gebied, Midden-Amerika: kenmerken en typische woorden |
 | **AI-docent** *(optioneel)* | Rollenspellen met correcties, grammaticavragen en tekstcorrectie via de Claude API (eigen sleutel) |
 | **Voortgang** | Dagdoel, streak, XP, badges, vaardigheden, zwakke punten, activiteitenkaart, back-up/herstel |
@@ -31,6 +32,11 @@ npm start            # = python3 -m http.server 8080 → http://localhost:8080
 
 ### Uitleg in jouw taal, steeds meer Spaans
 De instelling *Automatisch* geeft uitleg in het Nederlands tot en met A2. Vanaf B1 schakelt de app steeds meer over op Spaans. Je kunt dit zelf aanpassen bij Instellingen.
+
+## Stemmen
+Alle vaste lesstof is ingesproken met natuurlijke neurale stemmen uit Latijns-Amerika: woorden, voorbeeldzinnen, dialogen, leesteksten en vervoegingen. Elke dialoog gebruikt een stem uit het land waar hij zich afspeelt. De opnames staan in `audio/`. Wat niet is ingesproken, zoals de antwoorden van de AI-docent, leest je apparaat zelf voor.
+
+De opnames maakt de GitHub-actie **Stemmen maken** met de gratis voorleesstemmen van Microsoft Edge (`edge-tts`, geen sleutel nodig). Hij draait vanzelf als de lesstof op `main` verandert. Je kunt hem ook zelf starten via *Actions → Stemmen maken → Run workflow*. Hij spreekt alleen nieuwe teksten in en ruimt opnames op die niet meer gebruikt worden. Let op: dit is geen officiële dienst van Microsoft. Als hij ooit stopt, blijven de bestaande opnames gewoon werken.
 
 ## AI-docent instellen (optioneel)
 1. Maak een API-sleutel aan op [console.anthropic.com](https://console.anthropic.com). Je betaalt per gebruik.
@@ -48,7 +54,7 @@ De app haalt je voortgang op als je hem opent en uploadt hem kort na het oefenen
 
 ## Routekaart
 - ✅ **Fase 1:** basis, plaatsingstoets, herhaalsysteem, A1 + A2 compleet, AI-docent
-- ⏳ **Fase 2:** B1 (subjuntivo, condicional, meningen en argumenteren)
+- ✅ **Fase 2:** A1/A2 aangevuld (leesteksten, ±1.000 woorden) en B1 compleet (subjuntivo, condicional, pluscuamperfecto, indirecte rede, argumenteren)
 - ⏳ **Fase 3:** B2 (imperfecto de subjuntivo, voseo, regionale luistervaardigheid, schrijfopdrachten)
 - ⏳ **Fase 4:** C1–C2 (register, idiomen, authentieke teksten, essays en presentaties)
 
@@ -57,18 +63,27 @@ Gewone HTML, CSS en JavaScript. Er is geen build-stap en er zijn geen dependenci
 
 ```
 index.html          app-shell
+js/version.js       versienummer (zie hieronder)
 css/app.css         ontwerp (licht/donker)
 js/core.js          opslag, herhaalsysteem, antwoordcontrole, spraak
 js/conjugate.js     vervoegingsmachine
 js/curriculum.js    niveaus en register
 js/gen.js           oefeningen en sessies samenstellen
+js/games.js         woordspellen (puzzelmakers + spelschermen, route #/juegos)
 js/lesson.js        lesmotor (alle oefenvormen)
 js/ai.js            AI-docent (Claude API)
 js/app.js           schermen en navigatie
 content/a1.js       lesstof A1 · content/a2.js lesstof A2 · content/extra.js toets, regio’s, rollenspellen
+content/*-plus.js   aanvullingen per unit (extra woorden, oefeningen, leesteksten)
+tools/tts-*.{js,py} teksten verzamelen en inspreken (zie .github/workflows/stemmen.yml)
+audio/              ingesproken opnames (audio/<sleutel>.mp3 + index.json)
 ```
 
 Een nieuw niveau voeg je toe door een bestand `content/b1.js` aan te maken in hetzelfde formaat en het in `index.html` en `sw.js` op te nemen.
+
+Wil je een bestaande unit aanvullen, gebruik dan `S.extendUnit(id, { vocab, ex, reading })` (zie `content/a1-plus.js`). Woorden en oefeningen komen dan altijd achteraan. Voeg ze nooit in het midden toe: de herhaling onthoudt ze op volgnummer.
+
+**Versienummer.** Verhoog bij elke wijziging die live gaat het nummer en de datum in `js/version.js`, en het nummer in `package.json` (de test controleert dat ze gelijk zijn). Het nummer staat in ⚙️ Instellingen › Over de app, met een knop *Controleren op updates*. De service worker gebruikt het als cachenaam, dus een nieuw nummer ruimt de oude offline-cache op.
 
 ```bash
 npm test             # controleert alle lesstof, vervoegingen en de antwoordcontrole
