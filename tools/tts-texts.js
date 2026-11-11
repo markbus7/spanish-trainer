@@ -27,14 +27,17 @@ function country(place) {
   return cps.length >= 2 ? String.fromCharCode(cps[0] - 0x1F1E6 + 65, cps[1] - 0x1F1E6 + 65) : null;
 }
 const out = new Map();
+let LV = 'X'; // niveau van de unit die nu wordt doorlopen (voor 'offline downloaden per niveau'); X = overig
 function add(text, voice = DEF) {
   if (!text || !/[a-záéíóúñü]/i.test(text)) return;
   const k = S.Speech.key(text);
-  if (!out.has(k)) out.set(k, { k, text: S.Speech.clean(text), voice });
+  if (!out.has(k)) out.set(k, { k, text: S.Speech.clean(text), voice, lv: [LV] });
+  else if (!out.get(k).lv.includes(LV)) out.get(k).lv.push(LV);
 }
 const ES = /[¿¡áéíóúñ]|\b(el|la|los|las|un|una|de|que|y|es|en|yo|tú|usted|no)\b/i;
 
 for (const u of S.C.all()) {
+  LV = u.level;
   const c = country(u.dialogue && u.dialogue.place) || country(u.reading && u.reading.place);
   const [vf, vm_] = VOICES[c] || VOICES.MX;
   u.vocab.forEach(w => { add(w[0]); add(w[0].replace(/…/g, '').trim()); });
@@ -67,6 +70,7 @@ for (const u of S.C.all()) {
     });
   }));
 }
+LV = 'X';
 (S.phrases || []).forEach(p => add(p[0]));
 (S.regions || []).forEach(r => { const v = VOICES[r.id.toUpperCase()]; (r.words || []).forEach(([es]) => add(es, v ? v[0] : DEF)); });
 add('¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.');

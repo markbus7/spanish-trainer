@@ -524,3 +524,8 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 }
 .unit-lv > summary b, .test-row summary b { color: var(--ink); }
 .unit-lv > summary, .test-row summary { color: var(--ink); margin: 0; }
+
+/* Offline luisteren (Instellingen) */
+.offline-rows { display: flex; flex-direction: column; gap: 4px; }
+.offline-row { padding: 10px 0; border-top: 1px solid var(--line, rgba(0,0,0,.08)); align-items: center; }
+.offline-row:first-child { border-top: 0; }

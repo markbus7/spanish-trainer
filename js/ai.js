@@ -5,11 +5,11 @@
   const API = 'https://api.anthropic.com/v1/messages';
   const VERSION = '2026-10-21';
   const MODELS = [
-    { id: 'claude-opus-5-5', label: 'Claude Opus 5.5 — beste kwaliteit (aanbevolen)' },
-    { id: 'claude-sonnet-5-5', label: 'Claude Sonnet 5.5 — snel, goedkoper' },
+    { id: 'claude-sonnet-5-5', label: 'Claude Sonnet 5.5 — snel en goedkoper (aanbevolen)' },
+    { id: 'claude-opus-5-5', label: 'Claude Opus 5.5 — beste kwaliteit, duurder' },
     { id: 'claude-haiku-5-5', label: 'Claude Haiku 5.5 — snelst, goedkoopst' }
   ];
-  const FALLBACK_MODELS = ['claude-opus-5-5', 'claude-sonnet-5-5'];
+  const FALLBACK_MODELS = ['claude-sonnet-5-5', 'claude-opus-5-5'];
 
   function key() { return (S.Store.state.settings.aiKey || '').trim(); }
   function model() { const m = S.Store.state.settings.aiModel; return MODELS.some(x => x.id === m) ? m : MODELS[0].id; }

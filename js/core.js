@@ -40,7 +40,7 @@
       v: 1, created: Date.now(), updated: 0, epoch: 0, name: '',
       settings: {
         goal: 20, explain: 'auto', strictAccents: false, voice: '', rate: 0.9, sound: true, theme: 'auto',
-        aiKey: '', aiModel: 'claude-opus-5-5', autoSpeak: true, tutorVoice: false, unlockAll: false, region: 'latam'
+        aiKey: '', aiModel: 'claude-sonnet-5-5', aiModelV: 2, autoSpeak: true, tutorVoice: false, unlockAll: false, region: 'latam'
       },
       placement: { done: false, level: null, start: null, date: null },
       units: {}, levels: {}, srs: {}, tags: {},
@@ -62,7 +62,12 @@
     load() {
       try {
         const raw = localStorage.getItem(KEY);
-        if (raw) this.state = merge(defaults(), JSON.parse(raw));
+        if (raw) {
+          const saved = JSON.parse(raw), ss = saved.settings || {};
+          // v1.5: Sonnet is de nieuwe standaard. Wie nog op de oude standaard (Opus) stond, gaat één keer mee over.
+          if (!(ss.aiModelV >= 2) && ss.aiModel === 'claude-opus-5-5') ss.aiModel = 'claude-sonnet-5-5';
+          this.state = merge(defaults(), saved);
+        }
       } catch (e) { this.ok = false; }
       return this.state;
     },
@@ -287,7 +292,7 @@
   const Speech = {
     voices: [], ready: false,
     /* Opnames: vaste lesstof is vooraf ingesproken (audio/<sleutel>.mp3, zie tools/). Anders de stem van het apparaat. */
-    clips: null, el: null,
+    clips: null, levels: null, el: null,
     clean(t) { return String(t).normalize('NFC').replace(/\s*\/\s*/g, ', ').replace(/\s+/g, ' ').trim(); },
     key(t) {
       const s = this.clean(t).toLowerCase();
@@ -299,7 +304,7 @@
     },
     loadClips() {
       if (typeof fetch !== 'function' || typeof Audio !== 'function') return;
-      fetch('audio/index.json').then(r => r.ok ? r.json() : null).then(j => { if (j && j.clips) this.clips = new Set(j.clips); }).catch(() => { /* geen opnames */ });
+      this.clipsLoaded = fetch('audio/index.json').then(r => r.ok ? r.json() : null).then(j => { if (j && j.clips) { this.clips = new Set(j.clips); this.levels = j.levels || null; } }).catch(() => { /* geen opnames */ });
     },
     hasClip(text) { return !!(this.clips && Store.state.settings.clips !== false && text && this.clips.has(this.key(text))); },
     playClip(text, opt) {
