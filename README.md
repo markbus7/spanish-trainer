@@ -16,15 +16,15 @@ npm start            # = python3 -m http.server 8080 → http://localhost:8080
 
 | Onderdeel | Inhoud |
 |---|---|
-| **Curriculum** | 32 units (10 × A1, 12 × A2, 10 × B1), elk met 7 stappen: *Woorden 1 · Woorden 2 · Grammatica · Dialoog · Lezen · Toepassen · Unittoets* |
-| **Lesstof** | ±1.370 woorden, ±730 oefeningen, 32 dialogen en 32 leesteksten uit 15 landen, uitleg in het Nederlands (vanaf B1 met Spaanse samenvatting) |
+| **Curriculum** | 36 units (10 × A1, 12 × A2, 10 × B1, en de eerste 4 van B2), elk met 7 stappen: *Woorden 1 · Woorden 2 · Grammatica · Dialoog · Lezen · Toepassen · Unittoets* |
+| **Lesstof** | ±1.500 woorden, ±800 oefeningen, 36 dialogen en 36 leesteksten uit 15 landen, uitleg in het Nederlands (vanaf B1 met Spaanse samenvatting) |
 | **Plaatsingstoets** | Adaptief (A1 → B2). Bepaalt je startpunt. |
 | **Herhaalsysteem** | Spaced repetition voor woorden, grammatica én werkwoorden. Wat je fout doet, komt sneller terug. |
 | **Oefenvormen** | meerkeuze, invullen, vertalen, zinnen bouwen, paren koppelen, dictee, uitspraak (spraakherkenning), schrijfopdrachten |
 | **Luisteren & spreken** | Dialogen eerst zonder tekst beluisteren, daarna begripsvragen. *Speel een rol*: de app speelt de anderen, jij spreekt jouw zinnen in en krijgt een score (spraakherkenning, geen AI nodig). Leesteksten laten voorlezen |
 | **Woordenboek** | Zoeken in alle woorden (Spaans of Nederlands), woorden in je herhaling zetten en eigen woorden toevoegen |
 | **Woordspellen** | *Sopa de letras* (woordzoeker), *Crucigrama* (kruiswoord), *Revoltijo* (letterhusselaar), *El volcán* (raad het woord) en *Parejas* (memory). Woorden uit je eigen units, een heel niveau of één unit; wat in de herhaling klaarstaat komt eerst, en elk woord telt mee in de herhaling |
-| **Werkwoordtrainer** | Vervoegingsmachine voor 170+ werkwoorden in 12 tijden, plus naslagtabellen |
+| **Werkwoordtrainer** | Vervoegingsmachine voor 170+ werkwoorden in 15 tijden (nu ook imperfecto de subjuntivo, condicional compuesto en pluscuamperfecto de subjuntivo), plus naslagtabellen |
 | **Regio’s** | Mexico, Colombia, Argentinië/Uruguay, Chili, Andes, Caribisch gebied, Midden-Amerika: kenmerken en typische woorden |
 | **AI-docent** *(optioneel)* | Rollenspellen met correcties, grammaticavragen en tekstcorrectie via de Claude API (eigen sleutel) |
 | **Voortgang** | Dagdoel, streak, XP, badges, vaardigheden, zwakke punten, activiteitenkaart, back-up/herstel |
@@ -62,7 +62,7 @@ De app haalt je voortgang op als je hem opent en uploadt hem kort na het oefenen
 ## Routekaart
 - ✅ **Fase 1:** basis, plaatsingstoets, herhaalsysteem, A1 + A2 compleet, AI-docent
 - ✅ **Fase 2:** A1/A2 aangevuld (leesteksten, ±1.000 woorden) en B1 compleet (subjuntivo, condicional, pluscuamperfecto, indirecte rede, argumenteren)
-- ⏳ **Fase 3:** B2 (imperfecto de subjuntivo, voseo, regionale luistervaardigheid, schrijfopdrachten)
+- 🚧 **Fase 3:** B2. Klaar: *Si tuviera tiempo…* (imperfecto de subjuntivo), *Me pidió que viniera* (subjuntivo in het verleden), *¿Vos sabés…?* (voseo, Río de la Plata), *Si lo hubiera sabido…* (onwerkelijk verleden). Nog te doen: o.a. Caribisch Spaans, passief en registers, nuance in connectoren, langere schrijfopdrachten
 - ⏳ **Fase 4:** C1–C2 (register, idiomen, authentieke teksten, essays en presentaties)
 
 ## Voor ontwikkelaars

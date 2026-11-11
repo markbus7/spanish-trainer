@@ -165,7 +165,7 @@
   function levelExam(lvl) {
     const us = C.unitsOf(lvl); const items = [];
     us.forEach(u => {
-      const exIdx = U.shuffle(u.ex.map((e, i) => i).filter(i => u.ex[i].t !== 'match')).slice(0, 2);
+      const exIdx = U.shuffle(u.ex.map((e, i) => i).filter(i => u.ex[i].t !== 'match')).slice(0, Math.max(2, Math.ceil(20 / us.length))); // minder units (B2 in opbouw): meer oefeningen per unit
       exIdx.forEach(i => items.push(normEx(u.ex[i], u, i)));
       const w = U.pick(C.words(u)); items.push(wordItem(w, 'type', u));
     });

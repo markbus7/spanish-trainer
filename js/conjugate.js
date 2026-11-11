@@ -18,7 +18,10 @@
     cond:  { es: 'condicional',            nl: 'voorwaardelijke wijs',        level: 'B1' },
     subj:  { es: 'presente de subjuntivo', nl: 'aanvoegende wijs',            level: 'B1' },
     plus:  { es: 'pretérito pluscuamperfecto', nl: 'voltooid verleden tijd (había + -do)', level: 'B1' },
-    neg:   { es: 'imperativo negativo',    nl: 'ontkennende gebiedende wijs (no + …)', level: 'B1' }
+    neg:   { es: 'imperativo negativo',    nl: 'ontkennende gebiedende wijs (no + …)', level: 'B1' },
+    impsubj: { es: 'imperfecto de subjuntivo', nl: 'aanvoegende wijs verleden (si tuviera…)', level: 'B2' },
+    condperf: { es: 'condicional compuesto',  nl: 'zou hebben (habría + -do)',  level: 'B2' },
+    plussubj: { es: 'pluscuamperfecto de subjuntivo', nl: 'had … (si hubiera + -do)', level: 'B2' }
   };
 
   /* stem: 'ie' | 'ue' | 'i' | 'uue' (jugar)
@@ -203,6 +206,14 @@
     if (v.cls === 'ar') { strong = softenForE(strong); nos = softenForE(nos); }
     return [strong + e[0], strong + e[1], strong + e[2], nos + e[3], strong + e[4]];
   }
+  // imperfecto de subjuntivo: 3e persoon meervoud van de indefinido zonder -ron + -ra (hablaron → hablara, tuvieron → tuviera)
+  const ACC = { a: 'á', e: 'é', i: 'í', o: 'ó', u: 'ú' };
+  function impSubjuntivo(v) {
+    if (v.data.impsubj) return v.data.impsubj.slice();
+    const st = preterito(v)[4].replace(/ron$/, '');
+    const nos = st.replace(/[aeiou]$/, c => ACC[c]);
+    return [st + 'ra', st + 'ras', st + 'ra', nos + 'ramos', st + 'ran'];
+  }
   function gerundio(v) {
     if (v.data.ger) return v.data.ger;
     if (v.cls === 'ar') return v.stem + 'ando';
@@ -231,6 +242,9 @@
       case 'subj': return withRefl(v, subjuntivo(v));
       case 'perf': { const p = participio(v); return withRefl(v, VERBS.haber.pres.map(h => h + ' ' + p)); }
       case 'plus': { const p = participio(v); return withRefl(v, imperfecto(parse('haber')).map(h => h + ' ' + p)); }
+      case 'impsubj': return withRefl(v, impSubjuntivo(v));
+      case 'condperf': { const p = participio(v); return withRefl(v, futuro(parse('haber'), COND).map(h => h + ' ' + p)); }
+      case 'plussubj': { const p = participio(v); return withRefl(v, impSubjuntivo(parse('haber')).map(h => h + ' ' + p)); }
       case 'neg': {
         if (v.data.noImper) return null;
         const s = withRefl(v, subjuntivo(v));
