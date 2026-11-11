@@ -36,7 +36,7 @@
 
   /* ================= badges ================= */
   const BADGES = {
-    'first': ['🌱', 'Eerste les', 'Je eerste les afgerond'], 'placement': ['🧭', 'Plaatsbepaling', 'Plaatsingstoets gedaan'],
+    'first': ['🌱', 'Eerste les', 'Je eerste les afgerond'], 'placement': ['🧭', 'Niveautest', 'Niveautest gedaan'],
     'streak3': ['🔥', '3 dagen', '3 dagen op rij geoefend'], 'streak7': ['🔥', 'Een week', '7 dagen op rij'], 'streak30': ['🌋', 'Een maand', '30 dagen op rij'],
     'words50': ['📚', '50 woorden', '50 woorden in je herhaling'], 'words250': ['📚', '250 woorden', '250 woorden in je herhaling'], 'words500': ['🏛️', '500 woorden', '500 woorden in je herhaling'],
     'unit1': ['🏅', 'Eerste unit', 'Je eerste unit gehaald'], 'perfect': ['💯', 'Foutloos', 'Een unittoets 100% gehaald'],
@@ -91,7 +91,7 @@
       lvl = L.id; frac = p; break;
     }
     if (frac >= 1) { const i = C.LEVELS.findIndex(l => l.id === lvl); const nxt = C.LEVELS[i + 1]; return { label: lvl + ' ✓' + (nxt ? ' → ' + nxt.id : ''), lvl, frac }; }
-    const pl = s.placement.level;
+    const lt = (s.tests || [])[(s.tests || []).length - 1]; const pl = (lt && lt.level) || s.placement.level;
     return { label: (frac < 0.15 && pl && pl > lvl ? pl : lvl) + (frac > 0 ? ' · ' + Math.round(frac * 100) + '%' : ''), lvl, frac };
   };
 
@@ -134,8 +134,12 @@
   S.runSession = runSession;
   /* Voor activiteiten buiten de lessen om (woordspellen): XP, tijd, streak en badges. */
   S.App = {
-    finishActivity({ xp = 0, minutes = 0, game = null } = {}) {
+    finishActivity({ xp = 0, minutes = 0, game = null, stats = null } = {}) {
       Store.addXP(xp); addTime(minutes);
+      if (stats && stats.id && stats.words) {
+        const gs = st().games[stats.id] || (st().games[stats.id] = { n: 0, words: 0, good: 0 });
+        if (game) gs.n++; gs.words += stats.words; gs.good += stats.good || 0;
+      }
       if (xp || game) Store.touchStreak();
       if (game) {
         const d = Store.today(); d.done.games = true;
@@ -156,15 +160,26 @@
         if (stepId === 'test') {
           const passed = sum.score >= (session.pass || 0.8);
           us.best = Math.max(us.best || 0, sum.score);
+          st().fast = sum.score >= 0.9 ? (st().fast || 0) + 1 : 0;
           if (passed) {
             us.steps.test = true; us.done = true;
             award('unit1'); if (sum.score === 1) award('perfect');
             const nxt = C.next(u.id);
             if (st().current === u.id && nxt) st().current = nxt.id;
             const lvlDone = C.unitsOf(u.level).every(x => P.unitState(x.id).done || P.unitState(x.id).tested);
-            return { passed: true, bonusXP: 100 + (sum.score === 1 ? 50 : 0), emoji: '🏅', title: '¡Unidad completada!',
+            const res = { passed: true, bonusXP: 100 + (sum.score === 1 ? 50 : 0), emoji: '🏅', title: '¡Unidad completada!',
               text: lvlDone ? `Alle units van ${u.level} zijn klaar. Tijd voor het niveau-examen! 🎓` : (nxt ? 'Volgende unit ontgrendeld: ' + nxt.icon + ' ' + nxt.title : ''),
               nextLabel: nxt && !lvlDone ? 'Naar de volgende unit' : 'Klaar', next: () => { location.hash = nxt && !lvlDone ? '#/unit/' + nxt.id : '#/ruta'; } };
+            // gaat het heel goed? stel voor om sneller door de stof te gaan
+            const lv = st().levels[u.level];
+            if (!lvlDone && st().fast >= 3 && !(lv && lv.passed)) {
+              res.text = `⚡ ${st().fast} unittoetsen op rij met 90% of meer! Misschien beheers je ${u.level} al. Met het niveau-examen ${u.level} weet je het zeker. Haal je het, dan kun je meteen door naar het volgende niveau.`;
+              res.alt = { label: '🎓 Niveau-examen ' + u.level, fn: () => startLevelExam(u.level) };
+            } else if (!lvlDone && nxt && nxt.level === u.level && sum.score >= 0.95 && !P.unitState(nxt.id).done) {
+              res.text = `⚡ ${Math.round(sum.score * 100)}%, sterk! Ken je ${nxt.icon} ${nxt.title} misschien ook al? Doe dan meteen die toets. Haal je 80%, dan is ook die unit klaar.`;
+              res.alt = { label: '⚡ Volgende unit direct toetsen', fn: () => startStep(nxt, 'test') };
+            }
+            return res;
           }
           return { passed: false, emoji: '💪', title: 'Bijna!', text: `Je had ${Math.round(sum.score * 100)}%. Je hebt 80% nodig. Bekijk je fouten, herhaal de lastige stappen en probeer het opnieuw.`, nextLabel: 'Terug naar de unit', next: () => { location.hash = '#/unit/' + u.id; }, alt: { label: '🔁 Opnieuw', fn: () => startStep(u, 'test') } };
         }
@@ -173,6 +188,15 @@
         const nxtStep = P.nextStep(u);
         const extra = { bonusXP: 20, title: step.nl + ' ✓', text: nxtStep ? 'Volgende: ' + nxtStep.icon + ' ' + nxtStep.nl : '', nextLabel: nxtStep ? 'Volgende stap' : 'Klaar', next: () => { if (nxtStep) startStep(u, nxtStep.id); } };
         extra.alt = { label: 'Terug', fn: () => { location.hash = '#/unit/' + u.id; } };
+        // snel en (bijna) foutloos? vraag of je de unit al beheerst
+        const secs = sum.total ? sum.minutes * 60 / sum.total : 99;
+        if (nxtStep && nxtStep.id !== 'test' && !us.offered && sum.total >= 8 && sum.score >= 0.9 && secs <= 12) {
+          us.offered = true;
+          return Object.assign(extra, { emoji: '⚡', title: 'Dit gaat je makkelijk af!',
+            text: `${Math.round(sum.score * 100)}% goed, gemiddeld ${U.plural(Math.max(1, Math.round(secs)), 'seconde', 'seconden')} per vraag. Ken je de rest van ${u.icon} ${u.title} misschien al? Doe dan meteen de unittoets. Haal je 80%, dan is de unit klaar. Zo niet, dan ga je gewoon verder met ${nxtStep.nl}.`,
+            nextLabel: '⚡ Direct naar de unittoets', next: () => startStep(u, 'test'),
+            alt: { label: 'Gewoon verder: ' + nxtStep.nl, fn: () => startStep(u, nxtStep.id) } });
+        }
         if (stepId === 'apply' && u.scenario) extra.alt = { label: S.AI.enabled() ? '🤖 Rollenspel met AI' : 'Terug', fn: () => { if (S.AI.enabled()) { startRoleplay(unitScenario(u)); location.hash = '#/docente'; } else location.hash = '#/unit/' + u.id; } };
         return extra;
       }
@@ -234,11 +258,11 @@
       h('div', { class: 'hero' }, h('div', { class: 'hero-emoji' }, '🌎'), h('h1', null, '¡Bienvenido!'), h('p', null, 'Leer Latijns-Amerikaans Spaans stap voor stap: van A1 naar B1 en verder, tot C2.')),
       section('Hoe heet je?', name),
       section('Waar begin je?',
-        h('button', { class: 'choice primary', type: 'button', onclick: () => go(() => { location.hash = '#/toets'; }) }, h('b', null, '🧭 Plaatsingstoets (aanbevolen)'), h('span', null, '±8 minuten. Ik bepaal je niveau en zet je op de juiste plek. Ideaal als je denkt dat je A1 of A2 bent.')),
+        h('button', { class: 'choice primary', type: 'button', onclick: () => go(() => { location.hash = '#/toets'; }) }, h('b', null, '🧭 Niveautest (aanbevolen)'), h('span', null, '±8 minuten. Ik bepaal je niveau en zet je op de juiste plek. Je kunt de test later altijd opnieuw doen via je profiel.')),
         h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.all()[0].id) }, h('b', null, '🌱 Vanaf het begin (A1)'), h('span', null, 'Je begint bij unit 1. Units die je al kent, kun je snel afronden met «Ik ken dit al».')),
         C.unitsOf('A2').length ? h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf('A2')[0].id) }, h('b', null, '🚀 Begin bij A2'), h('span', null, 'Je kunt je al redden in de presente en wilt de verleden tijden leren.')) : null,
         C.unitsOf('B1').length ? h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf('B1')[0].id) }, h('b', null, '🌠 Begin bij B1'), h('span', null, 'Je kent de verleden tijden en wilt de subjuntivo, de condicional en argumenteren leren.')) : null),
-      h('p', { class: 'muted small center' }, '🔒 Je voortgang wordt alleen op dit apparaat bewaard. Via Voortgang kun je een back-up maken.'));
+      h('p', { class: 'muted small center' }, '🔒 Je voortgang wordt alleen op dit apparaat bewaard. Via Perfil kun je een back-up maken.'));
   };
 
   /* ================= HOY ================= */
@@ -327,7 +351,7 @@
     });
     wrap.append(section('Extra', h('div', { class: 'quick' },
       quick('🌎', 'Regio’s', 'Mexico tot Argentinië', () => { location.hash = '#/regios'; }),
-      quick('🧭', 'Plaatsingstoets', 'opnieuw doen', () => { location.hash = '#/toets'; }))));
+      quick('🧭', 'Niveautest', 'test je niveau opnieuw', () => { location.hash = '#/toets'; }))));
     return wrap;
   };
   routes.ruta.tab = 'ruta';
@@ -340,8 +364,18 @@
     runSession(ses, { onFinish: sum => {
       const L = st().levels[lvl] || (st().levels[lvl] = { passed: false, best: 0 });
       L.best = Math.max(L.best || 0, sum.score);
-      if (sum.score >= 0.8) { L.passed = true; award(lvl); return { passed: true, bonusXP: 300, emoji: '🎓', title: '¡Nivel ' + lvl + ' aprobado!', text: 'Gefeliciteerd! Je hebt het niveau-examen ' + lvl + ' gehaald met ' + Math.round(sum.score * 100) + '%.', next: () => { location.hash = '#/ruta'; } }; }
-      return { passed: false, title: 'Nog niet…', text: `Je had ${Math.round(sum.score * 100)}%. Je hebt 80% nodig. Oefen je zwakke punten (Voortgang) en probeer het opnieuw.`, next: () => { location.hash = '#/progreso'; } };
+      if (sum.score >= 0.8) {
+        L.passed = true; award(lvl); st().fast = 0;
+        const res = { passed: true, bonusXP: 300, emoji: '🎓', title: '¡Nivel ' + lvl + ' aprobado!', text: 'Gefeliciteerd! Je hebt het niveau-examen ' + lvl + ' gehaald met ' + Math.round(sum.score * 100) + '%.', next: () => { location.hash = '#/ruta'; } };
+        const nx = C.LEVELS[lvIdx(lvl) + 1];
+        if (nx && C.available(nx.id) && lvIdx(lessonLevel()) <= lvIdx(lvl)) {
+          res.text += ` Je lessen staan nog op ${lessonLevel()}. Wil je verder met ${nx.id}? De units die je nog niet had afgerond, blijven open om te herhalen.`;
+          res.nextLabel = '🚀 Lessen naar ' + nx.id; res.next = () => { moveLessonsTo(nx.id); location.hash = '#/ruta'; };
+          res.alt = { label: 'Nog niet', fn: () => { location.hash = '#/ruta'; } };
+        }
+        return res;
+      }
+      return { passed: false, title: 'Nog niet…', text: `Je had ${Math.round(sum.score * 100)}%. Je hebt 80% nodig. Oefen je zwakke punten (Perfil) en probeer het opnieuw.`, next: () => { location.hash = '#/perfil'; } };
     } });
   }
 
@@ -571,45 +605,151 @@
     if (rest.length) body.append(h('div', { class: 'correction', html: S.md(rest.join('\n')) }));
   }
 
-  /* ================= PROGRESO ================= */
-  routes.progreso = function () {
-    const s = st(); const wrap = h('div', { class: 'page' });
-    const est = P.estimate();
-    wrap.append(h('h1', null, 'Progreso'));
-    wrap.append(h('div', { class: 'card level-est' }, h('div', { class: 'big' }, est.label), h('div', { class: 'muted small' }, 'Geschat niveau op basis van je units en examens'),
-      h('div', { class: 'lv-bars' }, C.LEVELS.map(L => h('div', { class: 'lv-bar' }, h('b', null, L.id), bar(P.levelProgress(L.id), L.color), h('small', null, C.available(L.id) ? Math.round(P.levelProgress(L.id) * 100) + '%' : 'binnenkort'))))));
-    const words = Object.keys(s.srs).filter(k => k.startsWith('w|'));
-    const cnt = { learning: 0, known: 0, mastered: 0 }; words.forEach(k => { cnt[SRS.status(k)]++; });
-    const totalMin = Object.values(s.days).reduce((a, d) => a + d.min, 0);
-    const totItems = Object.values(s.days).reduce((a, d) => a + d.items, 0), totOk = Object.values(s.days).reduce((a, d) => a + d.ok, 0);
-    wrap.append(h('div', { class: 'stat-grid' },
-      statCard('🔥', Store.liveStreak(), 'dagen op rij', 'record: ' + s.streak.best),
-      statCard('⭐', s.xp, 'XP totaal'),
-      statCard('⏱️', Math.round(totalMin), 'minuten geoefend'),
-      statCard('📚', words.length, 'woorden geleerd', cnt.mastered + ' beheerst · ' + cnt.known + ' bekend'),
-      statCard('🎯', totItems ? Math.round(totOk / totItems * 100) + '%' : '—', 'nauwkeurigheid', totItems + ' antwoorden'),
-      statCard('🏅', C.all().filter(u => P.unitState(u.id).done).length + '/' + C.all().length, 'units afgerond')));
-    // vaardigheden
+  /* ================= PERFIL (alles over je voortgang) ================= */
+  function fmtDate(t, opt) { return new Date(t).toLocaleDateString('nl-NL', opt || { day: 'numeric', month: 'long', year: 'numeric' }); }
+  function wordStats(units) {
+    const out = { total: 0, learning: 0, known: 0, mastered: 0 };
+    units.forEach(u => C.words(u).forEach(w => { out.total++; const sx = SRS.status(w.id); if (sx !== 'new') out[sx]++; }));
+    out.seen = out.learning + out.known + out.mastered;
+    return out;
+  }
+  function stackBar(ws) {
+    const t = Math.max(1, ws.total); const seg = (n, cls) => n ? h('i', { class: cls, style: { width: (n / t * 100) + '%' } }) : null;
+    return h('div', { class: 'stack' }, seg(ws.mastered, 'm'), seg(ws.known, 'k'), seg(ws.learning, 'l'));
+  }
+  routes.perfil = function () {
+    const s = st(); const wrap = h('div', { class: 'page profile' });
+    const est = P.estimate(); const t = lastTest();
+    // ---- kop ----
+    const initial = (s.name || '?').trim().charAt(0).toUpperCase() || '?';
+    const activeDays = Object.values(s.days).filter(d => d.min > 0 || d.items > 0).length;
+    wrap.append(h('div', { class: 'prof-head' },
+      h('div', { class: 'avatar' }, initial),
+      h('div', { class: 'grow' },
+        h('h1', null, s.name || 'Mijn profiel'),
+        h('p', { class: 'muted small' }, 'Leert Spaans sinds ' + fmtDate(s.created) + ' · ' + U.plural(activeDays, 'dag', 'dagen') + ' geoefend'),
+        h('div', { class: 'chips' }, h('span', { class: 'chip' }, '📈 ' + est.label), h('span', { class: 'chip' }, '🔥 ' + U.plural(Store.liveStreak(), 'dag', 'dagen')), h('span', { class: 'chip' }, '⭐ ' + s.xp + ' XP')))));
+
+    // ---- niveau ----
+    const les = lessonLevel(); const cur = P.current();
+    const passed = C.LEVELS.filter(L => s.levels[L.id] && s.levels[L.id].passed).map(L => L.id);
+    const lvCard = h('div', { class: 'card lv-overview' },
+      h('div', { class: 'lv-three' },
+        lvTile('🧭', 'Niveautest', t ? (t.level || 'A1−') : '—', t ? 'beheerst · ' + fmtDate(t.d, { day: 'numeric', month: 'short' }) : 'nog niet gedaan'),
+        lvTile('📚', 'Je lessen', les, cur.icon + ' ' + cur.title),
+        lvTile('🎓', 'Examens', passed.length ? passed[passed.length - 1] : '—', passed.length ? 'behaald: ' + passed.join(', ') : 'nog geen')),
+      h('div', { class: 'lv-bars' }, C.LEVELS.filter(L => C.available(L.id)).map(L => h('div', { class: 'lv-bar' }, h('b', null, L.id), bar(P.levelProgress(L.id), L.color), h('small', null, Math.round(P.levelProgress(L.id) * 100) + '% lessen')))));
+    wrap.append(section('Mijn niveau', lvCard));
+    const adv = levelAdvice();
+    if (adv) wrap.append(adviceCard(adv));
+    else wrap.append(h('div', { class: 'card advice' }, h('b', null, '🧭 Weet je hoe goed je echt bent?'), h('p', { class: 'small' }, 'Doe de niveautest (±8 min). Dan zie je of je hoger zit dan de lessen die je nu krijgt, en kun je meteen hoger instappen.')));
+
+    // ---- niveautests: historie ----
+    const tests = testsOf().slice().reverse();
+    const due = !t || Date.now() >= nextTestDate(t);
+    const hist = h('div', { class: 'card' },
+      h('div', { class: 'row gap between wrap' },
+        h('p', { class: 'small muted grow' }, t ? (due ? '⏰ Tijd voor een nieuwe test: je laatste is van ' + fmtDate(t.d) + '.' : 'Tip: doe de test elke 4 weken. Volgende keer vanaf ' + fmtDate(nextTestDate(t), { day: 'numeric', month: 'long' }) + '.') : 'Nog geen test gedaan.'),
+        h('a', { class: 'btn ' + (due ? 'primary' : 'ghost'), href: '#/toets' }, t ? '🧭 Test opnieuw' : '🧭 Doe de niveautest')));
+    if (tests.length >= 2) hist.append(testChart(testsOf()));
+    tests.slice(0, 8).forEach((x, i) => {
+      hist.append(h('details', { class: 'test-row' + (i === 0 ? ' latest' : '') },
+        h('summary', null, h('span', { class: 'lv-badge sm', style: { background: x.level ? C.level(x.level).color : 'var(--muted)' } }, x.level || 'A1−'),
+          h('div', { class: 'grow' }, h('b', null, fmtDate(x.d)), h('small', { class: 'muted' }, TEST_ORDER.filter(l => x.bands[l]).map(l => l + ' ' + Math.round(x.bands[l].ok / Math.max(1, x.bands[l].n) * 100) + '%').join(' · '))),
+          x.lesson ? h('small', { class: 'muted' }, 'lessen: ' + x.lesson) : null),
+        bandBars(x), partRows(x.parts)));
+    });
+    wrap.append(section('Mijn niveautests', hist));
+
+    // ---- woordenschat ----
+    const lvls = C.LEVELS.filter(L => C.available(L.id));
+    const allW = wordStats(C.all());
+    const hard = Object.entries(s.srs).filter(([k, c]) => k.startsWith('w|') && c.l > 0).sort((a, b) => b[1].l - a[1].l || a[1].i - b[1].i).slice(0, 8)
+      .map(([k]) => { const [, uid, i] = k.split('|'); const u = C.get(uid); return u ? C.word(u, +i) : null; }).filter(Boolean);
+    wrap.append(section('Woordenschat', h('div', { class: 'card' },
+      h('div', { class: 'vocab-big' }, h('b', null, allW.seen), h('span', null, ' van ' + allW.total + ' woorden geleerd')),
+      stackBar(allW),
+      h('div', { class: 'legend small' }, h('span', null, h('i', { class: 'm' }), allW.mastered + ' beheerst'), h('span', null, h('i', { class: 'k' }), allW.known + ' bekend'), h('span', null, h('i', { class: 'l' }), allW.learning + ' aan het leren')),
+      h('p', { class: 'small muted' }, 'Beheerst = je weet het woord na 3 weken of langer nog. Bekend = na een week of langer.'),
+      h('div', { class: 'vocab-levels' }, lvls.map(L => { const ws = wordStats(C.unitsOf(L.id)); return h('div', { class: 'lv-bar' }, h('b', null, L.id), stackBar(ws), h('small', null, ws.seen + '/' + ws.total)); })),
+      hard.length ? h('div', null, h('h3', { class: 'sub' }, 'Lastige woorden'), h('div', { class: 'word-list' }, hard.map(w => h('div', { class: 'word-row' }, S.Lesson.speakBtn(w.es), h('div', { class: 'grow' }, h('b', { lang: 'es' }, w.es), h('span', null, w.nl)))))) : null,
+      SRS.dueCount() ? h('button', { class: 'btn primary wide', type: 'button', onclick: () => startReview(25) }, '🔁 Herhaal nu (' + SRS.dueCount() + ' klaar)') : null)));
+
+    // ---- grammatica ----
+    const tagRows = Object.entries(s.tags).filter(([k, v]) => k !== 'vocab' && v.ok + v.no >= 3).map(([k, v]) => [k, v.ok / (v.ok + v.no), v.ok + v.no]).sort((a, b) => b[1] - a[1]);
+    const strong = tagRows.filter(r => r[1] >= 0.8), weak = tagRows.filter(r => r[1] < 0.8).reverse();
+    wrap.append(section('Grammatica', h('div', { class: 'card' },
+      tagRows.length ? null : h('p', { class: 'muted small' }, 'Nog te weinig antwoorden. Na een paar lessen zie je hier welke onderwerpen goed gaan en welke nog niet.'),
+      strong.length ? h('div', null, h('h3', { class: 'sub' }, '💪 Gaat goed (' + strong.length + ')'), h('div', { class: 'chips' }, strong.map(([k, f]) => h('span', { class: 'chip ok' }, C.tag(k) + ' · ' + Math.round(f * 100) + '%')))) : null,
+      weak.length ? h('div', null, h('h3', { class: 'sub' }, '🎯 Nog oefenen (' + weak.length + ')'), weak.slice(0, 8).map(([k, f, n]) => h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, C.tag(k)), bar(f, '#e2603a'), h('small', { class: 'muted' }, Math.round(f * 100) + '%'))),
+        h('button', { class: 'btn primary wide', type: 'button', onclick: () => { const ses = Gen.weakTraining(weak.slice(0, 6).map(w => w[0])); if (!ses.items.length) { S.toast('Nog geen oefeningen voor deze onderwerpen'); return; } runSession(ses); } }, 'Oefen deze onderwerpen')) : null)));
+
+    // ---- units ----
+    const unitsCard = h('div', { class: 'card units-card' });
+    lvls.forEach(L => {
+      const us = C.unitsOf(L.id);
+      const done = us.filter(u => P.unitState(u.id).done).length, skipped = us.filter(u => !P.unitState(u.id).done && P.unitState(u.id).tested).length;
+      const lv = s.levels[L.id];
+      const det = h('details', { class: 'unit-lv', open: L.id === cur.level ? true : null },
+        h('summary', null, h('span', { class: 'lv-badge sm' }, L.id), h('div', { class: 'grow' }, h('b', null, L.name), bar(P.levelProgress(L.id), L.color)),
+          h('small', { class: 'muted' }, done + '/' + us.length + ' klaar' + (skipped ? ' · ' + skipped + ' ⏭️' : '') + (lv && lv.passed ? ' · 🎓' : ''))),
+        us.map((u, i) => {
+          const us2 = P.unitState(u.id); const ws = wordStats([u]);
+          const stt = us2.done ? '✅' : us2.tested ? '⏭️' : u.id === cur.id ? '▶️' : Object.keys(us2.steps || {}).length ? '◔' : '';
+          return h('a', { class: 'unit-mini', href: '#/unit/' + u.id },
+            h('span', { class: 'u-icon' }, u.icon), h('div', { class: 'grow' }, h('b', null, (i + 1) + '. ' + u.title), h('small', { class: 'muted' }, Gen.STEPS.filter(x => (us2.steps || {})[x.id] || us2.done).length + '/' + Gen.STEPS.length + ' stappen · ' + ws.seen + '/' + ws.total + ' woorden' + (us2.best ? ' · toets ' + Math.round(us2.best * 100) + '%' : ''))),
+            h('span', { class: 'u-status' }, stt));
+        }),
+        h('button', { class: 'btn ghost small-btn', type: 'button', onclick: () => startLevelExam(L.id) }, '🎓 Niveau-examen ' + L.id + (lv && lv.best ? ' (beste: ' + Math.round(lv.best * 100) + '%)' : '')));
+      det.style.setProperty('--lc', L.color); unitsCard.append(det);
+    });
+    wrap.append(section('Units', unitsCard));
+
+    // ---- vaardigheden ----
     const sk = [['vocab', '📚 Woordenschat'], ['grammar', '🧩 Grammatica'], ['listen', '🎧 Luisteren'], ['read', '📖 Lezen'], ['speak', '🎙️ Spreken'], ['write', '✍️ Schrijven']];
     wrap.append(section('Vaardigheden', h('div', { class: 'card' }, sk.map(([k, l]) => {
       const v = s.skills[k]; const n = v.ok + v.no;
       return h('div', { class: 'skill-row' }, h('span', null, l), bar(n ? v.ok / n : 0), h('small', { class: 'muted' }, n ? Math.round(v.ok / n * 100) + '% · ' + n : '—'));
     }))));
-    // activiteit
-    wrap.append(section('Activiteit (12 weken)', heatmap()));
-    // forecast
+
+    // ---- woordspellen ----
+    const gs = s.games || {};
+    const played = s.done.games || 0;
+    wrap.append(section('Woordspellen', h('div', { class: 'card' },
+      h('p', { class: 'small muted' }, played ? U.plural(played, 'spel', 'spellen') + ' uitgespeeld.' : 'Nog geen spel uitgespeeld.'),
+      S.Games.GAMES.map(g => { const x = gs[g.id]; return h('div', { class: 'skill-row' }, h('span', null, g.icon + ' ' + g.es), bar(x && x.words ? x.good / x.words : 0, '#1b998b'), h('small', { class: 'muted' }, x && x.words ? U.plural(x.n || 0, 'keer', 'keer') + ' · ' + Math.round(x.good / x.words * 100) + '%' : '—')); }),
+      h('a', { class: 'btn ghost wide', href: '#/juegos' }, '🎲 Naar de spellen'))));
+
+    // ---- activiteit ----
+    const totalMin = Object.values(s.days).reduce((a, d) => a + d.min, 0);
+    const totItems = Object.values(s.days).reduce((a, d) => a + d.items, 0), totOk = Object.values(s.days).reduce((a, d) => a + d.ok, 0);
+    wrap.append(section('Activiteit', h('div', { class: 'stat-grid' },
+      statCard('🔥', Store.liveStreak(), 'dagen op rij', 'record: ' + s.streak.best),
+      statCard('⏱️', Math.round(totalMin), 'minuten geoefend', Math.round(totalMin / 60 * 10) / 10 + ' uur'),
+      statCard('🎯', totItems ? Math.round(totOk / totItems * 100) + '%' : '—', 'goed beantwoord', totItems + ' antwoorden'),
+      statCard('📅', activeDays, 'dagen geoefend')), heatmap()));
     const fc = SRS.forecast(7); const mx = Math.max(1, ...fc);
     wrap.append(section('Herhaling komende 7 dagen', h('div', { class: 'card forecast' }, fc.map((n, i) => h('div', { class: 'fc' }, h('i', { style: { height: Math.max(3, n / mx * 70) + 'px' } }), h('b', null, n), h('small', null, i === 0 ? 'vandaag' : ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'][new Date(Date.now() + i * 864e5).getDay()]))))));
-    // zwakke punten
-    const weak = weakTags();
-    if (weak.length) wrap.append(section('Aandachtspunten', h('div', { class: 'card' }, weak.map(([t, v]) => h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, C.tag(t)), bar(v.ok / (v.ok + v.no), '#e2603a'), h('small', { class: 'muted' }, Math.round(v.ok / (v.ok + v.no) * 100) + '%'))),
-      h('button', { class: 'btn primary wide', type: 'button', onclick: () => runSession(Gen.weakTraining(weak.map(w => w[0]))) }, 'Oefen deze punten'))));
-    // badges
-    wrap.append(section('Badges', h('div', { class: 'badges' }, Object.entries(BADGES).map(([id, b]) => h('div', { class: 'badge' + (s.badges.includes(id) ? ' on' : ''), title: b[2] }, h('span', null, b[0]), h('small', null, b[1]))))));
-    // data
+    // ---- badges en gegevens ----
+    wrap.append(section('Badges (' + s.badges.filter(b => BADGES[b]).length + '/' + Object.keys(BADGES).length + ')', h('div', { class: 'badges' }, Object.entries(BADGES).map(([id, b]) => h('div', { class: 'badge' + (s.badges.includes(id) ? ' on' : ''), title: b[2] }, h('span', null, b[0]), h('small', null, b[1]))))));
     wrap.append(section('Je gegevens', dataTools()));
     return wrap;
   };
+  routes.perfil.tab = 'perfil';
+  routes.progreso = routes.perfil;
+  function lvTile(icon, label, big, sub) { return h('div', { class: 'lv-tile' }, h('span', { class: 'muted small' }, icon + ' ' + label), h('b', null, big), h('small', { class: 'muted' }, sub)); }
+  /* Kleine grafiek: niveau per test door de tijd. */
+  function testChart(list) {
+    const pts = list.slice(-12); const W = 320, H = 110, padL = 30, padR = 10, padT = 10, padB = 22;
+    const lv = TEST_ORDER; const y = x => { const i = x.level ? lv.indexOf(x.level) + 1 : 0; const nb = Gen.levelTestResult(x.bands, TEST_ORDER).nextFrac || 0; return Math.min(lv.length, i + nb * 0.9); };
+    const X = i => padL + (pts.length === 1 ? 0 : i * (W - padL - padR) / (pts.length - 1)), Y = v => padT + (H - padT - padB) * (1 - v / lv.length);
+    let g = '';
+    for (let i = 0; i <= lv.length; i++) g += `<line x1="${padL}" x2="${W - padR}" y1="${Y(i)}" y2="${Y(i)}" class="gl"/><text x="${padL - 6}" y="${Y(i) + 4}" text-anchor="end">${i ? lv[i - 1] : '·'}</text>`;
+    const path = pts.map((p, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(y(p)).toFixed(1)).join(' ');
+    const dots = pts.map((p, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(y(p)).toFixed(1)}" r="4"/>`).join('');
+    const labels = [0, pts.length - 1].filter((v, i, a) => a.indexOf(v) === i).map(i => `<text x="${X(i)}" y="${H - 6}" text-anchor="${i ? 'end' : 'start'}">${U.esc(fmtDate(pts[i].d, { day: 'numeric', month: 'short' }))}</text>`).join('');
+    return h('div', { class: 'test-chart', html: `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Niveau per test">${g}<path d="${path}"/>${dots}${labels}</svg>` });
+  }
   function statCard(icon, v, l, sub) { return h('div', { class: 'stat-card' }, h('span', { class: 'si' }, icon), h('b', null, String(v)), h('span', null, l), sub ? h('small', { class: 'muted' }, sub) : null); }
   function heatmap() {
     const days = st().days; const grid = h('div', { class: 'heat' });
@@ -651,69 +791,154 @@
   };
   routes.regios.tab = 'ruta';
 
-  /* ================= PLAATSINGSTOETS ================= */
+  /* ================= NIVEAUTEST (herhaalbaar) ================= */
+  const TEST_ORDER = ['A1', 'A2', 'B1', 'B2'];
+  const PART_NL = { grammar: 'grammatica', vocab: 'woordenschat', listen: 'luisteren' };
+  const lvIdx = id => C.LEVELS.findIndex(l => l.id === id);
+  const availLevels = () => C.LEVELS.filter(l => C.available(l.id)).map(l => l.id);
+  function testsOf() { return (st().tests || []).slice().sort((a, b) => a.d - b.d); }
+  function lastTest() { const t = testsOf(); return t[t.length - 1] || null; }
+  /* Oude plaatsingstoets (8 vragen per blok) overnemen in de testhistorie. */
+  function migrateTests() {
+    const s = st(); s.tests = s.tests || [];
+    const p = s.placement;
+    if (p && p.done && p.scores && p.date && !s.tests.some(t => t.d === p.date)) {
+      const bands = {}; TEST_ORDER.forEach(l => { if (p.scores[l] != null) bands[l] = { ok: p.scores[l], n: 8 }; });
+      s.tests.push({ d: p.date, level: p.level === 'A1' && (p.scores.A1 || 0) < 6 ? null : p.level, bands, parts: {}, old: true });
+      s.tests.sort((a, b) => a.d - b.d);
+      Store.save({ quiet: true });
+    }
+  }
+  /* Op welk niveau staan je lessen nu? */
+  function lessonLevel() {
+    const all = C.all(); const open = all.find(u => !P.unitState(u.id).done && !P.unitState(u.id).tested);
+    return (open || P.current()).level;
+  }
+  /* Welk lesniveau past bij een testuitslag: het niveau na wat je beheerst (zo hoog als de lesstof gaat). */
+  function fitLevel(level) {
+    const av = availLevels(); if (!level) return av[0];
+    const want = C.LEVELS[lvIdx(level) + 1];
+    return want && C.available(want.id) ? want.id : av[av.length - 1];
+  }
+  /* Advies: passen je lessen bij je testuitslag? */
+  function levelAdvice(t) {
+    t = t || lastTest(); if (!t) return null;
+    const les = lessonLevel(); const fit = fitLevel(t.level);
+    const li = lvIdx(les), fi = lvIdx(fit);
+    const maxed = t.level && lvIdx(t.level) >= lvIdx(fit);
+    if (li < fi) return { kind: 'higher', les, fit, text: `Je beheerst ${t.level} volgens de test, maar je lessen staan nog op ${les}. Je kunt je lessen verplaatsen naar ${fit}. De units ervoor blijven open om te herhalen.` };
+    if (li > fi) return { kind: 'lower', les, fit, text: `Je lessen (${les}) lopen voor op je testuitslag. Geen probleem: herhaal je zwakke punten en doe de test over een paar weken opnieuw.` };
+    if (maxed) return { kind: 'top', les, fit, text: `Je beheerst ook ${t.level}. Hogere lessen komen later. Rond de ${fit}-units tot die tijd snel af met «Ik ken dit al», dan vind je je laatste gaten.` };
+    return { kind: 'fit', les, fit, text: `Je lessen (${les}) passen bij je niveau. Ga zo door!` };
+  }
+  function moveLessonsTo(lvl) {
+    const first = C.unitsOf(lvl)[0]; if (!first) return;
+    const idx = C.index(first.id);
+    C.all().slice(0, idx).forEach(u => { const us = Store.unit(u.id); if (!us.done) us.tested = true; });
+    st().current = first.id; Store.save();
+    S.toast('🚀 Je lessen staan nu op ' + lvl + ': ' + first.icon + ' ' + first.title);
+  }
+  function confirmMove(lvl) {
+    S.confirm('Lessen naar ' + lvl + '?', 'Je gaat verder bij ' + lvl + ', unit 1. Units die je nog niet had afgerond, krijgen ⏭️ (overgeslagen). Je kunt ze altijd nog openen, en met «Ik ken dit al» doe je meteen de toets.', 'Verplaatsen', () => { moveLessonsTo(lvl); location.hash = '#/ruta'; });
+  }
+  function nextTestDate(t) { return t ? t.d + 28 * 864e5 : 0; }
+
   routes.toets = function () {
+    const t = lastTest();
     const wrap = h('div', { class: 'page' });
-    wrap.append(h('h1', null, '🧭 Plaatsingstoets'),
-      h('div', { class: 'card' }, h('p', null, 'Je krijgt tot 4 korte blokken van 8 vragen: A1, A2, B1 en B2. Haal je minstens 6 van de 8 goed, dan ga je door naar het volgende blok. Je ziet pas aan het eind hoe je het gedaan hebt.'),
-        h('p', { class: 'small muted' }, 'Tip: weet je het niet? Gok dan niet, maar kies wat je het meest logisch vindt. Zo krijg je het eerlijkste resultaat.'),
-        h('button', { class: 'btn primary wide', type: 'button', onclick: () => runPlacement() }, 'Start')));
+    wrap.append(h('a', { class: 'back', href: '#/perfil' }, '← Perfil'), h('h1', null, '🧭 Niveautest'),
+      h('div', { class: 'card' },
+        h('p', null, 'Je krijgt tot 4 blokken van ±10 vragen: A1, A2, B1 en B2. Per blok: grammatica, woordbetekenis en een luistervraag. Heb je 70% of meer goed, dan ga je door naar het volgende blok. Je ziet pas aan het eind hoe je het gedaan hebt.'),
+        h('p', { class: 'small muted' }, 'Elke keer krijg je andere vragen, dus je kunt de test herhalen om te zien hoe je groeit. Je antwoorden tellen niet mee voor je herhaling. Weet je het niet? Kies wat je het meest logisch vindt.'),
+        t ? h('p', { class: 'small' }, 'Vorige test: ', h('b', null, t.level ? 'niveau ' + t.level : 'beginner'), ' op ' + fmtDate(t.d) + '.') : null,
+        h('button', { class: 'btn primary wide', type: 'button', onclick: () => runPlacement() }, t ? 'Start de test opnieuw' : 'Start')));
     return wrap;
   };
+  routes.toets.tab = 'perfil';
   function runPlacement() {
-    const order = ['A1', 'A2', 'B1', 'B2']; const scores = {};
+    const bands = {}, parts = {};
     const step = (i) => {
-      const lvl = order[i];
-      S.Lesson.run(Gen.placementBand(lvl), {
-        onItem: () => {},
+      const lvl = TEST_ORDER[i];
+      const ses = Gen.levelTestBand(lvl);
+      if (!ses.items.length) return placementResult(bands, parts);
+      S.Lesson.run(ses, {
+        onItem: (it, ok) => { const p = parts[it.part || 'grammar'] || (parts[it.part || 'grammar'] = { ok: 0, n: 0 }); p.n++; if (ok) p.ok++; },
         onFinish: sum => {
-          scores[lvl] = sum.ok;
-          const pass = sum.ok >= 6;
-          if (pass && i < order.length - 1) return { silent: true, next: () => step(i + 1) };
-          return { silent: true, next: () => placementResult(scores) };
+          bands[lvl] = { ok: sum.ok, n: sum.total };
+          const pass = sum.total && sum.ok / sum.total >= Gen.TEST_PASS;
+          if (pass && i < TEST_ORDER.length - 1) return { silent: true, next: () => step(i + 1) };
+          return { silent: true, next: () => placementResult(bands, parts) };
         },
         onClose: () => {}
       });
     };
     step(0);
   }
-  function placementResult(scores) {
-    const s = st();
-    const order = ['A1', 'A2', 'B1', 'B2']; let level = null;
-    for (const l of order) { if (scores[l] >= 6) level = l; else break; }
-    let start, text;
-    if (!scores.A2 && (scores.A1 || 0) < 6) { start = C.all()[0].id; text = (scores.A1 || 0) >= 4 ? 'Je kent al een flink deel van A1. Begin bij unit 1; units die je al beheerst, rond je snel af met «Ik ken dit al».' : 'Je begint bij A1, unit 1. ¡Vamos!'; }
-    else if ((scores.A2 || 0) < 6) { start = C.unitsOf('A2')[0].id; text = 'Je beheerst A1. Je begint bij A2, unit 1: de verleden tijden. A1 blijft beschikbaar om te herhalen.'; }
-    else if (C.unitsOf('B1').length) {
-      start = C.unitsOf('B1')[0].id;
-      text = (scores.B1 || 0) >= 6
-        ? 'Sterk! Je zit op B1-niveau of hoger. Je begint bij B1, unit 1. Ken je een unit al, doe dan meteen de toets («Ik ken dit al»). Zo vind je snel je gaten.'
-        : 'Je beheerst A2. Je begint bij B1, unit 1: de subjuntivo. A1 en A2 blijven beschikbaar om te herhalen.';
+  function placementResult(bands, parts) {
+    const s = st(); const first = !s.placement.done;
+    const res = Gen.levelTestResult(bands, TEST_ORDER);
+    const before = lessonLevel();
+    const rec = { d: Date.now(), level: res.level, bands, parts, lesson: first ? null : before };
+    s.tests = (s.tests || []).concat([rec]).slice(-60);
+    let text = '';
+    if (first) {
+      const fit = fitLevel(res.level); const start = C.unitsOf(fit)[0].id;
+      const idx = C.index(start);
+      C.all().slice(0, idx).forEach(u => { const us = Store.unit(u.id); if (!us.done) us.tested = true; });
+      s.placement = { done: true, level: res.level || 'A1', start, date: rec.d, scores: Object.fromEntries(Object.entries(bands).map(([k, v]) => [k, v.ok])) };
+      s.current = start;
+      text = !res.level ? 'Je begint bij A1, unit 1. Units die je al beheerst, rond je snel af met «Ik ken dit al». ¡Vamos!'
+        : lvIdx(res.level) >= lvIdx(fit) ? `Sterk! Je beheerst ${res.level}. Je begint bij ${fit}, unit 1. Ken je een unit al, doe dan meteen de toets («Ik ken dit al»). Zo vind je snel je gaten.`
+          : `Je beheerst ${res.level}. Je begint bij ${fit}, unit 1. Eerdere units blijven beschikbaar om te herhalen.`;
     }
-    else {
-      start = C.unitsOf('A2')[C.unitsOf('A2').length - 1].id;
-      text = (scores.B1 || 0) >= 6
-        ? 'Sterk! Je zit op B1-niveau of hoger. B1-lessen komen in de volgende fase. Doe tot die tijd per A2-unit de toets («Ik ken dit al»). Zo vind je je gaten en vult je herhaling zich met woorden en grammatica.'
-        : 'Je hebt een goede A2-basis en zit op weg naar B1. B1-lessen komen in de volgende fase. Doe tot die tijd per A2-unit de toets («Ik ken dit al»). Waar je onder de 80% blijft, volg je de unit gewoon helemaal.';
-    }
-    const idx = C.index(start);
-    C.all().slice(0, idx).forEach(u => { const us = Store.unit(u.id); if (!us.done) us.tested = true; });
-    s.placement = { done: true, level: level || 'A1', start, date: Date.now(), scores };
-    s.current = start; award('placement'); Store.touchStreak(); Store.save();
-    lastPlacement = { scores, level, text };
-    if (level) S.confetti();
+    award('placement'); Store.touchStreak(); Store.save();
+    lastPlacement = { rec, text, first };
+    if (res.level) S.confetti();
     if (location.hash === '#/resultado') render(); else location.hash = '#/resultado';
   }
   let lastPlacement = null;
+  function bandBars(t) {
+    return h('div', { class: 'lv-bars' }, TEST_ORDER.map(l => {
+      const b = t.bands[l]; const L = C.level(l);
+      return h('div', { class: 'lv-bar' }, h('b', null, l), bar(b && b.n ? b.ok / b.n : 0, L.color), h('small', null, b ? b.ok + '/' + b.n + (b.n && b.ok / b.n >= Gen.TEST_PASS ? ' ✓' : '') : '—'));
+    }));
+  }
   routes.resultado = function () {
-    const r = lastPlacement || (st().placement.scores ? { scores: st().placement.scores, level: st().placement.level, text: '' } : null);
-    if (!r) return routes.hoy();
-    const rows = ['A1', 'A2', 'B1', 'B2'].map(l => h('div', { class: 'lv-bar' }, h('b', null, l), bar(r.scores[l] != null ? r.scores[l] / 8 : 0, C.level(l).color), h('small', null, r.scores[l] != null ? r.scores[l] + '/8' : '—')));
-    return h('div', { class: 'page' }, h('h1', null, 'Resultaat'),
-      h('div', { class: 'card level-est' }, h('div', { class: 'big' }, r.level ? 'Niveau ' + r.level : 'Beginner'), h('div', { class: 'lv-bars' }, rows)),
-      r.text ? h('p', null, r.text) : null,
-      h('a', { class: 'btn primary wide', href: '#/hoy' }, 'Naar mijn plan voor vandaag'));
+    const r = lastPlacement || (lastTest() ? { rec: lastTest(), text: '', first: false } : null);
+    if (!r) return routes.perfil();
+    const t = r.rec; const res = Gen.levelTestResult(t.bands, TEST_ORDER);
+    const prev = testsOf().filter(x => x.d < t.d).pop();
+    const wrap = h('div', { class: 'page' }, h('h1', null, 'Uitslag niveautest'));
+    const trend = prev ? (lvIdx(t.level) > lvIdx(prev.level) ? '📈 Hoger dan je vorige test (' + (prev.level || 'beginner') + ')' : lvIdx(t.level) < lvIdx(prev.level) ? '📉 Lager dan je vorige test (' + (prev.level || 'beginner') + '). Dat kan gebeuren: doe hem later nog eens.' : '➡️ Gelijk aan je vorige test') : null;
+    wrap.append(h('div', { class: 'card level-est' },
+      h('div', { class: 'muted small' }, 'Je beheerst'),
+      h('div', { class: 'big' }, t.level ? 'Niveau ' + t.level : 'Beginner (A1)'),
+      res.next && res.nextFrac >= 0.4 ? h('div', { class: 'small' }, `en je bent goed op weg naar ${res.next} (${Math.round(res.nextFrac * 100)}%)`) : null,
+      trend ? h('div', { class: 'small muted' }, trend) : null,
+      bandBars(t), partRows(t.parts)));
+    if (r.text) wrap.append(h('p', null, r.text));
+    if (!r.first) {
+      const adv = levelAdvice(t);
+      if (adv) wrap.append(adviceCard(adv));
+    }
+    wrap.append(h('div', { class: 'row gap wrap' }, h('a', { class: 'btn primary', href: '#/perfil' }, '👤 Naar mijn profiel'), h('a', { class: 'btn ghost', href: '#/hoy' }, 'Naar Hoy')));
+    return wrap;
   };
+  routes.resultado.tab = 'perfil';
+  function partRows(parts) {
+    const ks = Object.keys(PART_NL).filter(k => parts && parts[k] && parts[k].n);
+    if (!ks.length) return null;
+    return h('div', { class: 'part-chips' }, ks.map(k => h('span', { class: 'chip' }, PART_NL[k] + ' ' + Math.round(parts[k].ok / parts[k].n * 100) + '%')));
+  }
+  function adviceCard(adv) {
+    return h('div', { class: 'card advice ' + adv.kind },
+      h('b', null, { higher: '🚀 Je kunt hoger instappen', lower: '🔁 Eerst je basis versterken', top: '🏔️ Je zit aan de top van de lesstof', fit: '✅ Je lessen passen bij je niveau' }[adv.kind]),
+      h('p', { class: 'small' }, adv.text),
+      adv.kind === 'higher' ? h('div', { class: 'row gap wrap' },
+        h('button', { class: 'btn primary', type: 'button', onclick: () => confirmMove(adv.fit) }, 'Lessen naar ' + adv.fit + ' verplaatsen'),
+        h('button', { class: 'btn ghost', type: 'button', onclick: () => startLevelExam(adv.les) }, '🎓 Eerst examen ' + adv.les)) : null,
+      adv.kind === 'higher' ? h('p', { class: 'small muted' }, 'Twijfel je? Met het niveau-examen ' + adv.les + ' zie je of je de stof echt beheerst (80% nodig).') : null);
+  }
 
   /* ================= AJUSTES ================= */
   routes.ajustes = function () {
@@ -756,13 +981,13 @@
     wrap.append(section('☁️ Synchroniseren (optioneel)', syncCard()));
     wrap.append(section('Lessen', h('div', { class: 'card form' },
       toggle('Alle units ontgrendelen', 'Vrij door de stof bladeren, zonder volgorde.', s.unlockAll, v => set('unlockAll', v)),
-      h('a', { class: 'btn ghost', href: '#/toets' }, '🧭 Plaatsingstoets opnieuw doen'))));
+      h('a', { class: 'btn ghost', href: '#/toets' }, '🧭 Niveautest opnieuw doen'))));
     wrap.append(section('Gegevens', dataTools(), h('div', { class: 'card' }, h('button', { class: 'btn danger', type: 'button', onclick: () => S.confirm('Alles wissen?', 'Al je voortgang, woorden en statistieken worden verwijderd' + (S.Sync && S.Sync.enabled() ? ', ook op je andere gekoppelde apparaten' : '') + '. Dit kan niet ongedaan worden gemaakt. Maak eerst een back-up!', 'Alles wissen', () => { Store.reset(); location.hash = '#/hoy'; render(); }) }, '🗑 Voortgang wissen'))));
     wrap.append(section('ℹ️ Over de app', versionCard()));
-    wrap.append(h('p', { class: 'muted small center' }, 'Español Latino ' + appVersion() + ' · lesstof A1–A2 · ' + C.all().length + ' units · ' + C.all().reduce((a, u) => a + u.vocab.length, 0) + ' woorden · ' + Object.keys(S.conj.VERBS).length + ' werkwoorden'));
+    wrap.append(h('p', { class: 'muted small center' }, 'Español Latino ' + appVersion() + ' · lesstof ' + availLevels().join('–').replace(/–.*–/, '–') + ' · ' + C.all().length + ' units · ' + C.all().reduce((a, u) => a + u.vocab.length, 0) + ' woorden · ' + Object.keys(S.conj.VERBS).length + ' werkwoorden'));
     return wrap;
   };
-  routes.ajustes.tab = 'progreso';
+  routes.ajustes.tab = 'perfil';
   function ago(t) {
     if (!t) return 'nog nooit';
     const m = Math.round((Date.now() - t) / 60000);
@@ -852,7 +1077,7 @@
     if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme');
   }
   function boot() {
-    Store.load();
+    Store.load(); migrateTests();
     applyTheme(); Speech.init();
     const ver = document.getElementById('tb-ver'); if (ver) ver.textContent = appVersion();
     window.addEventListener('hashchange', render);
