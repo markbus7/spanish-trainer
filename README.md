@@ -23,7 +23,7 @@ npm start            # = python3 -m http.server 8080 → http://localhost:8080
 | **Oefenvormen** | meerkeuze, invullen, vertalen, zinnen bouwen, paren koppelen, dictee, uitspraak (spraakherkenning), schrijfopdrachten |
 | **Luisteren & spreken** | Dialogen eerst zonder tekst beluisteren, daarna begripsvragen. *Speel een rol*: de app speelt de anderen, jij spreekt jouw zinnen in en krijgt een score (spraakherkenning, geen AI nodig). Leesteksten laten voorlezen |
 | **Woordenboek** | Zoeken in alle woorden (Spaans of Nederlands), woorden in je herhaling zetten en eigen woorden toevoegen |
-| **Woordspellen** | *Sopa de letras* (woordzoeker), *Crucigrama* (kruiswoord), *Revoltijo* (letterhusselaar), *El volcán* (raad het woord) en *Parejas* (memory). Woorden uit je eigen units, een heel niveau of één unit; wat in de herhaling klaarstaat komt eerst, en elk woord telt mee in de herhaling |
+| **Woordspellen** | *Sopa de letras* (woordzoeker), *Crucigrama* (kruiswoord), *Revoltijo* (letterhusselaar), *El volcán* (raad het woord) en *Parejas* (memory). Woorden uit je eigen units, een heel niveau of één unit; wat in de herhaling klaarstaat komt eerst, en elk woord telt mee in de herhaling (behalve bij *Parejas*: memory test vooral plekken onthouden en telt alleen als extra oefening) |
 | **Werkwoordtrainer** | Vervoegingsmachine voor 170+ werkwoorden in 15 tijden (nu ook imperfecto de subjuntivo, condicional compuesto en pluscuamperfecto de subjuntivo), plus naslagtabellen |
 | **Regio’s** | Mexico, Colombia, Argentinië/Uruguay, Chili, Andes, Caribisch gebied, Midden-Amerika: kenmerken en typische woorden |
 | **AI-docent** *(optioneel)* | Rollenspellen met correcties, grammaticavragen en tekstcorrectie via de Claude API (eigen sleutel) |
