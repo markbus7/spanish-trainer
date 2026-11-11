@@ -17,7 +17,7 @@ npm start            # = python3 -m http.server 8080 → http://localhost:8080
 | Onderdeel | Inhoud |
 |---|---|
 | **Curriculum** | 32 units (10 × A1, 12 × A2, 10 × B1), elk met 7 stappen: *Woorden 1 · Woorden 2 · Grammatica · Dialoog · Lezen · Toepassen · Unittoets* |
-| **Lesstof** | ±1.370 woorden, ±600 oefeningen, 32 dialogen en 32 leesteksten uit 15 landen, uitleg in het Nederlands (vanaf B1 met Spaanse samenvatting) |
+| **Lesstof** | ±1.370 woorden, ±730 oefeningen, 32 dialogen en 32 leesteksten uit 15 landen, uitleg in het Nederlands (vanaf B1 met Spaanse samenvatting) |
 | **Plaatsingstoets** | Adaptief (A1 → B2). Bepaalt je startpunt. |
 | **Herhaalsysteem** | Spaced repetition voor woorden, grammatica én werkwoorden. Wat je fout doet, komt sneller terug. |
 | **Oefenvormen** | meerkeuze, invullen, vertalen, zinnen bouwen, paren koppelen, dictee, uitspraak (spraakherkenning), schrijfopdrachten |
