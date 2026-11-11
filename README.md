@@ -21,6 +21,8 @@ npm start            # = python3 -m http.server 8080 → http://localhost:8080
 | **Plaatsingstoets** | Adaptief (A1 → B2). Bepaalt je startpunt. |
 | **Herhaalsysteem** | Spaced repetition voor woorden, grammatica én werkwoorden. Wat je fout doet, komt sneller terug. |
 | **Oefenvormen** | meerkeuze, invullen, vertalen, zinnen bouwen, paren koppelen, dictee, uitspraak (spraakherkenning), schrijfopdrachten |
+| **Luisteren & spreken** | Dialogen eerst zonder tekst beluisteren, daarna begripsvragen. *Speel een rol*: de app speelt de anderen, jij spreekt jouw zinnen in en krijgt een score (spraakherkenning, geen AI nodig). Leesteksten laten voorlezen |
+| **Woordenboek** | Zoeken in alle woorden (Spaans of Nederlands), woorden in je herhaling zetten en eigen woorden toevoegen |
 | **Woordspellen** | *Sopa de letras* (woordzoeker), *Crucigrama* (kruiswoord), *Revoltijo* (letterhusselaar), *El volcán* (raad het woord) en *Parejas* (memory). Woorden uit je eigen units, een heel niveau of één unit; wat in de herhaling klaarstaat komt eerst, en elk woord telt mee in de herhaling |
 | **Werkwoordtrainer** | Vervoegingsmachine voor 170+ werkwoorden in 12 tijden, plus naslagtabellen |
 | **Regio’s** | Mexico, Colombia, Argentinië/Uruguay, Chili, Andes, Caribisch gebied, Midden-Amerika: kenmerken en typische woorden |
@@ -38,9 +40,14 @@ Alle vaste lesstof is ingesproken met natuurlijke neurale stemmen uit Latijns-Am
 
 De opnames maakt de GitHub-actie **Stemmen maken** met de gratis voorleesstemmen van Microsoft Edge (`edge-tts`, geen sleutel nodig). Hij draait vanzelf als de lesstof op `main` verandert. Je kunt hem ook zelf starten via *Actions → Stemmen maken → Run workflow*. Hij spreekt alleen nieuwe teksten in en ruimt opnames op die niet meer gebruikt worden. Let op: dit is geen officiële dienst van Microsoft. Als hij ooit stopt, blijven de bestaande opnames gewoon werken.
 
+## Offline luisteren
+Opnames die je een keer gehoord hebt, blijven op je apparaat staan, ook na een update. Wil je zonder internet oefenen? Ga naar ⚙️ **Instellingen › Offline luisteren** en download een heel niveau (A1 ±27 MB, A2 ±40 MB, B1 ±46 MB).
+
 ## AI-docent instellen (optioneel)
 1. Maak een API-sleutel aan op [console.anthropic.com](https://console.anthropic.com). Je betaalt per gebruik.
 2. Ga in de app naar ⚙️ **Instellingen → AI-docent** en plak je sleutel.
+
+Standaard gebruikt de docent **Claude Sonnet 5.5**: ruim goed genoeg voor A1–B1 en een stuk goedkoper dan Opus. Je kunt het model wijzigen bij Instellingen.
 
 De sleutel wordt alleen in je eigen browser bewaard en gaat rechtstreeks naar Anthropic. Hij komt nooit in een back-up terecht.
 

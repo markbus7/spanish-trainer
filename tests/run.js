@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/extra.js', 'js/gen.js', 'js/games.js']) {
+for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/extra.js', 'js/gen.js', 'js/games.js', 'js/words.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -237,6 +237,30 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
     });
   }
   ok(['A1', 'A2', 'B1'].every(l => G.poolFor(l, x => G.FIT.grid(x, 10)).length >= 60), 'spellen: genoeg puzzelwoorden per niveau');
+}
+
+/* ---------- woordenboek en eigen woorden ---------- */
+{
+  const keep = S.Store.state;
+  S.Store.state = JSON.parse(JSON.stringify(keep)); S.Store.state.myWords = {}; S.Store.state.srs = {};
+  const W = S.Words;
+  ok(W.search('perro', 'all').some(w => w.es.includes('perro')), 'woordenboek: vindt perro');
+  ok(W.search('hond', 'all').some(w => w.es.includes('perro')), 'woordenboek: zoekt ook in het Nederlands');
+  ok(W.search('', 'B1').every(w => w.level === 'B1'), 'woordenboek: filter op niveau');
+  const r = W.addMine('la chamba', 'het werk (Mexico)');
+  ok(r && r.id && S.Store.state.srs[r.id], 'eigen woord: komt in de herhaling');
+  ok(W.addMine('La Chamba', 'werk').dup, 'eigen woord: geen dubbele');
+  ok(!W.addMine('', 'x'), 'eigen woord: leeg wordt geweigerd');
+  const key = r.id.split('|')[2];
+  const it = S.Gen.reviewSession(50, [r.id]).items[0];
+  ok(it && it.word && it.word.es === 'la chamba' && (it.options ? it.options.length >= 2 : true), 'eigen woord: herhaalkaart werkt');
+  const before = JSON.parse(JSON.stringify(S.Store.state));
+  W.removeMine(key);
+  ok(!W.mine().length && !S.Store.state.srs[r.id], 'eigen woord: verwijderen');
+  S.Store.state.updated = Date.now() + 5;
+  const m = S.Store.mergeStates(S.Store.state, before);
+  ok(m.myWords[key].del && !m.srs[r.id], 'eigen woord: verwijdering overleeft synchroniseren');
+  S.Store.state = keep;
 }
 
 /* ---------- versie en offline-cache ---------- */

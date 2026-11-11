@@ -543,3 +543,15 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .rp-score.good { color: var(--ok); }
 .rd-p.active { background: var(--gold-soft); border-radius: 10px; }
 .rp-panel.hidden { display: none; }
+
+/* Woordenboek */
+.words-add-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: .5rem; align-items: center; }
+@media (max-width: 600px) { .words-add-row { grid-template-columns: 1fr; } }
+.words-search { display: flex; flex-direction: column; gap: .6rem; }
+.words-list { display: flex; flex-direction: column; gap: .4rem; margin-top: .6rem; }
+.words-row { display: flex; align-items: center; gap: .6rem; padding: .6rem .8rem; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.words-row .icon-btn { margin: 0; flex: none; }
+.words-st { flex: none; min-width: 2rem; text-align: center; font-size: 1.1rem; }
+.words-add-box { margin-top: .6rem; }
+.words-add-box summary { cursor: pointer; list-style-position: inside; }
+.words-add-box .words-add { margin-top: .6rem; }

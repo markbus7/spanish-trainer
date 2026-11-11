@@ -180,6 +180,11 @@
   function resolve(id) {
     const [type, a, b] = id.split('|');
     const card = S.Store.state.srs[id];
+    if (type === 'w' && a === 'my') {
+      const w = S.Words && S.Words.mineWord(b); if (!w) return null;
+      const r = card ? card.r : 1;
+      return wordItem(w, r <= 1 ? U.pick(['mc-es', 'mc-nl']) : r === 2 ? U.pick(['mc-nl', 'type']) : 'type', S.Words.distractorUnit());
+    }
     if (type === 'w') {
       const u = C.get(a); if (!u) return null; const w = C.word(u, +b); if (!w) return null;
       const r = card ? card.r : 1;

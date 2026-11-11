@@ -46,7 +46,7 @@
       units: {}, levels: {}, srs: {}, tags: {},
       skills: { vocab: { ok: 0, no: 0 }, grammar: { ok: 0, no: 0 }, listen: { ok: 0, no: 0 }, speak: { ok: 0, no: 0 }, read: { ok: 0, no: 0 }, write: { ok: 0, no: 0 } },
       days: {}, xp: 0, streak: { cur: 0, best: 0, last: null }, current: null, badges: [], done: {},
-      tests: [], games: {}, fast: 0
+      tests: [], games: {}, fast: 0, myWords: {}
     };
   }
   function merge(base, extra) {
@@ -185,6 +185,10 @@
       const o = O.games[id], n = out.games[id] || (out.games[id] = {});
       for (const f of ['n', 'words', 'good']) n[f] = max(n[f], o[f]);
     }
+    // eigen woorden: per sleutel de nieuwste versie (ook verwijderingen)
+    out.myWords = Object.assign({}, N.myWords || {});
+    for (const k in O.myWords || {}) { const o = O.myWords[k], n = out.myWords[k]; if (!n || (o.t || 0) > (n.t || 0)) out.myWords[k] = clone(o); }
+    for (const k in out.myWords) if (out.myWords[k].del) delete out.srs['w|my|' + k];
     if (!out.current) out.current = O.current;
     return out;
   }

@@ -479,6 +479,7 @@
       S.Games.GAMES.map(g => quick(g.icon, g.es, g.nl, () => S.Games.start(g.id))),
       quick('🗂️', 'Alle spellen', 'kies je woorden', () => { location.hash = '#/juegos'; }))));
     wrap.append(section('Meer', h('div', { class: 'quick' },
+      quick('📚', 'Woordenboek', 'zoeken + eigen woorden', () => { location.hash = '#/woorden'; }),
       quick('⚡', 'Woordensprint', '2 minuten', () => runSession(Gen.sprint(30))),
       quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10))),
       quick('🎙️', 'Uitspraak', '8 zinnen', () => runSession(Gen.speakTraining(8))),
@@ -510,6 +511,8 @@
     return wrap;
   };
   routes.tablas.tab = 'practica';
+  routes.woorden = () => S.Words.page();
+  routes.woorden.tab = 'practica';
   routes.juegos = () => S.Games.page();
   routes.juegos.tab = 'practica';
 
