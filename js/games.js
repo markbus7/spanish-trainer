@@ -232,7 +232,7 @@
     g.good = good;
     g.xp = good * 4 + (complete && g.results.size ? 15 : 0);
     const minutes = Math.min(20, (g.active + Math.min(Date.now() - g.last, 45000)) / 60000);
-    if (S.App) S.App.finishActivity({ xp: g.xp, minutes, game: complete ? g.game.id : null });
+    if (S.App) S.App.finishActivity({ xp: g.xp, minutes, game: complete ? g.game.id : null, stats: { id: g.game.id, words: g.results.size, good } });
   }
   function showResults(g, title, text) {
     const list = [...g.results.values()];

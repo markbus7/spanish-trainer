@@ -468,3 +468,59 @@ input[type=range] { width: 100%; accent-color: var(--teal); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
 .steps-list { margin: .2rem 0 .4rem; padding-left: 1.3rem; } .steps-list li { margin: .25rem 0; }
+
+/* ---------- Perfil ---------- */
+.prof-head { display: flex; align-items: center; gap: 1rem; margin-bottom: .4rem; }
+.prof-head h1 { margin: 0; }
+.prof-head p { margin: .1rem 0 0; }
+.avatar { width: 68px; height: 68px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--accent), var(--gold)); color: #fff; font: 600 2rem var(--serif); box-shadow: var(--shadow); }
+.lv-three { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-bottom: .9rem; }
+.lv-tile { display: flex; flex-direction: column; align-items: center; text-align: center; padding: .7rem .4rem; border-radius: 12px; background: var(--bg2); min-width: 0; }
+.lv-tile b { font-family: var(--serif); font-size: 1.9rem; line-height: 1.15; color: var(--accent); }
+.lv-tile small { font-size: .76rem; line-height: 1.3; max-width: 100%; overflow-wrap: anywhere; }
+.lv-bars .lv-bar + .lv-bar { margin-top: .3rem; }
+.advice { border-left: 5px solid var(--teal); }
+.advice.higher { border-left-color: var(--accent); background: var(--accent-soft); }
+.advice.lower { border-left-color: var(--gold); }
+.advice b { font-size: 1.02rem; }
+.advice p { margin: .3rem 0 .6rem; }
+.advice .row { margin-top: .4rem; }
+.lv-badge.sm { width: 38px; height: 38px; border-radius: 11px; font-size: .95rem; background: var(--lc, var(--accent)); }
+.test-row { border-top: 1px solid var(--line); }
+.test-row summary { display: flex; align-items: center; gap: .7rem; padding: .6rem 0; cursor: pointer; list-style: none; }
+.test-row summary::-webkit-details-marker { display: none; }
+.test-row summary .grow { display: flex; flex-direction: column; }
+.test-row[open] { padding-bottom: .7rem; }
+.part-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; justify-content: center; }
+.test-chart svg { width: 100%; height: auto; display: block; margin: .4rem 0 .6rem; font: 10px var(--font); }
+.test-chart .gl { stroke: var(--line); stroke-width: 1; }
+.test-chart text { fill: var(--muted); }
+.test-chart path { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; }
+.test-chart circle { fill: var(--card); stroke: var(--accent); stroke-width: 2.5; }
+.vocab-big b { font-family: var(--serif); font-size: 2.2rem; color: var(--accent); }
+.vocab-big span { color: var(--ink2); }
+.stack { display: flex; height: 12px; border-radius: 999px; background: var(--bg2); overflow: hidden; flex: 1; }
+.stack i { display: block; height: 100%; }
+.stack .m, .legend .m { background: var(--teal); } .stack .k, .legend .k { background: var(--blue); } .stack .l, .legend .l { background: var(--gold); }
+.legend { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin: .5rem 0 .2rem; color: var(--ink2); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: .35rem; }
+.vocab-levels { margin: .6rem 0; } .vocab-levels .lv-bar + .lv-bar { margin-top: .4rem; }
+h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 1rem 0 .4rem; }
+.unit-lv { border-top: 1px solid var(--line); }
+.unit-lv:first-child { border-top: 0; }
+.unit-lv > summary { display: flex; align-items: center; gap: .7rem; padding: .7rem 0; cursor: pointer; list-style: none; }
+.unit-lv > summary::-webkit-details-marker { display: none; }
+.unit-lv > summary .grow b { display: block; margin-bottom: .25rem; }
+.unit-lv[open] { padding-bottom: .8rem; }
+.unit-mini { display: flex; align-items: center; gap: .7rem; padding: .5rem .4rem; border-radius: 10px; text-decoration: none; color: var(--ink); }
+.unit-mini:hover { background: var(--bg2); }
+.unit-mini small { display: block; font-size: .78rem; }
+.unit-mini .u-icon { font-size: 1.3rem; }
+.small-btn { margin-top: .5rem; }
+@media (max-width: 430px) {
+  .lv-tile b { font-size: 1.5rem; }
+  .avatar { width: 54px; height: 54px; font-size: 1.6rem; }
+  .prof-head .tb-gear { align-self: flex-start; }
+}
+.unit-lv > summary b, .test-row summary b { color: var(--ink); }
+.unit-lv > summary, .test-row summary { color: var(--ink); margin: 0; }

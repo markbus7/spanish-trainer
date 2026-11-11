@@ -45,7 +45,8 @@
       placement: { done: false, level: null, start: null, date: null },
       units: {}, levels: {}, srs: {}, tags: {},
       skills: { vocab: { ok: 0, no: 0 }, grammar: { ok: 0, no: 0 }, listen: { ok: 0, no: 0 }, speak: { ok: 0, no: 0 }, read: { ok: 0, no: 0 }, write: { ok: 0, no: 0 } },
-      days: {}, xp: 0, streak: { cur: 0, best: 0, last: null }, current: null, badges: [], done: {}
+      days: {}, xp: 0, streak: { cur: 0, best: 0, last: null }, current: null, badges: [], done: {},
+      tests: [], games: {}
     };
   }
   function merge(base, extra) {
@@ -171,6 +172,14 @@
     out.streak = { cur: later.cur, last: later.last, best: Math.max(sa.best || 0, sb.best || 0, later.cur || 0) };
     out.badges = [...new Set([...(N.badges || []), ...(O.badges || [])])];
     out.done = Object.assign({}, O.done || {}, N.done || {});
+    // niveautests: alle uitslagen van beide apparaten (op tijdstip), oudste eerst
+    const seenT = new Set(); out.tests = [];
+    [...(N.tests || []), ...(O.tests || [])].sort((a, b) => a.d - b.d).forEach(t => { if (t && !seenT.has(t.d)) { seenT.add(t.d); out.tests.push(clone(t)); } });
+    out.tests = out.tests.slice(-60);
+    for (const id in O.games || {}) {
+      const o = O.games[id], n = out.games[id] || (out.games[id] = {});
+      for (const f of ['n', 'words', 'good']) n[f] = max(n[f], o[f]);
+    }
     if (!out.current) out.current = O.current;
     return out;
   }

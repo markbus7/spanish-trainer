@@ -122,7 +122,27 @@ for (const u of units) {
     ses.items.forEach(it => { if (it.kind === 'type') ok(it.answers && it.answers.length && it.answers.every(Boolean), where + ' ' + st.id + ' type-item zonder antwoord'); });
   }
 }
-['A1', 'A2', 'B1', 'B2'].forEach(l => ok(S.placement.filter(q => q.lv === l).length === 8, 'plaatsingstoets ' + l));
+['A1', 'A2', 'B1'].forEach(l => ok(S.placement.filter(q => q.lv === l).length >= 16, 'niveautest: genoeg vragen voor ' + l));
+ok(S.placement.filter(q => q.lv === 'B2').length >= 8, 'niveautest: genoeg vragen voor B2');
+ok(new Set(S.placement.map(q => q.q)).size === S.placement.length, 'niveautest: geen dubbele vragen');
+S.placement.forEach((q, i) => ok(!/vosotros|vuestr/i.test(q.q + ' ' + q.o.join(' ')), 'niveautest zonder vosotros ' + i));
+for (let r = 0; r < 20; r++) ['A1', 'A2', 'B1', 'B2'].forEach(l => {
+  const b = S.Gen.levelTestBand(l);
+  ok(b.items.length >= 8 && b.items.length <= 10, 'niveautest-blok ' + l + ': ' + b.items.length + ' vragen');
+  b.items.forEach(it => ok(it.kind === 'mc' && it.options.includes(it.answer) && new Set(it.options).size === it.options.length && !it.srsId, 'niveautest-vraag ' + l + ' ' + (it.q || it.sentence)));
+});
+const LR = S.Gen.levelTestResult;
+ok(LR({ A1: { ok: 9, n: 10 }, A2: { ok: 6, n: 10 } }).level === 'A1' && LR({ A1: { ok: 9, n: 10 }, A2: { ok: 6, n: 10 } }).next === 'A2', 'uitslag: A1 beheerst, op weg naar A2');
+ok(LR({ A1: { ok: 5, n: 10 } }).level === null, 'uitslag: beginner');
+ok(LR({ A1: { ok: 10, n: 10 }, A2: { ok: 8, n: 10 }, B1: { ok: 7, n: 10 }, B2: { ok: 3, n: 8 } }).level === 'B1', 'uitslag: B1');
+{ // samenvoegen van testhistorie en spelstatistiek
+  const a = { settings: {}, updated: 2, tests: [{ d: 1, level: 'A1', bands: {} }, { d: 3, level: 'A2', bands: {} }], games: { sopa: { n: 2, words: 10, good: 8 } } };
+  const b = { settings: {}, updated: 1, tests: [{ d: 1, level: 'A1', bands: {} }, { d: 2, level: 'A2', bands: {} }], games: { sopa: { n: 3, words: 12, good: 9 }, volcan: { n: 1, words: 4, good: 4 } } };
+  const m = S.Store.mergeStates(a, b);
+  ok(m.tests.map(t => t.d).join() === '1,2,3', 'sync: niveautests samengevoegd');
+  ok(m.games.sopa.n === 3 && m.games.volcan.words === 4, 'sync: spelstatistiek samengevoegd');
+  ok(JSON.stringify(S.Store.mergeStates(m, m).tests) === JSON.stringify(m.tests), 'sync: idempotent');
+}
 S.placement.forEach((q, i) => ok(new Set(q.o).size === q.o.length, 'plaatsingsvraag ' + i));
 ok(['A1', 'A2', 'B1'].every(l => S.Gen.levelExam(l).items.length >= 20), 'niveau-examens');
 ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');

@@ -248,5 +248,43 @@
     return { title: 'Plaatsingstoets · ' + lvl, items: qs.map(q => ({ kind: 'mc', q: q.q.includes('___') ? null : q.q, sentence: q.q.includes('___') ? q.q : null, options: U.shuffle(q.o), answer: q.o[0], tag: null, fill: q.q.includes('___') })), mode: 'exam' };
   }
 
-  S.Gen = { STEPS, stepSession, reviewSession, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, placementBand, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART };
+  /* Herhaalbare niveautest: per niveau een blok met grammatica uit de vragenbank, woordbetekenis en een luistervraag.
+     Elke keer andere vragen; de antwoorden tellen niet mee voor je herhaling of statistieken. */
+  const TEST_PASS = 0.7;
+  function placementQ(q) {
+    const fill = q.q.includes('___');
+    return { kind: 'mc', q: fill ? null : q.q, sentence: fill ? q.q : null, options: U.shuffle(q.o), answer: q.o[0], fill, part: 'grammar' };
+  }
+  function levelTestBand(lvl) {
+    const bank = S.placement.filter(q => q.lv === lvl);
+    const words = C.unitsOf(lvl).flatMap(u => C.words(u).map(w => ({ w, u })))
+      .filter(({ w }) => w.es.length <= 28 && !/[/(]/.test(w.es));
+    const items = [];
+    if (!words.length) {
+      U.sample(bank, 8).forEach(q => items.push(placementQ(q)));
+    } else {
+      U.sample(bank, 6).forEach(q => items.push(placementQ(q)));
+      const picked = U.sample(words, 4);
+      picked.forEach(({ w, u }, i) => {
+        const it = wordItem(w, i < 3 ? 'mc-es' : 'listen-mc', u);
+        if (!it || it.options.length < 3) return;
+        delete it.srsId; delete it.tag; delete it.skill;
+        it.part = i < 3 ? 'vocab' : 'listen';
+        items.push(it);
+      });
+    }
+    return { title: 'Niveautest · ' + lvl, items: U.shuffle(items), mode: 'exam', level: lvl };
+  }
+  /* Uitslag van de blokken → niveau. bands: { A1: { ok, n }, ... } in volgorde gemaakt. */
+  function levelTestResult(bands, order = ['A1', 'A2', 'B1', 'B2']) {
+    let level = null, next = null;
+    for (const l of order) {
+      const b = bands[l]; if (!b) break;
+      if (b.n && b.ok / b.n >= TEST_PASS) level = l; else { next = l; break; }
+    }
+    const nb = next && bands[next];
+    return { level, next, nextFrac: nb && nb.n ? nb.ok / nb.n : 0 };
+  }
+
+  S.Gen = { STEPS, stepSession, reviewSession, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART };
 })(window.SPT);
