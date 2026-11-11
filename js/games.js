@@ -155,7 +155,7 @@
     { id: 'cruci', icon: '✏️', es: 'Crucigrama', nl: 'Kruiswoord', desc: 'Vul het kruiswoord in met Spaanse woorden. Accenten hoef je niet te typen.', min: 6 },
     { id: 'revoltijo', icon: '🔀', es: 'Revoltijo', nl: 'Letterhusselaar', desc: 'Zet de door elkaar gehusselde letters in de goede volgorde.', min: 3 },
     { id: 'volcan', icon: '🌋', es: 'El volcán', nl: 'Raad het woord', desc: 'Raad het woord letter voor letter, voordat de vulkaan uitbarst.', min: 4 },
-    { id: 'parejas', icon: '🃏', es: 'Parejas', nl: 'Memory', desc: 'Draai kaartjes om en vind steeds het Spaanse woord met de Nederlandse betekenis.', min: 3 }
+    { id: 'parejas', icon: '🃏', es: 'Parejas', nl: 'Memory', desc: 'Draai kaartjes om en vind steeds het Spaanse woord met de Nederlandse betekenis. Telt als extra oefening, nooit als fout.', min: 3, practice: true }
   ];
 
   S.Games = { GAMES, gen: { gameWord, plain, FIT, wordSearch, crossword, scramble, poolFor, pickWords, sourceUnits } };
@@ -225,6 +225,7 @@
     const d = S.Store.today();
     for (const { w, ok } of g.results.values()) {
       d.items++; if (ok) { d.ok++; good++; }
+      if (g.game.practice) continue; // alleen oefening: herhaling en statistieken blijven ongemoeid
       S.Store.skill('vocab', ok); S.Store.mark('vocab', ok);
       if (S.SRS.has(w.id)) S.SRS.grade(w.id, ok);
       else if (learned.has(w.unit)) S.SRS.add(w.id, ok ? 1 : 0);
@@ -249,7 +250,7 @@
         h('span', { class: 'gm-wmark' }, ok ? '✓' : '✗'),
         h('div', { class: 'grow' }, h('div', { class: 'es', lang: 'es' }, w.es), h('div', { class: 'nl' }, w.nl)),
         S.Lesson.speakBtn(w.say)))),
-      n ? h('p', { class: 'small muted center' }, 'Gemiste woorden komen vaker terug in je herhaling.') : null));
+      n ? h('p', { class: 'small muted center' }, g.game.practice ? 'Memory telt als extra oefening. Je herhaling verandert er niet door.' : 'Gemiste woorden komen vaker terug in je herhaling.') : null));
     g.foot.append(h('div', { class: 'ls-actions' },
       h('button', { class: 'btn ghost', type: 'button', onclick: () => { g.close(true); location.hash = '#/juegos'; S.render(); } }, 'Andere spellen'),
       h('button', { class: 'btn primary', type: 'button', onclick: () => start(g.game.id, g.src) }, '🔁 Nog een keer')));
@@ -595,7 +596,7 @@
     const words = pickWords(g.src, n, FIT.pair);
     if (words.length < 4) return notEnough(g, 4);
     const cards = U.shuffle(words.flatMap(w => [{ w, side: 'es', text: w.es }, { w, side: 'nl', text: w.nl }]));
-    const seen = new Set(), misses = new Map(), matched = new Set();
+    const matched = new Set();
     let open = [], busy = false, moves = 0;
     const board = vars(h('div', { class: 'mm-grid' }), { '--cols': wide() ? 4 : 3 });
     const upd = () => { g.status.textContent = matched.size + '/' + words.length + ' · ' + moves + ' beurten'; };
@@ -611,16 +612,13 @@
       if (open.length < 2) return;
       moves++; const [a, b] = open; open = [];
       if (a.w === b.w) {
-        matched.add(a.w); g.mark(a.w, !(misses.get(a.w) > 0));
+        matched.add(a.w); g.mark(a.w, true); // memory toetst vooral plekken onthouden: elk gevonden paar is oefening, nooit fout
         setTimeout(() => { a.el.classList.add('done'); b.el.classList.add('done'); S.Sound.good(); }, 250);
         if (matched.size === words.length) setTimeout(() => g.finish(null, () => words.length + ' paren in ' + moves + ' beurten · +' + g.xp + ' XP'), 1100);
       } else {
-        // een fout telt pas als je het andere kaartje van dat paar al eens gezien had
-        [a, b].forEach(x => { const partner = x.w.id + (x.side === 'es' ? 'nl' : 'es'); if (seen.has(partner)) misses.set(x.w, (misses.get(x.w) || 0) + 1); });
         busy = true;
         setTimeout(() => { a.open = b.open = false; a.el.classList.remove('open'); b.el.classList.remove('open'); busy = false; }, 1100);
       }
-      seen.add(a.w.id + a.side); seen.add(b.w.id + b.side);
       upd();
     }
     upd();

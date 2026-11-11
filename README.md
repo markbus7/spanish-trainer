@@ -21,7 +21,7 @@ npm start            # = python3 -m http.server 8080 → http://localhost:8080
 | **Plaatsingstoets** | Adaptief (A1 → B2). Bepaalt je startpunt. |
 | **Herhaalsysteem** | Spaced repetition voor woorden, grammatica én werkwoorden. Wat je fout doet, komt sneller terug. |
 | **Oefenvormen** | meerkeuze, invullen, vertalen, zinnen bouwen, paren koppelen, dictee, uitspraak (spraakherkenning), schrijfopdrachten |
-| **Woordspellen** | *Sopa de letras* (woordzoeker), *Crucigrama* (kruiswoord), *Revoltijo* (letterhusselaar), *El volcán* (raad het woord) en *Parejas* (memory). Woorden uit je eigen units, een heel niveau of één unit; wat in de herhaling klaarstaat komt eerst, en elk woord telt mee in de herhaling |
+| **Woordspellen** | *Sopa de letras* (woordzoeker), *Crucigrama* (kruiswoord), *Revoltijo* (letterhusselaar), *El volcán* (raad het woord) en *Parejas* (memory). Woorden uit je eigen units, een heel niveau of één unit; wat in de herhaling klaarstaat komt eerst, en elk woord telt mee in de herhaling (behalve bij *Parejas*: memory test vooral plekken onthouden en telt alleen als extra oefening) |
 | **Werkwoordtrainer** | Vervoegingsmachine voor 170+ werkwoorden in 12 tijden, plus naslagtabellen |
 | **Regio’s** | Mexico, Colombia, Argentinië/Uruguay, Chili, Andes, Caribisch gebied, Midden-Amerika: kenmerken en typische woorden |
 | **AI-docent** *(optioneel)* | Rollenspellen met correcties, grammaticavragen en tekstcorrectie via de Claude API (eigen sleutel) |
