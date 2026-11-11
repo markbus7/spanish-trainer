@@ -974,7 +974,12 @@
     const modelSel = h('select', { class: 'input', onchange: e => set('aiModel', e.target.value) }, S.AI.MODELS.map(m => h('option', { value: m.id, selected: s.aiModel === m.id ? true : null }, m.label)));
     const testOut = h('span', { class: 'small' });
     wrap.append(section('🤖 AI-docent (optioneel)', h('div', { class: 'card form' },
-      h('p', { class: 'small muted' }, 'Maak een API-sleutel aan op console.anthropic.com (je betaalt per gebruik). De sleutel wordt alleen in deze browser bewaard en rechtstreeks naar Anthropic gestuurd. Hij komt nooit in back-ups terecht. Gebruik dit alleen op je eigen apparaat.'),
+      h('p', { class: 'small muted' }, 'Met een eigen API-sleutel van Anthropic kun je oefengesprekken voeren en krijg je feedback op je schrijfopdrachten. Je betaalt per gebruik.'),
+      h('ol', { class: 'small steps-list' },
+        h('li', null, 'Open ', h('a', { href: 'https://console.anthropic.com/settings/keys', target: '_blank', rel: 'noopener' }, 'deze link naar Anthropic'), ' en log in (of maak een account aan).'),
+        h('li', null, 'Kies "Create Key", geef de sleutel een naam (bijv. Español Latino) en kopieer hem.'),
+        h('li', null, 'Plak de sleutel hieronder en tik op "Test verbinding". Tegoed zet je op dezelfde site onder Billing.')),
+      h('p', { class: 'small muted' }, 'De sleutel wordt alleen in deze browser bewaard en rechtstreeks naar Anthropic gestuurd. Hij komt nooit in back-ups of de gist terecht. Gebruik dit alleen op je eigen apparaat.'),
       label('API-sleutel', keyIn), label('Model', modelSel),
       h('div', { class: 'row gap' }, h('button', { class: 'btn ghost', type: 'button', onclick: async () => { set('aiKey', keyIn.value.trim()); testOut.textContent = 'Testen…'; try { const t = await S.AI.test(); testOut.textContent = '✅ Werkt: ' + t; } catch (e) { testOut.textContent = '⚠️ ' + e.message; } } }, 'Test verbinding'), testOut),
       s.aiKey ? h('button', { class: 'btn link', type: 'button', onclick: () => { set('aiKey', ''); render(); } }, 'Sleutel verwijderen') : null)));
