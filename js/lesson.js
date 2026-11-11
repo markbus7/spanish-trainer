@@ -95,31 +95,124 @@
 
   R.dialogue = (it, ctx) => {
     const d = it.dialogue; ctx.free();
+    const set = S.Store.state.settings;
     const speakers = [...new Set(d.lines.map(l => l[0]))];
     let showAll = false;
     const lines = d.lines.map(([who, es, nl]) => {
       const tr = h('div', { class: 'nl hidden' }, nl);
+      const esEl = h('div', { class: 'es', lang: 'es' }, es);
+      const extra = h('div', { class: 'rp-turn' });
       const line = h('div', { class: 'dl ' + (speakers.indexOf(who) % 2 ? 'right' : 'left') },
         h('div', { class: 'avatar', title: who }, who[0]),
-        h('div', { class: 'bubble', onclick: () => tr.classList.toggle('hidden') },
-          h('div', { class: 'who' }, who), h('div', { class: 'es', lang: 'es' }, es), tr),
+        h('div', { class: 'bubble', onclick: () => { if (line.classList.contains('mine')) return; tr.classList.toggle('hidden'); } },
+          h('div', { class: 'who' }, who), esEl, tr, extra),
         speakBtn(es));
-      line._tr = tr; line._es = es; return line;
+      Object.assign(line, { _tr: tr, _es: es, _nl: nl, _who: who, _esEl: esEl, _extra: extra });
+      return line;
     });
+    const list = h('div', { class: 'dl-list' }, lines);
+
+    /* Eerst luisteren: de Spaanse tekst is wazig tot je hem zelf zichtbaar maakt. */
+    const listenFirst = Speech.canSpeak() && set.listenFirst !== false;
+    const intro = h('p', { class: 'muted small' });
+    const maskBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => mask(!list.classList.contains('masked')) });
+    function mask(on) {
+      list.classList.toggle('masked', on);
+      maskBtn.textContent = on ? '👀 Toon de tekst' : '🎧 Verberg de tekst';
+      intro.textContent = on ? '🎧 Luister eerst zonder tekst. Hoeveel versta je? Daarna maak je de tekst zichtbaar.' : 'Lees en luister. Tik op een zin voor de vertaling.';
+    }
+    mask(listenFirst);
+
     let playing = false;
-    const playBtn = h('button', { class: 'btn ghost', type: 'button', onclick: async () => {
-      if (playing) { playing = false; Speech.stop(); playBtn.textContent = '▶ Alles afspelen'; return; }
+    async function playAll() {
       playing = true; playBtn.textContent = '⏸ Stop';
       for (const l of lines) { if (!playing) break; l.classList.add('active'); l.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); await Speech.say(l._es); l.classList.remove('active'); }
       playing = false; playBtn.textContent = '▶ Alles afspelen';
+    }
+    const playBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => {
+      if (playing) { playing = false; Speech.stop(); return; }
+      if (role.active) stopRole();
+      playAll();
     } }, '▶ Alles afspelen');
     const trBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => { showAll = !showAll; lines.forEach(l => l._tr.classList.toggle('hidden', !showAll)); trBtn.textContent = showAll ? '🙈 Verberg vertaling' : '👁 Toon vertaling'; } }, '👁 Toon vertaling');
-    ctx.onLeave(() => { playing = false; Speech.stop(); });
+
+    /* Rollenspel: jij speelt één persoon. De app speelt de anderen; jouw zinnen spreek je zelf in. */
+    const role = { active: false, me: null, scores: [] };
+    const rolePanel = h('div', { class: 'rp-panel hidden' });
+    const roleBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => {
+      if (role.active) { stopRole(); return; }
+      rolePanel.innerHTML = '';
+      rolePanel.append(h('div', { class: 'small' }, h('b', null, '🎭 Welke rol speel jij?'), ' Jouw zinnen spreek je zelf in, de app speelt de rest.'),
+        h('div', { class: 'row gap wrap' }, speakers.map(w => h('button', { class: 'btn primary', type: 'button', onclick: () => startRole(w) }, w)),
+          h('button', { class: 'btn ghost', type: 'button', onclick: () => rolePanel.classList.add('hidden') }, 'Annuleer')));
+      rolePanel.classList.remove('hidden');
+    } }, '🎭 Speel een rol');
+    function resetLines() {
+      lines.forEach(l => { l.classList.remove('mine', 'active', 'said'); l._extra.innerHTML = ''; l._esEl.classList.remove('hide-es'); });
+    }
+    function stopRole() {
+      role.active = false; Speech.stop(); Speech.stopListening(); resetLines();
+      roleBtn.textContent = '🎭 Speel een rol'; rolePanel.classList.add('hidden');
+      if (role.resolve) { role.resolve(null); role.resolve = null; }
+    }
+    async function startRole(me) {
+      playing = false; Speech.stop();
+      Object.assign(role, { active: true, me, scores: [] });
+      mask(false); resetLines();
+      roleBtn.textContent = '⏹ Stop rollenspel';
+      rolePanel.innerHTML = ''; rolePanel.append(h('div', { class: 'small' }, '🎭 Jij bent ', h('b', null, me), '. Bij jouw beurt zie je wat je moet zeggen in het Nederlands. Tik op de microfoon en zeg het in het Spaans.'));
+      lines.forEach(l => { if (l._who === me) { l.classList.add('mine'); l._esEl.classList.add('hide-es'); l._tr.classList.remove('hidden'); } });
+      for (const l of lines) {
+        if (!role.active) return;
+        l.classList.add('active'); l.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        if (l._who === me) {
+          const score = await myTurn(l);
+          if (!role.active) return;
+          if (score !== null) role.scores.push(score);
+          l._esEl.classList.remove('hide-es'); l.classList.add('said');
+        } else await Speech.say(l._es);
+        l.classList.remove('active');
+      }
+      role.active = false; roleBtn.textContent = '🎭 Nog een keer';
+      const n = role.scores.length, avg = n ? Math.round(role.scores.reduce((a, b) => a + b, 0) / n) : 0;
+      rolePanel.innerHTML = '';
+      rolePanel.append(h('div', null, h('b', null, n ? (avg >= 80 ? '🎉 ¡Excelente! ' : avg >= 60 ? '👍 ¡Bien hecho! ' : '💪 ¡Sigue practicando! ') : '🎭 Klaar. '),
+        n ? `Je zei ${n} zinnen, gemiddeld ${avg}% goed verstaan.` : 'Je hebt geen zinnen ingesproken.'),
+        h('div', { class: 'row gap wrap' }, speakers.filter(w => w !== me).map(w => h('button', { class: 'btn ghost', type: 'button', onclick: () => startRole(w) }, 'Speel nu ' + w))));
+      rolePanel.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      if (n) { S.Store.save(); if (avg >= 80) Sound.good(); }
+    }
+    function myTurn(l) {
+      return new Promise(resolve => {
+        role.resolve = resolve;
+        let tries = 0;
+        const status = h('div', { class: 'small muted' }, 'Jouw beurt: tik op 🎙️ en zeg het in het Spaans.');
+        const finish = score => { role.resolve = null; l._extra.innerHTML = ''; if (score !== null) l._extra.append(h('div', { class: 'small rp-score' + (score >= 75 ? ' good' : '') }, (score >= 75 ? '✅ ' : '〰️ ') + score + '%')); resolve(score); };
+        const mic = h('button', { class: 'mic mic-sm', type: 'button', 'aria-label': 'Start opnemen', onclick: async e => {
+          e.stopPropagation();
+          if (mic.classList.contains('rec')) { Speech.stopListening(); return; }
+          mic.classList.add('rec'); status.textContent = 'Ik luister…';
+          try {
+            const alts = await Speech.listen();
+            mic.classList.remove('rec'); tries++;
+            const best = alts.map(a => [a, S.check.similarity(a, l._es)]).sort((a, b) => b[1] - a[1])[0];
+            const score = Math.round(best[1] * 100);
+            if (best[1] >= 0.75 || tries >= 3) { S.Store.skill('speak', best[1] >= 0.75); if (best[1] >= 0.75) Sound.good(); else Sound.bad(); finish(score); }
+            else { Sound.bad(); status.textContent = `Ik hoorde «${best[0]}» (${score}%). Probeer het nog eens (${tries}/3).`; }
+          } catch (err) { mic.classList.remove('rec'); status.textContent = err.message; }
+        } }, '🎙️');
+        const hint = h('button', { class: 'btn ghost small', type: 'button', onclick: e => { e.stopPropagation(); l._esEl.classList.remove('hide-es'); Speech.say(l._es); } }, '💡 Voorzeggen');
+        const skip = h('button', { class: 'btn ghost small', type: 'button', onclick: e => { e.stopPropagation(); finish(null); } }, 'Overslaan');
+        l._extra.append(h('div', { class: 'row gap wrap rp-ctrl' }, mic, hint, skip), status);
+      });
+    }
+
+    ctx.onLeave(() => { playing = false; if (role.active) stopRole(); Speech.stop(); });
     return h('div', { class: 'dialogue' },
       h('div', { class: 'eyebrow' }, '💬 ' + (d.place || '')), h('h2', null, d.t),
-      h('p', { class: 'muted small' }, 'Lees en luister. Tik op een zin voor de vertaling.'),
-      h('div', { class: 'row gap wrap' }, Speech.canSpeak() ? playBtn : null, trBtn),
-      h('div', { class: 'dl-list' }, lines));
+      intro,
+      h('div', { class: 'row gap wrap' }, Speech.canSpeak() ? playBtn : null, Speech.canSpeak() ? maskBtn : null, trBtn, Speech.canSpeak() && Speech.canListen() ? roleBtn : null),
+      rolePanel, list);
   };
 
   R.reading = (it, ctx) => {
@@ -128,14 +221,21 @@
     const paras = r.p.map(([es, nl]) => {
       const tr = h('div', { class: 'nl hidden' }, nl);
       const p = h('div', { class: 'rd-p' }, h('div', { class: 'rd-text', onclick: () => tr.classList.toggle('hidden') }, h('p', { class: 'es', lang: 'es' }, es), tr), speakBtn(es));
-      p._tr = tr; return p;
+      p._tr = tr; p._es = es; return p;
     });
+    let playing = false;
+    const playBtn = h('button', { class: 'btn ghost', type: 'button', onclick: async () => {
+      if (playing) { playing = false; Speech.stop(); return; }
+      playing = true; playBtn.textContent = '⏸ Stop';
+      for (const p of paras) { if (!playing) break; p.classList.add('active'); p.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); await Speech.say(p._es); p.classList.remove('active'); }
+      playing = false; playBtn.textContent = '▶ Voorlezen';
+    } }, '▶ Voorlezen');
     const trBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => { showAll = !showAll; paras.forEach(p => p._tr.classList.toggle('hidden', !showAll)); trBtn.textContent = showAll ? '🙈 Verberg vertaling' : '👁 Toon vertaling'; } }, '👁 Toon vertaling');
-    ctx.onLeave(() => Speech.stop());
+    ctx.onLeave(() => { playing = false; Speech.stop(); });
     return h('div', { class: 'reading' },
       h('div', { class: 'eyebrow' }, '📖 ' + (r.type || 'Lectura')), h('h2', null, r.t),
       h('p', { class: 'muted small' }, 'Lees eerst zonder vertaling. Tik op een alinea als je vastloopt.'),
-      h('div', { class: 'row gap wrap' }, trBtn),
+      h('div', { class: 'row gap wrap' }, Speech.canSpeak() ? playBtn : null, trBtn),
       h('div', { class: 'rd-body' }, paras),
       r.gl && r.gl.length ? h('details', { class: 'rd-gl' }, h('summary', null, '📝 Woordjes bij de tekst'), h('ul', null, r.gl.map(([es, nl]) => h('li', null, h('b', { lang: 'es' }, es), ' — ' + nl)))) : null);
   };

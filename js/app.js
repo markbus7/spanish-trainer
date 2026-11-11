@@ -966,6 +966,7 @@
       Speech.clips ? toggle('Ingesproken opnames gebruiken', '🎧 ' + Speech.clips.size.toLocaleString('nl-NL') + ' woorden en zinnen zijn ingesproken met natuurlijke Latijns-Amerikaanse stemmen. Wat niet is ingesproken, leest je apparaat zelf voor.', s.clips !== false, v => set('clips', v)) : null,
       Speech.canSpeak() ? label(Speech.clips ? 'Stem van het apparaat (voor de rest)' : 'Voorleesstem', voiceSel) : h('p', { class: 'warn' }, 'Je browser ondersteunt geen voorlezen.'),
       label('Spreeksnelheid', rate),
+      toggle('Dialogen eerst alleen beluisteren', 'De tekst is wazig tot je hem zelf zichtbaar maakt. Goed voor je luistervaardigheid.', s.listenFirst !== false, v => set('listenFirst', v)),
       h('button', { class: 'btn ghost', type: 'button', onclick: () => Speech.say('¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.') }, '🔊 Test de stem'),
       h('p', { class: 'small muted' }, Speech.voices.some(v => Speech.rank(v) >= 85) ? '✅ Er is een Latijns-Amerikaanse stem gevonden.' : 'Tip: installeer in de instellingen van je apparaat een Spaanse stem (Mexico of VS). Op een iPhone: Instellingen › Toegankelijkheid › Gesproken materiaal › Stemmen › Spaans (Mexico).'),
       h('p', { class: 'small muted' }, Speech.canListen() ? '🎙️ Spraakherkenning is beschikbaar.' : '🎙️ Spraakherkenning werkt niet in deze browser. Gebruik Chrome of Safari voor spreekoefeningen.'))));

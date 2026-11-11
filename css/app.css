@@ -529,3 +529,17 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .offline-rows { display: flex; flex-direction: column; gap: 4px; }
 .offline-row { padding: 10px 0; border-top: 1px solid var(--line, rgba(0,0,0,.08)); align-items: center; }
 .offline-row:first-child { border-top: 0; }
+
+/* Dialoog: eerst luisteren + rollenspel */
+.dl-list.masked .dl .es { filter: blur(6px); user-select: none; -webkit-user-select: none; }
+.dl .es.hide-es { display: none; }
+.dl.mine .nl { display: block !important; font-weight: 600; color: var(--ink); }
+.dl.mine.said .nl { font-weight: 400; color: var(--muted); }
+.rp-panel { margin-top: .8rem; padding: .8rem 1rem; border-radius: 14px; background: var(--bg2); display: flex; flex-direction: column; gap: .6rem; }
+.rp-turn:empty { display: none; }
+.rp-turn { margin-top: .5rem; display: flex; flex-direction: column; gap: .35rem; }
+.rp-ctrl { align-items: center; }
+.rp-score { font-weight: 700; color: var(--muted); }
+.rp-score.good { color: var(--ok); }
+.rd-p.active { background: var(--gold-soft); border-radius: 10px; }
+.rp-panel.hidden { display: none; }
