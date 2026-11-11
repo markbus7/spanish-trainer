@@ -46,7 +46,7 @@
       units: {}, levels: {}, srs: {}, tags: {},
       skills: { vocab: { ok: 0, no: 0 }, grammar: { ok: 0, no: 0 }, listen: { ok: 0, no: 0 }, speak: { ok: 0, no: 0 }, read: { ok: 0, no: 0 }, write: { ok: 0, no: 0 } },
       days: {}, xp: 0, streak: { cur: 0, best: 0, last: null }, current: null, badges: [], done: {},
-      tests: [], games: {}
+      tests: [], games: {}, fast: 0
     };
   }
   function merge(base, extra) {

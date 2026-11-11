@@ -160,15 +160,26 @@
         if (stepId === 'test') {
           const passed = sum.score >= (session.pass || 0.8);
           us.best = Math.max(us.best || 0, sum.score);
+          st().fast = sum.score >= 0.9 ? (st().fast || 0) + 1 : 0;
           if (passed) {
             us.steps.test = true; us.done = true;
             award('unit1'); if (sum.score === 1) award('perfect');
             const nxt = C.next(u.id);
             if (st().current === u.id && nxt) st().current = nxt.id;
             const lvlDone = C.unitsOf(u.level).every(x => P.unitState(x.id).done || P.unitState(x.id).tested);
-            return { passed: true, bonusXP: 100 + (sum.score === 1 ? 50 : 0), emoji: '🏅', title: '¡Unidad completada!',
+            const res = { passed: true, bonusXP: 100 + (sum.score === 1 ? 50 : 0), emoji: '🏅', title: '¡Unidad completada!',
               text: lvlDone ? `Alle units van ${u.level} zijn klaar. Tijd voor het niveau-examen! 🎓` : (nxt ? 'Volgende unit ontgrendeld: ' + nxt.icon + ' ' + nxt.title : ''),
               nextLabel: nxt && !lvlDone ? 'Naar de volgende unit' : 'Klaar', next: () => { location.hash = nxt && !lvlDone ? '#/unit/' + nxt.id : '#/ruta'; } };
+            // gaat het heel goed? stel voor om sneller door de stof te gaan
+            const lv = st().levels[u.level];
+            if (!lvlDone && st().fast >= 3 && !(lv && lv.passed)) {
+              res.text = `⚡ ${st().fast} unittoetsen op rij met 90% of meer! Misschien beheers je ${u.level} al. Met het niveau-examen ${u.level} weet je het zeker. Haal je het, dan kun je meteen door naar het volgende niveau.`;
+              res.alt = { label: '🎓 Niveau-examen ' + u.level, fn: () => startLevelExam(u.level) };
+            } else if (!lvlDone && nxt && nxt.level === u.level && sum.score >= 0.95 && !P.unitState(nxt.id).done) {
+              res.text = `⚡ ${Math.round(sum.score * 100)}%, sterk! Ken je ${nxt.icon} ${nxt.title} misschien ook al? Doe dan meteen die toets. Haal je 80%, dan is ook die unit klaar.`;
+              res.alt = { label: '⚡ Volgende unit direct toetsen', fn: () => startStep(nxt, 'test') };
+            }
+            return res;
           }
           return { passed: false, emoji: '💪', title: 'Bijna!', text: `Je had ${Math.round(sum.score * 100)}%. Je hebt 80% nodig. Bekijk je fouten, herhaal de lastige stappen en probeer het opnieuw.`, nextLabel: 'Terug naar de unit', next: () => { location.hash = '#/unit/' + u.id; }, alt: { label: '🔁 Opnieuw', fn: () => startStep(u, 'test') } };
         }
@@ -177,6 +188,15 @@
         const nxtStep = P.nextStep(u);
         const extra = { bonusXP: 20, title: step.nl + ' ✓', text: nxtStep ? 'Volgende: ' + nxtStep.icon + ' ' + nxtStep.nl : '', nextLabel: nxtStep ? 'Volgende stap' : 'Klaar', next: () => { if (nxtStep) startStep(u, nxtStep.id); } };
         extra.alt = { label: 'Terug', fn: () => { location.hash = '#/unit/' + u.id; } };
+        // snel en (bijna) foutloos? vraag of je de unit al beheerst
+        const secs = sum.total ? sum.minutes * 60 / sum.total : 99;
+        if (nxtStep && nxtStep.id !== 'test' && !us.offered && sum.total >= 8 && sum.score >= 0.9 && secs <= 12) {
+          us.offered = true;
+          return Object.assign(extra, { emoji: '⚡', title: 'Dit gaat je makkelijk af!',
+            text: `${Math.round(sum.score * 100)}% goed, gemiddeld ${U.plural(Math.max(1, Math.round(secs)), 'seconde', 'seconden')} per vraag. Ken je de rest van ${u.icon} ${u.title} misschien al? Doe dan meteen de unittoets. Haal je 80%, dan is de unit klaar. Zo niet, dan ga je gewoon verder met ${nxtStep.nl}.`,
+            nextLabel: '⚡ Direct naar de unittoets', next: () => startStep(u, 'test'),
+            alt: { label: 'Gewoon verder: ' + nxtStep.nl, fn: () => startStep(u, nxtStep.id) } });
+        }
         if (stepId === 'apply' && u.scenario) extra.alt = { label: S.AI.enabled() ? '🤖 Rollenspel met AI' : 'Terug', fn: () => { if (S.AI.enabled()) { startRoleplay(unitScenario(u)); location.hash = '#/docente'; } else location.hash = '#/unit/' + u.id; } };
         return extra;
       }
@@ -344,7 +364,17 @@
     runSession(ses, { onFinish: sum => {
       const L = st().levels[lvl] || (st().levels[lvl] = { passed: false, best: 0 });
       L.best = Math.max(L.best || 0, sum.score);
-      if (sum.score >= 0.8) { L.passed = true; award(lvl); return { passed: true, bonusXP: 300, emoji: '🎓', title: '¡Nivel ' + lvl + ' aprobado!', text: 'Gefeliciteerd! Je hebt het niveau-examen ' + lvl + ' gehaald met ' + Math.round(sum.score * 100) + '%.', next: () => { location.hash = '#/ruta'; } }; }
+      if (sum.score >= 0.8) {
+        L.passed = true; award(lvl); st().fast = 0;
+        const res = { passed: true, bonusXP: 300, emoji: '🎓', title: '¡Nivel ' + lvl + ' aprobado!', text: 'Gefeliciteerd! Je hebt het niveau-examen ' + lvl + ' gehaald met ' + Math.round(sum.score * 100) + '%.', next: () => { location.hash = '#/ruta'; } };
+        const nx = C.LEVELS[lvIdx(lvl) + 1];
+        if (nx && C.available(nx.id) && lvIdx(lessonLevel()) <= lvIdx(lvl)) {
+          res.text += ` Je lessen staan nog op ${lessonLevel()}. Wil je verder met ${nx.id}? De units die je nog niet had afgerond, blijven open om te herhalen.`;
+          res.nextLabel = '🚀 Lessen naar ' + nx.id; res.next = () => { moveLessonsTo(nx.id); location.hash = '#/ruta'; };
+          res.alt = { label: 'Nog niet', fn: () => { location.hash = '#/ruta'; } };
+        }
+        return res;
+      }
       return { passed: false, title: 'Nog niet…', text: `Je had ${Math.round(sum.score * 100)}%. Je hebt 80% nodig. Oefen je zwakke punten (Perfil) en probeer het opnieuw.`, next: () => { location.hash = '#/perfil'; } };
     } });
   }
