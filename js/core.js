@@ -11,7 +11,7 @@
       if (v == null || v === false) continue;
       if (k === 'class') el.className = v;
       else if (k === 'html') el.innerHTML = v;
-      else if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
+      else if (k === 'style' && typeof v === 'object') { for (const p in v) { if (p.startsWith('--')) el.style.setProperty(p, v[p]); else el.style[p] = v[p]; } }
       else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
       else el.setAttribute(k, v === true ? '' : v);
     }
@@ -40,13 +40,13 @@
       v: 1, created: Date.now(), updated: 0, epoch: 0, name: '',
       settings: {
         goal: 20, explain: 'auto', strictAccents: false, voice: '', rate: 0.9, sound: true, theme: 'auto',
-        aiKey: '', aiModel: 'claude-opus-5-5', autoSpeak: true, tutorVoice: false, unlockAll: false, region: 'latam'
+        aiKey: '', aiModel: 'claude-sonnet-5-5', aiModelV: 2, autoSpeak: true, tutorVoice: false, unlockAll: false, region: 'latam'
       },
       placement: { done: false, level: null, start: null, date: null },
       units: {}, levels: {}, srs: {}, tags: {},
       skills: { vocab: { ok: 0, no: 0 }, grammar: { ok: 0, no: 0 }, listen: { ok: 0, no: 0 }, speak: { ok: 0, no: 0 }, read: { ok: 0, no: 0 }, write: { ok: 0, no: 0 } },
       days: {}, xp: 0, streak: { cur: 0, best: 0, last: null }, current: null, badges: [], done: {},
-      tests: [], games: {}, fast: 0
+      tests: [], games: {}, fast: 0, myWords: {}
     };
   }
   function merge(base, extra) {
@@ -62,7 +62,12 @@
     load() {
       try {
         const raw = localStorage.getItem(KEY);
-        if (raw) this.state = merge(defaults(), JSON.parse(raw));
+        if (raw) {
+          const saved = JSON.parse(raw), ss = saved.settings || {};
+          // v1.5: Sonnet is de nieuwe standaard. Wie nog op de oude standaard (Opus) stond, gaat één keer mee over.
+          if (!(ss.aiModelV >= 2) && ss.aiModel === 'claude-opus-5-5') ss.aiModel = 'claude-sonnet-5-5';
+          this.state = merge(defaults(), saved);
+        }
       } catch (e) { this.ok = false; }
       return this.state;
     },
@@ -180,6 +185,10 @@
       const o = O.games[id], n = out.games[id] || (out.games[id] = {});
       for (const f of ['n', 'words', 'good']) n[f] = max(n[f], o[f]);
     }
+    // eigen woorden: per sleutel de nieuwste versie (ook verwijderingen)
+    out.myWords = Object.assign({}, N.myWords || {});
+    for (const k in O.myWords || {}) { const o = O.myWords[k], n = out.myWords[k]; if (!n || (o.t || 0) > (n.t || 0)) out.myWords[k] = clone(o); }
+    for (const k in out.myWords) if (out.myWords[k].del) delete out.srs['w|my|' + k];
     if (!out.current) out.current = O.current;
     return out;
   }
@@ -287,7 +296,7 @@
   const Speech = {
     voices: [], ready: false,
     /* Opnames: vaste lesstof is vooraf ingesproken (audio/<sleutel>.mp3, zie tools/). Anders de stem van het apparaat. */
-    clips: null, el: null,
+    clips: null, levels: null, el: null,
     clean(t) { return String(t).normalize('NFC').replace(/\s*\/\s*/g, ', ').replace(/\s+/g, ' ').trim(); },
     key(t) {
       const s = this.clean(t).toLowerCase();
@@ -299,7 +308,7 @@
     },
     loadClips() {
       if (typeof fetch !== 'function' || typeof Audio !== 'function') return;
-      fetch('audio/index.json').then(r => r.ok ? r.json() : null).then(j => { if (j && j.clips) this.clips = new Set(j.clips); }).catch(() => { /* geen opnames */ });
+      this.clipsLoaded = fetch('audio/index.json').then(r => r.ok ? r.json() : null).then(j => { if (j && j.clips) { this.clips = new Set(j.clips); this.levels = j.levels || null; } }).catch(() => { /* geen opnames */ });
     },
     hasClip(text) { return !!(this.clips && Store.state.settings.clips !== false && text && this.clips.has(this.key(text))); },
     playClip(text, opt) {

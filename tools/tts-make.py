@@ -31,6 +31,17 @@ async def make(item, sem, stats):
             os.remove(path + '.tmp')
 
 
+def write_index(items, have):
+    """audio/index.json: alle opnames, plus per niveau welke erbij horen (voor offline downloaden in de app)."""
+    have_set, levels = set(have), {}
+    for i in items:
+        if i['k'] in have_set:
+            for lv in i.get('lv') or ['X']:
+                levels.setdefault(lv, []).append(i['k'])
+    with open(os.path.join(AUDIO, 'index.json'), 'w', encoding='utf8') as fh:
+        json.dump({'clips': have, 'levels': {k: sorted(v) for k, v in sorted(levels.items())}}, fh, separators=(',', ':'))
+
+
 async def main():
     items = json.load(open(sys.argv[1], encoding='utf8'))
     limit = int(os.environ.get('TTS_LIMIT', '0')) or None
@@ -48,8 +59,7 @@ async def main():
         await asyncio.gather(*tasks[n:n + 200])
         print(f'  {min(n + 200, len(tasks))}/{len(tasks)} ({stats["fail"]} mislukt)', flush=True)
     have = sorted(f[:-4] for f in os.listdir(AUDIO) if f.endswith('.mp3'))
-    with open(os.path.join(AUDIO, 'index.json'), 'w', encoding='utf8') as fh:
-        json.dump({'clips': have}, fh, separators=(',', ':'))
+    write_index(items, have)
     print(f'Klaar: {stats["ok"]} nieuw, {stats["fail"]} mislukt, {len(have)} opnames totaal')
     if stats['fail']:
         print('Laatste fout:', stats['last_error'])

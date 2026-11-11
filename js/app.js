@@ -479,6 +479,7 @@
       S.Games.GAMES.map(g => quick(g.icon, g.es, g.nl, () => S.Games.start(g.id))),
       quick('🗂️', 'Alle spellen', 'kies je woorden', () => { location.hash = '#/juegos'; }))));
     wrap.append(section('Meer', h('div', { class: 'quick' },
+      quick('📚', 'Woordenboek', 'zoeken + eigen woorden', () => { location.hash = '#/woorden'; }),
       quick('⚡', 'Woordensprint', '2 minuten', () => runSession(Gen.sprint(30))),
       quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10))),
       quick('🎙️', 'Uitspraak', '8 zinnen', () => runSession(Gen.speakTraining(8))),
@@ -510,6 +511,8 @@
     return wrap;
   };
   routes.tablas.tab = 'practica';
+  routes.woorden = () => S.Words.page();
+  routes.woorden.tab = 'practica';
   routes.juegos = () => S.Games.page();
   routes.juegos.tab = 'practica';
 
@@ -966,9 +969,11 @@
       Speech.clips ? toggle('Ingesproken opnames gebruiken', '🎧 ' + Speech.clips.size.toLocaleString('nl-NL') + ' woorden en zinnen zijn ingesproken met natuurlijke Latijns-Amerikaanse stemmen. Wat niet is ingesproken, leest je apparaat zelf voor.', s.clips !== false, v => set('clips', v)) : null,
       Speech.canSpeak() ? label(Speech.clips ? 'Stem van het apparaat (voor de rest)' : 'Voorleesstem', voiceSel) : h('p', { class: 'warn' }, 'Je browser ondersteunt geen voorlezen.'),
       label('Spreeksnelheid', rate),
+      toggle('Dialogen eerst alleen beluisteren', 'De tekst is wazig tot je hem zelf zichtbaar maakt. Goed voor je luistervaardigheid.', s.listenFirst !== false, v => set('listenFirst', v)),
       h('button', { class: 'btn ghost', type: 'button', onclick: () => Speech.say('¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.') }, '🔊 Test de stem'),
       h('p', { class: 'small muted' }, Speech.voices.some(v => Speech.rank(v) >= 85) ? '✅ Er is een Latijns-Amerikaanse stem gevonden.' : 'Tip: installeer in de instellingen van je apparaat een Spaanse stem (Mexico of VS). Op een iPhone: Instellingen › Toegankelijkheid › Gesproken materiaal › Stemmen › Spaans (Mexico).'),
       h('p', { class: 'small muted' }, Speech.canListen() ? '🎙️ Spraakherkenning is beschikbaar.' : '🎙️ Spraakherkenning werkt niet in deze browser. Gebruik Chrome of Safari voor spreekoefeningen.'))));
+    if ('caches' in window && 'serviceWorker' in navigator) wrap.append(section('📥 Offline luisteren', offlineCard()));
     // AI
     const keyIn = h('input', { class: 'input', type: 'password', placeholder: 'sk-ant-…', value: s.aiKey || '', autocomplete: 'off', onchange: e => { set('aiKey', e.target.value.trim()); } });
     const modelSel = h('select', { class: 'input', onchange: e => set('aiModel', e.target.value) }, S.AI.MODELS.map(m => h('option', { value: m.id, selected: s.aiModel === m.id ? true : null }, m.label)));
@@ -1069,6 +1074,59 @@
         btn),
       out,
       h('p', { class: 'small muted' }, 'Na een update zie je hier een hoger versienummer. Staat er nog het oude nummer? Tik dan op «Controleren op updates».'));
+  }
+  /* Opnames per niveau downloaden, zodat ze ook zonder internet werken (sw.js bewaart ze in een vaste cache). */
+  const AUDIO_CACHE = 'espanol-latino-audio';
+  const LV_NAMES = { A1: 'A1', A2: 'A2', B1: 'B1', B2: 'B2', C1: 'C1', C2: 'C2', X: 'Overig (zinnen, regio’s)' };
+  function offlineCard() {
+    const url = k => new URL('audio/' + k + '.mp3', location.href).href;
+    const rows = h('div', { class: 'offline-rows' });
+    const note = h('p', { class: 'small muted' }, 'Opnames die je al eens gehoord hebt, blijven bewaard. Download een heel niveau als je onderweg zonder internet wilt oefenen. Gemiddeld ±17 kB per opname.');
+    let busy = false;
+    async function have(keys) {
+      const c = await caches.open(AUDIO_CACHE), got = new Set((await c.keys()).map(r => r.url));
+      return keys.filter(k => got.has(url(k))).length;
+    }
+    async function draw() {
+      if (Speech.clipsLoaded) await Speech.clipsLoaded;
+      if (!Speech.levels) { note.textContent = 'Er zijn (nog) geen opnames om te downloaden.'; return; }
+      rows.innerHTML = '';
+      for (const lv of Object.keys(Speech.levels)) {
+        const keys = Speech.levels[lv], n = await have(keys).catch(() => 0), all = keys.length;
+        const mb = Math.round(all * 17 / 1024);
+        const out = h('small', { class: 'muted' }, n >= all ? '✅ Alles offline beschikbaar' : `${n.toLocaleString('nl-NL')} van ${all.toLocaleString('nl-NL')} opnames offline · ±${mb} MB`);
+        const dl = h('button', { class: 'btn ' + (n >= all ? 'ghost' : 'primary'), type: 'button', disabled: n >= all ? true : null, onclick: () => get(lv, keys, out, dl) }, n >= all ? 'Klaar' : '📥 Download');
+        const rm = n ? h('button', { class: 'btn ghost', type: 'button', title: 'Verwijderen', onclick: () => drop(keys) }, '🗑') : null;
+        rows.append(h('div', { class: 'row gap between wrap offline-row' }, h('div', null, h('b', null, LV_NAMES[lv] || lv), h('div', null, out)), h('div', { class: 'row gap' }, dl, rm)));
+      }
+    }
+    async function get(lv, keys, out, btn) {
+      if (busy) return; busy = true; btn.disabled = true;
+      const c = await caches.open(AUDIO_CACHE), got = new Set((await c.keys()).map(r => r.url));
+      const todo = keys.filter(k => !got.has(url(k)));
+      let done = keys.length - todo.length, fail = 0;
+      const step = async () => {
+        while (todo.length) {
+          const k = todo.shift();
+          try { const r = await fetch(url(k), { cache: 'no-store' }); if (r.ok && r.status === 200) await c.put(url(k), r); else fail++; } catch (e) { fail++; }
+          done++; if (done % 20 === 0 || !todo.length) out.textContent = `⏳ ${done.toLocaleString('nl-NL')} van ${keys.length.toLocaleString('nl-NL')}…`;
+        }
+      };
+      await Promise.all([step(), step(), step(), step(), step(), step()]);
+      busy = false;
+      if (fail) S.toast('⚠️ ' + fail + ' opnames lukten niet' + (navigator.onLine === false ? ' (je bent offline)' : '') + '. Probeer het later opnieuw.');
+      else S.toast('📥 ' + (LV_NAMES[lv] || lv) + ' staat offline');
+      if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => { /* */ });
+      draw();
+    }
+    async function drop(keys) {
+      if (busy) return;
+      const c = await caches.open(AUDIO_CACHE);
+      await Promise.all(keys.map(k => c.delete(url(k))));
+      draw();
+    }
+    draw();
+    return h('div', { class: 'card form' }, note, rows);
   }
   function label(t, el) { return h('label', { class: 'field' }, h('span', null, t), el); }
   function toggle(t, sub, val, fn) {

@@ -165,7 +165,7 @@
   function levelExam(lvl) {
     const us = C.unitsOf(lvl); const items = [];
     us.forEach(u => {
-      const exIdx = U.shuffle(u.ex.map((e, i) => i).filter(i => u.ex[i].t !== 'match')).slice(0, 2);
+      const exIdx = U.shuffle(u.ex.map((e, i) => i).filter(i => u.ex[i].t !== 'match')).slice(0, Math.max(2, Math.ceil(20 / us.length))); // minder units (B2 in opbouw): meer oefeningen per unit
       exIdx.forEach(i => items.push(normEx(u.ex[i], u, i)));
       const w = U.pick(C.words(u)); items.push(wordItem(w, 'type', u));
     });
@@ -180,6 +180,11 @@
   function resolve(id) {
     const [type, a, b] = id.split('|');
     const card = S.Store.state.srs[id];
+    if (type === 'w' && a === 'my') {
+      const w = S.Words && S.Words.mineWord(b); if (!w) return null;
+      const r = card ? card.r : 1;
+      return wordItem(w, r <= 1 ? U.pick(['mc-es', 'mc-nl']) : r === 2 ? U.pick(['mc-nl', 'type']) : 'type', S.Words.distractorUnit());
+    }
     if (type === 'w') {
       const u = C.get(a); if (!u) return null; const w = C.word(u, +b); if (!w) return null;
       const r = card ? card.r : 1;

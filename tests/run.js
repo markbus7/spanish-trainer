@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/extra.js', 'js/gen.js', 'js/games.js']) {
+for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'js/gen.js', 'js/games.js', 'js/words.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -35,7 +35,12 @@ const known = {
   'hacer|perf': 'he hecho|has hecho|ha hecho|hemos hecho|han hecho', 'volver|perf': 'he vuelto|has vuelto|ha vuelto|hemos vuelto|han vuelto',
   'leer|perf': 'he leído|has leído|ha leído|hemos leído|han leído', 'ir|perf': 'he ido|has ido|ha ido|hemos ido|han ido',
   'dormir|prog': 'estoy durmiendo|estás durmiendo|está durmiendo|estamos durmiendo|están durmiendo', 'leer|prog': 'estoy leyendo|estás leyendo|está leyendo|estamos leyendo|están leyendo',
-  'decir|prog': 'estoy diciendo|estás diciendo|está diciendo|estamos diciendo|están diciendo'
+  'decir|prog': 'estoy diciendo|estás diciendo|está diciendo|estamos diciendo|están diciendo',
+  'hablar|impsubj': 'hablara hablaras hablara habláramos hablaran', 'tener|impsubj': 'tuviera tuvieras tuviera tuviéramos tuvieran',
+  'ser|impsubj': 'fuera fueras fuera fuéramos fueran', 'decir|impsubj': 'dijera dijeras dijera dijéramos dijeran',
+  'dormir|impsubj': 'durmiera durmieras durmiera durmiéramos durmieran', 'leer|impsubj': 'leyera leyeras leyera leyéramos leyeran',
+  'saber|impsubj': 'supiera supieras supiera supiéramos supieran', 'haber|impsubj': 'hubiera hubieras hubiera hubiéramos hubieran',
+  'hacer|condperf': 'habría hecho|habrías hecho|habría hecho|habríamos hecho|habrían hecho', 'ver|plussubj': 'hubiera visto|hubieras visto|hubiera visto|hubiéramos visto|hubieran visto'
 };
 for (const [k, v] of Object.entries(known)) {
   const [verb, tense] = k.split('|');
@@ -65,7 +70,7 @@ ok(C('ano', ['año']).warn === 'enye', 'ñ-waarschuwing');
 
 /* ---------- lesstof ---------- */
 const units = S.C.all();
-ok(units.length === 32, 'aantal units = ' + units.length);
+ok(units.length === 36, 'aantal units = ' + units.length);
 const ids = new Set();
 const tags = S.C.TAGS;
 for (const u of units) {
@@ -144,7 +149,7 @@ ok(LR({ A1: { ok: 10, n: 10 }, A2: { ok: 8, n: 10 }, B1: { ok: 7, n: 10 }, B2: {
   ok(JSON.stringify(S.Store.mergeStates(m, m).tests) === JSON.stringify(m.tests), 'sync: idempotent');
 }
 S.placement.forEach((q, i) => ok(new Set(q.o).size === q.o.length, 'plaatsingsvraag ' + i));
-ok(['A1', 'A2', 'B1'].every(l => S.Gen.levelExam(l).items.length >= 20), 'niveau-examens');
+ok(['A1', 'A2', 'B1', 'B2'].every(l => S.Gen.levelExam(l).items.length >= 20), 'niveau-examens');
 ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
 
 /* ---------- samenvoegen bij synchroniseren ---------- */
@@ -237,6 +242,30 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
     });
   }
   ok(['A1', 'A2', 'B1'].every(l => G.poolFor(l, x => G.FIT.grid(x, 10)).length >= 60), 'spellen: genoeg puzzelwoorden per niveau');
+}
+
+/* ---------- woordenboek en eigen woorden ---------- */
+{
+  const keep = S.Store.state;
+  S.Store.state = JSON.parse(JSON.stringify(keep)); S.Store.state.myWords = {}; S.Store.state.srs = {};
+  const W = S.Words;
+  ok(W.search('perro', 'all').some(w => w.es.includes('perro')), 'woordenboek: vindt perro');
+  ok(W.search('hond', 'all').some(w => w.es.includes('perro')), 'woordenboek: zoekt ook in het Nederlands');
+  ok(W.search('', 'B1').every(w => w.level === 'B1'), 'woordenboek: filter op niveau');
+  const r = W.addMine('la chamba', 'het werk (Mexico)');
+  ok(r && r.id && S.Store.state.srs[r.id], 'eigen woord: komt in de herhaling');
+  ok(W.addMine('La Chamba', 'werk').dup, 'eigen woord: geen dubbele');
+  ok(!W.addMine('', 'x'), 'eigen woord: leeg wordt geweigerd');
+  const key = r.id.split('|')[2];
+  const it = S.Gen.reviewSession(50, [r.id]).items[0];
+  ok(it && it.word && it.word.es === 'la chamba' && (it.options ? it.options.length >= 2 : true), 'eigen woord: herhaalkaart werkt');
+  const before = JSON.parse(JSON.stringify(S.Store.state));
+  W.removeMine(key);
+  ok(!W.mine().length && !S.Store.state.srs[r.id], 'eigen woord: verwijderen');
+  S.Store.state.updated = Date.now() + 5;
+  const m = S.Store.mergeStates(S.Store.state, before);
+  ok(m.myWords[key].del && !m.srs[r.id], 'eigen woord: verwijdering overleeft synchroniseren');
+  S.Store.state = keep;
 }
 
 /* ---------- versie en offline-cache ---------- */
