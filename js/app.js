@@ -664,11 +664,15 @@
     const paint = () => { tg.textContent = on() ? '🔊 Ze praat hardop' : '🔇 Alleen tekst'; tg.classList.toggle('on', on()); tg.setAttribute('aria-pressed', on() ? 'true' : 'false'); };
     tg.onclick = () => { st().settings.tutorVoice = !on(); save(); paint(); if (on()) { Speech.unlock(); S.Tutor.say('¡Perfecto! Ahora te hablo en voz alta.'); } else Speech.stop(); };
     paint();
+    // Lupe praat met de stem van het apparaat. Is dat een eenvoudige (robotachtige) stem, wijs dan de weg naar een betere.
+    const voiceHint = h('a', { class: 'small voice-hint', href: '#/ajustes' }, '🎙️ Klinkt Lupe robotachtig? Zo krijgt ze een natuurlijke stem ›');
+    const checkVoice = () => { voiceHint.hidden = !Speech.voices.length || Speech.hasGoodVoice(); };
+    checkVoice(); setTimeout(checkVoice, 800);
     const av = lupeAv(72, 'big');
     av.title = 'Tik om haar te laten stoppen met praten';
     av.onclick = () => { Speech.stop(); S.Tutor.setTalking(false); };
     return h('div', { class: 'tutor-head' }, av,
-      h('div', { class: 'grow' }, h('h1', null, S.Tutor.title), h('p', { class: 'small muted' }, S.Tutor.tagline), tg),
+      h('div', { class: 'grow' }, h('h1', null, S.Tutor.title), h('p', { class: 'small muted' }, S.Tutor.tagline), tg, voiceHint),
       h('button', { class: 'btn ghost small t-stop', type: 'button', onclick: () => { Speech.stop(); S.Tutor.setTalking(false); } }, '■ Stop'));
   }
   function bubble(m, pending) {
