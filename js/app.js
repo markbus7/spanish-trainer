@@ -1042,17 +1042,42 @@
     const voiceSel = h('select', { class: 'input', onchange: e => set('voice', e.target.value) });
     const fillVoices = () => {
       voiceSel.innerHTML = ''; voiceSel.append(h('option', { value: '' }, 'Automatisch (beste Latijns-Amerikaanse stem)'));
-      Speech.voices.slice().sort((a, b) => Speech.rank(b) - Speech.rank(a)).forEach(v => voiceSel.append(h('option', { value: v.voiceURI, selected: s.voice === v.voiceURI ? true : null }, v.name + ' (' + v.lang + ')' + (/es-es/i.test(v.lang) ? ' — Spanje' : ''))));
+      Speech.voices.slice().sort((a, b) => Speech.rank(b) - Speech.rank(a)).forEach(v => voiceSel.append(h('option', { value: v.voiceURI, selected: s.voice === v.voiceURI ? true : null }, v.name + ' (' + v.lang + ')' + (/es-es/i.test(v.lang) ? ' — Spanje' : '') + (Speech.qualityLabel(v) ? ' · ' + Speech.qualityLabel(v) : ''))));
     };
     fillVoices(); setTimeout(fillVoices, 700);
     const rate = h('input', { type: 'range', min: 0.6, max: 1.2, step: 0.05, value: s.rate, oninput: e => set('rate', +e.target.value) });
+    // Test: speelt een opname én de apparaatstem, en zegt wat er klonk. Zo zie je meteen of je iPad de natuurlijke stem gebruikt.
+    const testOut = h('p', { class: 'small' });
+    const voiceTip = h('div', { class: 'small muted voice-tip' });
+    const drawTip = () => {
+      const v = Speech.voice(), q = v ? Speech.quality(v) : -1;
+      voiceTip.innerHTML = '';
+      voiceTip.append(h('p', null, v ? 'Apparaatstem nu: ' + v.name + ' (' + v.lang + ')' + (q >= 2 ? ' ✅ ' + Speech.qualityLabel(v) : ' — eenvoudige stem, klinkt wat robotachtig') : 'Geen Spaanse apparaatstem gevonden.'));
+      if (q < 2) voiceTip.append(h('p', null, h('b', null, 'Natuurlijker voorlezen op iPad of iPhone: '),
+        'open Instellingen › Toegankelijkheid › Gesproken materiaal › Stemmen › Spaans. Kies Paulina of Juan (Mexico) en download de versie ',
+        h('b', null, 'Verbeterd'), ' of ', h('b', null, 'Premium'), ' (±100–400 MB, via wifi). Sluit daarna de app helemaal af en open hem opnieuw; de nieuwe stem wordt dan vanzelf gekozen. Op een Mac: Systeeminstellingen › Toegankelijkheid › Gesproken materiaal › Systeemstem › Beheer stemmen.'));
+    };
+    drawTip(); setTimeout(drawTip, 700);
+    const runTest = async () => {
+      testOut.textContent = '…';
+      const clipText = '¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.';
+      let msg = [];
+      if (Speech.hasClip(clipText)) {
+        await Speech.say(clipText);
+        msg.push(Speech.last && Speech.last.src === 'clip' ? '✅ Lesstof: natuurlijke opname speelt goed af.' : '⚠️ De opname speelde niet af (' + ((Speech.last && Speech.last.err) || 'onbekend') + '). Je hoorde de apparaatstem.');
+      } else if (s.clips === false) msg.push('ℹ️ Opnames staan uit.');
+      const v = Speech.voice();
+      await Speech.speak('Y esto es la voz de tu dispositivo.');
+      msg.push(v ? 'Apparaatstem (voor de AI-docent en eigen woorden): ' + v.name + (Speech.quality(v) >= 2 ? ' ✅ ' + Speech.qualityLabel(v) : ' — eenvoudig; zie de tip hieronder voor een natuurlijkere stem.') : 'Geen apparaatstem.');
+      testOut.textContent = msg.join(' ');
+    };
     wrap.append(section('Stem & uitspraak', h('div', { class: 'card form' },
       Speech.clips ? toggle('Ingesproken opnames gebruiken', '🎧 ' + Speech.clips.size.toLocaleString('nl-NL') + ' woorden en zinnen zijn ingesproken met natuurlijke Latijns-Amerikaanse stemmen. Wat niet is ingesproken, leest je apparaat zelf voor.', s.clips !== false, v => set('clips', v)) : null,
       Speech.canSpeak() ? label(Speech.clips ? 'Stem van het apparaat (voor de rest)' : 'Voorleesstem', voiceSel) : h('p', { class: 'warn' }, 'Je browser ondersteunt geen voorlezen.'),
-      label('Spreeksnelheid', rate),
+      label('Spreeksnelheid apparaatstem', rate),
       toggle('Dialogen eerst alleen beluisteren', 'De tekst is wazig tot je hem zelf zichtbaar maakt. Goed voor je luistervaardigheid.', s.listenFirst !== false, v => set('listenFirst', v)),
-      h('button', { class: 'btn ghost', type: 'button', onclick: () => Speech.say('¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.') }, '🔊 Test de stem'),
-      h('p', { class: 'small muted' }, Speech.voices.some(v => Speech.rank(v) >= 85) ? '✅ Er is een Latijns-Amerikaanse stem gevonden.' : 'Tip: installeer in de instellingen van je apparaat een Spaanse stem (Mexico of VS). Op een iPhone: Instellingen › Toegankelijkheid › Gesproken materiaal › Stemmen › Spaans (Mexico).'),
+      h('button', { class: 'btn ghost', type: 'button', onclick: runTest }, '🔊 Test de stemmen'), testOut,
+      voiceTip,
       h('p', { class: 'small muted' }, Speech.canListen() ? '🎙️ Spraakherkenning is beschikbaar.' : '🎙️ Spraakherkenning werkt niet in deze browser. Gebruik Chrome of Safari voor spreekoefeningen.'))));
     if ('caches' in window && 'serviceWorker' in navigator) wrap.append(section('📥 Offline luisteren', offlineCard()));
     // AI

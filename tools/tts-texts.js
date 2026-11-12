@@ -70,6 +70,22 @@ for (const u of S.C.all()) {
     });
   }));
 }
+// niveautest: de ingevulde zin wordt na het antwoord voorgelezen
+(S.placement || []).forEach(q => {
+  LV = q.lv;
+  if (q.q.includes('___')) add(q.q.replace('___', q.o[0]));
+});
+// woordspellen lezen de eerste vorm van een woord voor (zonder '…' en zonder alternatief na '/')
+for (const u of S.C.all()) {
+  LV = u.level;
+  S.C.words(u).forEach(w => add(String(w.es).split(/\s*\/\s*/)[0].replace(/…|\.\.\./g, '').trim()));
+}
+// Vervoegingstabellen (Práctica): elke vorm van elk werkwoord heeft een 🔊-knop
+for (const v of Object.keys(S.conj.VERBS)) for (const t of Object.keys(S.conj.TENSES)) {
+  const tb = S.conj.table(v, t); if (!tb) continue;
+  LV = S.conj.TENSES[t].level || 'X';
+  S.conj.personsFor(t).forEach(p => add(tb[p]));
+}
 LV = 'X';
 (S.phrases || []).forEach(p => add(p[0]));
 (S.regions || []).forEach(r => { const v = VOICES[r.id.toUpperCase()]; (r.words || []).forEach(([es]) => add(es, v ? v[0] : DEF)); });

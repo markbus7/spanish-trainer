@@ -713,7 +713,9 @@
       setTimeout(() => mainBtn.focus({ preventScroll: true }), 50);
       const sayIt = r.expected && (it.speakAnswer || it.sentence || it.kind === 'listen' || it.word);
       if (sayIt && S.Store.state.settings.autoSpeak && it.kind !== 'speak') {
-        const txt = it.sentence ? it.sentence.replace('___', (r.ok ? r.user : r.expected)) : (it.kind === 'mc' && it.word && it.q === 'Wat betekent dit?' ? it.word.es : r.expected);
+        let txt = it.sentence ? it.sentence.replace('___', (r.ok ? r.user : r.expected)) : (it.kind === 'mc' && it.word && it.q === 'Wat betekent dit?' ? it.word.es : r.expected);
+        // Goed, maar anders getypt (zonder accent, synoniem)? Dan liever de ingesproken versie van het verwachte antwoord.
+        if (it.sentence && r.ok && !Speech.hasClip(txt) && Speech.hasClip(it.sentence.replace('___', r.expected))) txt = it.sentence.replace('___', r.expected);
         setTimeout(() => Speech.say(txt), 150);
       }
     }

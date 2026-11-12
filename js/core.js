@@ -419,9 +419,12 @@
         this._end = end; // stop() rondt het lopende fragment af
         a.src = 'audio/' + this.key(text) + '.mp3';
         a.preservesPitch = true; a.webkitPreservesPitch = true;
-        a.defaultPlaybackRate = a.playbackRate = Math.max(0.5, Math.min(1.5, (opt.slow ? 0.7 : 1) * (Store.state.settings.rate || 0.9) / 0.9));
-        a.onended = () => end(true); a.onerror = () => end(false);
-        const p = a.play(); if (p && p.catch) p.catch(err => end(err && err.name === 'AbortError'));
+        // Op normale snelheid speelt de opname onbewerkt af: versnellen of vertragen met behoud van toonhoogte
+        // klinkt in Safari/WebKit metalig en robotachtig. Alleen de 🐢-knop vertraagt (dat is dan de bedoeling).
+        a.defaultPlaybackRate = a.playbackRate = opt.slow ? 0.75 : 1;
+        a.onended = () => end(true);
+        a.onerror = () => { this.clipError = 'laden mislukt (code ' + (a.error ? a.error.code : '?') + ')'; end(false); };
+        const p = a.play(); if (p && p.catch) p.catch(err => { if (err && err.name !== 'AbortError') this.clipError = err.name + ': ' + err.message; end(err && err.name === 'AbortError'); });
         setTimeout(() => end(true), 60000);
       });
     },
@@ -434,17 +437,32 @@
     },
     canSpeak() { return 'speechSynthesis' in window || !!this.clips; },
     canListen() { return !!(window.SpeechRecognition || window.webkitSpeechRecognition); },
+    /* Kwaliteit van een apparaatstem: iOS/macOS hebben 'compact' (robotachtig), 'verbeterd' (enhanced) en 'premium';
+       Edge heeft 'Online (Natural)'-stemmen. Hoe beter, hoe natuurlijker. */
+    quality(v) {
+      const s = (v.name + ' ' + v.voiceURI).toLowerCase();
+      if (/premium|natural|neural/.test(s)) return 3;
+      if (/enhanced|verbeterd|mejorad|améliorée|erweitert/.test(s)) return 2;
+      if (/google|online/.test(s)) return 1;
+      return 0;
+    },
+    qualityLabel(v) { return ['', 'goed', 'verbeterd', 'natuurlijk'][this.quality(v)]; },
+    isEffect(v) { return /\b(eddy|flo|grandma|grandpa|abuel[ao]|reed|rocko|sandy|shelley|bad news|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|albert|fred|junior|kathy|ralph)\b/i.test(v.name); },
     rank(v) {
       const l = v.lang.replace('_', '-').toLowerCase();
       let s = 0;
       if (l === 'es-mx') s = 100; else if (l === 'es-us') s = 95; else if (l === 'es-419') s = 92;
       else if (/es-(co|ar|cl|pe|ve|uy|cr|ec|gt|pa|pr|do|bo|py|sv|hn|ni|cu)/.test(l)) s = 85; else if (l === 'es-es') s = 30; else s = 50;
-      if (/google|natural|premium|enhanced|neural|siri|mejorad/i.test(v.name)) s += 8;
+      // Een verbeterde of premium-stem klinkt veel natuurlijker: die wint van een compacte stem uit een ander Latijns-Amerikaans land.
+      s += [0, 8, 20, 30][this.quality(v)];
+      if (/compact/i.test(v.voiceURI)) s -= 3;
       // Apple-effectstemmen (iOS/macOS) klinken robotachtig of grappig: alleen als niets anders er is
-      if (/\b(eddy|flo|grandma|grandpa|abuel[ao]|reed|rocko|sandy|shelley|bad news|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|albert|fred|junior|kathy|ralph)\b/i.test(v.name)) s -= 70;
-      if (/paulina|juan|sabina|monica|mónica/i.test(v.name) && l !== 'es-es') s += 3;
+      if (this.isEffect(v)) s -= 70;
+      if (/paulina|juan|sabina|monica|mónica|dalia|jorge/i.test(v.name) && l !== 'es-es') s += 3;
       return s;
     },
+    /* Is er alleen een robotachtige stem? Dan tonen we uitleg om een betere te downloaden. */
+    hasGoodVoice() { return this.voices.some(v => this.rank(v) >= 85 && this.quality(v) >= 2); },
     voice() {
       if (!this.voices.length && 'speechSynthesis' in window) this.voices = speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang));
       const want = Store.state.settings.voice;
@@ -458,7 +476,9 @@
       if (!text) return Promise.resolve();
       const id = ++this._talkId;
       this._talk(true, text);
-      const p = this.hasClip(text) ? (this.stop(), this.playClip(text, opt).catch(() => this.speak(text, opt))) : this.speak(text, opt);
+      const p = this.hasClip(text)
+        ? (this.stop(), this.playClip(text, opt).then(() => { this.last = { src: 'clip' }; }, () => { this.last = { src: 'clip-failed', err: this.clipError || 'onbekend' }; return this.speak(text, opt, true); }))
+        : this.speak(text, opt);
       return p.then(() => { if (this._talkId === id) this._talk(false); });
     },
     /* Lange teksten in zinnen opdelen: sommige browsers stoppen anders na ±15 seconden. */
@@ -478,14 +498,17 @@
       if (this._unlocked || !('speechSynthesis' in window)) return;
       try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); this._unlocked = true; } catch (e) { /* */ }
     },
-    speak(text, opt = {}) {
+    speak(text, opt = {}, afterClip) {
       if (!('speechSynthesis' in window)) return Promise.resolve();
+      if (!afterClip) this.last = { src: 'device' };
       return new Promise(res => {
         try {
           speechSynthesis.cancel();
-          const parts = this.chunks(text);
+          // geen emoji's, opmaak of pijltjes voorlezen (de stem zegt anders 'zwaaiende hand')
+          const parts = this.chunks(String(text).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, '').replace(/[*_#`>→]+/g, ' '));
           if (!parts.length) return res();
           const v = this.voice();
+          if (this.last) this.last.voice = v ? v.name : null;
           parts.forEach((p, i) => {
             const u = new SpeechSynthesisUtterance(p);
             if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'es-MX';
