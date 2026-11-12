@@ -29,10 +29,11 @@
     if (!Speech.canSpeak() || !text) return null;
     return h('button', { class: 'icon-btn speak' + (opt.big ? ' big' : ''), type: 'button', title: 'Beluister', 'aria-label': 'Beluister', onclick: (e) => { e.stopPropagation(); Speech.say(text, opt); } }, opt.slow ? '🐢' : '🔊');
   }
-  function accentBar(input) {
+  function accentBar(target) {
     const chars = ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü', '¿', '¡'];
     return h('div', { class: 'accent-bar', role: 'toolbar', 'aria-label': 'Speciale tekens' },
       chars.map(c => h('button', { type: 'button', tabindex: '-1', onmousedown: e => e.preventDefault(), onclick: () => {
+        const input = typeof target === 'function' ? target() : target; if (!input) return;
         const s = input.selectionStart ?? input.value.length, e = input.selectionEnd ?? input.value.length;
         input.value = input.value.slice(0, s) + c + input.value.slice(e);
         input.focus(); input.setSelectionRange(s + 1, s + 1); input.dispatchEvent(new Event('input'));
@@ -140,6 +141,50 @@
     return h('div', { class: 'conj-table' },
       h('div', { class: 'ct-title' }, '📋 ', h('b', { lang: 'es' }, verb), ' · ' + (Tn.es || '') + ' = ' + (Tn.nl || '')),
       h('table', null, h('tbody', null, rows)));
+  }
+  /* Zin met de goede woorden van de vorige poging al ingevuld: alleen de foute woorden zijn vakjes.
+     keep = { a: goede antwoord, k: nummers van de woorden die al goed waren }. */
+  function partialInput(keep, ctx) {
+    const segs = S.check.words(keep.a), kept = new Set(keep.k), inputs = [];
+    let current = null;
+    const el = h('div', { class: 'partial', lang: 'es' });
+    segs.forEach((seg, i) => {
+      if (i % 2 === 0) { if (seg) el.append(h('span', { class: 'p-sep' }, seg)); return; }
+      const wi = (i - 1) / 2;
+      if (kept.has(wi)) { el.append(h('span', { class: 'p-word' }, seg)); return; }
+      const inp = h('input', { class: 'p-input', type: 'text', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', spellcheck: 'false', lang: 'es', enterkeyhint: inputs.length ? 'done' : 'next',
+        'aria-label': 'Woord ' + (wi + 1), style: 'width:' + Math.max(3, [...seg].length + 1.5) + 'ch' });
+      inp.dataset.i = i;
+      inp.addEventListener('focus', () => { current = inp; });
+      inp.addEventListener('input', () => ctx.can(inputs.every(x => x.value.trim())));
+      inp.addEventListener('keydown', e => {
+        // Enter of spatie in een vakje: door naar het volgende lege vakje
+        if ((e.key === 'Enter' || e.key === ' ') && !inputs.every(x => x.value.trim())) {
+          const next = inputs.find((x, n) => n > inputs.indexOf(inp) && !x.value.trim()) || inputs.find(x => !x.value.trim());
+          if (next && next !== inp) { e.preventDefault(); e.stopPropagation(); next.focus(); }
+          else if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); }
+        }
+      });
+      inputs.push(inp); el.append(inp);
+    });
+    if (inputs.length) inputs[inputs.length - 1].enterKeyHint = 'done';
+    return {
+      el, inputs,
+      current: () => current || inputs[0],
+      focus: () => { const f = inputs.find(x => !x.value.trim()) || inputs[0]; if (f) f.focus({ preventScroll: true }); },
+      value: () => segs.map((seg, i) => { const inp = inputs.find(x => +x.dataset.i === i); return inp ? inp.value.trim() : seg; }).join(''),
+      set disabled(v) { inputs.forEach(x => { x.disabled = v; }); },
+      mark: (user, answers) => {
+        // na controleren: per vakje laten zien of het nu goed is
+        const p = S.check.parts(user, answers);
+        if (!p || p.a !== keep.a) return;
+        inputs.forEach(x => { const wi = (+x.dataset.i - 1) / 2; x.classList.add(p.st[wi] === 'bad' ? 'bad' : 'ok'); });
+      }
+    };
+  }
+  function wordDiff(p) {
+    const segs = S.check.words(p.a);
+    return h('div', { class: 'word-diff', lang: 'es' }, segs.map((seg, i) => i % 2 === 0 ? seg : h('span', { class: 'wd ' + p.st[(i - 1) / 2] }, seg)));
   }
   function textInput(ph) {
     return h('input', { class: 'answer-input', type: 'text', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', spellcheck: 'false', lang: 'es', placeholder: ph || 'Typ je antwoord…', enterkeyhint: 'done' });
@@ -376,22 +421,39 @@
     if (it.sentence) { sent = sentenceEl(it.sentence); wrap.append(sent); }
     if (it.h) wrap.append(h('div', { class: 'hint' }, '(' + it.h + ')'));
     if (it.nl && it.sentence) wrap.append(h('div', { class: 'nl-hint' }, it.nl));
-    const inp = textInput(it.conj ? 'vervoeging…' : undefined);
-    inp.addEventListener('input', () => ctx.can(inp.value.trim().length > 0));
+    // Herhaling van een zin met fouten: de goede woorden staan er al, alleen de foute zijn vakjes
+    let part = it.translate && S.check.partsUsable(it.keep) ? partialInput(it.keep, ctx) : null;
+    let inp = part ? null : textInput(it.conj ? 'vervoeging…' : undefined);
+    const field = () => part || inp;
     const fillBlank = txt => { if (sent) { const bl = sent.querySelector('.blank'); if (bl) { bl.textContent = txt; bl.classList.add('filled'); } } };
-    const help = typeHelp(inp, ctx, () => it.answers[0], () => {
+    const help = typeHelp({ focus: o => field().focus(o), set disabled(v) { field().disabled = v; } }, ctx, () => it.answers[0], () => {
       fillBlank(it.answers[0]);
       ctx.submit({ ok: false, dontKnow: true, user: '', expected: it.answers[0], x: it.x, alts: it.answers });
     });
-    wrap.append(inp, accentBar(inp), help.el);
-    setTimeout(() => inp.focus({ preventScroll: true }), 80);
+    const bar = accentBar(() => part ? part.current() : inp);
+    if (part) {
+      const whole = h('button', { class: 'btn link small p-whole', type: 'button', onclick: () => {
+        if (ctx.answered()) return;
+        // toch liever de hele zin zelf typen
+        inp = textInput(); inp.addEventListener('input', () => ctx.can(inp.value.trim().length > 0));
+        part.el.replaceWith(inp); part = null; whole.remove(); note.remove(); ctx.can(false); inp.focus({ preventScroll: true });
+      } }, '✏️ Liever de hele zin typen');
+      const note = h('div', { class: 'p-note' }, '🔁 De woorden die je de vorige keer goed had, staan er al. Vul alleen de lege vakjes in.');
+      wrap.append(note, part.el, bar, help.el, whole);
+    } else {
+      inp.addEventListener('input', () => ctx.can(inp.value.trim().length > 0));
+      wrap.append(inp, bar, help.el);
+    }
+    setTimeout(() => field().focus({ preventScroll: true }), 80);
     ctx.evaluate = () => {
       help.done();
-      const user = inp.value.trim();
+      const user = part ? part.value().trim() : inp.value.trim();
       const r = S.Gen.checkType(user, it);
-      inp.disabled = true;
+      field().disabled = true;
+      if (part) { part.mark(user, it.answers); const w = wrap.querySelector('.p-whole'); if (w) w.remove(); }
       if (sent) { const bl = sent.querySelector('.blank'); if (bl) { bl.textContent = r.ok ? user : (r.best || it.answers[0]); bl.classList.add('filled'); } }
-      return { ok: r.ok, user, expected: r.best || it.answers[0], warn: r.warn, gender: r.gender, synonym: r.synonym, main: it.word ? it.word.es : it.answers[0], x: it.x, alts: it.answers, hinted: help.hints() };
+      const parts = it.translate && !r.ok ? S.check.parts(user, it.answers) : null;
+      return { ok: r.ok, user, expected: r.best || it.answers[0], warn: r.warn, gender: r.gender, synonym: r.synonym, main: it.word ? it.word.es : it.answers[0], x: it.x, alts: it.answers, hinted: help.hints(), parts };
     };
     return wrap;
   };
@@ -639,6 +701,8 @@
       // opnieuw aanbieden in leer-/herhaalmodus
       if (retryLater) {
         const copy = { ...it, retry: true, orig: it.orig || it };
+        // zin half goed: straks alleen de foute woorden opnieuw invullen
+        if (S.check.partsUsable(r.parts)) { copy.keep = { a: r.parts.a, k: r.parts.k }; r.keepLater = true; }
         if (copy.options) copy.options = U.shuffle(copy.options);
         queue.push(copy);
       }
@@ -671,6 +735,10 @@
       if (!r.ok && r.expected && r.matchMistakes == null) {
         fb.append(h('div', null, T('correct') + ': ', h('b', { lang: 'es' }, r.expected), (it.speakAnswer || it.kind === 'listen' || it.sentence) ? speakBtn(it.sentence ? it.sentence.replace('___', r.expected) : r.expected) : null));
         if (r.user && it.kind !== 'mc') fb.append(h('div', { class: 'small muted' }, 'Jouw antwoord: ' + r.user));
+        if (r.parts && r.parts.k.length) {
+          fb.append(h('div', { class: 'small' }, 'Per woord: ', wordDiff(r.parts), h('span', { class: 'muted' }, ' (groen goed' + (r.parts.st.includes('accent') ? ' · geel: let op het accent' : '') + ' · rood fout)')));
+          if (r.keepLater) fb.append(h('div', { class: 'small' }, '🔁 Straks staan de groene woorden er al en vul je alleen de rode opnieuw in.'));
+        }
         if (r.warn === 'article-wrong') {
           const noun = r.expected.replace(S.Gen.ART, '');
           fb.append(h('div', null, '📌 Let op het lidwoord: ', h('b', { lang: 'es' }, r.expected), r.gender ? ' (' + noun + ' is ' + r.gender + ')' : ''));

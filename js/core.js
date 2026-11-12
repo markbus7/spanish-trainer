@@ -47,6 +47,7 @@
       skills: { vocab: { ok: 0, no: 0 }, grammar: { ok: 0, no: 0 }, listen: { ok: 0, no: 0 }, speak: { ok: 0, no: 0 }, read: { ok: 0, no: 0 }, write: { ok: 0, no: 0 } },
       days: {}, xp: 0, streak: { cur: 0, best: 0, last: null }, current: null, badges: [], done: {},
       tests: [], games: {}, fast: 0, myWords: {},
+      partial: {}, // zinnen met fouten: welke woorden al goed waren (sleutel = srsId)
       paused: { t: 0, data: null } // onderbroken oefening, om later verder te gaan
     };
   }
@@ -190,6 +191,9 @@
     out.myWords = Object.assign({}, N.myWords || {});
     for (const k in O.myWords || {}) { const o = O.myWords[k], n = out.myWords[k]; if (!n || (o.t || 0) > (n.t || 0)) out.myWords[k] = clone(o); }
     for (const k in out.myWords) if (out.myWords[k].del) delete out.srs['w|my|' + k];
+    // half goede zinnen: per zin de nieuwste stand (ook 'weer helemaal goed')
+    out.partial = Object.assign({}, N.partial || {});
+    for (const k in O.partial || {}) { const o = O.partial[k], n = out.partial[k]; if (!n || (o.t || 0) > (n.t || 0)) out.partial[k] = clone(o); }
     // onderbroken oefening: de laatst bewaarde (of laatst afgeronde/weggegooide) wint
     const pa = A.paused || {}, pb = B.paused || {};
     out.paused = clone((pa.t || 0) >= (pb.t || 0) ? pa : pb);
@@ -336,7 +340,49 @@
     return { ok: false, best: list[0], dist: bestD };
   }
   function similarity(a, b) { a = bare(a); b = bare(b); const L = Math.max(a.length, b.length) || 1; return 1 - lev(a, b) / L; }
-  S.check = { check, norm, bare, similarity, lev };
+
+  /* ---------- Per woord vergelijken (zinsvertaling) ----------
+     words("¿Cómo está usted?") → ['¿', 'Cómo', ' ', 'está', ' ', 'usted', '?']: woorden en wat ertussen staat.
+     De woorden staan op de oneven plaatsen. */
+  const WORD_RE = /[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu;
+  function words(a) {
+    const out = []; let last = 0; a = String(a || '');
+    for (const m of a.matchAll(WORD_RE)) { out.push(a.slice(last, m.index), m[0]); last = m.index + m[0].length; }
+    out.push(a.slice(last));
+    return out;
+  }
+  function rawVariants(ans) {
+    const out = new Set();
+    const rec = s => { const m = s.match(/\(([^)]*)\)/); if (!m) { out.add(s.replace(/\s+/g, ' ').replace(/\s+([,.?!;:])/g, '$1').replace(/([¿¡])\s+/g, '$1').trim()); return; } rec(s.replace(m[0], m[1])); rec(s.replace(m[0], '')); };
+    rec(String(ans || ''));
+    return [...out];
+  }
+  /** Welke woorden van het goede antwoord had de gebruiker al goed?
+      Geeft { a: het antwoord (zoals het in de les staat), st: per woord 'ok' | 'accent' | 'bad', k: nummers van de goede woorden }. */
+  function parts(user, answers) {
+    const uw = (String(user || '').match(WORD_RE) || []).map(w => norm(w));
+    if (!uw.length) return null;
+    const ub = uw.map(w => bare(w));
+    let best = null;
+    (Array.isArray(answers) ? answers : [answers]).filter(Boolean).forEach(ans => rawVariants(ans).forEach(a => {
+      const ew = words(a).filter((_, i) => i % 2), eb = ew.map(w => bare(w));
+      // langste gemeenschappelijke rij woorden (zonder accenten), zodat de volgorde telt
+      const n = eb.length, m = ub.length, L = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+      for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = eb[i] === ub[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+      const st = new Array(n).fill('bad');
+      for (let i = 0, j = 0; i < n && j < m;) {
+        if (eb[i] === ub[j]) { st[i] = norm(ew[i]) === uw[j] ? 'ok' : 'accent'; i++; j++; }
+        else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++;
+      }
+      const good = L[0][0], score = good * 100 - (n - good) * 10 - Math.abs(n - m);
+      if (!best || score > best.score) best = { a, st, score };
+    }));
+    if (!best) return null;
+    return { a: best.a, st: best.st, k: best.st.map((s, i) => s === 'bad' ? -1 : i).filter(i => i >= 0) };
+  }
+  /** Bruikbaar om bij de herhaling de goede woorden al in te vullen: minstens één goed en één fout woord. */
+  function partsUsable(p) { return !!(p && p.a && p.k && p.k.length && p.k.length < (words(p.a).length - 1) / 2); }
+  S.check = { check, norm, bare, similarity, lev, words, parts, partsUsable };
 
   /* ================= Spraak ================= */
   const Speech = {
