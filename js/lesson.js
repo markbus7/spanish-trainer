@@ -291,15 +291,10 @@
     setTimeout(() => inp.focus({ preventScroll: true }), 80);
     ctx.evaluate = () => {
       const user = inp.value.trim();
-      let r = S.check.check(user, it.answers, { noTypo: it.noTypo });
-      if (!r.ok && it.articleOptional) {
-        const noArt = it.answers.map(a => a.replace(S.Gen.ART, ''));
-        const r2 = S.check.check(user.replace(S.Gen.ART, ''), noArt, { noTypo: it.noTypo });
-        if (r2.ok && !S.Gen.ART.test(user) && S.Gen.ART.test(it.answers[0])) r = { ok: true, warn: 'article', best: it.answers.find(a => a.replace(S.Gen.ART, '') === r2.best) || it.answers[0] };
-      }
+      const r = S.Gen.checkType(user, it);
       inp.disabled = true;
       if (sent) { const bl = sent.querySelector('.blank'); if (bl) { bl.textContent = r.ok ? user : (r.best || it.answers[0]); bl.classList.add('filled'); } }
-      return { ok: r.ok, user, expected: r.best || it.answers[0], warn: r.warn, x: it.x, alts: it.answers };
+      return { ok: r.ok, user, expected: r.best || it.answers[0], warn: r.warn, gender: r.gender, synonym: r.synonym, main: it.word ? it.word.es : it.answers[0], x: it.x, alts: it.answers };
     };
     return wrap;
   };
@@ -570,9 +565,16 @@
       if (r.ok && r.warn === 'enye') fb.append(h('div', null, '✍️ Let op de ñ: ', h('b', { lang: 'es' }, r.expected)));
       if (r.ok && r.warn === 'typo') fb.append(h('div', null, '🔤 Kleine typfout — precies: ', h('b', { lang: 'es' }, r.expected)));
       if (r.ok && r.warn === 'article') fb.append(h('div', null, '📌 Vergeet het lidwoord niet: ', h('b', { lang: 'es' }, r.expected)));
+      if (r.ok && r.warn === 'synonym') fb.append(h('div', null, '👍 Ook goed! In de les staat: ', h('b', { lang: 'es' }, r.main)));
       if (!r.ok && r.expected && r.matchMistakes == null) {
         fb.append(h('div', null, T('correct') + ': ', h('b', { lang: 'es' }, r.expected), (it.speakAnswer || it.kind === 'listen' || it.sentence) ? speakBtn(it.sentence ? it.sentence.replace('___', r.expected) : r.expected) : null));
         if (r.user && it.kind !== 'mc') fb.append(h('div', { class: 'small muted' }, 'Jouw antwoord: ' + r.user));
+        if (r.warn === 'article-wrong') {
+          const noun = r.expected.replace(S.Gen.ART, '');
+          fb.append(h('div', null, '📌 Let op het lidwoord: ', h('b', { lang: 'es' }, r.expected), r.gender ? ' (' + noun + ' is ' + r.gender + ')' : ''));
+        }
+        if (r.synonym && r.main) fb.append(h('div', { class: 'small muted' }, 'In de les staat: ', h('b', { lang: 'es' }, r.main)));
+        else if (it.syn && it.syn.length) fb.append(h('div', { class: 'small muted' }, 'Ook goed: ' + it.syn.filter(x => !/\//.test(x)).slice(0, 2).join(', ')));
       }
       if (r.ok && it.alts && it.alts.length > 1 && it.translate) {
         const other = it.alts.filter(a => S.check.norm(a) !== S.check.norm(r.user)).slice(0, 1);

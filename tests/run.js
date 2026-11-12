@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'js/gen.js', 'js/games.js', 'js/words.js']) {
+for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'js/gen.js', 'js/games.js', 'js/words.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -335,6 +335,43 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
   ok(sw.includes("importScripts('js/version.js')"), 'sw.js haalt versie uit js/version.js');
   const assets = (/const ASSETS = \[([^\]]*)\]/.exec(sw) || [, ''])[1];
   for (const src of [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1])) ok(assets.includes("'" + src + "'"), 'sw.js cachet ' + src);
+}
+
+/* ---------- synoniemen en woordvormen bij typvragen ---------- */
+{
+  const G = S.Gen, allEs = new Set(units.flatMap(u => u.vocab.map(v => v[0])));
+  for (const k of Object.keys(S.synonyms)) ok(allEs.has(k), 'synoniem-sleutel bestaat niet in een woordenlijst: ' + k);
+  const find = es => { for (const u of units) { const i = u.vocab.findIndex(v => v[0] === es); if (i >= 0) return S.C.word(u, i); } };
+  const item = es => G.wordItem(find(es), 'type', units[0]);
+  const T = (es, user) => G.checkType(user, item(es));
+  const taal = item('el idioma');
+  ok(T('el idioma', 'el idioma').ok && !T('el idioma', 'el idioma').warn, 'el idioma goed');
+  ok(T('el idioma', 'la lengua').ok && T('el idioma', 'la lengua').warn === 'synonym', 'la lengua = goed synoniem');
+  const fout = T('el idioma', 'el lengua');
+  ok(!fout.ok && fout.warn === 'article-wrong' && fout.best === 'la lengua' && fout.gender === 'vrouwelijk', 'el lengua fout, met lidwoord-hint: ' + JSON.stringify(fout));
+  const fout2 = T('el idioma', 'la idioma');
+  ok(!fout2.ok && fout2.warn === 'article-wrong' && fout2.gender === 'mannelijk', 'la idioma is geen typfout: ' + JSON.stringify(fout2));
+  ok(T('el idioma', 'lengua').ok && T('el idioma', 'lengua').warn === 'article', 'lengua zonder lidwoord = lidwoord-waarschuwing');
+  ok(T('el agua', 'la agua').gender === '', 'el agua: geen geslachtsclaim');
+  ok(!T('el idioma', 'el español').ok, 'fout blijft fout');
+  ok(taal.syn.includes('la lengua'), 'synoniemen op item');
+  // dezelfde Nederlandse vertaling telt automatisch
+  ok(T('la chamba', 'el trabajo').ok && T('el trabajo', 'la chamba').ok, 'het werk: chamba ↔ trabajo');
+  ok(T('deberías…', 'tendrías que').ok, 'je zou moeten: deberías ↔ tendrías que');
+  // vormen met / en o/a
+  const F = es => G.forms(es);
+  ok(['el maestro', 'la maestra'].every(x => F('el / la maestro/a').includes(x)) && !F('el / la maestro/a').includes('a'), 'el / la maestro/a: ' + F('el / la maestro/a'));
+  ok(['el jefe', 'la jefa'].every(x => F('el / la jefe/a').includes(x)), 'jefe/jefa');
+  ok(['el anfitrión', 'la anfitriona'].every(x => F('el / la anfitrión/ona').includes(x)), 'anfitrión/anfitriona: ' + F('el / la anfitrión/ona'));
+  ok(['el estudiante', 'la estudiante'].every(x => F('el / la estudiante').includes(x)), 'el / la estudiante');
+  ok(['estar resfriado', 'estar resfriada'].every(x => F('estar resfriado/a').includes(x)), 'resfriado/a');
+  ok(F('sacar / tomar fotos').includes('sacar fotos') && F('sacar / tomar fotos').includes('tomar fotos'), 'sacar / tomar fotos');
+  ok(F('seguro / segura de sí mismo/a').includes('seguro de sí mismo') && F('seguro / segura de sí mismo/a').includes('segura de sí misma'), 'seguro de sí mismo');
+  ok(F('y').includes('y'), 'kort woord blijft');
+  ok(T('el / la mejor amigo/a', 'la mejor amiga').ok && T('el / la mejor amigo/a', 'el mejor amigo').ok, 'mejor amigo/amiga');
+  // er zijn genoeg synoniemen
+  let n = 0; units.forEach(u => S.C.words(u).forEach(w => { n += G.wordSynonyms(w).length; }));
+  ok(n > 100, 'aantal synoniemen ' + n);
 }
 
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);

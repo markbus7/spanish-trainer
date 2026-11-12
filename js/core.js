@@ -281,6 +281,7 @@
 
   /* ================= Antwoordcontrole ================= */
   const PRON = /^(yo|tú|tu|él|el|ella|usted|nosotros|nosotras|ellos|ellas|ustedes)\s+/;
+  const ARTS = /^(el|la|los|las|un|una)\s+/;
   function norm(s) {
     return String(s || '').toLowerCase().normalize('NFC')
       .replace(/[“”«»"]/g, '').replace(/[‘’`´]/g, "'")
@@ -324,7 +325,12 @@
     }
     // kleine typfout bij langere antwoorden
     let best = null, bestD = 99;
-    for (const [c, orig] of cands) { const d = lev(bare(c), bare(uNoPron)); if (d < bestD) { bestD = d; best = orig; } }
+    // een ander lidwoord (el idioma ↔ la idioma) is geen typfout
+    const art = s => (s.match(ARTS) || [''])[0].trim();
+    for (const [c, orig] of cands) {
+      if (art(c) && art(u) && art(c) !== art(u)) continue;
+      const d = lev(bare(c), bare(uNoPron)); if (d < bestD) { bestD = d; best = orig; }
+    }
     const len = bare(best || '').length;
     if (best && len >= 7 && bestD === 1 && !opts.noTypo) return { ok: true, exact: false, warn: 'typo', best };
     return { ok: false, best: list[0], dist: bestD };

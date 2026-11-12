@@ -8,10 +8,70 @@
   function parts(es) {
     return String(es).split(/\s*\/\s*/).map(x => x.replace(/…/g, '').replace(/\s*\.\.\.$/, '').trim()).filter(Boolean);
   }
-  function wordAnswers(w) {
-    const p = parts(w.es);
-    const out = new Set([w.es.replace(/…/g, '').trim(), ...p]);
+  /* Mannelijke / vrouwelijke vorm van "amigo/a", "jefe/a", "anfitrión/ona". */
+  const SLASH = /(\S+?)\/(a|ona)\b/g;
+  const masc = s => s.replace(SLASH, '$1');
+  function femWord(x, suf) {
+    if (suf === 'ona') return x.replace(/ón$/, 'ona');
+    if (/[oe]$/.test(x)) return x.slice(0, -1) + 'a';
+    return x.normalize('NFD').replace(/([aeiou])́(?=[^aeiou]*$)/, '$1').normalize('NFC') + 'a';
+  }
+  const fem = s => s.replace(SLASH, (_, x, suf) => femWord(x, suf));
+  /** Alle schrijfwijzen van een woord uit de woordenlijst: "el / la maestro/a" → el maestro, la maestra. */
+  function forms(es) {
+    const s = String(es).replace(/…/g, '').replace(/\s*\.\.\.$/, '').trim();
+    const out = new Set([s]);
+    const add = x => { x = x.trim(); if (!x) return; out.add(x); if (/\S\/(a|ona)\b/.test(x)) { out.add(masc(x)); out.add(fem(x)); } };
+    const m = s.match(/^(el|un|los)\s*\/\s*(la|una|las)\s+(.+)$/i);
+    if (m) { out.add(m[1] + ' ' + masc(m[3])); out.add(m[2] + ' ' + fem(m[3])); return [...out]; }
+    const segs = s.split(/\s*\/\s+|\s+\/\s*/);
+    segs.forEach(add);
+    // "sacar / tomar fotos", "seguro / segura de sí mismo/a": eerste woord + de rest van het tweede deel
+    if (segs.length === 2 && !/\s/.test(segs[0]) && /\s/.test(segs[1])) add(segs[0] + segs[1].replace(/^\S+/, ''));
+    if (segs.length === 1) add(s);
+    return [...out].filter(x => x && !/^(el|la|los|las|un|una)$/i.test(x));
+  }
+  /* Woorden met precies dezelfde Nederlandse vertaling rekenen elkaar goed (bijv. «het werk»: el trabajo, la chamba…). */
+  let SAME_NL = null;
+  const nlKey = nl => String(nl || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  function sameNl(w) {
+    if (!SAME_NL) {
+      SAME_NL = new Map();
+      C.all().forEach(u => u.vocab.forEach(v => { const k = nlKey(v[1]); if (!SAME_NL.has(k)) SAME_NL.set(k, new Set()); SAME_NL.get(k).add(v[0]); }));
+    }
+    return [...(SAME_NL.get(nlKey(w.nl)) || [])].filter(es => es !== w.es);
+  }
+  function wordAnswers(w) { return forms(w.es); }
+  /** Andere correcte antwoorden: synoniemen uit content/synoniemen.js en woorden met dezelfde vertaling. */
+  function wordSynonyms(w) {
+    const main = new Set(forms(w.es).map(x => S.check.norm(x)));
+    const out = new Set();
+    [...((S.synonyms || {})[w.es] || []), ...sameNl(w)].forEach(es => forms(es).forEach(x => { if (!main.has(S.check.norm(x))) out.add(x); }));
     return [...out];
+  }
+  /** Controle van een typvraag over een woord (of zin): synoniemen, lidwoord optioneel/fout. */
+  function checkType(user, it) {
+    const all = it.answers.concat(it.syn || []);
+    let r = S.check.check(user, all, { noTypo: it.noTypo });
+    if (!r.ok && it.articleOptional) {
+      const strip = a => a.replace(ART, '');
+      const r2 = S.check.check(strip(user), all.map(strip), { noTypo: it.noTypo });
+      if (r2.ok) {
+        const full = all.find(a => strip(a) === r2.best) || it.answers[0];
+        if (!ART.test(user) && ART.test(full)) r = { ok: true, warn: 'article', best: full };
+        else if (ART.test(user) && ART.test(full)) r = { ok: false, warn: 'article-wrong', best: full, gender: genderOf(full) };
+      }
+    }
+    if (it.syn && it.syn.includes(r.best)) { r.synonym = true; if (r.ok && !r.warn) r.warn = 'synonym'; }
+    if (!r.ok && !r.warn) r.best = it.answers[0];
+    return r;
+  }
+  function genderOf(full) {
+    const m = String(full).match(ART); if (!m) return '';
+    const a = m[1].toLowerCase(), noun = full.replace(ART, '');
+    if (/^(la|una|las)$/.test(a)) return 'vrouwelijk';
+    if (/^(el|un)$/.test(a) && /^h?[aá]/i.test(noun)) return ''; // el agua, el hambre: vrouwelijk, maar met el
+    return 'mannelijk';
   }
   function wordItem(w, kind, unit) {
     const base = { srsId: w.id, tag: 'vocab', skill: 'vocab', word: w };
@@ -24,7 +84,7 @@
     if (kind === 'mc-es') return { ...base, kind: 'mc', prompt: w.es, speakPrompt: w.es, q: 'Wat betekent dit?', options: U.shuffle([w.nl, ...distract.map(d => d.nl)]), answer: w.nl };
     if (kind === 'mc-nl') return { ...base, kind: 'mc', prompt: w.nl, q: 'Hoe zeg je dit in het Spaans?', options: U.shuffle([w.es, ...distract.map(d => d.es)]), answer: w.es, speakAnswer: true };
     if (kind === 'listen-mc') return { ...base, kind: 'mc', audio: w.es, q: 'Wat hoor je?', options: U.shuffle([w.es, ...distract.map(d => d.es)]), answer: w.es, skill: 'listen' };
-    if (kind === 'type') return { ...base, kind: 'type', prompt: w.nl, q: 'Typ in het Spaans', answers: wordAnswers(w), articleOptional: true, note: w.note, speakAnswer: true };
+    if (kind === 'type') return { ...base, kind: 'type', prompt: w.nl, q: 'Typ in het Spaans', answers: wordAnswers(w), syn: wordSynonyms(w), articleOptional: true, note: w.note, speakAnswer: true };
     return null;
   }
   function matchItem(words) {
@@ -291,5 +351,5 @@
     return { level, next, nextFrac: nb && nb.n ? nb.ok / nb.n : 0 };
   }
 
-  S.Gen = { STEPS, stepSession, reviewSession, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART };
+  S.Gen = { STEPS, stepSession, reviewSession, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART, forms, wordSynonyms, checkType };
 })(window.SPT);
