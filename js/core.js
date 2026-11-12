@@ -463,11 +463,14 @@
     },
     /* Is er alleen een robotachtige stem? Dan tonen we uitleg om een betere te downloaden. */
     hasGoodVoice() { return this.voices.some(v => this.rank(v) >= 85 && this.quality(v) >= 2); },
-    voice() {
+    /* Bekende vrouwenstemmen (iOS/macOS, Edge, Chrome). Voor Lupe. */
+    isFemale(v) { return /paulina|m[oó]nica|marisol|ang[eé]lica|soledad|isabela|francisca|dalia|elvira|paloma|salome|elena|catalina|camila|helena|laura|sabina|google español/i.test(v.name); },
+    voice(opt = {}) {
       if (!this.voices.length && 'speechSynthesis' in window) this.voices = speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang));
       const want = Store.state.settings.voice;
       if (want) { const v = this.voices.find(x => x.voiceURI === want || x.name === want); if (v) return v; }
-      return this.voices.slice().sort((a, b) => this.rank(b) - this.rank(a))[0] || null;
+      const score = v => this.rank(v) + (opt.female && this.isFemale(v) ? 6 : 0);
+      return this.voices.slice().sort((a, b) => score(b) - score(a))[0] || null;
     },
     /* Wie wil weten of er gesproken wordt (bijv. de docente die haar mond beweegt): Speech.onTalk = (aan, tekst) => … */
     onTalk: null, _talkId: 0,
@@ -507,12 +510,13 @@
           // geen emoji's, opmaak of pijltjes voorlezen (de stem zegt anders 'zwaaiende hand')
           const parts = this.chunks(String(text).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, '').replace(/[*_#`>→]+/g, ' '));
           if (!parts.length) return res();
-          const v = this.voice();
+          const v = this.voice(opt);
           if (this.last) this.last.voice = v ? v.name : null;
           parts.forEach((p, i) => {
             const u = new SpeechSynthesisUtterance(p);
             if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'es-MX';
-            u.rate = (opt.slow ? 0.65 : 1) * (Store.state.settings.rate || 0.9);
+            u.rate = (opt.slow ? 0.65 : 1) * (opt.rate || 1) * (Store.state.settings.rate || 0.9);
+            if (opt.pitch) u.pitch = opt.pitch;
             if (i === parts.length - 1) u.onend = () => res();
             u.onerror = () => res();
             speechSynthesis.speak(u);
