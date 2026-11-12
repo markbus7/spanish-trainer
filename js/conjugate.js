@@ -5,23 +5,26 @@
 
   const PERSONS = ['yo', 'tú', 'él / ella / usted', 'nosotros', 'ellos / ellas / ustedes'];
   const REFL = ['me', 'te', 'se', 'nos', 'se'];
+  /* Nederlandse betekenis van de personen (voor uitleg bij vervoegingsvragen) */
+  const PERSONS_NL = ['ik', 'jij', 'hij / zij / u', 'wij', 'zij / jullie'];
+  const PERSONS_NL_IMPER = ['', 'jij (bevel)', 'u (bevel)', '', 'jullie (bevel)'];
 
   const TENSES = {
-    pres:  { es: 'presente',               nl: 'tegenwoordige tijd',          level: 'A1' },
-    prog:  { es: 'presente progresivo',    nl: 'bezig zijn met (estar + -ndo)', level: 'A1' },
-    ira:   { es: 'ir a + infinitivo',      nl: 'nabije toekomst',             level: 'A1' },
-    pret:  { es: 'pretérito indefinido',   nl: 'verleden tijd (afgerond)',    level: 'A2' },
-    imp:   { es: 'pretérito imperfecto',   nl: 'verleden tijd (gewoonte/achtergrond)', level: 'A2' },
-    perf:  { es: 'pretérito perfecto',     nl: 'voltooide tijd (he + -do)',   level: 'A2' },
-    fut:   { es: 'futuro simple',          nl: 'toekomende tijd',             level: 'A2' },
-    imper: { es: 'imperativo',             nl: 'gebiedende wijs',             level: 'A2' },
-    cond:  { es: 'condicional',            nl: 'voorwaardelijke wijs',        level: 'B1' },
-    subj:  { es: 'presente de subjuntivo', nl: 'aanvoegende wijs',            level: 'B1' },
-    plus:  { es: 'pretérito pluscuamperfecto', nl: 'voltooid verleden tijd (había + -do)', level: 'B1' },
-    neg:   { es: 'imperativo negativo',    nl: 'ontkennende gebiedende wijs (no + …)', level: 'B1' },
-    impsubj: { es: 'imperfecto de subjuntivo', nl: 'aanvoegende wijs verleden (si tuviera…)', level: 'B2' },
-    condperf: { es: 'condicional compuesto',  nl: 'zou hebben (habría + -do)',  level: 'B2' },
-    plussubj: { es: 'pluscuamperfecto de subjuntivo', nl: 'had … (si hubiera + -do)', level: 'B2' }
+    pres:  { es: 'presente',               nl: 'tegenwoordige tijd',          level: 'A1', tip: 'wat nu gebeurt of wat je gewoonlijk doet' },
+    prog:  { es: 'presente progresivo',    nl: 'bezig zijn met (estar + -ndo)', level: 'A1', tip: 'waar je op dit moment mee bezig bent: estar + -ando/-iendo' },
+    ira:   { es: 'ir a + infinitivo',      nl: 'nabije toekomst',             level: 'A1', tip: 'wat je straks gaat doen: ir + a + hele werkwoord' },
+    pret:  { es: 'pretérito indefinido',   nl: 'verleden tijd (afgerond)',    level: 'A2', tip: 'iets wat in het verleden gebeurde en klaar is (ayer, el año pasado)' },
+    imp:   { es: 'pretérito imperfecto',   nl: 'verleden tijd (gewoonte/achtergrond)', level: 'A2', tip: 'hoe het vroeger was of wat je vroeger vaak deed' },
+    perf:  { es: 'pretérito perfecto',     nl: 'voltooide tijd (he + -do)',   level: 'A2', tip: 'iets wat (vandaag/ooit) gebeurd is: haber + -ado/-ido' },
+    fut:   { es: 'futuro simple',          nl: 'toekomende tijd',             level: 'A2', tip: 'wat er later zal gebeuren' },
+    imper: { es: 'imperativo',             nl: 'gebiedende wijs',             level: 'A2', tip: 'een opdracht of verzoek geven' },
+    cond:  { es: 'condicional',            nl: 'voorwaardelijke wijs',        level: 'B1', tip: 'wat je zou doen' },
+    subj:  { es: 'presente de subjuntivo', nl: 'aanvoegende wijs',            level: 'B1', tip: 'na wensen, twijfel of gevoel (quiero que…, ojalá…)' },
+    plus:  { es: 'pretérito pluscuamperfecto', nl: 'voltooid verleden tijd (había + -do)', level: 'B1', tip: 'wat al gebeurd was vóór iets anders in het verleden' },
+    neg:   { es: 'imperativo negativo',    nl: 'ontkennende gebiedende wijs (no + …)', level: 'B1', tip: 'zeggen dat iemand iets níét moet doen' },
+    impsubj: { es: 'imperfecto de subjuntivo', nl: 'aanvoegende wijs verleden (si tuviera…)', level: 'B2', tip: 'in \'als\'-zinnen die niet echt zijn (si tuviera…)' },
+    condperf: { es: 'condicional compuesto',  nl: 'zou hebben (habría + -do)',  level: 'B2', tip: 'wat je zou hebben gedaan' },
+    plussubj: { es: 'pluscuamperfecto de subjuntivo', nl: 'had … (si hubiera + -do)', level: 'B2', tip: 'als iets anders was gegaan (si hubiera…)' }
   };
 
   /* stem: 'ie' | 'ue' | 'i' | 'uue' (jugar)
@@ -283,7 +286,8 @@
     if (tense === 'imper' || tense === 'neg') return ['', 'tú', 'usted', '', 'ustedes'][p];
     return PERSONS[p];
   }
+  function personNl(tense, p) { return (tense === 'imper' || tense === 'neg' ? PERSONS_NL_IMPER : PERSONS_NL)[p] || ''; }
   function info(inf) { return VERBS[inf] || VERBS[parse(inf).base] || null; }
 
-  S.conj = { table, conj, alternatives, PERSONS, TENSES, VERBS, personsFor, personLabel, info, gerundio: inf => gerundio(parse(inf)), participio: inf => participio(parse(inf)) };
+  S.conj = { table, conj, alternatives, PERSONS, TENSES, VERBS, personsFor, personLabel, personNl, PERSONS_NL, info, gerundio: inf => gerundio(parse(inf)), participio: inf => participio(parse(inf)) };
 })(typeof window !== 'undefined' ? (window.SPT = window.SPT || {}) : (globalThis.SPT = globalThis.SPT || {}));
