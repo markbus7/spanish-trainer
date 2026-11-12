@@ -667,7 +667,7 @@
   }
   function stackBar(ws) {
     const t = Math.max(1, ws.total); const seg = (n, cls) => n ? h('i', { class: cls, style: { width: (n / t * 100) + '%' } }) : null;
-    return h('div', { class: 'stack' }, seg(ws.mastered, 'm'), seg(ws.known, 'k'), seg(ws.learning, 'l'));
+    return h('div', { class: 'wstack' }, seg(ws.mastered, 'm'), seg(ws.known, 'k'), seg(ws.learning, 'l'));
   }
   routes.perfil = function () {
     const s = st(); const wrap = h('div', { class: 'page profile' });

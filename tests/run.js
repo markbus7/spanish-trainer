@@ -308,6 +308,21 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
   S.Store.state = keep;
 }
 
+/* ---------- antwoordknoppen: geen botsende klassen ---------- */
+{
+  // Een losse regel als `.stack {…}` (profielbalk) gold ook voor de antwoordknoppen en drukte ze plat tot één strookje van 12px.
+  const css = fs.readFileSync(path.join(root, 'css/app.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const lesson = fs.readFileSync(path.join(root, 'js/lesson.js'), 'utf8');
+  const line = lesson.split('\n').find(l => l.includes("class: 'options' +")) || '';
+  const mods = [...line.matchAll(/'\s+([\w-]+)'/g)].map(m => m[1]);
+  ok(mods.length > 0, 'antwoordknoppen: modifier-klasse gevonden');
+  const selectors = [...css.matchAll(/([^{}]+)\{/g)].flatMap(m => m[1].split(',').map(x => x.trim()));
+  for (const m of mods) {
+    const bad = selectors.filter(sel => new RegExp('\\.' + m + '(?![\\w-])').test(sel) && !sel.includes('.options.' + m));
+    ok(!bad.length, 'antwoordknoppen: .' + m + ' komt alleen voor als .options.' + m + (bad.length ? ' (ook in: ' + bad.join(' | ') + ')' : ''));
+  }
+}
+
 /* ---------- versie en offline-cache ---------- */
 {
   const vctx = vm.createContext({}); vctx.self = vctx;

@@ -256,7 +256,7 @@
     if (it.sentence) { sent = sentenceEl(it.sentence); wrap.append(sent); }
     if (it.h) wrap.append(h('div', { class: 'hint' }, '(' + it.h + ')'));
     if (it.nl && it.sentence) wrap.append(h('div', { class: 'nl-hint' }, it.nl));
-    const opts = h('div', { class: 'options' + (it.options.some(o => o.length > 28) ? ' stack' : '') });
+    const opts = h('div', { class: 'options' + (it.options.some(o => o.length > 28) ? ' one-col' : '') });
     const btns = it.options.map((o, i) => h('button', { class: 'opt', type: 'button', 'data-k': i + 1, onclick: () => choose(o, btns[i]) }, h('span', { class: 'k' }, i + 1), h('span', { lang: 'es' }, o)));
     opts.append(...btns); wrap.append(opts);
     function choose(o, b) {
