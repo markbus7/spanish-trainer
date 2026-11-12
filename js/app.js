@@ -102,7 +102,8 @@
     if (it.skill) Store.skill(it.skill, ok);
     if (it.tag) Store.mark(it.tag, ok);
     if (it.srsId) {
-      if (SRS.has(it.srsId)) { if (!r || !r.override) SRS.grade(it.srsId, ok); else { const c = st().srs[it.srsId]; if (c) { c.l = Math.max(0, c.l - 1); } } }
+      if (SRS.has(it.srsId) && ok && r && r.hinted && !r.override) { const c = st().srs[it.srsId]; c.t = Date.now(); c.r = 0; c.i = 1; c.d = Math.min(c.d, U.dayIndex() + 1); }
+      else if (SRS.has(it.srsId)) { if (!r || !r.override) SRS.grade(it.srsId, ok); else { const c = st().srs[it.srsId]; if (c) { c.l = Math.max(0, c.l - 1); } } }
       else if (!ok) stepWrong.add(it.srsId); else if (r && r.override) stepWrong.delete(it.srsId);
     }
     save();
