@@ -580,16 +580,18 @@
 
   routes.docente = function () {
     const wrap = h('div', { class: 'page chat-page' });
-    wrap.append(h('h1', null, 'Docente'));
     if (!S.AI.enabled()) {
-      wrap.append(h('div', { class: 'card' },
-        h('h3', null, '🤖 Je persoonlijke AI-docent'),
+      wrap.append(h('h1', null, 'Docente'));
+      wrap.append(h('div', { class: 'card tutor-intro' },
+        h('div', { class: 'row gap' }, lupeAv(84), h('div', null, h('h3', null, '¡Hola! Soy Lupe 👋'), h('p', { class: 'small muted' }, S.Tutor.tagline))),
+        h('p', null, 'Ik ben een ajolote uit de kanalen van Xochimilco (Mexico-Stad) en ik wil graag je persoonlijke docente zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.'),
         h('p', null, 'Voer echte gesprekken (rollenspellen in Mexico, Colombia, Argentinië…). Je krijgt direct correcties in het Nederlands, kunt alles over grammatica vragen en krijgt feedback op je teksten.'),
         h('p', { class: 'small muted' }, 'Hiervoor heb je een eigen API-sleutel van Anthropic (Claude) nodig. Die maak je aan op platform.claude.com (uitleg in Instellingen). Je betaalt per gebruik, meestal een paar cent per gesprek. De sleutel wordt alleen op dit apparaat bewaard.'),
         h('a', { class: 'btn primary', href: '#/ajustes' }, 'Sleutel instellen'),
         h('p', { class: 'small muted' }, 'Zonder AI werkt de rest van de app gewoon: lessen, herhaling, luisteren en spreken.')));
       return wrap;
     }
+    wrap.append(tutorHead());
     const modes = h('div', { class: 'seg' },
       [['roleplay', '🎭 Rollenspel'], ['ask', '❓ Vraag het'], ['write', '✍️ Correctie']].map(([m, l]) => h('button', { class: chat.mode === m ? 'on' : '', type: 'button', onclick: () => { if (chat.mode !== m) { chat.mode = m; chat.messages = []; render(); } } }, l)));
     wrap.append(modes);
@@ -610,16 +612,17 @@
 
     const log = h('div', { class: 'chat-log', 'aria-live': 'polite' });
     chat.messages.forEach((m, i) => { if (!(i === 0 && m.hidden)) log.append(bubble(m)); });
+    if (!chat.messages.length && LUPE_HELLO[chat.mode]) log.append(bubble({ role: 'assistant', content: LUPE_HELLO[chat.mode], mode: chat.mode, local: true }));
     const inp = h('textarea', { class: 'chat-input', rows: chat.mode === 'write' ? 5 : 2, lang: 'es', placeholder: chat.mode === 'write' ? 'Escribe tu texto aquí…' : 'Escribe en español… (Nederlands mag ook)' });
     const send = h('button', { class: 'btn primary', type: 'button' }, 'Enviar');
     const micBtn = Speech.canListen() ? h('button', { class: 'icon-btn mic-sm', type: 'button', title: 'Inspreken' }, '🎙️') : null;
-    const voiceOn = h('label', { class: 'small row gap' }, h('input', { type: 'checkbox', checked: st().settings.tutorVoice ? true : null, onchange: e => { st().settings.tutorVoice = e.target.checked; save(); } }), 'Antwoorden voorlezen');
     const doSend = async (text, hidden) => {
       text = (text || '').trim(); if (!text || chat.busy) return;
+      if (st().settings.tutorVoice && !hidden) Speech.unlock();
       const um = { role: 'user', content: text, hidden };
       chat.messages.push(um); if (!hidden) log.append(bubble(um));
       inp.value = '';
-      const am = { role: 'assistant', content: '' }; chat.messages.push(am);
+      const am = { role: 'assistant', content: '', mode: chat.mode }; chat.messages.push(am);
       const b = bubble(am, true); log.append(b); scrollLog();
       chat.busy = true; send.disabled = true;
       const sys = chat.mode === 'roleplay' ? S.AI.roleplaySystem(chat.scenario) : chat.mode === 'ask' ? S.AI.askSystem() : S.AI.writingSystem();
@@ -628,7 +631,7 @@
         const full = await S.AI.stream({ system: sys, messages: msgs, maxTokens: chat.mode === 'roleplay' ? 1500 : 3000, effort: chat.mode === 'write' ? 'medium' : 'low', onText: t => { am.content = t; fillBubble(b, am); scrollLog(); } });
         am.content = full; fillBubble(b, am);
         award('ai'); Store.skill(chat.mode === 'write' ? 'write' : 'speak', true); Store.today().min += 0.5; Store.touchStreak(); save();
-        if (st().settings.tutorVoice) Speech.say(replyPart(full));
+        if (st().settings.tutorVoice) S.Tutor.say(S.Tutor.spoken(full, am.mode));
       } catch (e) {
         chat.messages.pop(); if (!hidden) { /* laat de vraag staan */ }
         b.querySelector('.bubble-body').innerHTML = '<span class="warn">⚠️ ' + U.esc(e.message) + '</span>';
@@ -644,14 +647,32 @@
       micBtn.classList.remove('rec');
     };
     wrap.append(log, h('div', { class: 'chat-bar' }, inp, h('div', { class: 'chat-actions' }, micBtn, send)), S.Lesson.accentBar(inp),
-      h('div', { class: 'row gap between' }, voiceOn, h('button', { class: 'btn link small', type: 'button', onclick: () => { chat.messages = []; if (chat.mode === 'roleplay') chat.autostart = true; render(); } }, '🗑 Nieuw gesprek')));
+      h('div', { class: 'row gap between' }, h('span'), h('button', { class: 'btn link small', type: 'button', onclick: () => { chat.messages = []; if (chat.mode === 'roleplay') chat.autostart = true; render(); } }, '🗑 Nieuw gesprek')));
     if (chat.mode === 'roleplay' && chat.autostart && !chat.messages.length) { chat.autostart = false; setTimeout(() => doSend('(Empecemos el juego de rol. / Laten we beginnen.)', true), 50); }
     setTimeout(scrollLog, 30);
     return wrap;
   };
-  function replyPart(t) { return String(t).split(/\n\s*---\s*\n/)[0]; }
+  /* ---- Lupe, de docente ---- */
+  const LUPE_HELLO = {
+    ask: '**¡Hola! Soy Lupe, tu profe de español. ¿Qué quieres saber hoy?**\n\n*Vraag me alles over grammatica, woorden, uitspraak of cultuur. Nederlands mag ook.*',
+    write: '**¡Órale, a escribir! Escribe tu texto y yo te ayudo a corregirlo.**\n\n*Schrijf een e-mail, appje of dagboekstukje. Ik verbeter het en leg uit waarom.*'
+  };
+  function lupeAv(size, cls) { return S.Tutor.avatar(size, cls); }
+  function tutorHead() {
+    const on = () => !!st().settings.tutorVoice;
+    const tg = h('button', { class: 'chip toggle voice-tg' + (on() ? ' on' : ''), type: 'button', 'aria-pressed': on() ? 'true' : 'false' });
+    const paint = () => { tg.textContent = on() ? '🔊 Ze praat hardop' : '🔇 Alleen tekst'; tg.classList.toggle('on', on()); tg.setAttribute('aria-pressed', on() ? 'true' : 'false'); };
+    tg.onclick = () => { st().settings.tutorVoice = !on(); save(); paint(); if (on()) { Speech.unlock(); S.Tutor.say('¡Perfecto! Ahora te hablo en voz alta.'); } else Speech.stop(); };
+    paint();
+    const av = lupeAv(72, 'big');
+    av.title = 'Tik om haar te laten stoppen met praten';
+    av.onclick = () => { Speech.stop(); S.Tutor.setTalking(false); };
+    return h('div', { class: 'tutor-head' }, av,
+      h('div', { class: 'grow' }, h('h1', null, S.Tutor.title), h('p', { class: 'small muted' }, S.Tutor.tagline), tg),
+      h('button', { class: 'btn ghost small t-stop', type: 'button', onclick: () => { Speech.stop(); S.Tutor.setTalking(false); } }, '■ Stop'));
+  }
   function bubble(m, pending) {
-    const b = h('div', { class: 'msg ' + m.role }, h('div', { class: 'bubble-body' }, pending ? h('span', { class: 'typing' }, '…') : null));
+    const b = h('div', { class: 'msg ' + m.role }, m.role === 'assistant' ? lupeAv(34, 'mini') : null, h('div', { class: 'bubble-body' }, pending ? h('span', { class: 'typing' }, '…') : null));
     if (!pending) fillBubble(b, m);
     return b;
   }
@@ -659,9 +680,13 @@
     const body = b.querySelector('.bubble-body'); body.innerHTML = '';
     if (m.role === 'user') { body.textContent = m.content; return; }
     const [reply, ...rest] = String(m.content).split(/\n\s*---\s*\n/);
-    body.append(h('div', { class: 'reply', lang: 'es', html: S.md(reply) }));
-    if (reply.trim()) body.append(S.Lesson.speakBtn(reply.replace(/\*\*/g, '')));
+    const r = h('div', { class: 'reply', lang: m.mode === 'roleplay' ? 'es' : null, html: S.md(reply) });
+    body.append(r);
     if (rest.length) body.append(h('div', { class: 'correction', html: S.md(rest.join('\n')) }));
+    // Spaanse (vetgedrukte) stukken: tik om ze te horen
+    body.querySelectorAll('b').forEach(x => { if (/[a-záéíóúñ]/i.test(x.textContent) && !/:\s*$/.test(x.textContent)) { x.classList.add('say-es'); x.lang = 'es'; x.title = 'Tik om te horen'; x.onclick = () => S.Tutor.say(S.Tutor.spoken('**' + x.textContent + '**', 'ask')); } });
+    const sp = S.Tutor.spoken(m.content, m.mode);
+    if (sp && Speech.canSpeak()) body.append(h('button', { class: 'btn link small replay', type: 'button', title: 'Laat Lupe het nog eens zeggen' , onclick: e => { e.stopPropagation(); S.Tutor.say(sp); } }, '🔊 Nog eens'));
   }
 
   /* ================= PERFIL (alles over je voortgang) ================= */
@@ -1199,7 +1224,7 @@
   }
   function boot() {
     Store.load(); migrateTests();
-    applyTheme(); Speech.init();
+    applyTheme(); Speech.init(); S.Tutor.hookSpeech();
     const ver = document.getElementById('tb-ver'); if (ver) ver.textContent = appVersion();
     window.addEventListener('hashchange', render);
     render();

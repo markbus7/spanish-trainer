@@ -128,8 +128,12 @@ Learner level: ${p.level} (CEFR). ${LEVEL_GUIDE[p.level] || LEVEL_GUIDE.B1}
 Grammar the learner has studied so far: ${p.grammar.join('; ') || 'basics'}.
 ${p.weak.length ? 'Known weak points to watch for: ' + p.weak.join(', ') + '.' : ''}
 Always use Latin American norms: "ustedes" (never "vosotros"), seseo, Latin American vocabulary (carro, celular, computadora, jugo, manejar, etc.). Unless the scenario sets a country, use neutral Latin American Spanish.
-Do not use Markdown headings or tables. Keep formatting minimal (bold is fine).`;
+Do not use Markdown headings or tables. Keep formatting minimal.`;
   }
+
+  // De app leest de vetgedrukte stukken voor met een Spaanse stem; daarom alleen Spaans vet.
+  const BOLD_RULE = 'Formatting rule: put every Spanish example sentence or Spanish phrase in **bold** (the app reads the bold parts aloud with a Spanish voice). Never put Dutch text or labels in bold.';
+  function tutorPersona() { return (S.Tutor && S.Tutor.persona) || ''; }
 
   function roleplaySystem(sc) {
     const p = learnerProfile();
@@ -153,18 +157,24 @@ Rules for every reply:
     const p = learnerProfile();
     return `${baseRules(p)}
 
-You answer the learner's questions about Spanish grammar, vocabulary, pronunciation and culture. Answer in ${explainLang()}, clearly and concisely (max ~150 words), with 2–4 short Latin American Spanish example sentences and their translations. Mention regional differences when relevant (e.g. Mexico vs. Argentina vs. Spain). End with one tiny practice question when it fits.`;
+${tutorPersona()}
+
+You answer the learner's questions about Spanish grammar, vocabulary, pronunciation and culture. Answer in ${explainLang()}, clearly and concisely (max ~150 words), with 2–4 short Latin American Spanish example sentences and their translations. Mention regional differences when relevant (e.g. Mexico vs. Argentina vs. Spain). End with one tiny practice question when it fits.
+${BOLD_RULE}`;
   }
 
   function writingSystem() {
     const p = learnerProfile();
     return `${baseRules(p)}
 
+${tutorPersona()}
+
 You correct a short text written by the learner. Respond in ${explainLang()} using exactly this structure (no headings):
 ✍️ Corrected version: the full corrected text in Spanish (keep the learner's ideas; only fix errors and make it natural Latin American Spanish).
 ❌ → ✅ Up to 5 most important corrections, one per line, each with a very short explanation.
 💡 One tip to sound more natural.
-⭐ A score from 1 to 10 for this level, with one encouraging sentence.`;
+⭐ A score from 1 to 10 for this level, with one encouraging sentence.
+${BOLD_RULE}`;
   }
 
   async function checkTranslation(nl, user, accepted) {
