@@ -77,6 +77,70 @@
     const row = h('div', { class: 'type-help' }, ctx.mode === 'exam' ? null : hintBtn, dkBtn);
     return { el: h('div', null, hintLine, row), hints: () => n, done: () => row.classList.add('hidden') };
   }
+  /* ---------- vervoegen: kaart met uitleg + mini-tabel ---------- */
+  // Nederlandse tegenwoordige tijd van veelgebruikte werkwoorden: ik · jij · hij/zij · wij · zij/jullie
+  const NL_PRES = {
+    ser: 'ben bent is zijn zijn', estar: 'ben bent is zijn zijn', tener: 'heb hebt heeft hebben hebben', ir: 'ga gaat gaat gaan gaan',
+    hacer: 'doe doet doet doen doen', poder: 'kan kunt kan kunnen kunnen', querer: 'wil wilt wil willen willen', venir: 'kom komt komt komen komen',
+    decir: 'zeg zegt zegt zeggen zeggen', saber: 'weet weet weet weten weten', dar: 'geef geeft geeft geven geven', ver: 'zie ziet ziet zien zien',
+    hablar: 'spreek spreekt spreekt spreken spreken', comer: 'eet eet eet eten eten', vivir: 'woon woont woont wonen wonen',
+    trabajar: 'werk werkt werkt werken werken', beber: 'drink drinkt drinkt drinken drinken', escribir: 'schrijf schrijft schrijft schrijven schrijven',
+    leer: 'lees leest leest lezen lezen', dormir: 'slaap slaapt slaapt slapen slapen', comprar: 'koop koopt koopt kopen kopen',
+    necesitar: 'heb … nodig|hebt … nodig|heeft … nodig|hebben … nodig|hebben … nodig', estudiar: 'studeer studeert studeert studeren studeren',
+    llamarse: 'heet heet heet heten heten', salir: 'ga uit|gaat uit|gaat uit|gaan uit|gaan uit', jugar: 'speel speelt speelt spelen spelen',
+    conocer: 'ken kent kent kennen kennen', pedir: 'vraag om|vraagt om|vraagt om|vragen om|vragen om', pensar: 'denk denkt denkt denken denken'
+  };
+  const NL_PRON = ['ik', 'jij', 'hij / zij', 'wij', 'zij / jullie'];
+  function nlForm(verb, tense, p) {
+    if (tense !== 'pres' || !NL_PRES[verb]) return null;
+    const raw = NL_PRES[verb]; const f = (raw.includes('|') ? raw.split('|') : raw.split(' '))[p];
+    return NL_PRON[p] + ' ' + f;
+  }
+  function conjCard(it, ctx) {
+    const { verb, tense, person: p } = it.conj;
+    const Tn = S.conj.TENSES[tense] || {};
+    const info = S.conj.info(verb) || {};
+    const pNl = S.conj.personNl ? S.conj.personNl(tense, p) : '';
+    const nl = nlForm(verb, tense, p);
+    const imper = tense === 'imper' || tense === 'neg';
+    // invulzin: "tú ___"  (bij gebiedende wijs: "¡___!  (tú)")
+    const blank = h('span', { class: 'blank' }, ' ');
+    const frame = h('div', { class: 'conj-frame', lang: 'es' }, imper ? ['¡', blank, '! ', h('span', { class: 'cf-pron small' }, '(' + it.person + ')')] : [h('span', { class: 'cf-pron' }, it.person), ' ', blank]);
+    // voorbeeld met een andere persoon, zodat je het patroon ziet
+    let ex = null;
+    if (ctx.mode !== 'exam') {
+      const tbl = S.conj.table(verb, tense) || [];
+      const q = S.conj.personsFor(tense).find(i => i !== p && tbl[i]);
+      if (q != null) {
+        const exNl = nlForm(verb, tense, q);
+        ex = h('div', { class: 'conj-ex' }, 'Voorbeeld: ', h('b', { lang: 'es' }, (imper ? '¡' + tbl[q] + '! (' + S.conj.personLabel(tense, q) + ')' : S.conj.personLabel(tense, q).split(' / ')[0] + ' ' + tbl[q])), exNl ? ' = ' + exNl : '');
+      }
+    }
+    const el = h('div', { class: 'conj-card' },
+      h('div', { class: 'verb', lang: 'es' }, verb),
+      info.nl ? h('div', { class: 'conj-mean' }, '= ' + info.nl) : null,
+      h('div', { class: 'conj-facts' },
+        h('div', { class: 'cf' }, h('span', { class: 'cf-k' }, 'Wie?'), h('span', { class: 'person' }, it.person), pNl ? h('span', { class: 'cf-nl' }, '= ' + pNl) : null),
+        h('div', { class: 'cf' }, h('span', { class: 'cf-k' }, 'Tijd?'), h('span', { class: 'cf-t', lang: 'es' }, Tn.es || ''), h('span', { class: 'cf-nl' }, '= ' + (Tn.nl || '')))),
+      Tn.tip ? h('div', { class: 'conj-tip' }, '💡 ' + Tn.tip.charAt(0).toUpperCase() + Tn.tip.slice(1)) : null,
+      h('div', { class: 'conj-ask' }, 'Vul de juiste vorm in:'),
+      frame,
+      h('div', { class: 'conj-nl' }, nl ? '🇳🇱 ' + nl : '🇳🇱 ' + (pNl || it.person) + ' + ‘' + (info.nl || verb) + '’'),
+      ex);
+    return { el, frame };
+  }
+  function conjTable(it) {
+    const { verb, tense, person: p } = it.conj;
+    const tbl = S.conj.table(verb, tense) || [];
+    const Tn = S.conj.TENSES[tense] || {};
+    const rows = S.conj.personsFor(tense).filter(i => tbl[i]).map(i => h('tr', { class: i === p ? 'me' : '' },
+      h('td', { class: 'ct-p', lang: 'es' }, S.conj.personLabel(tense, i)),
+      h('td', { class: 'ct-f', lang: 'es' }, tbl[i]),
+      h('td', { class: 'ct-nl' }, nlForm(verb, tense, i) || S.conj.personNl(tense, i))));
+    return h('div', { class: 'conj-table' },
+      h('div', { class: 'ct-title' }, '📋 ', h('b', { lang: 'es' }, verb), ' · ' + (Tn.es || '') + ' = ' + (Tn.nl || '')),
+      h('table', null, h('tbody', null, rows)));
+  }
   function textInput(ph) {
     return h('input', { class: 'answer-input', type: 'text', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', spellcheck: 'false', lang: 'es', placeholder: ph || 'Typ je antwoord…', enterkeyhint: 'done' });
   }
@@ -306,12 +370,9 @@
     const qKey = Q_MAP[it.q];
     const wrap = h('div', { class: 'type' });
     wrap.append(h('div', { class: 'instr' }, it.sentence ? T('fill') : it.conj ? T('conj') : (qKey ? T(qKey) : T('type'))));
-    if (it.conj) {
-      wrap.append(h('div', { class: 'conj-card' },
-        h('div', { class: 'verb', lang: 'es' }, it.prompt), h('div', { class: 'sub' }, it.sub),
-        h('div', { class: 'person' }, it.person)));
-    } else if (it.prompt) wrap.append(h('div', { class: 'prompt' }, it.prompt));
     let sent = null;
+    if (it.conj) { const c = conjCard(it, ctx); sent = c.frame; wrap.append(c.el); }
+    else if (it.prompt) wrap.append(h('div', { class: 'prompt' }, it.prompt));
     if (it.sentence) { sent = sentenceEl(it.sentence); wrap.append(sent); }
     if (it.h) wrap.append(h('div', { class: 'hint' }, '(' + it.h + ')'));
     if (it.nl && it.sentence) wrap.append(h('div', { class: 'nl-hint' }, it.nl));
@@ -617,6 +678,7 @@
         if (r.synonym && r.main) fb.append(h('div', { class: 'small muted' }, 'In de les staat: ', h('b', { lang: 'es' }, r.main)));
         else if (it.syn && it.syn.length) fb.append(h('div', { class: 'small muted' }, 'Ook goed: ' + it.syn.filter(x => !/\//.test(x)).slice(0, 2).join(', ')));
       }
+      if (!r.ok && it.conj && S.conj.table(it.conj.verb, it.conj.tense)) fb.append(conjTable(it));
       if (r.ok && it.alts && it.alts.length > 1 && it.translate) {
         const other = it.alts.filter(a => S.check.norm(a) !== S.check.norm(r.user)).slice(0, 1);
         if (other.length) fb.append(h('div', { class: 'small muted' }, 'Ook goed: ' + other[0]));

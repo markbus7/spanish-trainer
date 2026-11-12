@@ -373,6 +373,10 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
   let n = 0; units.forEach(u => S.C.words(u).forEach(w => { n += G.wordSynonyms(w).length; }));
   ok(n > 100, 'aantal synoniemen ' + n);
 }
+/* ---------- uitleg bij vervoegingsvragen ---------- */
+Object.entries(S.conj.TENSES).forEach(([k, T]) => ok(T.nl && T.tip, 'tijd ' + k + ' mist Nederlandse uitleg (nl/tip)'));
+Object.keys(S.conj.TENSES).forEach(t => S.conj.personsFor(t).forEach(p => ok(S.conj.personNl(t, p), 'geen Nederlandse persoon voor ' + t + '/' + p)));
+ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijns-Amerikaans Spaans');
 
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);

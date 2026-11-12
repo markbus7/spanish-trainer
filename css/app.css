@@ -227,7 +227,31 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .conj-card { text-align: center; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 1.1rem; box-shadow: var(--shadow); }
 .conj-card .verb { font-family: var(--serif); font-size: 2rem; font-weight: 600; }
 .conj-card .sub { color: var(--muted); font-size: .9rem; }
-.conj-card .person { display: inline-block; margin-top: .6rem; background: var(--accent-soft); color: var(--accent); padding: .3rem .9rem; border-radius: 999px; font-weight: 800; font-size: 1.1rem; }
+.conj-card .person { display: inline-block; background: var(--accent-soft); color: var(--accent); padding: .2rem .8rem; border-radius: 999px; font-weight: 800; font-size: 1.05rem; }
+.conj-mean { color: var(--ink2); font-size: 1.05rem; margin-top: .1rem; }
+.conj-facts { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem 1.4rem; margin-top: .8rem; }
+.conj-facts .cf { display: flex; align-items: center; gap: .45rem; flex-wrap: wrap; justify-content: center; }
+.cf-k { color: var(--muted); font-size: .82rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.cf-t { font-weight: 700; }
+.cf-nl { color: var(--ink2); }
+.conj-tip { color: var(--muted); font-size: .88rem; margin-top: .45rem; }
+.conj-ask { margin-top: .9rem; color: var(--muted); font-size: .85rem; font-weight: 600; }
+.conj-frame { font-family: var(--serif); font-size: 1.6rem; font-weight: 600; margin-top: .15rem; }
+.conj-frame .cf-pron { color: var(--accent); }
+.conj-frame .blank { min-width: 3.5em; }
+.conj-frame .cf-pron.small { font-size: 1rem; }
+.conj-nl { color: var(--ink2); font-size: 1rem; margin-top: .2rem; }
+.conj-ex { margin-top: .7rem; padding-top: .6rem; border-top: 1px dashed var(--line); color: var(--muted); font-size: .9rem; }
+.conj-ex b { color: var(--ink); }
+.conj-table { margin: .5rem 0 .3rem; background: color-mix(in srgb, var(--card) 70%, transparent); border-radius: 10px; padding: .5rem .7rem; }
+.conj-table .ct-title { font-size: .9rem; margin-bottom: .3rem; }
+.conj-table table { border-collapse: collapse; width: 100%; max-width: 520px; font-size: .95rem; }
+.conj-table td { padding: .2rem .4rem; }
+.conj-table .ct-p { color: var(--muted); white-space: nowrap; }
+.conj-table .ct-f { font-weight: 700; }
+.conj-table .ct-nl { color: var(--muted); font-size: .85rem; }
+.conj-table tr.me td { background: var(--accent-soft); color: var(--accent); }
+.conj-table tr.me td:first-child { border-radius: 8px 0 0 8px; } .conj-table tr.me td:last-child { border-radius: 0 8px 8px 0; }
 .card-word { text-align: center; padding-top: 2rem; }
 .big-es { font-family: var(--serif); font-size: 2.3rem; font-weight: 600; margin: .4rem 0; line-height: 1.2; }
 .big-nl { font-size: 1.25rem; color: var(--ink2); margin-bottom: .8rem; }
