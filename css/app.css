@@ -209,7 +209,7 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .hint { color: var(--accent); font-weight: 700; font-size: .95rem; }
 .nl-hint { color: var(--muted); font-size: .95rem; margin: .3rem 0 1rem; }
 .options { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-top: 1rem; }
-.options.stack { grid-template-columns: 1fr; }
+.options.one-col { grid-template-columns: 1fr; }
 @media (max-width: 380px) { .options { grid-template-columns: 1fr; } }
 .opt { display: flex; align-items: center; gap: .6rem; text-align: left; padding: .9rem; border-radius: 14px; border: 2px solid var(--line); background: var(--card); font-size: 1.02rem; font-weight: 600; min-height: 56px; box-shadow: 0 2px 0 var(--line); transition: transform .06s, border-color .15s; }
 .opt:hover:not(:disabled) { border-color: color-mix(in srgb, var(--teal) 50%, var(--line)); }
@@ -506,9 +506,10 @@ input[type=range] { width: 100%; accent-color: var(--teal); }
 .test-chart circle { fill: var(--card); stroke: var(--accent); stroke-width: 2.5; }
 .vocab-big b { font-family: var(--serif); font-size: 2.2rem; color: var(--accent); }
 .vocab-big span { color: var(--ink2); }
-.stack { display: flex; height: 12px; border-radius: 999px; background: var(--bg2); overflow: hidden; flex: 1; }
-.stack i { display: block; height: 100%; }
-.stack .m, .legend .m { background: var(--teal); } .stack .k, .legend .k { background: var(--blue); } .stack .l, .legend .l { background: var(--gold); }
+/* .wstack, niet .stack: die naam botste met de antwoordknoppen (.options) en drukte ze plat tot één strookje. */
+.wstack { display: flex; height: 12px; border-radius: 999px; background: var(--bg2); overflow: hidden; flex: 1; }
+.wstack i { display: block; height: 100%; }
+.wstack .m, .legend .m { background: var(--teal); } .wstack .k, .legend .k { background: var(--blue); } .wstack .l, .legend .l { background: var(--gold); }
 .legend { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin: .5rem 0 .2rem; color: var(--ink2); }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: .35rem; }
 .vocab-levels { margin: .6rem 0; } .vocab-levels .lv-bar + .lv-bar { margin-top: .4rem; }
