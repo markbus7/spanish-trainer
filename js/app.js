@@ -578,7 +578,7 @@
       wrap.append(h('div', { class: 'card' },
         h('h3', null, '🤖 Je persoonlijke AI-docent'),
         h('p', null, 'Voer echte gesprekken (rollenspellen in Mexico, Colombia, Argentinië…). Je krijgt direct correcties in het Nederlands, kunt alles over grammatica vragen en krijgt feedback op je teksten.'),
-        h('p', { class: 'small muted' }, 'Hiervoor heb je een eigen API-sleutel van Anthropic (Claude) nodig. Die maak je aan op console.anthropic.com. Je betaalt per gebruik, meestal een paar cent per gesprek. De sleutel wordt alleen op dit apparaat bewaard.'),
+        h('p', { class: 'small muted' }, 'Hiervoor heb je een eigen API-sleutel van Anthropic (Claude) nodig. Die maak je aan op platform.claude.com (uitleg in Instellingen). Je betaalt per gebruik, meestal een paar cent per gesprek. De sleutel wordt alleen op dit apparaat bewaard.'),
         h('a', { class: 'btn primary', href: '#/ajustes' }, 'Sleutel instellen'),
         h('p', { class: 'small muted' }, 'Zonder AI werkt de rest van de app gewoon: lessen, herhaling, luisteren en spreken.')));
       return wrap;
@@ -1030,9 +1030,11 @@
     wrap.append(section('🤖 AI-docent (optioneel)', h('div', { class: 'card form' },
       h('p', { class: 'small muted' }, 'Met een eigen API-sleutel van Anthropic kun je oefengesprekken voeren en krijg je feedback op je schrijfopdrachten. Je betaalt per gebruik.'),
       h('ol', { class: 'small steps-list' },
-        h('li', null, 'Open ', h('a', { href: 'https://console.anthropic.com/settings/keys', target: '_blank', rel: 'noopener' }, 'deze link naar Anthropic'), ' en log in (of maak een account aan).'),
-        h('li', null, 'Kies "Create Key", geef de sleutel een naam (bijv. Español Latino) en kopieer hem.'),
+        h('li', null, 'Open ', h('a', { href: 'https://platform.claude.com/settings/keys', target: '_blank', rel: 'noopener' }, 'deze link naar Anthropic'), ' en log in (of maak een account aan).'),
+        h('li', null, 'Tik op "Create Key". Vraagt de site "Where does your code run?", kies dan ', h('b', null, 'Somewhere else'), ' (API-sleutel).'),
+        h('li', null, 'Geef de sleutel een naam (bijv. Español Latino) en ', h('b', null, 'kopieer hem meteen'), ': hij wordt maar één keer getoond.'),
         h('li', null, 'Plak de sleutel hieronder en tik op "Test verbinding". Tegoed zet je op dezelfde site onder Billing.')),
+      h('p', { class: 'small' }, '🔒 Deel je sleutel met niemand: wie hem heeft, gebruikt jouw tegoed. Kwijt of gelekt? Verwijder hem op de site en maak een nieuwe.'),
       h('p', { class: 'small muted' }, 'De sleutel wordt alleen in deze browser bewaard en rechtstreeks naar Anthropic gestuurd. Hij komt nooit in back-ups of de gist terecht. Gebruik dit alleen op je eigen apparaat.'),
       label('API-sleutel', keyIn), label('Model', modelSel),
       h('div', { class: 'row gap' }, h('button', { class: 'btn ghost', type: 'button', onclick: async () => { set('aiKey', keyIn.value.trim()); testOut.textContent = 'Testen…'; try { const t = await S.AI.test(); testOut.textContent = '✅ Werkt: ' + t; } catch (e) { testOut.textContent = '⚠️ ' + e.message; } } }, 'Test verbinding'), testOut),
