@@ -378,6 +378,29 @@ Object.entries(S.conj.TENSES).forEach(([k, T]) => ok(T.nl && T.tip, 'tijd ' + k 
 Object.keys(S.conj.TENSES).forEach(t => S.conj.personsFor(t).forEach(p => ok(S.conj.personNl(t, p), 'geen Nederlandse persoon voor ' + t + '/' + p)));
 ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijns-Amerikaans Spaans');
 
+/* ---------- per woord vergelijken (zinsvertaling: alleen foute woorden opnieuw) ---------- */
+{
+  const P = S.check.parts;
+  const p = P('buenos dias, como es usted?', ['Buenos días, ¿cómo está usted?']);
+  ok(p && p.st.join() === 'ok,accent,accent,bad,ok', 'per woord: ' + (p && p.st.join()));
+  ok(p && p.k.join() === '0,1,2,4' && S.check.partsUsable(p), 'goede woorden bewaard: ' + (p && p.k));
+  const segs = S.check.words(p.a); ok(segs.join('') === p.a && segs.length === 11, 'woorden en tussenstukken');
+  // vakje "está" invullen geeft weer de hele zin
+  const filled = segs.map((x, i) => i === 7 ? 'está' : x).join('');
+  ok(S.check.check(filled, ['Buenos días, ¿cómo está usted?']).ok, 'ingevulde zin is goed');
+  ok(!S.check.partsUsable(P('hola', ['Buenos días, ¿cómo está usted?'])), 'niets goed: hele zin typen');
+  ok(!S.check.partsUsable(P('buenos días cómo está usted', ['Buenos días, ¿cómo está usted?'])), 'alles goed: geen vakjes');
+  const q = P('me llamo pedro', ['(Yo) me llamo Ana.']);
+  ok(q && q.a === 'me llamo Ana.' && q.k.join() === '0,1', 'optioneel (yo): ' + (q && q.a));
+  ok(P('tengo hambre mucho', ['Tengo mucha hambre.', 'Tengo hambre.']).a === 'Tengo hambre.', 'beste alternatief gekozen');
+  ok(P('', ['Hola']) === null, 'leeg antwoord');
+  // samenvoegen tussen apparaten: nieuwste stand per zin
+  const A = { updated: 2, partial: { 'x|a|1': { a: 'Hola amigo', k: [0], t: 5 }, 'x|a|2': { t: 9 } } };
+  const B = { updated: 1, partial: { 'x|a|1': { t: 7 }, 'x|a|2': { a: 'Buen día', k: [0], t: 3 } } };
+  const M = S.Store.mergeStates(A, B);
+  ok(!M.partial['x|a|1'].a && !M.partial['x|a|2'].a, 'partial samenvoegen');
+}
+
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);

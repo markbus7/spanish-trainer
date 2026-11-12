@@ -105,6 +105,12 @@
       if (SRS.has(it.srsId) && ok && r && r.hinted && !r.override) { const c = st().srs[it.srsId]; c.t = Date.now(); c.r = 0; c.i = 1; c.d = Math.min(c.d, U.dayIndex() + 1); }
       else if (SRS.has(it.srsId)) { if (!r || !r.override) SRS.grade(it.srsId, ok); else { const c = st().srs[it.srsId]; if (c) { c.l = Math.max(0, c.l - 1); } } }
       else if (!ok) stepWrong.add(it.srsId); else if (r && r.override) stepWrong.delete(it.srsId);
+      // zin half goed: bij de volgende herhaling staan de goede woorden er al
+      if (it.translate) {
+        const P = st().partial || (st().partial = {});
+        if (!ok && r && S.check.partsUsable(r.parts)) P[it.srsId] = { a: r.parts.a, k: r.parts.k, t: Date.now() };
+        else if (P[it.srsId] && P[it.srsId].a && ok) P[it.srsId] = { t: Date.now() };
+      }
     }
     save();
   }

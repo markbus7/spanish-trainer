@@ -219,6 +219,21 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .opt:disabled { cursor: default; }
 .answer-input { width: 100%; font-size: 1.2rem; padding: .85rem 1rem; border-radius: 14px; border: 2px solid var(--line); background: var(--card); margin-top: .6rem; }
 .answer-input:disabled { opacity: .85; }
+/* Zin met de goede woorden al ingevuld (herhaling na een fout) */
+.partial { margin-top: .6rem; padding: .7rem .9rem; border-radius: 14px; border: 2px solid var(--line); background: var(--card); font-size: 1.2rem; line-height: 2.4; }
+.partial .p-word { color: var(--ok); font-weight: 600; }
+.partial .p-sep { white-space: pre-wrap; }
+.partial .p-input { font: inherit; font-size: 1.1rem; max-width: 100%; padding: .1rem .35rem; margin: 0 .1rem; border: none; border-bottom: 3px solid var(--accent); border-radius: 6px 6px 0 0; background: var(--accent-soft); color: inherit; text-align: center; }
+.partial .p-input:focus { outline: none; border-bottom-color: var(--teal); background: var(--teal-soft); }
+.partial .p-input.ok { border-bottom-color: var(--ok); background: var(--ok-soft); }
+.partial .p-input.bad { border-bottom-color: var(--bad); background: var(--bad-soft); }
+.p-note { font-size: .9rem; color: var(--muted); margin-top: .4rem; }
+.p-whole { margin-top: .3rem; }
+.word-diff { display: inline; font-size: 1.05rem; }
+.word-diff .wd { padding: 0 .2em; border-radius: 5px; font-weight: 700; }
+.word-diff .wd.ok { background: var(--ok-soft); color: var(--ok); }
+.word-diff .wd.accent { background: var(--gold-soft); color: var(--gold); }
+.word-diff .wd.bad { background: var(--bad-soft); color: var(--bad); text-decoration: underline; }
 .accent-bar { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: .3rem; margin: .6rem 0; max-width: 460px; }
 .accent-bar button { min-width: 0; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); font-weight: 700; font-size: 1.05rem; }
 .type-help { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .2rem; }

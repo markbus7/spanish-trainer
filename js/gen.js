@@ -258,6 +258,9 @@
   function reviewSession(limit = 20, ids) {
     const due = ids || S.SRS.due(limit);
     const items = due.map(resolve).filter(Boolean);
+    // zinnen die de vorige keer half goed waren: de goede woorden alvast invullen
+    const P = S.Store.state.partial || {};
+    items.forEach(it => { const p = it.translate && P[it.srsId]; if (p && p.a && S.check.check(p.a, it.answers, { strict: true }).exact) it.keep = { a: p.a, k: p.k }; });
     // afwisselen: geen twee vervoegingen achter elkaar als het kan
     return { title: 'Herhaling', items: spread(items), mode: 'review' };
   }
