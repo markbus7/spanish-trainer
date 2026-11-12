@@ -1080,6 +1080,8 @@
       Speech.canSpeak() ? label(Speech.clips ? 'Stem van het apparaat (voor de rest)' : 'Voorleesstem', voiceSel) : h('p', { class: 'warn' }, 'Je browser ondersteunt geen voorlezen.'),
       label('Spreeksnelheid apparaatstem', rate),
       toggle('Dialogen eerst alleen beluisteren', 'De tekst is wazig tot je hem zelf zichtbaar maakt. Goed voor je luistervaardigheid.', s.listenFirst !== false, v => set('listenFirst', v)),
+      label('Stem van Lupe (docente)', h('select', { class: 'input', onchange: e => { set('lupeVoice', e.target.value); S.Tutor.say('¡Hola! Soy Lupe. ¿Te gusta mi voz?'); } },
+        [['girl', 'Meisje (hoge stem)'], ['woman', 'Vrouw']].map(([v, l]) => h('option', { value: v, selected: (s.lupeVoice || 'girl') === v ? true : null }, l)))),
       h('button', { class: 'btn ghost', type: 'button', onclick: runTest }, '🔊 Test de stemmen'), voiceOut,
       voiceTip,
       h('p', { class: 'small muted' }, Speech.canListen() ? '🎙️ Spraakherkenning is beschikbaar.' : '🎙️ Spraakherkenning werkt niet in deze browser. Gebruik Chrome of Safari voor spreekoefeningen.'))));
