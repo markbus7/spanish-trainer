@@ -46,7 +46,8 @@
       units: {}, levels: {}, srs: {}, tags: {},
       skills: { vocab: { ok: 0, no: 0 }, grammar: { ok: 0, no: 0 }, listen: { ok: 0, no: 0 }, speak: { ok: 0, no: 0 }, read: { ok: 0, no: 0 }, write: { ok: 0, no: 0 } },
       days: {}, xp: 0, streak: { cur: 0, best: 0, last: null }, current: null, badges: [], done: {},
-      tests: [], games: {}, fast: 0, myWords: {}
+      tests: [], games: {}, fast: 0, myWords: {},
+      paused: { t: 0, data: null } // onderbroken oefening, om later verder te gaan
     };
   }
   function merge(base, extra) {
@@ -189,9 +190,48 @@
     out.myWords = Object.assign({}, N.myWords || {});
     for (const k in O.myWords || {}) { const o = O.myWords[k], n = out.myWords[k]; if (!n || (o.t || 0) > (n.t || 0)) out.myWords[k] = clone(o); }
     for (const k in out.myWords) if (out.myWords[k].del) delete out.srs['w|my|' + k];
+    // onderbroken oefening: de laatst bewaarde (of laatst afgeronde/weggegooide) wint
+    const pa = A.paused || {}, pb = B.paused || {};
+    out.paused = clone((pa.t || 0) >= (pb.t || 0) ? pa : pb);
     if (!out.current) out.current = O.current;
     return out;
   }
+
+  /* ================= Onderbroken oefening =================
+     Een lopende les wordt na elke vraag bewaard, zodat je na verversen (of op een ander apparaat) verder kunt.
+     Oefeningen zijn gewone gegevens; een herhaalkopie verwijst naar zijn origineel via de plek in de rij. */
+  const Paused = {
+    MAX_AGE: 30 * 864e5,
+    get() {
+      const p = Store.state.paused;
+      if (!p || !p.data || !p.data.snap) return null;
+      if (Date.now() - (p.t || 0) > this.MAX_AGE) return null;
+      return p.data;
+    },
+    set(data) { Store.state.paused = { t: Date.now(), data }; Store.save(); },
+    clear() { if (Store.state.paused && Store.state.paused.data) { Store.state.paused = { t: Date.now(), data: null }; Store.save(); } },
+    pack(r) {
+      const q = r.queue, pos = new Map(q.map((it, i) => [it, i]));
+      return JSON.parse(JSON.stringify({
+        idx: r.idx, xp: r.xp, streak: r.streak, bestStreak: r.bestStreak, activeMs: Math.round(r.activeMs), paidXp: r.paidXp || 0, paidMs: Math.round(r.paidMs || 0),
+        queue: q.map(it => { if (!it.orig) return it; const c = Object.assign({}, it, { _o: pos.get(it.orig) }); delete c.orig; return c; }),
+        graded: [...r.graded].map(([it, ok]) => [pos.get(it), ok]).filter(g => g[0] != null),
+        mistakes: r.mistakes.map(m => ({ i: pos.get(m.it), r: m.r })).filter(m => m.i != null)
+      }));
+    },
+    unpack(snap) {
+      const s = JSON.parse(JSON.stringify(snap));
+      const queue = s.queue;
+      queue.forEach(it => { if (it._o != null) { it.orig = queue[it._o]; delete it._o; } });
+      return {
+        queue, idx: Math.min(s.idx || 0, queue.length), xp: s.xp || 0, streak: s.streak || 0, bestStreak: s.bestStreak || 0,
+        activeMs: s.activeMs || 0, paidXp: s.paidXp || 0, paidMs: s.paidMs || 0,
+        graded: new Map(s.graded.filter(g => queue[g[0]]).map(([i, ok]) => [queue[i], ok])),
+        mistakes: s.mistakes.filter(m => queue[m.i]).map(m => ({ it: queue[m.i], r: m.r }))
+      };
+    }
+  };
+  S.Paused = Paused;
 
   /* ================= Herhaalsysteem (vereenvoudigd SM-2, per dag) ================= */
   const SRS = {

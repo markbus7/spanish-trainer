@@ -12,12 +12,12 @@
     t.textContent = msg; t.classList.add('show');
     clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), ms);
   };
-  S.confirm = function (title, text, okLabel, onOk, cancelLabel = 'Annuleren') {
+  S.confirm = function (title, text, okLabel, onOk, cancelLabel = 'Annuleren', onCancel) {
     const root = document.getElementById('modal-root');
     const close = () => { root.innerHTML = ''; };
     root.append(h('div', { class: 'modal-bg', onclick: e => { if (e.target.classList.contains('modal-bg')) close(); } },
       h('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true' }, h('h3', null, title), h('p', null, text),
-        h('div', { class: 'row gap end' }, h('button', { class: 'btn ghost', type: 'button', onclick: close }, cancelLabel),
+        h('div', { class: 'row gap end' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => { close(); if (onCancel) onCancel(); } }, cancelLabel),
           h('button', { class: 'btn primary', type: 'button', onclick: () => { close(); onOk(); } }, okLabel)))));
   };
   S.confetti = function () {
@@ -114,12 +114,34 @@
     if (before < goal && Store.today().min >= goal) { award('goal'); setTimeout(() => { S.toast('🎯 Dagdoel gehaald! ¡Felicidades!', 3500); S.confetti(); }, 900); }
   }
   function afterSession(sum, extraXP = 0) {
-    Store.addXP(sum.xp + extraXP); addTime(sum.minutes);
+    Store.addXP((sum.newXp ?? sum.xp) + extraXP); addTime(sum.newMinutes ?? sum.minutes);
     Store.touchStreak(); award('first'); checkBadges(); Store.save();
   }
+  /* Onderbroken oefeningen. opts.desc zegt hoe we de les later weer opbouwen (welke unit/stap, herhaling …). */
+  const Paused = S.Paused;
+  const pauseKey = d => JSON.stringify(d || { kind: 'plain' });
   function runSession(session, opts = {}) {
+    const desc = opts.desc || { kind: 'plain' };
+    const resumable = !session.timer && session.mode !== 'exam';
+    const p = Paused.get();
+    if (resumable && !session.resume && p && !opts.fresh) {
+      const go = () => runSession(session, Object.assign({}, opts, { fresh: true }));
+      const where = `${p.title} (vraag ${Math.min(p.idx + 1, p.n)} van ${p.n})`;
+      if (pauseKey(p.desc) === pauseKey(desc)) S.confirm('Verder waar je was?', `Je was hier gebleven: ${where}. Je antwoorden en score staan nog klaar.`, '▶ Verder gaan', resumePaused, 'Opnieuw beginnen', go);
+      else S.confirm('Onderbroken oefening', `Je hebt nog een onderbroken oefening: ${where}. Begin je nu iets nieuws, dan vervalt die.`, '▶ Eerst die afmaken', resumePaused, 'Nieuw beginnen', go);
+      return;
+    }
     stepWrong.clear();
+    if (session.resume) {
+      // fout gemaakte nieuwe kaarten van vóór de pauze komen straks met interval 0 in de herhaling
+      Paused.unpack(session.resume).graded.forEach((ok, it) => { if (!ok && it.srsId && !SRS.has(it.srsId)) stepWrong.add(it.srsId); });
+    }
+    const meta = { title: session.title, mode: session.mode, pass: session.pass, srsAdd: session.srsAdd, offerRoleplay: session.offerRoleplay };
     S.Lesson.run(session, {
+      persist: resumable ? snap => {
+        if (!snap) Paused.clear();
+        else Paused.set({ desc, meta, title: session.title || 'Oefening', idx: snap.idx, n: snap.queue.length, snap });
+      } : null,
       onItem: recordItem,
       onFinish: sum => {
         if (session.srsAdd) session.srsAdd.forEach(id => SRS.add(id, stepWrong.has(id) ? 0 : 1));
@@ -127,11 +149,33 @@
         afterSession(sum, extra.bonusXP || 0);
         return extra;
       },
-      onAbort: sum => { Store.addXP(sum.xp); addTime(sum.minutes); if (sum.total) Store.touchStreak(); Store.save(); render(); },
+      onAbort: sum => { Store.addXP(sum.newXp); addTime(sum.newMinutes); if (sum.total) Store.touchStreak(); Store.save(); render(); },
       onClose: () => render()
     });
   }
   S.runSession = runSession;
+  function resumePaused() {
+    const p = Paused.get(); if (!p) { render(); return; }
+    const session = Object.assign({}, p.meta, { items: [], resume: p.snap });
+    const d = p.desc || {};
+    if (d.kind === 'step') { const u = C.get(d.unit); if (!u) { Paused.clear(); render(); return; } startStep(u, d.step, session); }
+    else if (d.kind === 'review') startReview(d.limit, session);
+    else if (d.kind === 'exam') startLevelExam(d.lvl, session);
+    else runSession(session, { desc: d });
+  }
+  function pausedCard() {
+    const p = Paused.get(); if (!p) return null;
+    const at = Math.min(p.idx + 1, p.n), ago = Date.now() - (st().paused.t || 0);
+    const when = ago < 36e5 ? 'zojuist' : ago < 864e5 ? 'vandaag' : 'op ' + new Date(st().paused.t).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' });
+    return h('div', { class: 'plan-card paused' },
+      h('div', { class: 'pc-icon' }, '⏸️'),
+      h('div', { class: 'pc-body' }, h('b', null, 'Verder waar je was'), h('span', null, `${p.title} · vraag ${at} van ${p.n}`),
+        h('div', { class: 'pbar' }, h('i', { style: { width: Math.round(p.idx / Math.max(1, p.n) * 100) + '%' } })),
+        h('small', null, 'Onderbroken ' + when + '. Je antwoorden en score zijn bewaard.')),
+      h('div', { class: 'pc-acts' },
+        h('button', { class: 'btn primary', type: 'button', onclick: resumePaused }, '▶ Verder'),
+        h('button', { class: 'btn link small', type: 'button', onclick: () => S.confirm('Weggooien?', 'De onderbroken oefening verdwijnt. Wat je al beantwoord hebt, telt wel mee voor je herhaling.', 'Weggooien', () => { Paused.clear(); render(); }) }, 'Weggooien')));
+  }
   /* Voor activiteiten buiten de lessen om (woordspellen): XP, tijd, streak en badges. */
   S.App = {
     finishActivity({ xp = 0, minutes = 0, game = null, stats = null } = {}) {
@@ -150,10 +194,11 @@
     }
   };
 
-  function startStep(u, stepId) {
-    const session = Gen.stepSession(u, stepId);
-    if (!session || !session.items.length) { S.toast('Deze stap heeft geen oefeningen.'); return; }
+  function startStep(u, stepId, resumed) {
+    const session = resumed || Gen.stepSession(u, stepId);
+    if (!session || (!session.items.length && !session.resume)) { S.toast('Deze stap heeft geen oefeningen.'); return; }
     runSession(session, {
+      desc: { kind: 'step', unit: u.id, step: stepId },
       onFinish: sum => {
         const us = Store.unit(u.id);
         const step = Gen.STEPS.find(s => s.id === stepId);
@@ -204,10 +249,10 @@
   }
   S.startStep = startStep;
 
-  function startReview(limit = 25) {
-    const s = Gen.reviewSession(limit);
-    if (!s.items.length) { S.toast('Niets te herhalen. ¡Bien hecho!'); return; }
-    runSession(s, { onFinish: sum => { Store.today().done.review = true; const left = SRS.dueCount(); return { title: 'Herhaling klaar', text: left ? `Er staan nog ${left} items klaar. Ga door of kom later terug.` : 'Alles herhaald voor vandaag! 🎉', nextLabel: left ? 'Nog een ronde' : 'Klaar', next: () => { if (left) startReview(limit); } }; } });
+  function startReview(limit = 25, resumed) {
+    const s = resumed || Gen.reviewSession(limit);
+    if (!s.items.length && !s.resume) { S.toast('Niets te herhalen. ¡Bien hecho!'); return; }
+    runSession(s, { desc: { kind: 'review', limit }, onFinish: sum => { Store.today().done.review = true; const left = SRS.dueCount(); return { title: 'Herhaling klaar', text: left ? `Er staan nog ${left} items klaar. Ga door of kom later terug.` : 'Alles herhaald voor vandaag! 🎉', nextLabel: left ? 'Nog een ronde' : 'Klaar', next: () => { if (left) startReview(limit); } }; } });
   }
 
   /* ================= Router ================= */
@@ -277,6 +322,8 @@
       ring(min / goal, min + "'", 'van ' + goal + "'")));
 
     const plan = h('div', { class: 'plan' });
+    // 0. onderbroken oefening
+    const pc = pausedCard(); if (pc) plan.append(pc);
     // 1. herhaling
     const revMin = Math.max(2, Math.round(Math.min(due, 25) * 0.3));
     plan.append(planCard('🔁', 'Herhaling', due ? `${Math.min(due, 25)} items · ±${revMin} min` : (d.done.review ? 'Klaar voor vandaag ✓' : 'Niets te herhalen — top!'),
@@ -359,9 +406,9 @@
     const s = P.unitState(u.id);
     return h('div', { class: 'dots' }, Gen.STEPS.map(x => h('i', { class: (s.steps || {})[x.id] || s.done ? 'on' : '', title: x.nl })));
   }
-  function startLevelExam(lvl) {
-    const ses = Gen.levelExam(lvl);
-    runSession(ses, { onFinish: sum => {
+  function startLevelExam(lvl, resumed) {
+    const ses = resumed || Gen.levelExam(lvl);
+    runSession(ses, { desc: { kind: 'exam', lvl }, onFinish: sum => {
       const L = st().levels[lvl] || (st().levels[lvl] = { passed: false, best: 0 });
       L.best = Math.max(L.best || 0, sum.score);
       if (sum.score >= 0.8) {
@@ -394,6 +441,8 @@
       steps.append(h('button', { class: 'step' + (done ? ' done' : '') + (nxt && nxt.id === x.id ? ' next' : ''), type: 'button', onclick: () => startStep(u, x.id) },
         h('span', { class: 'st-icon' }, done ? '✓' : x.icon), h('b', null, x.nl), h('small', null, '±' + x.min + ' min')));
     });
+    const pd = Paused.get();
+    if (pd && pd.desc && pd.desc.unit === u.id) wrap.append(h('div', { class: 'plan' }, pausedCard()));
     wrap.append(section('Stappen', steps));
     if (!s.done) wrap.append(h('div', { class: 'row gap wrap' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => S.confirm('Ik ken dit al', 'Je doet meteen de unittoets. Haal je 80% of meer, dan is de unit afgerond en gaan de woorden en oefeningen in je herhaling.', 'Start toets', () => {
       startStep(u, 'test');

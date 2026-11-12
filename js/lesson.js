@@ -442,11 +442,22 @@
     if (active) active.close(true);
     const root = document.getElementById('lesson');
     root.innerHTML = ''; root.hidden = false; document.body.classList.add('in-lesson');
-    const queue = session.items.filter(Boolean).slice();
-    const graded = new Map(); // item -> first result
-    const total = queue.filter(isGraded).length;
+    // hervatten: de bewaarde rij, antwoorden en score van een onderbroken les terugzetten
+    const R0 = session.resume ? S.Paused.unpack(session.resume) : null;
+    const queue = R0 ? R0.queue : session.items.filter(Boolean).slice();
+    const graded = R0 ? R0.graded : new Map(); // item -> first result
+    const total = queue.filter(it => !it.orig && isGraded(it)).length;
     let idx = 0, activeMs = 0, last = Date.now(), xp = 0, streak = 0, bestStreak = 0, answered = false, leaveFns = [];
-    const mistakes = [];
+    let paidXp = 0, paidMs = 0; // al bijgeschreven bij een eerdere pauze
+    const mistakes = R0 ? R0.mistakes : [];
+    if (R0) ({ idx, activeMs, xp, streak, bestStreak, paidXp, paidMs } = R0);
+    const canPause = !!hooks.persist && !session.timer;
+    function persist(at) {
+      if (!canPause) return;
+      if (at == null) { hooks.persist(null); return; }
+      if (at <= 0 || at > queue.length) return;
+      try { hooks.persist(S.Paused.pack({ queue, idx: at, graded, mistakes, xp, streak, bestStreak, activeMs, paidXp, paidMs })); } catch (e) { /* niet te bewaren: dan maar niet */ }
+    }
     const timerEnd = session.timer ? Date.now() + session.timer * 1000 : null;
 
     const bar = h('i'); const count = h('span', { class: 'ls-count' });
@@ -486,7 +497,7 @@
     function show() {
       leaveFns.forEach(f => f()); leaveFns = [];
       if (idx >= queue.length) return finish();
-      progress();
+      progress(); persist(idx);
       const it = queue[idx];
       answered = false; fb.innerHTML = ''; fb.className = 'ls-fb'; foot.classList.remove('ok', 'bad');
       skipBtn.hidden = true; skipBtn.onclick = null;
@@ -517,13 +528,15 @@
       // item direct verwerken (SRS + statistiek) — alleen eerste poging
       if (first && hooks.onItem) hooks.onItem(it, r.ok, r);
       if (session.mode === 'exam') { idx++; setTimeout(show, 120); return; }
+      const retryLater = !r.ok && !it.retry && (session.mode === 'learn' || session.mode === 'review') && !['match', 'speak'].includes(it.kind);
       (r.ok ? Sound.good : Sound.bad)();
       // opnieuw aanbieden in leer-/herhaalmodus
-      if (!r.ok && !it.retry && (session.mode === 'learn' || session.mode === 'review') && !['match', 'speak'].includes(it.kind)) {
+      if (retryLater) {
         const copy = { ...it, retry: true, orig: it.orig || it };
         if (copy.options) copy.options = U.shuffle(copy.options);
         queue.push(copy);
       }
+      touch(); persist(idx + 1); // dit antwoord is verwerkt: na verversen ga je verder met de volgende vraag
       renderFeedback(it, r);
       mainBtn.hidden = false; mainBtn.disabled = false; mainBtn.textContent = T('next');
       mainBtn.onclick = () => { touch(); idx++; show(); };
@@ -572,7 +585,7 @@
               if (qi > idx) queue.splice(qi, 1);
               const mi = mistakes.findIndex(m => m.it === it); if (mi >= 0) mistakes.splice(mi, 1);
               hooks.onItem && hooks.onItem(it, true, { ...r, ok: true, override: true });
-              xp += 10; progress();
+              xp += 10; progress(); if (idx < queue.length && queue[idx] === it) persist(idx + 1);
             }
           } catch (e) { b.disabled = false; b.textContent = '⚠️ ' + e.message; }
         };
@@ -583,10 +596,12 @@
     function summary() {
       const vals = [...graded.values()];
       const okN = vals.filter(Boolean).length;
-      return { total: vals.length, ok: okN, score: vals.length ? okN / vals.length : 1, xp, minutes: activeMs / 60000, mistakes, bestStreak, mode: session.mode };
+      // newXp/newMinutes: wat nog niet bij een eerdere pauze is bijgeschreven
+      return { total: vals.length, ok: okN, score: vals.length ? okN / vals.length : 1, xp, minutes: activeMs / 60000, newXp: xp - paidXp, newMinutes: Math.max(0, activeMs - paidMs) / 60000, mistakes, bestStreak, mode: session.mode };
     }
     function finish() {
       touch(); if (tick) clearInterval(tick);
+      persist(null);
       const sum = summary();
       const extra = (hooks.onFinish && hooks.onFinish(sum)) || {};
       if (session.mode === 'exam' && extra.silent) { close(true); extra.next && extra.next(); return; }
@@ -620,7 +635,12 @@
     function dedupe(ms) { const seen = new Set(); return ms.filter(m => { const k = (m.it.word ? m.it.word.id : '') + m.r.expected; if (seen.has(k)) return false; seen.add(k); return true; }); }
     function statBox(v, l) { return h('div', { class: 'stat' }, h('b', null, v), h('span', null, l)); }
     function tryClose() {
-      if (idx >= queue.length || idx === 0) return close();
+      if (idx >= queue.length || (idx === 0 && !graded.size)) return close();
+      if (canPause) {
+        const at = answered ? idx + 1 : idx;
+        S.confirm('Pauze nemen?', `Je bent bij vraag ${Math.min(at + 1, queue.length)} van ${queue.length}. Je antwoorden en score blijven bewaard: op de startpagina ga je later verder waar je was, ook op je andere apparaten.`, 'Pauzeren', () => close());
+        return;
+      }
       S.confirm('Les stoppen?', 'Wat je al geoefend hebt, telt mee voor je herhaling. De stap zelf is nog niet afgerond.', 'Stoppen', () => close());
     }
     function close(silent) {
@@ -628,7 +648,11 @@
       leaveFns.forEach(f => f()); Speech.stop(); Speech.stopListening();
       document.removeEventListener('keydown', onKey);
       root.hidden = true; root.innerHTML = ''; document.body.classList.remove('in-lesson');
-      if (!silent && hooks.onAbort) hooks.onAbort(summary());
+      if (!silent && hooks.onAbort) {
+        hooks.onAbort(summary());
+        paidXp = xp; paidMs = activeMs;
+        persist(answered ? idx + 1 : idx);
+      }
       active = null;
       hooks.onClose && hooks.onClose();
     }

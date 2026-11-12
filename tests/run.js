@@ -268,6 +268,46 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
   S.Store.state = keep;
 }
 
+/* ---------- onderbroken oefening hervatten ---------- */
+{
+  const P = S.Paused, G = S.Gen;
+  const u = units.find(x => x.level === 'A1');
+  // alle soorten sessies moeten te bewaren zijn (geen kringverwijzingen of functies)
+  const sessions = [...G.STEPS.map(st => G.stepSession(u, st.id)), G.reviewSession(20, Object.keys(S.Store.state.srs).slice(0, 20)), G.levelExam('A1'), G.listenTraining(5), G.speakTraining(5)].filter(Boolean);
+  for (const ses of sessions) {
+    const q = ses.items.filter(Boolean).slice();
+    let packed = null;
+    try { packed = P.pack({ queue: q, idx: 1, graded: new Map(), mistakes: [], xp: 0, streak: 0, bestStreak: 0, activeMs: 0 }); } catch (e) { /* faalt hieronder */ }
+    ok(packed && P.unpack(packed).queue.length === q.length, 'hervatten: sessie te bewaren: ' + ses.title);
+  }
+  // rondgang: herhaalkopie, antwoorden, fouten en score blijven gelijk
+  const q = G.stepSession(u, 'vocab1').items.slice();
+  const a = q[2], b = q[3];
+  const copy = Object.assign({}, a, { retry: true, orig: a }); q.push(copy);
+  const graded = new Map([[a, false], [b, true]]);
+  const pk = P.pack({ queue: q, idx: 4, graded, mistakes: [{ it: a, r: { ok: false, expected: 'x' } }], xp: 20, streak: 1, bestStreak: 2, activeMs: 65000, paidXp: 10, paidMs: 30000 });
+  const R = P.unpack(JSON.parse(JSON.stringify(pk)));
+  ok(R.idx === 4 && R.xp === 20 && R.streak === 1 && R.bestStreak === 2 && R.activeMs === 65000 && R.paidXp === 10 && R.paidMs === 30000, 'hervatten: positie en score bewaard');
+  ok(R.queue.length === q.length && R.queue[q.length - 1].orig === R.queue[2], 'hervatten: herhaalkopie wijst naar zijn origineel');
+  ok(R.graded.get(R.queue[2]) === false && R.graded.get(R.queue[3]) === true && R.graded.size === 2, 'hervatten: antwoorden bewaard');
+  ok(R.mistakes.length === 1 && R.mistakes[0].it === R.queue[2], 'hervatten: fouten bewaard');
+  // opslaan, wissen en synchroniseren
+  const keep = JSON.parse(JSON.stringify(S.Store.state));
+  P.set({ desc: { kind: 'step', unit: u.id, step: 'vocab1' }, title: 't', idx: 4, n: q.length, snap: pk });
+  ok(P.get() && P.get().idx === 4, 'hervatten: bewaard in de voortgang');
+  const withPause = JSON.parse(JSON.stringify(S.Store.state));
+  const other = JSON.parse(JSON.stringify(keep)); other.updated = Date.now() + 1e6; other.paused = { t: 0, data: null };
+  ok(S.Store.mergeStates(other, withPause).paused.data, 'sync: onderbroken oefening komt naar het andere apparaat');
+  const t0 = withPause.paused.t; const cleared = JSON.parse(JSON.stringify(withPause)); cleared.paused = { t: t0 + 5, data: null };
+  ok(!S.Store.mergeStates(withPause, cleared).paused.data && !S.Store.mergeStates(cleared, withPause).paused.data, 'sync: afgemaakte oefening komt niet terug');
+  const m2 = S.Store.mergeStates(withPause, other);
+  ok(JSON.stringify(S.Store.mergeStates(m2, m2).paused) === JSON.stringify(m2.paused), 'sync: hervatten idempotent');
+  P.clear(); ok(!P.get(), 'hervatten: wissen');
+  S.Store.state.paused = { t: Date.now() - 31 * 864e5, data: { snap: pk, idx: 1, n: 2 } };
+  ok(!P.get(), 'hervatten: na 30 dagen vervallen');
+  S.Store.state = keep;
+}
+
 /* ---------- versie en offline-cache ---------- */
 {
   const vctx = vm.createContext({}); vctx.self = vctx;
