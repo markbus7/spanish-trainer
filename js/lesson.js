@@ -47,6 +47,36 @@
     });
     return el;
   }
+  /* Hint en "Ik weet het niet" onder een typvraag. Elke hint onthult één letter meer
+     (eerste hint: lidwoord + eerste letter van elk woord); de laatste letter blijft altijd verborgen. */
+  const ART_RE = /^(el|la|los|las|un|una)\s+/i;
+  function hintMask(ans, n) {
+    const m = ans.match(ART_RE); const art = m ? m[0] : '';
+    const words = ans.slice(art.length).trim().split(/\s+/).map(w => [...w]);
+    const isL = c => /[\p{L}\p{N}]/u.test(c);
+    // volgorde: eerst de eerste letter van elk woord, daarna de rest van links naar rechts
+    const firsts = [], rest = [];
+    words.forEach((w, wi) => { let f = true; w.forEach((c, ci) => { if (!isL(c)) return; (f ? firsts : rest).push(wi + ':' + ci); f = false; }); });
+    const open = new Set(n > 0 ? firsts.concat(rest.slice(0, n - 1)) : []);
+    const text = art + words.map((w, wi) => w.map((c, ci) => !isL(c) || open.has(wi + ':' + ci) ? c : '_').join('\u2009')).join('   ');
+    return { text, max: Math.max(1, rest.length) }; // de laatste letter blijft verborgen
+  }
+  function typeHelp(inp, ctx, answer, onDontKnow) {
+    let n = 0;
+    const hintLine = h('div', { class: 'type-hint hidden', lang: 'es', 'aria-live': 'polite' });
+    const hintBtn = h('button', { class: 'btn ghost small', type: 'button', onclick: () => {
+      const a = answer(); const { max } = hintMask(a, 0);
+      if (n >= max) return;
+      n++; const r = hintMask(a, n);
+      hintLine.textContent = '💡 ' + r.text; hintLine.classList.remove('hidden');
+      hintBtn.textContent = n >= max ? '💡 Geen hints meer' : '💡 Nog een letter';
+      hintBtn.disabled = n >= max;
+      inp.focus({ preventScroll: true });
+    } }, '💡 Hint');
+    const dkBtn = h('button', { class: 'btn ghost small', type: 'button', onclick: () => { if (ctx.answered()) return; inp.disabled = true; row.classList.add('hidden'); onDontKnow(); } }, '🤷 Ik weet het niet');
+    const row = h('div', { class: 'type-help' }, ctx.mode === 'exam' ? null : hintBtn, dkBtn);
+    return { el: h('div', null, hintLine, row), hints: () => n, done: () => row.classList.add('hidden') };
+  }
   function textInput(ph) {
     return h('input', { class: 'answer-input', type: 'text', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', spellcheck: 'false', lang: 'es', placeholder: ph || 'Typ je antwoord…', enterkeyhint: 'done' });
   }
@@ -287,9 +317,15 @@
     if (it.nl && it.sentence) wrap.append(h('div', { class: 'nl-hint' }, it.nl));
     const inp = textInput(it.conj ? 'vervoeging…' : undefined);
     inp.addEventListener('input', () => ctx.can(inp.value.trim().length > 0));
-    wrap.append(inp, accentBar(inp));
+    const fillBlank = txt => { if (sent) { const bl = sent.querySelector('.blank'); if (bl) { bl.textContent = txt; bl.classList.add('filled'); } } };
+    const help = typeHelp(inp, ctx, () => it.answers[0], () => {
+      fillBlank(it.answers[0]);
+      ctx.submit({ ok: false, dontKnow: true, user: '', expected: it.answers[0], x: it.x, alts: it.answers });
+    });
+    wrap.append(inp, accentBar(inp), help.el);
     setTimeout(() => inp.focus({ preventScroll: true }), 80);
     ctx.evaluate = () => {
+      help.done();
       const user = inp.value.trim();
       let r = S.check.check(user, it.answers, { noTypo: it.noTypo });
       if (!r.ok && it.articleOptional) {
@@ -299,7 +335,7 @@
       }
       inp.disabled = true;
       if (sent) { const bl = sent.querySelector('.blank'); if (bl) { bl.textContent = r.ok ? user : (r.best || it.answers[0]); bl.classList.add('filled'); } }
-      return { ok: r.ok, user, expected: r.best || it.answers[0], warn: r.warn, x: it.x, alts: it.answers };
+      return { ok: r.ok, user, expected: r.best || it.answers[0], warn: r.warn, x: it.x, alts: it.answers, hinted: help.hints() };
     };
     return wrap;
   };
@@ -309,18 +345,20 @@
     const inp = textInput('Typ wat je hoort…');
     inp.addEventListener('input', () => ctx.can(inp.value.trim().length > 0));
     setTimeout(() => inp.focus({ preventScroll: true }), 80);
+    const help = typeHelp(inp, ctx, () => it.text, () => ctx.submit({ ok: false, dontKnow: true, user: '', expected: it.text, nl: it.nl }));
     ctx.evaluate = () => {
-      const user = inp.value.trim(); inp.disabled = true;
+      help.done();
+      const user = inp.value.trim(); inp.disabled = true; const hinted = help.hints();
       const r = S.check.check(user, [it.text]);
-      if (r.ok) return { ok: true, user, expected: it.text, warn: r.warn, nl: it.nl };
+      if (r.ok) return { ok: true, user, expected: it.text, warn: r.warn, nl: it.nl, hinted };
       const sim = S.check.similarity(user, it.text);
-      if (sim >= 0.88) return { ok: true, user, expected: it.text, warn: 'typo', nl: it.nl };
-      return { ok: false, user, expected: it.text, nl: it.nl };
+      if (sim >= 0.88) return { ok: true, user, expected: it.text, warn: 'typo', nl: it.nl, hinted };
+      return { ok: false, user, expected: it.text, nl: it.nl, hinted };
     };
     return h('div', { class: 'listen' },
       h('div', { class: 'instr' }, T('listen')),
       Speech.canSpeak() ? h('div', { class: 'row gap center' }, speakBtn(it.text, { big: true }), speakBtn(it.text, { slow: true })) : h('p', { class: 'warn' }, 'Je browser heeft geen voorleesfunctie. Lees de zin: ' + it.text),
-      inp, accentBar(inp));
+      inp, accentBar(inp), help.el);
   };
 
   R.speak = (it, ctx) => {
@@ -515,6 +553,7 @@
       mainBtn.disabled = true; mainBtn.textContent = T('check'); mainBtn.hidden = false;
       const ctx = ctxObj = {
         answered: () => answered,
+        mode: session.mode,
         can: v => { mainBtn.disabled = !v; },
         free: (label) => { mainBtn.disabled = false; mainBtn.textContent = label || T('next'); mainBtn.onclick = () => { touch(); idx++; show(); }; },
         auto: () => { mainBtn.hidden = true; },
@@ -534,12 +573,12 @@
       skipBtn.hidden = true;
       const first = !graded.has(it.orig || it);
       if (first) graded.set(it.orig || it, r.ok);
-      if (r.ok) { streak++; bestStreak = Math.max(bestStreak, streak); xp += it.retry ? 5 : 10; } else streak = 0;
+      if (r.ok) { streak++; bestStreak = Math.max(bestStreak, streak); xp += it.retry || r.hinted ? 5 : 10; } else streak = 0;
       if (!r.ok && !r.self && r.expected) mistakes.push({ it, r });
       // item direct verwerken (SRS + statistiek) — alleen eerste poging
       if (first && hooks.onItem) hooks.onItem(it, r.ok, r);
       if (session.mode === 'exam') { idx++; setTimeout(show, 120); return; }
-      const retryLater = !r.ok && !it.retry && (session.mode === 'learn' || session.mode === 'review') && !['match', 'speak'].includes(it.kind);
+      const retryLater = (!r.ok || r.hinted) && !it.retry && (session.mode === 'learn' || session.mode === 'review') && !['match', 'speak'].includes(it.kind);
       (r.ok ? Sound.good : Sound.bad)();
       // opnieuw aanbieden in leer-/herhaalmodus
       if (retryLater) {
@@ -563,7 +602,9 @@
       foot.classList.add(r.ok ? 'ok' : 'bad');
       fb.className = 'ls-fb show';
       if (r.silent && r.ok) { fb.append(h('div', { class: 'fb-title' }, U.pick(PRAISE))); return; }
-      fb.append(h('div', { class: 'fb-title' }, r.ok ? U.pick(PRAISE) : U.pick(OOPS)));
+      fb.append(h('div', { class: 'fb-title' }, r.dontKnow ? 'Geen probleem!' : r.ok ? U.pick(PRAISE) : U.pick(OOPS)));
+      if (r.dontKnow) fb.append(h('div', { class: 'small' }, '🔁 Dit komt later terug in je herhaling.'));
+      if (r.ok && r.hinted) fb.append(h('div', { class: 'small' }, '💡 Goed, met ' + (r.hinted === 1 ? 'een hint' : r.hinted + ' hints') + ' — je krijgt hem straks nog een keer.'));
       if (r.matchMistakes) fb.append(h('div', null, r.matchMistakes + (r.matchMistakes === 1 ? ' fout' : ' fouten') + ' — die woorden komen terug in je herhaling.'));
       if (r.speakScore != null) fb.append(h('div', null, 'Uitspraakscore: ' + r.speakScore + '%'));
       if (r.ok && r.warn === 'accent') fb.append(h('div', null, '✍️ Let op de accenten: ', h('b', { lang: 'es' }, r.expected)));

@@ -221,6 +221,9 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .answer-input:disabled { opacity: .85; }
 .accent-bar { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: .3rem; margin: .6rem 0; max-width: 460px; }
 .accent-bar button { min-width: 0; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); font-weight: 700; font-size: 1.05rem; }
+.type-help { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .2rem; }
+.type-help.hidden, .type-hint.hidden { display: none; }
+.type-hint { margin: .2rem 0 .5rem; padding: .55rem .8rem; border-radius: 12px; background: var(--card); border: 1px dashed var(--line); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.15rem; letter-spacing: .04em; white-space: pre-wrap; word-break: break-word; }
 .conj-card { text-align: center; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 1.1rem; box-shadow: var(--shadow); }
 .conj-card .verb { font-family: var(--serif); font-size: 2rem; font-weight: 600; }
 .conj-card .sub { color: var(--muted); font-size: .9rem; }
