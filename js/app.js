@@ -1161,9 +1161,37 @@
     if (!n) throw new Error('Onbekend versiebestand.');
     return { number: n[1], date: d ? d[1] : '' };
   }
+  // 1.10.0 > 1.9.2: per onderdeel als getal vergelijken
+  function newer(a, b) {
+    const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number);
+    for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); }
+    return false;
+  }
+  /* Bijwerken: nieuwe service worker ophalen en laten overnemen (die ruimt de oude cache op) en herladen met een nieuw adres, zodat Safari/Edge op de iPad niets ouds uit het geheugen haalt. */
   async function updateNow() {
-    try { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) await reg.update(); } catch (e) { /* geen service worker: gewoon herladen */ }
-    location.reload();
+    try {
+      const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+      if (reg) {
+        await reg.update();
+        const sw = reg.installing || reg.waiting;
+        if (sw) await new Promise(res => { const t = setTimeout(res, 4000); navigator.serviceWorker.addEventListener('controllerchange', () => { clearTimeout(t); res(); }, { once: true }); });
+      }
+    } catch (e) { /* geen service worker of cache: gewoon herladen */ }
+    location.replace(location.pathname + '?u=' + Date.now() + location.hash);
+  }
+  /* Automatisch kijken of er een nieuwe versie is: bij het openen, als je terugkomt in de app en elk half uur. */
+  let lastCheck = 0, shownFor = '';
+  async function autoCheck() {
+    if (Date.now() - lastCheck < 60000 || navigator.onLine === false) return;
+    lastCheck = Date.now();
+    try { const L = await latestVersion(); if (newer(L.number, V.number) && shownFor !== L.number) { shownFor = L.number; showUpdateBar(L); } } catch (e) { /* offline of geen verbinding: later opnieuw */ }
+  }
+  function showUpdateBar(L) {
+    const old = document.getElementById('update-bar'); if (old) old.remove();
+    const btn = h('button', { class: 'btn primary', type: 'button', onclick: () => { btn.disabled = true; btn.textContent = 'Bijwerken…'; updateNow(); } }, 'Nu bijwerken');
+    document.body.append(h('div', { id: 'update-bar', class: 'update-bar', role: 'status' },
+      h('span', null, '🆕 Versie ' + L.number + ' staat klaar'), btn,
+      h('button', { class: 'update-x', type: 'button', 'aria-label': 'Later', onclick: () => document.getElementById('update-bar').remove() }, '✕')));
   }
   function versionCard() {
     const out = h('p', { class: 'small', role: 'status' });
@@ -1171,7 +1199,7 @@
       btn.disabled = true; out.className = 'small'; out.textContent = 'Controleren…';
       try {
         const L = await latestVersion();
-        if (L.number === V.number) out.textContent = '✅ Je hebt de nieuwste versie.';
+        if (!newer(L.number, V.number)) out.textContent = '✅ Je hebt de nieuwste versie.';
         else {
           out.textContent = '';
           out.append('🆕 Versie ' + L.number + (L.date ? ' (' + versionDate(L.date) + ')' : '') + ' staat klaar. ',
@@ -1258,7 +1286,12 @@
     window.addEventListener('hashchange', render);
     render();
     if (S.Sync) S.Sync.init();
-    if ('serviceWorker' in navigator && /^https:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js?v=' + encodeURIComponent(V.number)).catch(() => {});
+    if ('serviceWorker' in navigator && /^https:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js?v=' + encodeURIComponent(V.number), { updateViaCache: 'none' }).catch(() => {});
+    if (location.search.includes('u=')) history.replaceState(null, '', location.pathname + location.hash); // adres na bijwerken weer netjes
+    setTimeout(autoCheck, 2500);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') autoCheck(); });
+    window.addEventListener('pageshow', e => { if (e.persisted) autoCheck(); });
+    setInterval(autoCheck, 30 * 60000);
   }
   S.P = P;
   document.addEventListener('DOMContentLoaded', boot);

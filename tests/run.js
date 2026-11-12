@@ -334,7 +334,13 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
   const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8'), html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   ok(sw.includes("importScripts('js/version.js')"), 'sw.js haalt versie uit js/version.js');
   const assets = (/const ASSETS = \[([^\]]*)\]/.exec(sw) || [, ''])[1];
-  for (const src of [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1])) ok(assets.includes("'" + src + "'"), 'sw.js cachet ' + src);
+  for (const src of [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1])) {
+    const [file, q] = src.split('?');
+    ok(assets.includes("'" + file + "'"), 'sw.js cachet ' + file);
+    ok(q === 'v=' + V.number, 'index.html laadt ' + file + ' met ?v=' + V.number + ' (gebruik node tools/versie.js)');
+  }
+  ok(html.includes('href="css/app.css?v=' + V.number + '"'), 'index.html laadt css/app.css met ?v=' + V.number);
+  ok(/updateViaCache:\s*'none'/.test(fs.readFileSync(path.join(root, 'js/app.js'), 'utf8')), 'service worker wordt zonder HTTP-cache bijgewerkt');
 }
 
 /* ---------- synoniemen en woordvormen bij typvragen ---------- */

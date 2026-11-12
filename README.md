@@ -90,7 +90,7 @@ Een nieuw niveau voeg je toe door een bestand `content/b1.js` aan te maken in he
 
 Wil je een bestaande unit aanvullen, gebruik dan `S.extendUnit(id, { vocab, ex, reading })` (zie `content/a1-plus.js`). Woorden en oefeningen komen dan altijd achteraan. Voeg ze nooit in het midden toe: de herhaling onthoudt ze op volgnummer.
 
-**Versienummer.** Verhoog bij elke wijziging die live gaat het nummer en de datum in `js/version.js`, en het nummer in `package.json` (de test controleert dat ze gelijk zijn). Het nummer staat in ⚙️ Instellingen › Over de app, met een knop *Controleren op updates*. De service worker gebruikt het als cachenaam, dus een nieuw nummer ruimt de oude offline-cache op.
+**Versienummer.** Verhoog bij elke wijziging die live gaat de versie met `node tools/versie.js 1.2.3`. Dat zet het nummer en de datum in `js/version.js`, het nummer in `package.json` en `?v=1.2.3` achter elk script en de stylesheet in `index.html` (de test controleert dat alles gelijk is). Door die `?v=` haalt de browser nooit een oud bestand uit zijn cache. Het nummer staat in ⚙️ Instellingen › Over de app, met een knop *Controleren op updates*. De app kijkt ook zelf (bij openen, bij terugkomen in de app en elk half uur) of er een nieuwere versie live staat en toont dan onderin «Nu bijwerken». De service worker gebruikt het nummer als cachenaam, dus een nieuw nummer ruimt de oude offline-cache op.
 
 ```bash
 npm test             # controleert alle lesstof, vervoegingen en de antwoordcontrole
