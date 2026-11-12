@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'js/gen.js', 'js/games.js', 'js/words.js']) {
+for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/tutor.js', 'js/ai.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -399,6 +399,20 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   const B = { updated: 1, partial: { 'x|a|1': { t: 7 }, 'x|a|2': { a: 'Buen día', k: [0], t: 3 } } };
   const M = S.Store.mergeStates(A, B);
   ok(!M.partial['x|a|1'].a && !M.partial['x|a|2'].a, 'partial samenvoegen');
+}
+
+/* ---------- docente Lupe: wat ze hardop zegt ---------- */
+{
+  const sp = S.Tutor.spoken;
+  ok(sp('¡Hola! ¿Qué vas a pedir? 🌮\n---\n✅ ¡Perfecto!', 'roleplay') === '¡Hola! ¿Qué vas a pedir?', 'rollenspel: alleen het antwoord, zonder emoji en feedback: ' + sp('¡Hola! ¿Qué vas a pedir? 🌮\n---\n✅ ¡Perfecto!', 'roleplay'));
+  ok(sp('Je gebruikt **por** voor oorzaak. Voorbeeld: **Lo hice por ti.** (Ik deed het voor jou.)', 'ask') === 'Lo hice por ti.', 'vraag: alleen vetgedrukt Spaans: ' + sp('Je gebruikt **por** voor oorzaak. Voorbeeld: **Lo hice por ti.**', 'ask'));
+  ok(sp('**Verbeterde versie:** **Ayer fui al mercado.**', 'write') === 'Ayer fui al mercado.', 'labels met dubbele punt niet voorlezen');
+  ok(sp('Alleen Nederlandse uitleg zonder voorbeelden.', 'ask') === '', 'geen Spaans → niets voorlezen');
+  const long = 'Hola. '.repeat(60);
+  ok(S.Speech.chunks(long).length > 1 && S.Speech.chunks(long).every(c => c.length <= 190), 'lange tekst in stukken voor de stem');
+  ok(S.Speech.chunks('¿Cómo estás?').length === 1, 'korte tekst blijft één stuk');
+  const sys = S.AI.askSystem();
+  ok(/Lupe/.test(sys) && /\*\*bold\*\*/.test(sys), 'docente-prompt noemt Lupe en de vetregel');
 }
 
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);

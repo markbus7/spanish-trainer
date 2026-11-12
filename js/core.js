@@ -40,7 +40,7 @@
       v: 1, created: Date.now(), updated: 0, epoch: 0, name: '',
       settings: {
         goal: 20, explain: 'auto', strictAccents: false, voice: '', rate: 0.9, sound: true, theme: 'auto',
-        aiKey: '', aiModel: 'claude-sonnet-5-5', aiModelV: 2, autoSpeak: true, tutorVoice: false, unlockAll: false, region: 'latam'
+        aiKey: '', aiModel: 'claude-sonnet-5-5', aiModelV: 2, autoSpeak: true, tutorVoice: true, tutorVoiceV: 2, unlockAll: false, region: 'latam'
       },
       placement: { done: false, level: null, start: null, date: null },
       units: {}, levels: {}, srs: {}, tags: {},
@@ -58,6 +58,13 @@
     }
     return base;
   }
+  function migrateSettings(ss) {
+    if (!ss) return;
+    // v1.5: Sonnet is de nieuwe standaard. Wie nog op de oude standaard (Opus) stond, gaat één keer mee over.
+    if (!(ss.aiModelV >= 2) && ss.aiModel === 'claude-opus-5-5') ss.aiModel = 'claude-sonnet-5-5';
+    // v1.8: de docente (Lupe) praat standaard hardop. Eén keer voor iedereen aanzetten; daarna telt je eigen keuze.
+    if (!(ss.tutorVoiceV >= 2)) { ss.tutorVoice = true; ss.tutorVoiceV = 2; }
+  }
   const Store = {
     state: defaults(),
     ok: true,
@@ -66,8 +73,7 @@
         const raw = localStorage.getItem(KEY);
         if (raw) {
           const saved = JSON.parse(raw), ss = saved.settings || {};
-          // v1.5: Sonnet is de nieuwe standaard. Wie nog op de oude standaard (Opus) stond, gaat één keer mee over.
-          if (!(ss.aiModelV >= 2) && ss.aiModel === 'claude-opus-5-5') ss.aiModel = 'claude-sonnet-5-5';
+          migrateSettings(ss);
           this.state = merge(defaults(), saved);
         }
       } catch (e) { this.ok = false; }
@@ -122,7 +128,9 @@
 
   function mergeStates(local, remote) {
     const clone = x => JSON.parse(JSON.stringify(x));
-    const A = merge(defaults(), clone(local || {})), B = merge(defaults(), clone(remote || {}));
+    const a0 = clone(local || {}), b0 = clone(remote || {});
+    migrateSettings(a0.settings); migrateSettings(b0.settings);
+    const A = merge(defaults(), a0), B = merge(defaults(), b0);
     const aiKey = A.settings.aiKey;
     // na wissen of back-up terugzetten wint de nieuwste "epoch" in zijn geheel
     if ((A.epoch || 0) !== (B.epoch || 0)) {
@@ -443,23 +451,50 @@
       if (want) { const v = this.voices.find(x => x.voiceURI === want || x.name === want); if (v) return v; }
       return this.voices.slice().sort((a, b) => this.rank(b) - this.rank(a))[0] || null;
     },
+    /* Wie wil weten of er gesproken wordt (bijv. de docente die haar mond beweegt): Speech.onTalk = (aan, tekst) => … */
+    onTalk: null, _talkId: 0,
+    _talk(on, text) { try { this.onTalk && this.onTalk(on, text); } catch (e) { /* */ } },
     say(text, opt = {}) {
       if (!text) return Promise.resolve();
-      if (this.hasClip(text)) { this.stop(); return this.playClip(text, opt).catch(() => this.speak(text, opt)); }
-      return this.speak(text, opt);
+      const id = ++this._talkId;
+      this._talk(true, text);
+      const p = this.hasClip(text) ? (this.stop(), this.playClip(text, opt).catch(() => this.speak(text, opt))) : this.speak(text, opt);
+      return p.then(() => { if (this._talkId === id) this._talk(false); });
+    },
+    /* Lange teksten in zinnen opdelen: sommige browsers stoppen anders na ±15 seconden. */
+    chunks(text) {
+      const t = String(text).replace(/\s*\/\s*/g, ', ').replace(/\s+/g, ' ').trim();
+      if (t.length <= 180) return t ? [t] : [];
+      const out = []; let cur = '';
+      (t.match(/[^.!?…]+[.!?…]+[»"”)]*\s*|[^.!?…]+$/g) || [t]).forEach(s => {
+        if (cur && (cur + s).length > 180) { out.push(cur.trim()); cur = ''; }
+        cur += s;
+      });
+      if (cur.trim()) out.push(cur.trim());
+      return out;
+    },
+    /* iOS spreekt alleen als de eerste uitspraak uit een tik komt. Roep dit aan in een klik-handler. */
+    unlock() {
+      if (this._unlocked || !('speechSynthesis' in window)) return;
+      try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); this._unlocked = true; } catch (e) { /* */ }
     },
     speak(text, opt = {}) {
       if (!('speechSynthesis' in window)) return Promise.resolve();
       return new Promise(res => {
         try {
           speechSynthesis.cancel();
-          const u = new SpeechSynthesisUtterance(String(text).replace(/\s*\/\s*/g, ', '));
+          const parts = this.chunks(text);
+          if (!parts.length) return res();
           const v = this.voice();
-          if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'es-MX';
-          u.rate = (opt.slow ? 0.65 : 1) * (Store.state.settings.rate || 0.9);
-          u.onend = u.onerror = () => res();
-          speechSynthesis.speak(u);
-          setTimeout(res, 15000);
+          parts.forEach((p, i) => {
+            const u = new SpeechSynthesisUtterance(p);
+            if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'es-MX';
+            u.rate = (opt.slow ? 0.65 : 1) * (Store.state.settings.rate || 0.9);
+            if (i === parts.length - 1) u.onend = () => res();
+            u.onerror = () => res();
+            speechSynthesis.speak(u);
+          });
+          setTimeout(res, Math.max(15000, String(text).length * 110));
         } catch (e) { res(); }
       });
     },

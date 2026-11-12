@@ -605,3 +605,36 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .words-add-box { margin-top: .6rem; }
 .words-add-box summary { cursor: pointer; list-style-position: inside; }
 .words-add-box .words-add { margin-top: .6rem; }
+
+/* ---------- Lupe, de docente ---------- */
+.lupe { flex: none; line-height: 0; }
+.lupe svg { display: block; overflow: visible; }
+.lupe .m-open { opacity: 0; }
+.lupe .lupe-eyes { transform-box: fill-box; transform-origin: center; animation: lupe-blink 5.5s infinite; }
+.lupe .gill { transform-box: view-box; }
+.lupe.talking .m-open { animation: lupe-talk .26s infinite alternate ease-in-out; }
+.lupe.talking .m-closed { animation: lupe-talk .26s infinite alternate-reverse ease-in-out; }
+.lupe.talking .gills-l, .lupe.talking .gills-r { animation: lupe-wiggle .5s infinite alternate ease-in-out; transform-box: fill-box; }
+.lupe.talking .gills-l { transform-origin: right center; } .lupe.talking .gills-r { transform-origin: left center; animation-delay: -.25s; }
+.lupe.big { animation: lupe-bob 3.2s infinite ease-in-out; cursor: pointer; }
+.lupe.talking.big { animation-duration: .9s; }
+@keyframes lupe-talk { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lupe-blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
+@keyframes lupe-wiggle { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+@keyframes lupe-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { .lupe, .lupe * { animation-duration: 0s !important; } .lupe.talking .m-open { opacity: 1; animation: none; } .lupe.talking .m-closed { opacity: 0; animation: none; } }
+
+.tutor-head { display: flex; align-items: center; gap: .9rem; background: linear-gradient(135deg, #fde3ec, var(--teal-soft)); border-radius: var(--r); padding: .8rem 1rem; margin-bottom: .9rem; }
+.tutor-head h1 { margin: 0; font-size: 1.5rem; }
+.tutor-head p { margin: .1rem 0 .45rem; }
+.tutor-head .voice-tg { font-size: .85rem; }
+.tutor-head .t-stop { display: none; align-self: flex-start; }
+.tutor-head:has(.lupe.talking) .t-stop { display: inline-flex; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tutor-head { background: linear-gradient(135deg, #3a1f2b, var(--teal-soft)); } }
+:root[data-theme="dark"] .tutor-head { background: linear-gradient(135deg, #3a1f2b, var(--teal-soft)); }
+.tutor-intro .row { align-items: center; margin-bottom: .4rem; } .tutor-intro h3 { margin: 0; }
+.msg.assistant { align-items: flex-end; gap: .45rem; }
+.msg.assistant .lupe.mini { margin-bottom: 2px; }
+.msg.assistant .bubble-body { max-width: calc(86% - 40px); }
+.bubble-body .replay { display: inline-block; margin-top: .35rem; padding: 0; }
+.bubble-body b.say-es { cursor: pointer; text-decoration: underline dotted color-mix(in srgb, var(--accent) 60%, transparent); text-underline-offset: 3px; }
