@@ -236,6 +236,10 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
 .match .col { display: flex; flex-direction: column; gap: .5rem; }
 .mt { padding: .8rem .6rem; border-radius: 12px; border: 2px solid var(--line); background: var(--card); font-weight: 600; min-height: 52px; box-shadow: 0 2px 0 var(--line); }
+.mt { display: flex; align-items: center; gap: .55rem; text-align: left; padding-left: .7rem; }
+.mt .k { flex: none; width: 24px; height: 24px; border-radius: 7px; border: 1.5px solid var(--line); font-size: .78rem; display: flex; align-items: center; justify-content: center; color: var(--muted); }
+.mt .mt-t { flex: 1; text-align: center; padding-right: 24px; }
+.mt.sel .k { border-color: var(--teal); color: var(--teal); }
 .mt.sel { border-color: var(--teal); background: var(--teal-soft); } .mt.done { opacity: .35; border-color: var(--ok); }
 .shake { animation: shake .35s; } @keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 .mic { width: 88px; height: 88px; border-radius: 50%; border: none; background: var(--accent); color: #fff; font-size: 2.2rem; margin: 1rem auto .4rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 45%, transparent); }
