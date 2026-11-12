@@ -452,7 +452,7 @@
     const bar = h('i'); const count = h('span', { class: 'ls-count' });
     const closeBtn = h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Stoppen', onclick: () => tryClose() }, '✕');
     const timerEl = timerEnd ? h('span', { class: 'ls-timer' }) : null;
-    const body = h('div', { class: 'ls-body' });
+    let body = h('div', { class: 'ls-body' });
     const fb = h('div', { class: 'ls-fb' });
     const mainBtn = h('button', { class: 'btn primary wide', type: 'button' });
     const skipBtn = h('button', { class: 'btn link', type: 'button' });
@@ -462,6 +462,10 @@
     let tick = null;
     if (timerEnd) tick = setInterval(() => { const s = Math.max(0, Math.round((timerEnd - Date.now()) / 1000)); timerEl.textContent = '⏱ ' + s + 's'; if (s <= 0) { clearInterval(tick); finish(); } }, 250);
 
+    /* Elke oefening krijgt een nieuw scrollvak. iPadOS/WebKit (Safari, Edge) tekende het hergebruikte
+       vak soms niet opnieuw na het wisselen van de inhoud: dan bleef een strookje van de vorige oefening
+       staan en waren de antwoordknoppen grotendeels onzichtbaar. */
+    function freshBody() { const nb = h('div', { class: 'ls-body' }); body.replaceWith(nb); body = nb; }
     function isGraded(it) { return !['card', 'info', 'dialogue', 'write'].includes(it.kind); }
     function touch() { const n = Date.now(); activeMs += Math.min(n - last, 60000); last = n; }
     function progress() {
@@ -498,9 +502,9 @@
         evaluate: null, keys: null
       };
       mainBtn.onclick = () => { if (ctx.evaluate) feedback(it, ctx.evaluate()); };
-      body.innerHTML = '';
+      freshBody();
       const el = (R[it.kind] || R.info)(it, ctx);
-      body.append(el); body.scrollTop = 0;
+      body.append(el);
     }
 
     function feedback(it, r) {
@@ -586,7 +590,7 @@
       const sum = summary();
       const extra = (hooks.onFinish && hooks.onFinish(sum)) || {};
       if (session.mode === 'exam' && extra.silent) { close(true); extra.next && extra.next(); return; }
-      body.innerHTML = ''; fb.innerHTML = ''; fb.className = 'ls-fb'; foot.classList.remove('ok', 'bad'); skipBtn.hidden = true;
+      freshBody(); fb.innerHTML = ''; fb.className = 'ls-fb'; foot.classList.remove('ok', 'bad'); skipBtn.hidden = true;
       bar.style.width = '100%';
       const pct = Math.round(sum.score * 100);
       const passed = extra.passed;
