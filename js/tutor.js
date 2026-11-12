@@ -46,7 +46,8 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     el.innerHTML = svg(size);
     return el;
   }
-  const VOICE = { pitch: 1.3, rate: 1.06, female: true };
+  /* Lupe klinkt standaard als een meisje: een vrouwenstem met een veel hogere toon. In Instellingen kan het ook als een volwassen vrouw. */
+  const VOICES = { girl: { pitch: 1.65, rate: 1.08, female: true }, woman: { pitch: 1.15, rate: 1.03, female: true } };
   let speaking = null; // tekst die Lupe nu uitspreekt
   function setTalking(on) {
     document.querySelectorAll('.lupe').forEach(el => el.classList.toggle('talking', !!on));
@@ -55,8 +56,8 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   function say(text) {
     if (!text) return Promise.resolve();
     speaking = text;
-    // Lupe is een vrolijke kleine axolotl: een vrouwenstem, iets hoger en iets vlotter dan de gewone voorleesstem.
-    return S.Speech.say(text, VOICE);
+    // Lupe is een vrolijke kleine axolotl: een meisjesstem, hoger en iets vlotter dan de gewone voorleesstem.
+    return S.Speech.say(text, VOICES[S.Store.state.settings.lupeVoice] || VOICES.girl);
   }
   function hookSpeech() {
     const prev = S.Speech.onTalk;
