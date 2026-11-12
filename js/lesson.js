@@ -389,8 +389,13 @@
     const left = U.shuffle(it.pairs.map((p, i) => ({ t: p[0], i }))), right = U.shuffle(it.pairs.map((p, i) => ({ t: p[1], i })));
     let sel = null, done = 0, mistakes = 0;
     const L = h('div', { class: 'col' }), Rr = h('div', { class: 'col' });
-    function mk(o, side) {
-      const b = h('button', { class: 'mt', type: 'button', lang: side === 'l' ? 'es' : 'nl', 'data-i': o.i }, o.t);
+    const LET = 'abcdefghij';
+    const btnsL = [], btnsR = [];
+    function mk(o, side, n) {
+      const key = side === 'l' ? String(n + 1) : LET[n];
+      // Label (1–5 links, a–e rechts): tik of typ bijv. "1" en dan "a" om te koppelen.
+      const b = h('button', { class: 'mt', type: 'button', 'data-i': o.i, 'data-k': key }, h('span', { class: 'k', 'aria-hidden': 'true' }, key), h('span', { class: 'mt-t', lang: side === 'l' ? 'es' : 'nl' }, o.t));
+      (side === 'l' ? btnsL : btnsR).push(b);
       b.onclick = () => {
         if (b.disabled) return;
         if (side === 'l') Speech.say(o.t);
@@ -406,7 +411,13 @@
       };
       return b;
     }
-    left.forEach(o => L.append(mk(o, 'l'))); right.forEach(o => Rr.append(mk(o, 'r')));
+    left.forEach((o, n) => L.append(mk(o, 'l', n))); right.forEach((o, n) => Rr.append(mk(o, 'r', n)));
+    ctx.keys = k => {
+      const key = String(k).toLowerCase();
+      const n = +key, li = LET.indexOf(key);
+      const b = n >= 1 && n <= btnsL.length ? btnsL[n - 1] : (key.length === 1 && li >= 0 && li < btnsR.length ? btnsR[li] : null);
+      if (b && !b.disabled) b.click();
+    };
     ctx.auto();
     return h('div', { class: 'match' }, h('div', { class: 'instr' }, T('match')), h('div', { class: 'match-grid' }, L, Rr));
   };
