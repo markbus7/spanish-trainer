@@ -1047,7 +1047,7 @@
     fillVoices(); setTimeout(fillVoices, 700);
     const rate = h('input', { type: 'range', min: 0.6, max: 1.2, step: 0.05, value: s.rate, oninput: e => set('rate', +e.target.value) });
     // Test: speelt een opname én de apparaatstem, en zegt wat er klonk. Zo zie je meteen of je iPad de natuurlijke stem gebruikt.
-    const testOut = h('p', { class: 'small' });
+    const voiceOut = h('p', { class: 'small' });
     const voiceTip = h('div', { class: 'small muted voice-tip' });
     const drawTip = () => {
       const v = Speech.voice(), q = v ? Speech.quality(v) : -1;
@@ -1059,7 +1059,7 @@
     };
     drawTip(); setTimeout(drawTip, 700);
     const runTest = async () => {
-      testOut.textContent = '…';
+      voiceOut.textContent = '…';
       const clipText = '¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.';
       let msg = [];
       if (Speech.hasClip(clipText)) {
@@ -1069,14 +1069,14 @@
       const v = Speech.voice();
       await Speech.speak('Y esto es la voz de tu dispositivo.');
       msg.push(v ? 'Apparaatstem (voor de AI-docent en eigen woorden): ' + v.name + (Speech.quality(v) >= 2 ? ' ✅ ' + Speech.qualityLabel(v) : ' — eenvoudig; zie de tip hieronder voor een natuurlijkere stem.') : 'Geen apparaatstem.');
-      testOut.textContent = msg.join(' ');
+      voiceOut.textContent = msg.join(' ');
     };
     wrap.append(section('Stem & uitspraak', h('div', { class: 'card form' },
       Speech.clips ? toggle('Ingesproken opnames gebruiken', '🎧 ' + Speech.clips.size.toLocaleString('nl-NL') + ' woorden en zinnen zijn ingesproken met natuurlijke Latijns-Amerikaanse stemmen. Wat niet is ingesproken, leest je apparaat zelf voor.', s.clips !== false, v => set('clips', v)) : null,
       Speech.canSpeak() ? label(Speech.clips ? 'Stem van het apparaat (voor de rest)' : 'Voorleesstem', voiceSel) : h('p', { class: 'warn' }, 'Je browser ondersteunt geen voorlezen.'),
       label('Spreeksnelheid apparaatstem', rate),
       toggle('Dialogen eerst alleen beluisteren', 'De tekst is wazig tot je hem zelf zichtbaar maakt. Goed voor je luistervaardigheid.', s.listenFirst !== false, v => set('listenFirst', v)),
-      h('button', { class: 'btn ghost', type: 'button', onclick: runTest }, '🔊 Test de stemmen'), testOut,
+      h('button', { class: 'btn ghost', type: 'button', onclick: runTest }, '🔊 Test de stemmen'), voiceOut,
       voiceTip,
       h('p', { class: 'small muted' }, Speech.canListen() ? '🎙️ Spraakherkenning is beschikbaar.' : '🎙️ Spraakherkenning werkt niet in deze browser. Gebruik Chrome of Safari voor spreekoefeningen.'))));
     if ('caches' in window && 'serviceWorker' in navigator) wrap.append(section('📥 Offline luisteren', offlineCard()));
