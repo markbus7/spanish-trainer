@@ -641,7 +641,7 @@
     const queue = R0 ? R0.queue : session.items.filter(Boolean).slice();
     const graded = R0 ? R0.graded : new Map(); // item -> first result
     const total = queue.filter(it => !it.orig && isGraded(it)).length;
-    let idx = 0, activeMs = 0, last = Date.now(), xp = 0, streak = 0, bestStreak = 0, answered = false, leaveFns = [];
+    let idx = 0, activeMs = 0, last = Date.now(), xp = 0, streak = 0, bestStreak = 0, misses = 0, answered = false, leaveFns = [];
     let paidXp = 0, paidMs = 0; // al bijgeschreven bij een eerdere pauze
     const mistakes = R0 ? R0.mistakes : [];
     if (R0) ({ idx, activeMs, xp, streak, bestStreak, paidXp, paidMs } = R0);
@@ -751,6 +751,8 @@
       const first = !graded.has(it.orig || it);
       if (first) graded.set(it.orig || it, r.ok);
       if (r.ok) { streak++; bestStreak = Math.max(bestStreak, streak); xp += it.retry || r.hinted ? 5 : 10; } else streak = 0;
+      // twee keer achter elkaar fout? Dan eerst een makkelijkere vraag, zodat je niet in een reeks pittige vastloopt
+      if (r.ok) misses = 0; else if (++misses >= 2 && session.mode !== 'exam' && !session.timer && S.Gen.easeNext(queue, idx + 1)) misses = 0;
       if (!r.ok && !r.self && r.expected) mistakes.push({ it, r });
       // item direct verwerken (SRS + statistiek) — alleen eerste poging
       if (first && hooks.onItem) hooks.onItem(it, r.ok, r);
@@ -763,7 +765,9 @@
         // zin half goed: straks alleen de foute woorden opnieuw invullen
         if (S.check.partsUsable(r.parts)) { copy.keep = { a: r.parts.a, k: r.parts.k }; r.keepLater = true; }
         if (copy.options) copy.options = U.shuffle(copy.options);
-        queue.push(copy);
+        // niet alle herkansingen als één blok aan het eind: een paar vragen later terug, tussen de rest door
+        const at = idx + 5;
+        if (at < queue.length && session.mode === 'review') queue.splice(at, 0, copy); else queue.push(copy);
       }
       touch(); persist(idx + 1); // dit antwoord is verwerkt: na verversen ga je verder met de volgende vraag
       renderFeedback(it, r);

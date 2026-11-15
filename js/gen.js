@@ -164,9 +164,9 @@
     const info = items.filter(i => i.kind === 'info'); const rest = items.filter(i => i.kind !== 'info');
     // uitleg eerst, oefeningen in de content-volgorde (van makkelijk naar moeilijk), vervoegingen erdoor
     const conj = rest.filter(i => i.conj); const ex = rest.filter(i => !i.conj);
-    const out = [...info];
-    ex.forEach((e, i) => { out.push(e); if (i % 3 === 2 && conj.length) out.push(conj.shift()); });
-    return out.concat(conj);
+    const ord = [];
+    ex.forEach((e, i) => { ord.push(e); if (i % 3 === 2 && conj.length) ord.push(conj.shift()); });
+    return info.concat(mix(ord.concat(conj), { keepOrder: true }));
   }
   function dialogueSession(u) {
     const d = u.dialogue;
@@ -207,7 +207,7 @@
     const sl = U.shuffle(shortLines(u));
     if (sl[0]) items.push(listenItem(sl[0].l[1], sl[0].l[2]));
     if (u.reading) { const q = U.pick(u.reading.q); items.push({ ...normEx(q, null, null, { noSrs: true }), q: '«' + u.reading.t + '» — ' + q.q, skill: 'read', tag: 'vocab' }); }
-    return { title: u.title + ' · Unittoets', items: U.shuffle(items.filter(Boolean)), mode: 'test', pass: 0.8 };
+    return { title: u.title + ' · Unittoets', items: mix(U.shuffle(items.filter(Boolean))), mode: 'test', pass: 0.8 };
   }
   function stepSession(u, step) {
     switch (step) {
@@ -233,7 +233,67 @@
     U.sample(conj, 5).forEach(([v, t]) => { const it = conjItem(v, t); if (it) items.push(it); });
     const u2 = U.sample(us, 2);
     u2.forEach(u => { const sl = shortLines(u); if (sl.length) { const l = U.pick(sl).l; items.push(listenItem(l[1], l[2])); } });
-    return { title: 'Niveau-examen ' + lvl, items: U.shuffle(items).slice(0, 36), mode: 'test', pass: 0.8 };
+    return { title: 'Niveau-examen ' + lvl, items: mix(U.shuffle(items).slice(0, 36)), mode: 'test', pass: 0.8 };
+  }
+
+
+  /* ---------- moeilijk en makkelijk afwisselen ----------
+     Elke vraag krijgt een inschatting: de soort vraag (meerkeuze < luisteren/zin bouwen < typen/vertalen)
+     plus hoe het met dat item gaat in de herhaling (vaak fout = zwaarder, al lang bekend = lichter).
+     mix() zet de vragen zo dat je begint en eindigt met iets haalbaars en dat de pittige vragen
+     gelijkmatig tussen de makkelijkere vallen (meestal hooguit 1 of 2 op rij). Welke items erin zitten verandert
+     niet, alleen de volgorde, dus de herhaling (SRS) werkt precies hetzelfde. */
+  const HARD = 2.5;
+  const BASE = { mc: 1, match: 1.5, order: 2, speak: 2, listen: 2.5, type: 2.5 };
+  function difficulty(it) {
+    if (!it || BASE[it.kind] == null) return 0; // uitleg, kaart, dialoog: geen vraag
+    let d = BASE[it.kind];
+    if (it.kind === 'mc' && (it.audio || it.fill)) d += 0.5;
+    if (it.translate) d += 0.5;
+    if (it.retry) d += 0.5;
+    const c = it.srsId && S.Store.state.srs && S.Store.state.srs[it.srsId];
+    if (c) {
+      if ((c.l || 0) >= 2 || (c.f || 0) > (c.g || 0) + 1) d += 1; // gaat vaak fout
+      else if (c.r === 0 && c.l) d += 0.5; // net weer fout gegaan
+      if (c.i >= 7) d -= 0.5; // ken je al goed
+      if (c.i >= 21) d -= 0.5;
+    }
+    return d;
+  }
+  function isHard(it) { return difficulty(it) >= HARD; }
+  // keepOrder: de volgorde binnen makkelijk en moeilijk blijft (voor lesstof die van makkelijk naar moeilijk opbouwt)
+  function mix(items, opts = {}) {
+    const q = items.filter(Boolean);
+    const easy = [], hard = [];
+    q.forEach(it => (isHard(it) ? hard : easy).push(it));
+    if (!hard.length || !easy.length) return q;
+    let first, last;
+    if (opts.keepOrder) { first = easy.shift(); last = easy.length ? easy.pop() : null; }
+    else {
+      const takeEasiest = () => { let b = 0; easy.forEach((it, i) => { if (difficulty(it) < difficulty(easy[b])) b = i; }); return easy.splice(b, 1)[0]; };
+      first = takeEasiest(); last = easy.length ? takeEasiest() : null;
+    }
+    // moeilijke vragen gelijkmatig over de gaten tussen de makkelijke verdelen: zo min mogelijk op rij
+    const out = [first], nH = hard.length, slots = easy.length + 1;
+    for (let k = 0; k < slots; k++) {
+      const n = Math.floor((k + 1) * nH / slots) - Math.floor(k * nH / slots);
+      out.push(...hard.splice(0, n));
+      if (k < easy.length) out.push(easy[k]);
+    }
+    if (last) out.push(last);
+    return out;
+  }
+  // na een paar fouten op rij: de eerstvolgende makkelijkere vraag naar voren halen (binnen hetzelfde blok
+  // vragen, nooit voor een uitleg of woordkaart langs). Geeft true als er iets is verschoven.
+  function easeNext(queue, at) {
+    const next = queue[at];
+    if (!next || !isHard(next)) return false;
+    for (let j = at + 1; j < queue.length; j++) {
+      const it = queue[j];
+      if (BASE[it.kind] == null) return false; // uitleg/kaart/dialoog: blok houdt op
+      if (!isHard(it)) { queue.splice(j, 1); queue.splice(at, 0, it); return true; }
+    }
+    return false;
   }
 
   /* ---------- herhaling (SRS) ---------- */
@@ -261,8 +321,22 @@
     // zinnen die de vorige keer half goed waren: de goede woorden alvast invullen
     const P = S.Store.state.partial || {};
     items.forEach(it => { const p = it.translate && P[it.srsId]; if (p && p.a && S.check.check(p.a, it.answers, { strict: true }).exact) it.keep = { a: p.a, k: p.k }; });
-    // afwisselen: geen twee vervoegingen achter elkaar als het kan
-    return { title: 'Herhaling', items: spread(items), mode: 'review' };
+    // bijna alles pittig? Dan een paar woorden die je al goed kent als opsteker ertussen (meerkeuze).
+    // Die zijn niet verlopen: goed doet niets met hun schema, fout zet ze gewoon terug in de herhaling.
+    if (!ids) items.push(...breathers(items));
+    // afwisselen: geen twee vervoegingen achter elkaar als het kan, en moeilijk en makkelijk door elkaar
+    return { title: 'Herhaling', items: mix(spread(items)), mode: 'review' };
+  }
+  function breathers(items, max = 5) {
+    const nH = items.filter(isHard).length, nE = items.length - nH;
+    const need = Math.min(max, Math.ceil(nH / 2) + 1 - nE); // genoeg makkelijke voor hooguit 2 moeilijke op rij
+    if (need <= 0) return [];
+    const t = U.dayIndex(), have = new Set(items.map(i => i.srsId));
+    const strong = Object.entries(S.Store.state.srs).filter(([id, c]) => id.startsWith('w|') && !id.startsWith('w|my|') && c.i >= 7 && c.d > t && !have.has(id)).map(([id]) => id);
+    return U.sample(strong, need).map(id => {
+      const [, a, b] = id.split('|'); const u = C.get(a); const w = u && C.word(u, +b);
+      return w ? { ...wordItem(w, U.pick(['mc-es', 'mc-nl']), u), bonus: true } : null;
+    }).filter(Boolean);
   }
   // hoeveel verlopen items echt te oefenen zijn (items van verwijderde lesstof tellen niet mee)
   function reviewCount() { return S.SRS.due().filter(id => resolve(id)).length; }
@@ -296,7 +370,7 @@
       const conj = U.sample(pairs, 8).map(([v, t]) => conjItem(v, t)).filter(Boolean);
       picked = U.shuffle(picked.slice(0, 15 - conj.length).concat(conj));
     }
-    return { title: 'Zwakke punten', items: picked, mode: 'learn' };
+    return { title: 'Zwakke punten', items: mix(picked), mode: 'learn' };
   }
   function listenTraining(n = 10) {
     const us = learnedUnits().length ? learnedUnits() : C.all().slice(0, 2);
@@ -311,7 +385,7 @@
   function sprint(n = 20) {
     const us = learnedUnits().length ? learnedUnits() : C.all().slice(0, 1);
     const ws = us.flatMap(u => C.words(u).map(w => [w, u]));
-    return { title: 'Woordensprint', items: U.sample(ws, n).map(([w, u]) => wordItem(w, U.pick(['mc-es', 'mc-nl', 'listen-mc', 'type']), u)), mode: 'learn', timer: 120 };
+    return { title: 'Woordensprint', items: mix(U.sample(ws, n).map(([w, u]) => wordItem(w, U.pick(['mc-es', 'mc-nl', 'listen-mc', 'type']), u))), mode: 'learn', timer: 120 };
   }
   function placementBand(lvl) {
     const qs = S.placement.filter(q => q.lv === lvl);
@@ -356,5 +430,5 @@
     return { level, next, nextFrac: nb && nb.n ? nb.ok / nb.n : 0 };
   }
 
-  S.Gen = { STEPS, stepSession, reviewSession, reviewCount, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART, forms, wordSynonyms, checkType };
+  S.Gen = { difficulty, isHard, mix, easeNext, STEPS, stepSession, reviewSession, reviewCount, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART, forms, wordSynonyms, checkType };
 })(window.SPT);
