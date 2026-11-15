@@ -560,6 +560,9 @@ input[type=range] { width: 100%; accent-color: var(--teal); }
 .wstack .m, .legend .m { background: var(--teal); } .wstack .k, .legend .k { background: var(--blue); } .wstack .l, .legend .l { background: var(--gold); }
 .legend { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin: .5rem 0 .2rem; color: var(--ink2); }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: .35rem; }
+.vocab-uitleg { margin: .4rem 0 .8rem; }
+.vocab-uitleg p { margin: .15rem 0; }
+.vocab-uitleg b { color: var(--ink2); font-weight: 600; }
 .vocab-levels { margin: .6rem 0; } .vocab-levels .lv-bar + .lv-bar { margin-top: .4rem; }
 h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 1rem 0 .4rem; }
 .unit-lv { border-top: 1px solid var(--line); }
