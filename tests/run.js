@@ -268,6 +268,18 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
   S.Store.state = keep;
 }
 
+{ // herhaling: teller klopt met wat 'Nog een ronde' oefent
+  const keep = S.Store.state; S.Store.state = JSON.parse(JSON.stringify(keep));
+  const t = S.U.dayIndex(); S.Store.state.srs = {};
+  S.C.all().slice(0, 3).forEach(u => u.vocab.forEach((_, i) => { S.Store.state.srs['w|' + u.id + '|' + i] = { d: t, i: 0, e: 2.5, r: 0, l: 0 }; }));
+  S.Store.state.srs['w|bestaat-niet|0'] = { d: t, i: 0, e: 2.5, r: 0, l: 0 };
+  const n = S.Gen.reviewCount();
+  ok(n < S.SRS.dueCount(), 'herhaling: onvindbare items tellen niet mee');
+  const sess = S.Gen.reviewSession(25);
+  ok(sess.items.length === Math.min(n, 25), 'herhaling: ronde bevat precies de resterende (max 25)');
+  S.Store.state = keep;
+}
+
 /* ---------- onderbroken oefening hervatten ---------- */
 {
   const P = S.Paused, G = S.Gen;

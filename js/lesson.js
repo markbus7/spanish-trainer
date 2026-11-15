@@ -637,7 +637,8 @@
     const fb = h('div', { class: 'ls-fb' });
     const mainBtn = h('button', { class: 'btn primary wide', type: 'button' });
     const skipBtn = h('button', { class: 'btn link', type: 'button' });
-    const foot = h('div', { class: 'ls-foot' }, fb, h('div', { class: 'ls-actions' }, skipBtn, mainBtn));
+    const footNote = h('p', { class: 'ls-note small muted', hidden: true });
+    const foot = h('div', { class: 'ls-foot' }, fb, h('div', { class: 'ls-actions' }, skipBtn, mainBtn), footNote);
     root.append(h('div', { class: 'ls' }, h('div', { class: 'ls-top' }, closeBtn, h('div', { class: 'ls-bar' }, bar), timerEl, count), body, foot));
 
     let tick = null;
@@ -822,6 +823,7 @@
           })) : null));
       mainBtn.hidden = false; mainBtn.disabled = false; mainBtn.textContent = extra.nextLabel || 'Klaar';
       mainBtn.onclick = () => { close(true); extra.next && extra.next(); };
+      if (extra.note) { footNote.textContent = extra.note; footNote.hidden = false; }
       if (extra.alt) { skipBtn.hidden = false; skipBtn.textContent = extra.alt.label; skipBtn.onclick = () => { close(true); extra.alt.fn(); }; }
       setTimeout(() => mainBtn.focus({ preventScroll: true }), 50);
     }

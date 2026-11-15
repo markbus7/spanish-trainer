@@ -259,7 +259,15 @@
   function startReview(limit = 25, resumed) {
     const s = resumed || Gen.reviewSession(limit);
     if (!s.items.length && !s.resume) { S.toast('Niets te herhalen. ¡Bien hecho!'); return; }
-    runSession(s, { desc: { kind: 'review', limit }, onFinish: sum => { Store.today().done.review = true; const left = SRS.dueCount(); return { lupe: left ? null : S.Tutor.lines.review, title: 'Herhaling klaar', text: left ? `Er staan nog ${left} items klaar. Ga door of kom later terug.` : 'Alles herhaald voor vandaag! 🎉', nextLabel: left ? 'Nog een ronde' : 'Klaar', next: () => { if (left) startReview(limit); } }; } });
+    runSession(s, { desc: { kind: 'review', limit }, onFinish: sum => {
+      Store.today().done.review = true;
+      const left = Gen.reviewCount(), round = Math.min(left, limit), rest = left - round;
+      return { lupe: left ? null : S.Tutor.lines.review, title: 'Herhaling klaar',
+        text: left ? `Er ${left === 1 ? 'staat' : 'staan'} nog ${U.plural(left, 'herhaling', 'herhalingen')} klaar. Ga door of kom later terug.` : 'Alles herhaald voor vandaag! 🎉',
+        nextLabel: left ? 'Nog een ronde' : 'Klaar',
+        note: left ? (rest ? `Nog ${U.plural(left, 'herhaling', 'herhalingen')} · deze ronde doet er ${round}, daarna nog ${rest}` : `Nog ${U.plural(left, 'herhaling', 'herhalingen')} · deze ronde doet ze allemaal`) : '',
+        next: () => { if (left) startReview(limit); } };
+    } });
   }
 
   /* ================= Router ================= */

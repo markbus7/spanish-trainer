@@ -196,6 +196,7 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .fb-ai { background: var(--card); border-radius: 10px; padding: .55rem .75rem; font-size: .92rem; }
 .ls-actions { display: flex; gap: .6rem; align-items: center; max-width: 640px; margin: 0 auto; }
 .ls-actions .btn.primary { flex: 1; padding: .9rem; font-size: 1.05rem; }
+.ls-note { max-width: 640px; margin: .45rem auto 0; text-align: center; }
 @keyframes rise { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
 
 .instr { font-weight: 700; color: var(--ink2); margin: .6rem 0 1rem; font-size: .95rem; }
