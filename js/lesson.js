@@ -722,7 +722,7 @@
     }
 
     function feedback(it, r) {
-      if (answered) return; answered = true; touch();
+      if (answered) return; answered = true; touch(); lastR = r;
       skipBtn.hidden = true; backBtn.hidden = true; peekBtn.hidden = true; closePeek();
       const first = !graded.has(it.orig || it);
       if (first) graded.set(it.orig || it, r.ok);
@@ -817,6 +817,29 @@
       }
     }
 
+    /* Wat Lupe ziet als je haar iets vraagt tijdens de les. */
+    let lastR = null;
+    function askContext() {
+      const it = queue[Math.min(idx, queue.length - 1)];
+      if (!it) return null;
+      const txt = el => String((el && (el.innerText || el.textContent)) || '').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim().slice(0, 3000);
+      let src = null;
+      for (let i = Math.min(idx, queue.length - 1); i >= 0; i--) if (['dialogue', 'reading'].includes(queue[i].kind)) { src = queue[i]; break; }
+      const parts = [];
+      if (session.title) parts.push('Lesson: ' + session.title);
+      if (src && src.dialogue) parts.push((src === it ? 'The learner is reading this dialogue' : 'Dialogue from earlier in this lesson') + (src.dialogue.place ? ' (' + src.dialogue.place + ')' : '') + ':\n' + src.dialogue.lines.map(([who, es, nl]) => who + ': ' + es + '  [NL: ' + nl + ']').join('\n'));
+      if (src && src.reading) parts.push((src === it ? 'The learner is reading this text' : 'Text from earlier in this lesson') + (src.reading.title ? ' "' + src.reading.title + '"' : '') + ':\n' + src.reading.p.map(([es, nl]) => es + '  [NL: ' + nl + ']').join('\n'));
+      const question = src !== it;
+      if (question) {
+        parts.push('Current exercise on screen' + (answered ? ' (already answered)' : ' (NOT answered yet)') + ':\n' + txt(body));
+        if (answered) parts.push('Feedback shown after the answer:\n' + txt(fb) + (lastR && lastR.user ? '\nLearner answered: ' + lastR.user : '') + (lastR && lastR.expected ? '\nExpected answer: ' + lastR.expected : ''));
+      }
+      const kindNl = { dialogue: 'Dialoog', reading: 'Leestekst', card: 'Nieuw woord', info: 'Uitleg' }[it.kind];
+      const what = kindNl || (answered ? 'Vraag en jouw antwoord' : 'Vraag'), title = session.title || '';
+      const label = !title ? what : title.toLowerCase().includes(what.toLowerCase()) ? title : what + ' · ' + title;
+      return { label, kind: src === it ? it.kind : 'question', question: question && isGraded(it), answered, ok: lastR ? lastR.ok : null, text: parts.join('\n\n') };
+    }
+
     function summary() {
       const vals = [...graded.values()];
       const okN = vals.filter(Boolean).length;
@@ -874,6 +897,7 @@
       closePeek(); leaveFns.forEach(f => f()); Speech.stop(); Speech.stopListening();
       document.removeEventListener('keydown', onKey);
       root.hidden = true; root.innerHTML = ''; document.body.classList.remove('in-lesson');
+      if (S.Ask) S.Ask.setSource(null);
       if (!silent && hooks.onAbort) {
         hooks.onAbort(summary());
         paidXp = xp; paidMs = activeMs;
@@ -883,6 +907,8 @@
       hooks.onClose && hooks.onClose();
     }
     active = { close };
+    // Profe Lupe (knop rechts) kijkt mee: dialoog/tekst, de vraag, jouw antwoord en de feedback
+    if (S.Ask) S.Ask.setSource(() => askContext());
     show();
   }
 

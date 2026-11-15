@@ -753,3 +753,50 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
   .voc-sort { width: 100%; }
   .voc-sbar { width: 36px; }
 }
+
+/* ---------- «Vraag het Lupe»: knop rechts + chatpaneel (js/ask.js) ---------- */
+:root { --ask-w: min(400px, 42vw); }
+.ask-fab { position: fixed; right: 0; top: 46%; z-index: 70; display: flex; align-items: center; justify-content: center; width: 54px; height: 58px; padding: 0 0 0 4px; border: 1px solid var(--line); border-right: none; border-radius: 18px 0 0 18px; background: var(--lupe-bub); box-shadow: var(--shadow); cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; transition: width .15s; }
+.ask-fab:hover { width: 60px; }
+.ask-fab[hidden] { display: none; }
+.ask-fab .lupe { pointer-events: none; }
+.ask-fab-q { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 99px; background: var(--accent); color: var(--accent-ink); font: 800 .7rem/18px var(--font); text-align: center; }
+.ask-backdrop { position: fixed; inset: 0; z-index: 71; background: rgba(20, 14, 8, .35); }
+.ask-backdrop[hidden], .ask-panel[hidden] { display: none; }
+.ask-panel { position: fixed; z-index: 72; left: 0; right: 0; bottom: 0; height: min(82dvh, 680px); display: flex; flex-direction: column; background: var(--bg); border-radius: 22px 22px 0 0; box-shadow: 0 -10px 40px rgba(0, 0, 0, .25); padding-bottom: env(safe-area-inset-bottom); animation: ask-up .22s ease-out; }
+.ask-grab { width: 42px; height: 5px; border-radius: 99px; background: var(--line); margin: 8px auto 0; flex: none; }
+.ask-head { display: flex; align-items: center; gap: .6rem; padding: .5rem 14px .6rem; border-bottom: 1px solid var(--line); flex: none; }
+.ask-head b { font-family: var(--serif); font-size: 1.1rem; }
+.ask-head .icon-btn { margin: 0; }
+.ask-where { color: var(--lupe-who); font-weight: 600; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.ask-body { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 0 14px 10px; overflow-y: auto; }
+.ask-log { flex: 1; min-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: .7rem; padding: .8rem 0; }
+.ask-log .bubble-body { max-width: 92%; font-size: .95rem; }
+.ask-log .msg.assistant .bubble-body { max-width: calc(100% - 44px); }
+.ask-chips { display: flex; flex-wrap: wrap; gap: .35rem; padding: .3rem 0 .5rem; flex: none; }
+.ask-chips .chip { cursor: pointer; border-color: var(--line); background: var(--card); }
+.ask-bar { flex: none; }
+.ask-input { font-size: 16px; } /* iOS zoomt niet in bij 16px */
+.ask-foot { display: flex; justify-content: flex-end; min-height: 1.6rem; flex: none; }
+.ask-nokey { padding: .9rem 0; display: flex; flex-direction: column; gap: .3rem; }
+.ask-nokey p { margin: .3rem 0; }
+@keyframes ask-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes ask-in { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+/* iPad en breder: zijpaneel; de les en de pagina schuiven opzij, zodat de knop «Verder» bereikbaar blijft */
+@media (min-width: 760px) {
+  .ask-panel { left: auto; top: 0; height: auto; width: var(--ask-w); border-radius: 0; border-left: 1px solid var(--line); box-shadow: -8px 0 30px rgba(0, 0, 0, .12); padding-top: env(safe-area-inset-top); animation: ask-in .22s ease-out; }
+  .ask-grab { display: none; }
+  .ask-backdrop { display: none; }
+  body.ask-open { padding-right: var(--ask-w); }
+  body.ask-open #lesson, body.ask-open .tabbar { right: var(--ask-w); }
+  body.ask-open .update-bar { left: calc((100vw - var(--ask-w)) / 2); }
+}
+@media (prefers-reduced-motion: reduce) { .ask-panel { animation: none; } }
+/* smal scherm: knop iets kleiner, en in een les ruimte vrijhouden zodat hij niets bedekt */
+@media (max-width: 759px) {
+  .ask-fab { width: 44px; height: 50px; }
+  .ask-fab:hover { width: 44px; }
+  .ask-fab .lupe svg { width: 32px; height: 32px; }
+  .ask-fab-q { width: 16px; height: 16px; line-height: 16px; font-size: .62rem; }
+  body.ask-fab-on #lesson .ls-body { padding-right: 50px; }
+}
