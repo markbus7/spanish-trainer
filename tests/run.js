@@ -127,6 +127,11 @@ for (const u of units) {
     ses.items.forEach(it => { if (it.kind === 'type') ok(it.answers && it.answers.length && it.answers.every(Boolean), where + ' ' + st.id + ' type-item zonder antwoord'); });
   }
 }
+// leesvraag in de unittoets brengt de tekst mee (📖 Tekst), anders kun je hem niet beantwoorden
+for (const u of units.filter(u => u.reading)) {
+  const rq = S.Gen.stepSession(u, 'test').items.filter(it => it.skill === 'read' && it.q && it.q.startsWith('«'));
+  ok(rq.length === 1 && rq[0].src && rq[0].src.kind === 'reading' && rq[0].src.reading === u.reading, u.id + ' unittoets: leesvraag zonder tekst');
+}
 ['A1', 'A2', 'B1'].forEach(l => ok(S.placement.filter(q => q.lv === l).length >= 16, 'niveautest: genoeg vragen voor ' + l));
 ok(S.placement.filter(q => q.lv === 'B2').length >= 8, 'niveautest: genoeg vragen voor B2');
 ok(new Set(S.placement.map(q => q.q)).size === S.placement.length, 'niveautest: geen dubbele vragen');
