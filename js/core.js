@@ -411,22 +411,35 @@
       this.clipsLoaded = fetch('audio/index.json').then(r => r.ok ? r.json() : null).then(j => { if (j && j.clips) { this.clips = new Set(j.clips); this.levels = j.levels || null; } }).catch(() => { /* geen opnames */ });
     },
     hasClip(text) { return !!(this.clips && Store.state.settings.clips !== false && text && this.clips.has(this.key(text))); },
-    playClip(text, opt) {
+    playClip(text, opt, direct) {
       return new Promise((res, rej) => {
         const a = this.el || (this.el = new Audio());
-        let done = false;
-        const end = ok => { if (done) return; done = true; a.onended = a.onerror = null; if (this._end === end) this._end = null; ok ? res() : rej(); };
+        let done = false, err = null;
+        const end = ok => {
+          if (done) return; done = true; a.onended = a.onerror = null; if (this._end === end) this._end = null;
+          if (ok) return res();
+          // Lukt het niet via de offline-opslag (service worker), probeer het bestand dan nog één keer rechtstreeks.
+          // Niet bij NotAllowedError: dan weigert de browser afspelen zonder tik en helpt opnieuw proberen niet.
+          if (!direct && !(err && err.name === 'NotAllowedError')) return this.playClip(text, opt, true).then(res, rej);
+          rej();
+        };
         this._end = end; // stop() rondt het lopende fragment af
-        a.src = 'audio/' + this.key(text) + '.mp3';
+        a.src = 'audio/' + this.key(text) + '.mp3' + (direct ? '?direct=1' : '');
         a.preservesPitch = true; a.webkitPreservesPitch = true;
         // Op normale snelheid speelt de opname onbewerkt af: versnellen of vertragen met behoud van toonhoogte
         // klinkt in Safari/WebKit metalig en robotachtig. Alleen de 🐢-knop vertraagt (dat is dan de bedoeling).
         a.defaultPlaybackRate = a.playbackRate = opt.slow ? 0.75 : 1;
         a.onended = () => end(true);
-        a.onerror = () => { this.clipError = 'laden mislukt (code ' + (a.error ? a.error.code : '?') + ')'; end(false); };
-        const p = a.play(); if (p && p.catch) p.catch(err => { if (err && err.name !== 'AbortError') this.clipError = err.name + ': ' + err.message; end(err && err.name === 'AbortError'); });
+        a.onerror = () => { this.clipError = 'laden mislukt (code ' + (a.error ? a.error.code : '?') + (direct ? ', ook rechtstreeks' : '') + ')'; end(false); };
+        const p = a.play(); if (p && p.catch) p.catch(e => { if (e && e.name !== 'AbortError') { err = e; this.clipError = e.name + ': ' + e.message; } end(e && e.name === 'AbortError'); });
         setTimeout(() => end(true), 60000);
       });
+    },
+    /* Valt de lesstof terug op de apparaatstem, zeg dan één keer waarom: dan klinkt het niet ineens 'robotachtig' zonder uitleg. */
+    clipFailed() {
+      this.last = { src: 'clip-failed', err: this.clipError || 'onbekend' };
+      if (this._warned) return; this._warned = true;
+      try { S.toast && S.toast('⚠️ De opname speelde niet af (' + this.last.err + '), daarom hoor je nu de apparaatstem. Herlaad de app als dit blijft gebeuren.', 6000); } catch (e) { /* */ }
     },
     init() {
       this.loadClips();
@@ -479,8 +492,11 @@
       if (!text) return Promise.resolve();
       const id = ++this._talkId;
       this._talk(true, text);
-      const p = this.hasClip(text)
-        ? (this.stop(), this.playClip(text, opt).then(() => { this.last = { src: 'clip' }; }, () => { this.last = { src: 'clip-failed', err: this.clipError || 'onbekend' }; return this.speak(text, opt, true); }))
+      // Is de lijst met opnames nog niet binnen (traag netwerk, net opgestart)? Probeer de opname dan toch:
+      // de bestandsnaam volgt uit de tekst. Bestaat hij niet, dan valt het vanzelf terug op de apparaatstem.
+      const pending = !this.clips && this.clipsLoaded && Store.state.settings.clips !== false && !opt.noClip;
+      const p = this.hasClip(text) || pending
+        ? (this.stop(), this.playClip(text, opt).then(() => { this.last = { src: 'clip' }; }, () => { if (!pending) this.clipFailed(); else this.last = { src: 'device' }; return this.speak(text, opt, true); }))
         : this.speak(text, opt);
       return p.then(() => { if (this._talkId === id) this._talk(false); });
     },

@@ -10,9 +10,11 @@ self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(keys => 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.hostname === 'api.anthropic.com' || url.hostname === 'api.github.com') return;
-  if (url.origin === location.origin && /\/audio\/[^/]+\.mp3$/.test(url.pathname)) {
+  // ?direct=1: de app probeert een opname rechtstreeks van het netwerk als het via de cache niet lukte
+  if (url.origin === location.origin && /\/audio\/[^/]+\.mp3$/.test(url.pathname) && !url.searchParams.has('direct')) {
     // opname: eerst uit de cache (ook offline), anders het hele bestand ophalen en bewaren
-    e.respondWith(audio(url.origin + url.pathname, e.request.headers.get('range')));
+    // gaat er iets mis met de cache (bijv. opslag vol), haal de opname dan gewoon van het netwerk
+    e.respondWith(audio(url.origin + url.pathname, e.request.headers.get('range')).catch(() => fetch(e.request)));
   } else if (url.origin === location.origin) {
     // eerst netwerk (altijd de nieuwste versie), anders cache. 'no-cache' slaat ook de
     // HTTP-cache van de browser over, zodat herladen meteen de nieuwste versie geeft.
@@ -29,7 +31,7 @@ async function audio(key, range) {
   if (!r) {
     r = await fetch(key);
     if (!r.ok || r.status !== 200) return r;
-    await c.put(key, r.clone());
+    try { await c.put(key, r.clone()); } catch (err) { /* opslag vol: dan alleen nu afspelen, niet bewaren */ }
   }
   if (!range) return r;
   const buf = await r.arrayBuffer(), m = /bytes=(\d*)-(\d*)/.exec(range) || [], size = buf.byteLength;
