@@ -641,12 +641,25 @@
     function scrollLog() { log.scrollTop = log.scrollHeight; }
     send.onclick = () => doSend(inp.value);
     inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && chat.mode !== 'write') { e.preventDefault(); doSend(inp.value); } });
+    // Inspreken: je ziet dat ze luistert, wat ze verstaat, en bij een fout wat je kunt doen. Bij een gesprek gaat het daarna vanzelf naar Lupe.
+    const micLive = S.Mic.live();
     if (micBtn) micBtn.onclick = async () => {
-      micBtn.classList.add('rec');
-      try { const alts = await Speech.listen(); inp.value = (inp.value ? inp.value + ' ' : '') + alts[0]; inp.focus(); } catch (e) { S.toast(e.message); }
-      micBtn.classList.remove('rec');
+      if (micBtn.classList.contains('rec')) { micLive.state('stopping'); Speech.stopListening(); return; }
+      S.Tutor.setTalking && S.Tutor.setTalking(false);
+      const before = inp.value;
+      micBtn.classList.add('rec'); micBtn.title = 'Klaar met praten'; micLive.start();
+      setTimeout(() => { try { micBtn.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { /* */ } }, 50);
+      try {
+        const alts = await Speech.listen(micLive.hooks({ onInterim: t => { micLive.interim(t); inp.value = (before ? before + ' ' : '') + t; } }));
+        const said = alts[0];
+        inp.value = (before ? before + ' ' : '') + said;
+        const auto = chat.mode !== 'write' && st().settings.micAutoSend !== false && !chat.busy;
+        micLive.done(said, auto ? '✅ Verstaan, ik stuur het naar Lupe' : '✅ Verstaan. Pas het aan als het nodig is en tik op Enviar');
+        if (auto) { doSend(inp.value); setTimeout(() => micLive.hide(), 2500); } else inp.focus();
+      } catch (e) { inp.value = before; micLive.fail(e); }
+      micBtn.classList.remove('rec'); micBtn.title = 'Inspreken';
     };
-    wrap.append(log, h('div', { class: 'chat-bar' }, inp, h('div', { class: 'chat-actions' }, micBtn, send)), S.Lesson.accentBar(inp),
+    wrap.append(log, micLive.el, h('div', { class: 'chat-bar' }, inp, h('div', { class: 'chat-actions' }, micBtn, send)), S.Lesson.accentBar(inp),
       h('div', { class: 'row gap between' }, h('span'), h('button', { class: 'btn link small', type: 'button', onclick: () => { chat.messages = []; if (chat.mode === 'roleplay') chat.autostart = true; render(); } }, '🗑 Nieuw gesprek')));
     if (chat.mode === 'roleplay' && chat.autostart && !chat.messages.length) { chat.autostart = false; setTimeout(() => doSend('(Empecemos el juego de rol. / Laten we beginnen.)', true), 50); }
     setTimeout(scrollLog, 30);
@@ -1085,6 +1098,10 @@
       h('button', { class: 'btn ghost', type: 'button', onclick: runTest }, '🔊 Test de stemmen'), voiceOut,
       voiceTip,
       h('p', { class: 'small muted' }, Speech.canListen() ? '🎙️ Spraakherkenning is beschikbaar.' : '🎙️ Spraakherkenning werkt niet in deze browser. Gebruik Chrome of Safari voor spreekoefeningen.'))));
+    const micCard = S.Mic.testCard();
+    if (Speech.canListen()) micCard.append(toggle('Ingesproken tekst meteen naar Lupe sturen', 'Uit: de tekst komt eerst in het invoerveld, zodat je hem kunt aanpassen.', s.micAutoSend !== false, v => set('micAutoSend', v)));
+    wrap.append(section('🎙️ Microfoontest', micCard));
+    if (S.micTestFocus) { S.micTestFocus = false; setTimeout(() => { try { micCard.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) { /* */ } }, 80); }
     if ('caches' in window && 'serviceWorker' in navigator) wrap.append(section('📥 Offline luisteren', offlineCard()));
     // AI
     const keyIn = h('input', { class: 'input', type: 'password', placeholder: 'sk-ant-…', value: s.aiKey || '', autocomplete: 'off', onchange: e => { set('aiKey', e.target.value.trim()); } });
