@@ -667,7 +667,10 @@
     const peekBtn = h('button', { class: 'btn ghost small ls-peek-btn', type: 'button', hidden: true, onclick: () => openPeek() });
     let peekEl = null;
     function peekSource() {
-      if (answered || timerEnd || session.mode === 'exam') return null;
+      if (answered || timerEnd) return null;
+      const cur = queue[idx];
+      if (cur && cur.src) return cur.src; // vraag die zijn eigen tekst meebrengt (bijv. leesvraag in de unittoets)
+      if (session.mode === 'exam') return null;
       for (let i = Math.min(idx, queue.length) - 1; i >= 0; i--) if (['dialogue', 'reading'].includes(queue[i].kind)) return queue[i];
       return null;
     }
@@ -742,6 +745,11 @@
       mainBtn.onclick = () => { if (ctx.evaluate) feedback(it, ctx.evaluate()); };
       freshBody();
       const el = (R[it.kind] || R.info)(it, ctx);
+      // brengt de vraag zijn eigen tekst mee? Dan ook een duidelijke knop boven de vraag
+      if (it.src && ps === it.src) {
+        const t = it.src.kind === 'dialogue' ? (it.src.dialogue.place || 'de dialoog') : it.src.reading.t;
+        el.prepend(h('button', { class: 'btn ghost small ls-src-btn', type: 'button', onclick: () => openPeek() }, (it.src.kind === 'dialogue' ? '💬 Lees eerst de dialoog' : '📖 Lees eerst de tekst') + ' «' + t + '»'));
+      }
       body.append(el);
     }
 
@@ -867,11 +875,12 @@
       if (!it) return null;
       const txt = el => String((el && (el.innerText || el.textContent)) || '').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim().slice(0, 3000);
       let src = null;
-      for (let i = Math.min(idx, queue.length - 1); i >= 0; i--) if (['dialogue', 'reading'].includes(queue[i].kind)) { src = queue[i]; break; }
+      if (queue[idx] && queue[idx].src) src = queue[idx].src;
+      else for (let i = Math.min(idx, queue.length - 1); i >= 0; i--) if (['dialogue', 'reading'].includes(queue[i].kind)) { src = queue[i]; break; }
       const parts = [];
       if (session.title) parts.push('Lesson: ' + session.title);
       if (src && src.dialogue) parts.push((src === it ? 'The learner is reading this dialogue' : 'Dialogue from earlier in this lesson') + (src.dialogue.place ? ' (' + src.dialogue.place + ')' : '') + ':\n' + src.dialogue.lines.map(([who, es, nl]) => who + ': ' + es + '  [NL: ' + nl + ']').join('\n'));
-      if (src && src.reading) parts.push((src === it ? 'The learner is reading this text' : 'Text from earlier in this lesson') + (src.reading.title ? ' "' + src.reading.title + '"' : '') + ':\n' + src.reading.p.map(([es, nl]) => es + '  [NL: ' + nl + ']').join('\n'));
+      if (src && src.reading) parts.push((src === it ? 'The learner is reading this text' : 'Text from earlier in this lesson') + ((src.reading.t || src.reading.title) ? ' "' + (src.reading.t || src.reading.title) + '"' : '') + ':\n' + src.reading.p.map(([es, nl]) => es + '  [NL: ' + nl + ']').join('\n'));
       const question = src !== it;
       if (question) {
         parts.push('Current exercise on screen' + (answered ? ' (already answered)' : ' (NOT answered yet)') + ':\n' + txt(body));

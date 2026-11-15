@@ -206,7 +206,8 @@
     U.sample(conj, 3).forEach(([v, t]) => { const it = conjItem(v, t); if (it) items.push(it); });
     const sl = U.shuffle(shortLines(u));
     if (sl[0]) items.push(listenItem(sl[0].l[1], sl[0].l[2]));
-    if (u.reading) { const q = U.pick(u.reading.q); items.push({ ...normEx(q, null, null, { noSrs: true }), q: '«' + u.reading.t + '» — ' + q.q, skill: 'read', tag: 'vocab' }); }
+    // leesvraag: de tekst gaat mee (src), zodat je hem tijdens de toets kunt openen met 📖 Tekst
+    if (u.reading) { const q = U.pick(u.reading.q); items.push({ ...normEx(q, null, null, { noSrs: true, skill: 'read' }), q: '«' + u.reading.t + '» — ' + q.q, skill: 'read', tag: 'vocab', src: { kind: 'reading', reading: u.reading } }); }
     return { title: u.title + ' · Unittoets', items: mix(U.shuffle(items.filter(Boolean))), mode: 'test', pass: 0.8 };
   }
   function stepSession(u, step) {
