@@ -818,3 +818,124 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .xi-fb .xi-more { margin: .15rem 0 0; }
 .xi-more.on { background: var(--teal-soft); }
 .ex-line .xi-btn, .dl-read .xi-btn { align-self: flex-start; }
+
+/* ---------- dagplan op Hoy: pad met afvinken, dagbeloning, weekstrook ---------- */
+.dp-title { display: flex; align-items: baseline; justify-content: space-between; gap: .6rem; }
+.dp-count { font-size: .85rem; font-weight: 700; color: var(--ink2); background: var(--bg2); border-radius: 999px; padding: .2rem .65rem; white-space: nowrap; }
+.dp-count.all { background: var(--gold-soft); color: var(--ink); }
+.dp { display: flex; flex-direction: column; gap: .9rem; }
+.dp-path { position: relative; display: flex; flex-direction: column; gap: .7rem; }
+.dp-item { position: relative; display: flex; align-items: stretch; gap: .65rem; }
+.dp-item > .plan-card { flex: 1; min-width: 0; }
+/* de lijn tussen de bolletjes */
+.dp-item:not(:last-child)::before { content: ''; position: absolute; left: 17px; top: 50%; height: calc(100% + .7rem); width: 4px; margin-left: -2px; background: var(--line); border-radius: 2px; z-index: 0; }
+.dp-item.done:not(:last-child)::before { background: var(--ok); }
+.dp-node { position: relative; z-index: 1; align-self: center; flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: .95rem; background: var(--card); color: var(--muted); border: 3px solid var(--line); }
+.dp-item.next .dp-node { border-color: var(--accent); color: var(--accent); animation: dp-pulse 2s ease-in-out infinite; }
+.dp-item.done .dp-node { background: var(--ok); border-color: var(--ok); color: #fff; }
+.dp-chest .dp-node { font-size: 1rem; border-color: var(--gold); background: var(--gold-soft); }
+.dp-chest.locked .dp-node { filter: grayscale(.7); opacity: .75; }
+.dp-chest.ready .dp-node { animation: dp-wiggle 1.6s ease-in-out infinite; }
+.dp-chest.opened .dp-node { background: var(--gold); border-color: var(--gold); }
+@keyframes dp-pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); } 50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 0%, transparent); } }
+@keyframes dp-wiggle { 0%, 70%, 100% { transform: rotate(0); } 75% { transform: rotate(-12deg) scale(1.08); } 85% { transform: rotate(10deg) scale(1.08); } 92% { transform: rotate(-5deg); } }
+
+.dp-card .pc-body b { overflow-wrap: anywhere; }
+.dp-card > .btn { flex: none; }
+.dp-tag { align-self: flex-start; font-style: normal; font-size: .68rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: .08rem .4rem; margin-bottom: .2rem; }
+.dp-tag.ok { color: var(--ok); background: var(--ok-soft); }
+.plan-card.dp-card.is-next { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow); }
+.plan-card.dp-card.is-done { background: color-mix(in srgb, var(--ok-soft) 70%, var(--card)); border-color: color-mix(in srgb, var(--ok) 35%, var(--line)); }
+.plan-card.dp-card.is-done .pc-icon { background: var(--card); }
+.dp-item.done .dp-card .btn.ghost { font-size: .85rem; }
+.dp-chest .plan-card.dp-card { background: linear-gradient(135deg, var(--gold-soft), var(--card) 75%); border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); }
+.dp-chest.locked .chest-ic { filter: grayscale(.6); opacity: .7; }
+.dp-chest .chest-ic { background: var(--card); }
+.dp-chest.ready .plan-card.dp-card { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold), var(--shadow); }
+.dp-chest.ready .chest-ic { animation: dp-wiggle 1.6s ease-in-out infinite; }
+.chest-btn { background: var(--gold); border-color: var(--gold); color: #3a2a05; }
+.dp-segs { display: flex; gap: 4px; margin-top: .4rem; max-width: 180px; }
+.dp-segs i { flex: 1; height: 8px; border-radius: 4px; background: var(--bg2); position: relative; overflow: hidden; }
+.dp-segs i::after { content: ''; position: absolute; inset: 0; background: var(--ok); transform: scaleX(0); transform-origin: left; transition: transform .7s cubic-bezier(.2, .8, .2, 1); }
+.dp-segs i.on::after { transform: scaleX(1); }
+.dp-segs i.on.late::after { transform: scaleX(0); }
+.dp-chest.opened .dp-segs i::after { background: var(--gold); }
+
+/* zojuist afgevinkt: bolletje springt, vinkje verschijnt, kaart licht op */
+.dp-item.just .dp-node { animation: dp-pop .7s cubic-bezier(.3, 1.6, .5, 1) .15s both; }
+.dp-item.just .dp-check { display: inline-block; animation: dp-check .5s ease-out .45s both; }
+.dp-item.just .dp-card { animation: dp-glow 1.6s ease-out .2s both; }
+@keyframes dp-pop { 0% { transform: scale(.4); background: var(--card); border-color: var(--line); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+@keyframes dp-check { from { transform: scale(0) rotate(-30deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+@keyframes dp-glow { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 60%, transparent), var(--shadow); } 100% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--ok) 0%, transparent), var(--shadow); } }
+
+@media (max-width: 560px) {
+  .dp-card { flex-wrap: wrap; }
+  .dp-card .pc-body { flex: 1 1 0; }
+  .dp-card > .btn { flex: 1 1 100%; }
+  .dp-item:not(:last-child)::before { left: 15px; }
+  .dp-node { width: 30px; height: 30px; font-size: .85rem; border-width: 3px; }
+  .dp-item { gap: .5rem; }
+}
+
+/* weekstrook */
+.week { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; box-shadow: var(--shadow); }
+.week-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+.wk-day { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.wk-day small { font-size: .72rem; color: var(--muted); font-weight: 600; }
+.wk-dot { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 1rem; background: var(--bg2); border: 2px solid transparent; }
+.wk-day.fire .wk-dot { background: var(--accent-soft); }
+.wk-day.star .wk-dot { background: var(--gold-soft); border-color: var(--gold); }
+.wk-day.future .wk-dot { background: transparent; border: 2px dashed var(--line); }
+.wk-day.today .wk-dot { border: 2px solid var(--accent); }
+.wk-day.today small { color: var(--accent); font-weight: 800; }
+.week-note { display: block; text-align: center; color: var(--ink2); font-size: .8rem; margin-top: .5rem; }
+.week.big { box-shadow: none; margin: .4rem 0 1rem; }
+
+/* snelle oefeningen die je vandaag al deed */
+.quick-btn { position: relative; }
+.quick-btn .qd { position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--ok); color: #fff; font-size: .75rem; font-weight: 800; }
+
+/* XP en reeks lopen op in de bovenbalk */
+.tb-chip.bump { animation: tb-bump .6s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes tb-bump { 0% { transform: scale(1); } 40% { transform: scale(1.25); background: var(--gold-soft); } 100% { transform: scale(1); } }
+.xp-float { position: fixed; z-index: 96; transform: translateX(-50%); font-weight: 800; color: var(--gold); text-shadow: 0 1px 0 rgba(0,0,0,.15); pointer-events: none; animation: xp-float 1.5s ease-out forwards; }
+@keyframes xp-float { 0% { opacity: 0; transform: translate(-50%, 6px) scale(.8); } 20% { opacity: 1; transform: translate(-50%, 0) scale(1.1); } 100% { opacity: 0; transform: translate(-50%, 34px) scale(1); } }
+
+/* dagplan op het eindscherm van een oefening */
+.dp-strip { margin: 0 auto 1.2rem; max-width: 440px; text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: .5rem; }
+.dp-strip.all { border-color: var(--gold); background: linear-gradient(135deg, var(--gold-soft), var(--card) 80%); }
+.dp-strip-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; } .dp-strip-head span { font-size: .85rem; color: var(--ink2); font-weight: 700; }
+.dp-strip small { color: var(--ink2); font-size: .82rem; }
+.dp-pills { display: flex; flex-wrap: wrap; gap: .35rem; }
+.dp-pill { display: inline-flex; align-items: center; gap: .3rem; padding: .25rem .6rem .25rem .3rem; border-radius: 999px; background: var(--bg2); color: var(--ink2); font-size: .82rem; font-weight: 700; }
+.dp-pill i { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: .7rem; background: var(--card); border: 2px solid var(--line); }
+.dp-pill.on { background: var(--ok-soft); color: var(--ok); }
+.dp-pill.on i { background: var(--ok); border-color: var(--ok); color: #fff; }
+.dp-pill.pop { animation: dp-pop .7s cubic-bezier(.3, 1.6, .5, 1) .6s both; }
+
+/* de dagbeloning */
+.modal.reward { text-align: center; max-width: 440px; max-height: calc(100vh - 32px); overflow-y: auto; }
+.modal.reward h3 { font-family: var(--serif); font-size: 1.45rem; margin: .4rem 0 .2rem; }
+.modal.reward .lupe-coach { text-align: left; margin: .8rem 0 0; }
+.modal.reward .stats-row { margin: .9rem 0 .4rem; }
+.chest-stage { position: relative; height: 150px; display: grid; place-items: center; }
+.chest-rays { position: absolute; width: 190px; height: 190px; border-radius: 50%; opacity: 0; transform: scale(.4);
+  background: repeating-conic-gradient(color-mix(in srgb, var(--gold) 55%, transparent) 0 12deg, transparent 12deg 30deg);
+  -webkit-mask: radial-gradient(circle, #000 30%, transparent 70%); mask: radial-gradient(circle, #000 30%, transparent 70%); transition: opacity .5s, transform .6s; }
+.chest-box { font-size: 84px; line-height: 1; animation: chest-shake .9s ease-in-out both; transition: transform .35s, opacity .35s; }
+.chest-prize { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 112px; height: 112px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe08a, var(--gold) 60%, #c98a10); color: #3a2a05; box-shadow: 0 6px 24px color-mix(in srgb, var(--gold) 50%, transparent), inset 0 -4px 0 rgba(0,0,0,.12);
+  opacity: 0; transform: scale(.2); transition: opacity .3s .15s, transform .55s cubic-bezier(.3, 1.6, .5, 1) .15s; }
+.chest-prize b { font-family: var(--serif); font-size: 2rem; line-height: 1; } .chest-prize span { font-weight: 800; font-size: .85rem; letter-spacing: .08em; }
+.chest-stage.open .chest-box { transform: scale(1.6) translateY(-10px); opacity: 0; animation: none; }
+.chest-stage.open .chest-prize { opacity: 1; transform: scale(1); }
+.chest-stage.open .chest-rays { opacity: 1; transform: scale(1); animation: rays-spin 9s linear infinite; }
+@keyframes chest-shake { 0% { transform: scale(.6); } 25% { transform: scale(1) rotate(0); } 40% { transform: rotate(-10deg); } 55% { transform: rotate(9deg); } 70% { transform: rotate(-6deg); } 85% { transform: rotate(4deg) scale(1.05); } 100% { transform: rotate(0) scale(1.08); } }
+@keyframes rays-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dp-item.next .dp-node, .dp-chest.ready .dp-node, .dp-chest.ready .chest-ic, .chest-box, .chest-stage.open .chest-rays, .dp-item.just .dp-node, .dp-item.just .dp-check, .dp-item.just .dp-card, .dp-pill.pop { animation: none; }
+}
+@media (max-width: 560px) { .dp-item.done .dp-card > .btn { flex: 0 0 auto; margin-left: auto; padding-top: .45rem; padding-bottom: .45rem; } }
+.wk-day.miss .wk-dot { border-color: var(--line); }

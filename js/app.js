@@ -43,6 +43,7 @@
     'A1': ['🥉', 'A1 behaald', 'Niveau-examen A1 gehaald'], 'A2': ['🥈', 'A2 behaald', 'Niveau-examen A2 gehaald'],
     'ai': ['🤖', 'Eerste gesprek', 'Een gesprek met de AI-docent gevoerd'], 'goal': ['🎯', 'Dagdoel', 'Je dagdoel gehaald'],
     'game': ['🎲', 'Speler', 'Je eerste woordspel uitgespeeld'], 'games10': ['🧩', 'Puzzelaar', '10 woordspellen uitgespeeld'],
+    'plan': ['🎁', 'Dagplan', 'Je eerste dagplan helemaal afgerond'], 'plan7': ['🗓️', 'Zeven plannen', '7 dagplannen afgerond'], 'plan30': ['🏆', 'Dertig plannen', '30 dagplannen afgerond'],
     'early': ['🌅', 'Vroege vogel', 'Geoefend vóór 8:00'], 'night': ['🦉', 'Nachtuil', 'Geoefend na 23:00']
   };
   function award(id) {
@@ -152,8 +153,10 @@
       onItem: recordItem,
       onFinish: sum => {
         if (session.srsAdd) session.srsAdd.forEach(id => SRS.add(id, stepWrong.has(id) ? 0 : 1));
+        if (desc.mark) Store.today().done[desc.mark] = true;
         const extra = opts.onFinish ? opts.onFinish(sum) || {} : {};
         afterSession(sum, extra.bonusXP || 0);
+        if (session.mode !== 'exam' || !extra.silent) extra.plan = close => planStrip(close);
         return extra;
       },
       onAbort: sum => { Store.addXP(sum.newXp); addTime(sum.newMinutes); if (sum.total) Store.touchStreak(); Store.save(); render(); },
@@ -224,6 +227,7 @@
       onFinish: sum => {
         const us = Store.unit(u.id);
         const step = Gen.STEPS.find(s => s.id === stepId);
+        const today = Store.today().done; today.learn = (today.learn || 0) + 1; today.learnLast = step.nl + ' · ' + u.title;
         if (stepId === 'test') {
           const passed = sum.score >= (session.pass || 0.8);
           us.best = Math.max(us.best || 0, sum.score);
@@ -301,11 +305,31 @@
   }
   function updateTopbar() {
     const sEl = document.getElementById('tb-streak'), xEl = document.getElementById('tb-xp'), dEl = document.getElementById('tb-due');
-    if (sEl) sEl.textContent = '🔥 ' + Store.liveStreak();
-    if (xEl) xEl.textContent = '⭐ ' + st().xp;
+    const streak = Store.liveStreak(), xp = st().xp;
+    if (sEl) { sEl.textContent = '🔥 ' + streak; if (shown.streak !== null && streak > shown.streak) bump(sEl); }
+    if (xEl) {
+      if (shown.xp !== null && xp > shown.xp) { countUp(xEl, shown.xp, xp, '⭐ '); floatUp(xEl, '+' + (xp - shown.xp)); bump(xEl); }
+      else xEl.textContent = '⭐ ' + xp;
+    }
+    shown.xp = xp; shown.streak = streak;
     if (dEl) { const n = SRS.dueCount(); dEl.textContent = '🔁 ' + n; dEl.hidden = !n; }
   }
   S.render = render;
+  /* XP en streak lopen zichtbaar op als ze na een oefening hoger zijn dan wat je net zag. */
+  const shown = { xp: null, streak: null };
+  const calm = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function countUp(el, from, to, pre = '', ms = 900) {
+    if (calm()) { el.textContent = pre + to; return; }
+    const t0 = performance.now();
+    const step = t => { const f = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - f, 3); el.textContent = pre + Math.round(from + (to - from) * e); if (f < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
+  function bump(el) { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
+  function floatUp(el, text) {
+    const r = el.getBoundingClientRect(); if (!r.width) return;
+    const f = h('span', { class: 'xp-float', 'aria-hidden': 'true', style: { left: (r.left + r.width / 2) + 'px', top: (r.bottom + 2) + 'px' } }, text);
+    document.body.append(f); setTimeout(() => f.remove(), 1600);
+  }
 
   function section(title, ...kids) { return h('section', { class: 'sec' }, title ? h('h2', { class: 'sec-title' }, title) : null, kids); }
   function ring(frac, label, sub) {
@@ -351,32 +375,28 @@
       h('div', null, h('h1', null, greeting()), h('p', { class: 'muted' }, min >= goal ? '🎯 Dagdoel gehaald! Alles wat je nu nog doet, is extra.' : `Vandaag: ${min} van ${goal} minuten.`),
         h('div', { class: 'chips' }, h('span', { class: 'chip' }, '🔥 ' + U.plural(Store.liveStreak(), 'dag', 'dagen')), h('span', { class: 'chip' }, '📈 ' + P.estimate().label))),
       ring(min / goal, min + "'", 'van ' + goal + "'")));
+    // het dagplan: drie taken, elk met een duidelijke 'klaar'-staat, en een beloning als alles af is
+    const ds = S.Dagplan.status(d, { due });
+    if (ds.tasks.review.free && !d.done.review0) d.done.review0 = true;
+    const just = S.Dagplan.fresh(d, ds); save();
     // Profe Lupe begroet je en zegt waar je vandaag het best mee begint
     const anyDays = Object.values(s.days).some(x => x.min > 0 || x.items > 0);
     wrap.append(S.Tutor.coach(S.Tutor.lines.hello({ paused: !!Paused.get(), goalDone: min >= goal, streak: Store.liveStreak(), lapsed: anyDays && !Store.liveStreak() && !d.items,
-      due, step: step && step.id, unit: u.title, unitNl: u.nl, min }), { cls: 'hoy-lupe' }));
+      due, step: step && step.id, unit: u.title, unitNl: u.nl, min,
+      chestReady: ds.all && !ds.chest, planDone: ds.chest, planLeft: ds.total - ds.n, planN: ds.n }), { cls: 'hoy-lupe' }));
 
     const plan = h('div', { class: 'plan' });
     // 0. onderbroken oefening
     const pc = pausedCard(); if (pc) plan.append(pc);
-    // 1. herhaling
-    const revMin = Math.max(2, Math.round(Math.min(due, 25) * 0.3));
-    plan.append(planCard('🔁', 'Herhaling', due ? `${Math.min(due, 25)} items · ±${revMin} min` : (d.done.review ? 'Klaar voor vandaag ✓' : 'Niets te herhalen — top!'),
-      due ? 'Start' : null, () => startReview(25), due ? 'hot' : 'done', 'Spaced repetition: woorden, grammatica en werkwoorden precies op het juiste moment.'));
-    // 2. nieuwe stof
-    if (step) {
-      plan.append(planCard(step.icon, `${u.icon} ${u.title}`, `${step.nl} · ±${step.min} min`, step.id === 'test' ? 'Start toets' : 'Start', () => startStep(u, step.id), 'new', `${u.level} · unit ${C.unitsOf(u.level).indexOf(u) + 1} — ${u.nl}`));
-    } else {
-      plan.append(planCard('🎓', 'Niveau-examen ' + u.level, 'Alle units zijn klaar', 'Naar de route', () => { location.hash = '#/ruta'; }, 'new'));
+    plan.append(dayPlan(ds, just, { d, due, u, step }));
+    wrap.append(section(null, h('div', { class: 'dp-title' }, h('h2', { class: 'sec-title' }, 'Je plan voor vandaag'),
+      h('span', { class: 'dp-count' + (ds.all ? ' all' : '') }, ds.chest ? '⭐ Voltooid' : `${ds.n} van ${ds.total}`)), plan));
+    if (just.length) setTimeout(() => S.Sound.good(), 350);
+    if (ds.all && !ds.chest && (just.length || wantChest)) {
+      setTimeout(() => { const c = document.querySelector('.dp-chest'); if (c) c.scrollIntoView({ block: 'center', behavior: calm() ? 'auto' : 'smooth' }); }, 500);
+      if (wantChest) setTimeout(openChest, 900);
     }
-    // 3. spreken / gesprek
-    if (S.AI.enabled()) {
-      const sc = unitScenario(u);
-      plan.append(planCard('🗣️', 'Gesprek met de AI-docent', sc.title + ' · ±5 min', 'Praten', () => { startRoleplay(sc); location.hash = '#/docente'; }, 'talk', sc.goal));
-    } else {
-      plan.append(planCard('🎙️', 'Spreken', '8 zinnen hardop · ±3 min', 'Start', () => runSession(Gen.speakTraining(8)), 'talk', 'Tip: met een AI-sleutel krijg je hier echte gesprekken met correcties.'));
-    }
-    wrap.append(section('Je plan voor vandaag', plan));
+    wantChest = false;
 
     // frase del día
     const ph = S.phrases[U.dayIndex() % S.phrases.length];
@@ -384,20 +404,127 @@
 
     // snelle training
     wrap.append(section('Extra oefenen', h('div', { class: 'quick' },
-      quick('⚡', 'Woordensprint', '2 min', () => runSession(Gen.sprint(30))),
+      quick('⚡', 'Woordensprint', '2 min', () => runSession(Gen.sprint(30), { desc: { kind: 'plain', mark: 'sprint' } }), d.done.sprint),
       quick('🧩', 'Werkwoorden', '20 vragen', () => { location.hash = '#/practica'; }),
-      quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10))),
-      quick('🎲', 'Woordspellen', 'puzzels en memory', () => { location.hash = '#/juegos'; }))));
+      quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10), { desc: { kind: 'plain', mark: 'listen' } }), d.done.listen),
+      quick('🎲', 'Woordspellen', 'puzzels en memory', () => { location.hash = '#/juegos'; }, d.done.games))));
     if (!Store.ok) wrap.append(h('p', { class: 'warn' }, '⚠️ Je browser staat opslaan niet toe (privévenster?). Je voortgang wordt niet bewaard.'));
     return wrap;
   };
-  function planCard(icon, title, sub, btn, fn, cls, desc) {
-    return h('div', { class: 'plan-card ' + (cls || '') },
-      h('div', { class: 'pc-icon' }, icon),
-      h('div', { class: 'pc-body' }, h('b', null, title), h('span', null, sub), desc ? h('small', null, desc) : null),
-      btn ? h('button', { class: 'btn primary', type: 'button', onclick: fn }, btn) : h('span', { class: 'pc-done' }, '✓'));
+  function quick(icon, t, s, fn, done) { return h('button', { class: 'quick-btn' + (done ? ' did' : ''), type: 'button', onclick: fn }, h('span', { class: 'qi' }, icon), done ? h('span', { class: 'qd', title: 'Vandaag gedaan' }, '✓') : null, h('b', null, t), h('small', null, s)); }
+
+  /* ================= Dagplan (Hoy) ================= */
+  let wantChest = false; // na 'Naar mijn beloning' op het eindscherm: Hoy opent de beloning meteen
+  function startSpeak() { runSession(Gen.speakTraining(8), { desc: { kind: 'plain', mark: 'speak' } }); }
+  function dayPlan(ds, just, { d, due, u, step }) {
+    const T = ds.tasks, isJust = id => just.includes(id);
+    const items = [];
+    // 1. herhaling
+    const revN = Math.min(due, 25), revMin = Math.max(2, Math.round(revN * 0.3));
+    items.push(T.review.done
+      ? task('review', '🔁', 'Herhaling', T.review.free ? 'Vandaag niets te herhalen' : 'Klaar voor vandaag', due ? { label: `Nog ${revN}`, fn: () => startReview(25) } : null,
+        T.review.free ? 'Je woorden zitten goed. Morgen staan er weer nieuwe klaar.' : due ? `Er ${due === 1 ? 'is' : 'zijn'} intussen ${U.plural(due, 'nieuwe herhaling', 'nieuwe herhalingen')} bij gekomen. Mag, hoeft niet.` : 'Alles herhaald. ¡Bien hecho!')
+      : task('review', '🔁', 'Herhaling', `${U.plural(revN, 'item', 'items')} · ±${revMin} min`, { label: 'Start', fn: () => startReview(25) }, 'Spaced repetition: woorden, grammatica en werkwoorden precies op het juiste moment.'));
+    // 2. nieuwe stof
+    const learnDesc = `${u.level} · unit ${C.unitsOf(u.level).indexOf(u) + 1} — ${u.nl}`;
+    if (T.learn.done) {
+      items.push(task('learn', '📘', d.done.learnLast || 'Nieuwe stof', T.learn.count > 1 ? `${T.learn.count} stappen gedaan vandaag` : 'Stap afgerond',
+        step ? { label: 'Nog een stap', fn: () => startStep(u, step.id) } : { label: 'Naar de route', fn: () => { location.hash = '#/ruta'; } },
+        step ? `Volgende: ${step.icon} ${step.nl} van ${u.icon} ${u.title}` : 'Alle units van dit niveau zijn klaar.'));
+    } else if (step) {
+      items.push(task('learn', step.icon, `${u.icon} ${u.title}`, `${step.nl} · ±${step.min} min`, { label: step.id === 'test' ? 'Start toets' : 'Start', fn: () => startStep(u, step.id) }, learnDesc));
+    } else {
+      items.push(task('learn', '🎓', 'Niveau-examen ' + u.level, 'Alle units zijn klaar', { label: 'Naar de route', fn: () => { location.hash = '#/ruta'; } }, 'Een geslaagde stap of het examen vinkt deze taak af.'));
+    }
+    // 3. spreken / gesprek
+    if (S.AI.enabled()) {
+      const sc = unitScenario(u), go = () => { startRoleplay(sc); location.hash = '#/docente'; };
+      items.push(T.speak.done ? task('speak', '🗣️', 'Spreken', 'Gesprek gevoerd', { label: 'Nog een keer', fn: go }, 'Lekker gepraat! Elk gesprek maakt je vlotter.')
+        : task('speak', '🗣️', 'Gesprek met Lupe', sc.title + ' · ±5 min', { label: 'Praten', fn: go }, sc.goal + ' Na drie beurten is deze taak klaar.'));
+    } else {
+      items.push(T.speak.done ? task('speak', '🎙️', 'Spreken', '8 zinnen hardop gezegd', { label: 'Nog een keer', fn: () => startSpeak() }, 'Hardop oefenen maakt je uitspraak beter.')
+        : task('speak', '🎙️', 'Spreken', '8 zinnen hardop · ±3 min', { label: 'Start', fn: () => startSpeak() }, 'Tip: met een AI-sleutel krijg je hier echte gesprekken met correcties.'));
+    }
+    function task(id, icon, title, sub, act, desc) {
+      const done = T[id].done, next = ds.next === id;
+      const card = h('div', { class: 'plan-card dp-card' + (done ? ' is-done' : next ? ' is-next' : '') },
+        h('div', { class: 'pc-icon' }, icon),
+        h('div', { class: 'pc-body' },
+          next ? h('em', { class: 'dp-tag' }, 'Volgende') : done ? h('em', { class: 'dp-tag ok' }, '✓ Klaar') : null,
+          h('b', null, title), h('span', null, sub), desc ? h('small', null, desc) : null),
+        act ? h('button', { class: 'btn ' + (done ? 'ghost' : 'primary'), type: 'button', onclick: act.fn }, act.label) : null);
+      return h('div', { class: 'dp-item' + (done ? ' done' : '') + (next ? ' next' : '') + (isJust(id) ? ' just' : '') },
+        h('div', { class: 'dp-node', 'aria-label': done ? 'klaar' : 'nog te doen' }, done ? h('span', { class: 'dp-check' }, '✓') : h('span', null, S.Dagplan.TASKS.indexOf(id) + 1)), card);
+    }
+    // 4. de dagbeloning
+    const left = ds.total - ds.n;
+    const chest = h('div', { class: 'dp-item dp-chest' + (ds.chest ? ' done opened' : ds.all ? ' ready' : ' locked') },
+      h('div', { class: 'dp-node' }, ds.chest ? '⭐' : '🎁'),
+      h('div', { class: 'plan-card dp-card' },
+        h('div', { class: 'pc-icon chest-ic' }, ds.chest ? '🏆' : '🎁'),
+        h('div', { class: 'pc-body' },
+          h('b', null, ds.chest ? 'Dagbeloning ontvangen' : 'Dagbeloning'),
+          h('span', null, ds.chest ? `+${S.Dagplan.CHEST_XP} XP · tot morgen!` : ds.all ? 'Alles af! Open je beloning.' : `Nog ${left} ${left === 1 ? 'taak' : 'taken'} · +${S.Dagplan.CHEST_XP} XP`),
+          h('div', { class: 'dp-segs', 'aria-hidden': 'true' }, S.Dagplan.TASKS.map(id => h('i', { class: (T[id].done ? 'on' : '') + (isJust(id) ? ' late' : '') })))),
+        ds.all && !ds.chest ? h('button', { class: 'btn primary chest-btn', type: 'button', onclick: openChest }, '🎁 Openen') : null));
+    const path = h('div', { class: 'dp-path' }, items, chest);
+    // de segmenten van zojuist afgevinkte taken vullen zich zichtbaar
+    if (just.length) setTimeout(() => path.querySelectorAll('.dp-segs i.late').forEach(i => i.classList.remove('late')), 450);
+    return h('div', { class: 'dp' }, path, weekStrip());
   }
-  function quick(icon, t, s, fn) { return h('button', { class: 'quick-btn', type: 'button', onclick: fn }, h('span', { class: 'qi' }, icon), h('b', null, t), h('small', null, s)); }
+  function weekStrip(big) {
+    const wk = S.Dagplan.week(st().days), streak = Store.liveStreak();
+    const today = wk.find(x => x.today);
+    const note = today && today.state === 'miss' && streak ? `Oefen vandaag om je reeks van ${U.plural(streak, 'dag', 'dagen')} vast te houden.`
+      : streak ? `🔥 ${U.plural(streak, 'dag', 'dagen')} op rij · ⭐ = dagplan af` : '⭐ = dagplan af · 🔥 = geoefend';
+    return h('div', { class: 'week' + (big ? ' big' : '') },
+      h('div', { class: 'week-days' }, wk.map(x => h('div', { class: 'wk-day ' + x.state + (x.today ? ' today' : ''), title: x.key },
+        h('span', { class: 'wk-dot' }, x.state === 'star' ? '⭐' : x.state === 'fire' ? '🔥' : ''), h('small', null, x.label)))),
+      h('small', { class: 'week-note' }, note));
+  }
+  /* De dagbeloning openen: kist schudt, springt open, XP, Lupe feliciteert. */
+  function openChest() {
+    const d = Store.today(); if (d.done.chest) return;
+    const ds = S.Dagplan.status(d, { due: SRS.dueCount() }); if (!ds.all) return;
+    d.done.chest = true; Store.addXP(S.Dagplan.CHEST_XP); Store.touchStreak();
+    const plans = S.Dagplan.plansDone(st().days);
+    award('plan'); if (plans >= 7) award('plan7'); if (plans >= 30) award('plan30');
+    checkBadges(); Store.save();
+    const streak = Store.liveStreak();
+    const root = document.getElementById('modal-root');
+    const close = () => { root.innerHTML = ''; render(); };
+    const xpEl = h('b', null, '+0');
+    const stage = h('div', { class: 'chest-stage' }, h('div', { class: 'chest-rays' }), h('div', { class: 'chest-box' }, '🎁'),
+      h('div', { class: 'chest-prize' }, xpEl, h('span', null, 'XP')));
+    root.append(h('div', { class: 'modal-bg', onclick: e => { if (e.target.classList.contains('modal-bg')) close(); } },
+      h('div', { class: 'modal reward', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Dagbeloning' },
+        stage,
+        h('h3', null, '¡Plan del día completado!'),
+        h('p', { class: 'center muted' }, 'Herhaling, nieuwe stof en spreken: alles af voor vandaag.'),
+        S.Tutor.coach(S.Tutor.lines.planDone({ streak }), { speak: true, delay: 1300, size: 46 }),
+        h('div', { class: 'stats-row' },
+          h('div', { class: 'stat' }, h('b', null, '+' + S.Dagplan.CHEST_XP), h('span', null, 'XP')),
+          h('div', { class: 'stat' }, h('b', null, '🔥 ' + streak), h('span', null, streak === 1 ? 'dag op rij' : 'dagen op rij')),
+          h('div', { class: 'stat' }, h('b', null, '⭐ ' + plans), h('span', null, plans === 1 ? 'dagplan' : 'dagplannen'))),
+        weekStrip(true),
+        h('div', { class: 'row gap end' }, h('button', { class: 'btn primary', type: 'button', onclick: close }, '¡Genial!')))));
+    S.Sound.tap();
+    setTimeout(() => { stage.classList.add('open'); S.Sound.win(); S.confetti(); countUp(xpEl, 0, S.Dagplan.CHEST_XP, '+', 700); }, calm() ? 0 : 900);
+  }
+  /* Op het eindscherm van een oefening: hoe ver je dagplan is. */
+  function planStrip(closeLesson) {
+    const d = Store.today(), ds = S.Dagplan.status(d, { due: SRS.dueCount() }), seen = d.done.seen || {};
+    const left = S.Dagplan.TASKS.filter(id => !ds.tasks[id].done).map(id => S.Dagplan.NAMES[id].toLowerCase());
+    return h('div', { class: 'dp-strip' + (ds.all ? ' all' : '') },
+      h('div', { class: 'dp-strip-head' }, h('b', null, '📋 Je dagplan'), h('span', null, ds.chest ? '⭐ voltooid' : `${ds.n} van ${ds.total}`)),
+      h('div', { class: 'dp-pills' }, S.Dagplan.TASKS.map(id => {
+        const t = ds.tasks[id];
+        return h('span', { class: 'dp-pill' + (t.done ? ' on' : '') + (t.done && !seen[id] && !t.free ? ' pop' : '') }, h('i', null, t.done ? '✓' : ''), S.Dagplan.NAMES[id]);
+      })),
+      ds.chest ? h('small', null, 'Je dagbeloning heb je al. Alles wat je nu doet, is extra.')
+        : ds.all ? h('button', { class: 'btn primary chest-btn', type: 'button', onclick: () => { wantChest = true; closeLesson(); location.hash = '#/hoy'; } }, '🎁 Naar mijn dagbeloning')
+          : h('small', null, 'Nog te doen: ' + left.join(' en ') + '. Dan wacht er een beloning.'));
+  }
 
   /* ================= RUTA ================= */
   routes.ruta = function () {
@@ -445,6 +572,7 @@
     const ses = resumed || Gen.levelExam(lvl);
     runSession(ses, { desc: { kind: 'exam', lvl }, onFinish: sum => {
       const L = st().levels[lvl] || (st().levels[lvl] = { passed: false, best: 0 });
+      const today = Store.today().done; today.learn = (today.learn || 0) + 1; today.learnLast = 'Niveau-examen ' + lvl;
       L.best = Math.max(L.best || 0, sum.score);
       if (sum.score >= 0.8) {
         L.passed = true; award(lvl); st().fast = 0;
@@ -566,7 +694,7 @@
       quick('📚', 'Woordenboek', 'zoeken + eigen woorden', () => { location.hash = '#/woorden'; }),
       quick('⚡', 'Woordensprint', '2 minuten', () => runSession(Gen.sprint(30))),
       quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10))),
-      quick('🎙️', 'Uitspraak', '8 zinnen', () => runSession(Gen.speakTraining(8))),
+      quick('🎙️', 'Uitspraak', '8 zinnen', () => startSpeak()),
       quick('🔀', 'Extra herhaling', 'ook niet-verlopen', () => { const ids = U.sample(Object.keys(st().srs), 20); if (!ids.length) { S.toast('Nog niets geleerd'); return; } runSession(Gen.reviewSession(20, ids)); }))));
     return wrap;
   };
@@ -605,7 +733,7 @@
   /* ================= DOCENTE (AI) ================= */
   const chat = { mode: 'roleplay', scenario: null, messages: [], busy: false, ctrl: null };
   function unitScenario(u) { return { id: 'unit-' + u.id, icon: u.icon, title: u.title, place: u.dialogue && u.dialogue.place, role: u.scenario.role, goal: u.scenario.goal, nl: u.scenario.nl }; }
-  function startRoleplay(sc) { chat.mode = 'roleplay'; chat.scenario = sc; chat.messages = []; chat.autostart = true; }
+  function startRoleplay(sc) { chat.mode = 'roleplay'; chat.scenario = sc; chat.messages = []; chat.autostart = true; chat.turns = 0; }
   S.startRoleplay = startRoleplay;
 
   routes.docente = function () {
@@ -660,7 +788,12 @@
       try {
         const full = await S.AI.stream({ system: sys, messages: msgs, maxTokens: chat.mode === 'roleplay' ? 1500 : 3000, effort: chat.mode === 'write' ? 'medium' : 'low', onText: t => { am.content = t; fillBubble(b, am); scrollLog(); } });
         am.content = full; fillBubble(b, am);
-        award('ai'); Store.skill(chat.mode === 'write' ? 'write' : 'speak', true); Store.today().min += 0.5; Store.touchStreak(); save();
+        award('ai'); Store.skill(chat.mode === 'write' ? 'write' : 'speak', true); Store.today().min += 0.5; Store.touchStreak();
+        // drie beurten in een rollenspel = de spreektaak van je dagplan
+        if (chat.mode === 'roleplay' && !hidden && (chat.turns = (chat.turns || 0) + 1) >= 3 && !Store.today().done.speak) {
+          Store.today().done.speak = true; S.Sound.good(); S.toast('🗣️ Gesprek gevoerd: spreken is afgevinkt in je dagplan ✓', 3200);
+        }
+        save();
         if (st().settings.tutorVoice) S.Tutor.say(S.Tutor.spoken(full, am.mode));
       } catch (e) {
         chat.messages.pop(); if (!hidden) { /* laat de vraag staan */ }

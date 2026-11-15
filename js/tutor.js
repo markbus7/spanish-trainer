@@ -126,11 +126,17 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     hello(c) {
       // c: { paused, goalDone, streak, lapsed, due, step, unit, min, goal }
       if (c.paused) return { es: '¡Hola! Te quedaste a mitad de una lección. ¿Seguimos donde ibas?', nl: 'Je was halverwege een les. Zullen we verdergaan waar je was?' };
+      if (c.chestReady) return L.chestReady;
+      if (c.planDone) return daily([
+        { es: '¡Plan cumplido! Lo que hagas ahora es extra.', nl: 'Je dagplan is af. Alles wat je nu nog doet, is extra.' },
+        { es: '¡Ya terminaste por hoy! Nos vemos mañana.', nl: 'Je bent klaar voor vandaag. Tot morgen!' }]);
       if (c.goalDone) return daily([
         { es: '¡Meta del día cumplida! Estoy muy orgullosa de ti.', nl: 'Dagdoel gehaald! Ik ben heel trots op je.' },
         { es: '¡Órale! Ya cumpliste tu meta. Todo lo que hagas ahora es extra.', nl: 'Je dagdoel is binnen. Alles wat je nu nog doet, is extra.' }]);
       if (c.lapsed) return { es: '¡Qué gusto verte otra vez! Empecemos con algo cortito.', nl: 'Fijn dat je er weer bent! We beginnen met iets korts.' };
       if (c.due >= 15) return { es: dueEs(c.due), nl: `Je hebt vandaag ${c.due} herhalingen. Begin daarmee, dan vergeet je niets.` };
+      if (c.planLeft === 1) return { es: '¡Ya casi! Solo te falta una tarea.', nl: 'Bijna! Nog maar één taak, dan krijg je je dagbeloning.' };
+      if (c.planLeft === 2 && c.planN) return { es: '¡Una tarea menos! Sigue así.', nl: 'Eén taak afgevinkt. Ga zo door!' };
       if (c.step === 'test') return { es: '¡Hoy toca la prueba de la unidad! Tú puedes.', nl: 'Vandaag is de unittoets aan de beurt. Jij kunt dit!' };
       if (c.streak >= 3) return daily(streakEs(c.streak).map((es, i) => ({ es, nl: i ? `${c.streak} dagen op rij. Hou je reeks vast!` : `Al ${c.streak} dagen op rij! Super.` })));
       if (c.min > 0) return { es: '¡Vas muy bien hoy! Un poquito más y llegas a tu meta.', nl: 'Je bent goed bezig vandaag. Nog even en je haalt je dagdoel.' };
@@ -177,6 +183,14 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
       return { es: '¡Sigue así! Las palabras difíciles vuelven pronto.', nl: 'Ga zo door! De lastige woorden komen snel terug.' };
     },
     review: { es: '¡Todo repasado! Nos vemos mañana.', nl: 'Alles herhaald voor vandaag. Tot morgen!' },
+    chestReady: { es: '¡Terminaste tu plan de hoy! Abre tu cofre.', nl: 'Je dagplan is af! Open je beloning.' },
+    /* Bij het openen van de dagbeloning. */
+    planDone(c = {}) {
+      if (c.streak >= 2 && c.streak <= 30) return { es: `¡Plan del día completado! Llevas ${c.streak} días seguidos.`, nl: `Dagplan voltooid, al ${c.streak} dagen op rij!` };
+      return daily([
+        { es: '¡Plan del día completado! ¡Qué padre!', nl: 'Je hebt je hele dagplan afgerond!' },
+        { es: '¡Lo lograste! Estoy muy orgullosa de ti.', nl: 'Het is je gelukt. Ik ben trots op je!' }]);
+    },
     voiceOn: '¡Perfecto! Ahora te hablo en voz alta.',
     voiceTest: '¡Hola! Soy Lupe. ¿Te gusta mi voz?',
     /* Alle vaste zinnen die Lupe kan zeggen, voor het inspreken (tools/tts-texts.js). units: [{ title, level, grammar }] */
@@ -184,8 +198,9 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
       const out = new Set(), add = x => { if (x && x.es) out.add(x.es); else if (typeof x === 'string') out.add(x); };
       // daily() kiest per dag een variant: loop een paar 'dagen' door om ze allemaal te krijgen
       const U = S.U, pickAll = fn => { const keep = U.dayIndex; for (let d = 0; d < 6; d++) { U.dayIndex = () => d; try { add(fn()); } finally { U.dayIndex = keep; } } };
-      [{ paused: 1 }, { lapsed: 1 }, { step: 'test' }, { min: 1 }].forEach(c => add(L.hello(c)));
-      pickAll(() => L.hello({ goalDone: 1 }));
+      [{ paused: 1 }, { lapsed: 1 }, { step: 'test' }, { min: 1 }, { chestReady: 1 }, { planLeft: 1 }, { planLeft: 2, planN: 1 }].forEach(c => add(L.hello(c)));
+      pickAll(() => L.hello({ goalDone: 1 })); pickAll(() => L.hello({ planDone: 1 })); pickAll(() => L.planDone());
+      for (let n = 2; n <= 30; n++) add(L.planDone({ streak: n }));
       units.forEach(u => pickAll(() => L.hello({ unit: u.title })));
       for (let n = 15; n <= DUE_MAX + 1; n++) add(dueEs(n));
       for (let n = 3; n <= STREAK_MAX + 1; n++) streakEs(n).forEach(add);
