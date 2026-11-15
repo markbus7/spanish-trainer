@@ -181,7 +181,22 @@
         h('small', null, 'Onderbroken ' + when + '. Je antwoorden en score zijn bewaard.')),
       h('div', { class: 'pc-acts' },
         h('button', { class: 'btn primary', type: 'button', onclick: resumePaused }, '▶ Verder'),
-        h('button', { class: 'btn link small', type: 'button', onclick: () => S.confirm('Weggooien?', 'De onderbroken oefening verdwijnt. Wat je al beantwoord hebt, telt wel mee voor je herhaling.', 'Weggooien', () => { Paused.clear(); render(); }) }, 'Weggooien')));
+        h('button', { class: 'btn link small', type: 'button', onclick: () => S.confirm('Opnieuw beginnen?', `Je begint ${p.title} weer bij vraag 1. De score van deze poging vervalt; wat je al beantwoord hebt, telt wel mee voor je herhaling.`, '↺ Opnieuw beginnen', restartPaused) }, '↺ Opnieuw beginnen')));
+  }
+  /* Dezelfde oefening vanaf vraag 1, in plaats van de onderbroken poging te hervatten. */
+  function restartPaused() {
+    const p = Paused.get(); if (!p) { render(); return; }
+    const d = p.desc || {};
+    Paused.clear();
+    if (d.kind === 'step') { const u = C.get(d.unit); if (u) startStep(u, d.step); }
+    else if (d.kind === 'review') startReview(d.limit);
+    else if (d.kind === 'exam') startLevelExam(d.lvl);
+    else {
+      // losse oefening (spreken, dictee …): dezelfde vragen opnieuw, zonder de herhaalkopieën
+      const items = Paused.unpack(p.snap).queue.filter(it => !it.orig);
+      runSession(Object.assign({}, p.meta, { items }), { desc: d });
+    }
+    if (!document.body.classList.contains('in-lesson')) render(); // niets te starten: kaart weg
   }
   /* Voor activiteiten buiten de lessen om (woordspellen): XP, tijd, streak en badges. */
   S.App = {
