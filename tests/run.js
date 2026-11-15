@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/tutor.js', 'js/ai.js']) {
+for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/dagplan.js', 'js/tutor.js', 'js/ai.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -607,6 +607,33 @@ async function micTests() {
 
 (async () => {
 await micTests();
+
+/* ---------- dagplan op Hoy ---------- */
+{
+  const D = S.Dagplan;
+  let st = D.status({ done: {} }, { due: 5 });
+  ok(st.n === 0 && !st.all && st.next === 'review', 'dagplan: leeg begint bij herhaling');
+  st = D.status({ done: {} }, { due: 0 });
+  ok(st.tasks.review.done && st.tasks.review.free && st.next === 'learn', 'dagplan: niets te herhalen telt als klaar');
+  st = D.status({ done: { review0: true } }, { due: 3 });
+  ok(st.tasks.review.done, 'dagplan: eerder vandaag niets te herhalen blijft klaar');
+  st = D.status({ done: { review: true, learn: 2, speak: true } }, { due: 4 });
+  ok(st.all && st.n === 3 && !st.chest && st.next === null, 'dagplan: alles af, beloning nog dicht');
+  const day = { done: { review: true, learn: 1 } };
+  const f1 = D.fresh(day, D.status(day, { due: 1 }));
+  ok(f1.join() === 'review,learn' && D.fresh(day, D.status(day, { due: 1 })).length === 0, 'dagplan: afvinken wordt één keer getoond');
+  const free = { done: {} };
+  ok(D.fresh(free, D.status(free, { due: 0 })).length === 0, 'dagplan: vrije herhaling geen afvinkmoment');
+  const now = new Date(2026, 10, 18, 15); // woensdag
+  const k = d => S.U.todayKey(new Date(2026, 10, d, 15));
+  const wk = D.week({ [k(16)]: { min: 5, done: { chest: true } }, [k(17)]: { min: 3, done: {} } }, now);
+  ok(wk.length === 7 && wk[0].label === 'ma' && wk[0].state === 'star' && wk[1].state === 'fire' && wk[2].today && wk[2].state === 'miss' && wk[3].state === 'future', 'dagplan: weekstrook ma–zo met ster, vuur en vandaag');
+  ok(D.week({}, new Date(2026, 10, 22, 2))[5].today, 'dagplan: zondag 02:00 telt nog als zaterdag');
+  ok(D.plansDone({ a: { done: { chest: true } }, b: { done: {} }, c: {} }) === 1, 'dagplan: geopende beloningen tellen');
+  const L = S.Tutor.lines;
+  ok(L.hello({ chestReady: 1 }).es === L.chestReady.es && L.hello({ paused: 1, chestReady: 1 }).es !== L.chestReady.es, 'Lupe: beloning klaar, maar onderbroken les gaat voor');
+  ok(L.every([]).includes(L.planDone({ streak: 12 }).es) && L.every([]).includes(L.hello({ planLeft: 1 }).es), 'Lupe: dagplanzinnen worden ingesproken');
+}
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);

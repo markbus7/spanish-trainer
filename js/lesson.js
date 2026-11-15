@@ -912,6 +912,7 @@
           statBox('+' + (sum.xp + (extra.bonusXP || 0)), 'XP'),
           statBox(Math.max(1, Math.round(sum.minutes)) + ' min', 'tijd'),
           sum.bestStreak >= 3 ? statBox('🔥 ' + sum.bestStreak, 'op rij') : null),
+        typeof extra.plan === 'function' ? extra.plan(() => close(true)) : null,
         sum.mistakes.length ? h('div', { class: 'mistakes' }, h('h3', null, 'Om te onthouden'),
           dedupe(sum.mistakes).slice(0, 8).map(m => {
             const es = m.it.word ? m.it.word.es : m.it.sentence ? m.it.sentence.replace('___', m.r.expected) : m.it.conj ? m.it.person + ' ' + m.r.expected : m.r.expected;
