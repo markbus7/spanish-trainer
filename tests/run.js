@@ -421,6 +421,51 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   ok(/Lupe/.test(sys) && /\*\*bold\*\*/.test(sys), 'docente-prompt noemt Lupe en de vetregel');
 }
 
+/* ---------- microfoon: spraakherkenning met terugkoppeling (nagebootste herkenning) ---------- */
+async function micTests() {
+  const Sp = S.Speech;
+  let script = null;
+  class FakeRec { start() { Sp._fake = this; setTimeout(() => script && script(this), 0); } stop() { setTimeout(() => this.onend && this.onend(), 0); } abort() { } }
+  const res = (txt, fin, alts) => { const r = (alts || [txt]).map(t => ({ transcript: t })); r.isFinal = fin; return r; };
+  const ev = list => ({ results: list });
+  ctx.webkitSpeechRecognition = FakeRec;
+  ok(Sp.canListen(), 'mic: spraakherkenning gevonden');
+  // tussentijdse tekst + einde zonder isFinal (zo doet Safari het soms): het gehoorde telt
+  let states = [], inter = [];
+  script = r => { r.onstart(); r.onspeechstart(); r.onresult(ev([res('hola', false)])); r.onresult(ev([res('hola Lupe', false)])); r.onend(); };
+  let got = await Sp.listen({ onState: s => states.push(s), onInterim: t => inter.push(t) });
+  ok(got[0] === 'hola Lupe', 'mic: tussentijdse tekst wordt het antwoord: ' + got);
+  ok(states.includes('listening') && states.includes('speech'), 'mic: status luistert/hoort je: ' + states);
+  ok(inter.join('|') === 'hola|hola Lupe', 'mic: live tekst: ' + inter);
+  ok(!Sp.isListening(), 'mic: na afloop luistert hij niet meer');
+  // definitieve uitslag met alternatieven
+  script = r => { r.onstart(); r.onresult(ev([res('', true, ['¿Cómo estás?', 'como estas'])])); r.onend(); };
+  got = await Sp.listen();
+  ok(got.length === 2 && got[0] === '¿Cómo estás?', 'mic: alternatieven: ' + got);
+  // fouten krijgen een duidelijke melding met uitleg
+  for (const code of ['not-allowed', 'service-not-allowed', 'audio-capture', 'network', 'language-not-supported']) {
+    script = r => { r.onstart(); r.onerror({ error: code }); r.onend(); };
+    let err = null; try { await Sp.listen(); } catch (e) { err = e; }
+    ok(err && err.code === code && err.help && err.help.length > 20 && !/Spraakherkenning: /.test(err.message), 'mic: foutmelding ' + code + ': ' + (err && err.message));
+  }
+  // niets gezegd
+  script = r => { r.onstart(); r.onerror({ error: 'no-speech' }); r.onend(); };
+  let err = null; try { await Sp.listen(); } catch (e) { err = e; }
+  ok(err && err.code === 'no-speech' && /niets/i.test(err.message), 'mic: niets gehoord');
+  // zelf stoppen (nog eens tikken) na wat tekst = klaar
+  script = r => { r.onstart(); r.onresult(ev([res('quiero un café', false)])); setTimeout(() => Sp.stopListening(), 5); };
+  got = await Sp.listen();
+  ok(got[0] === 'quiero un café', 'mic: tik nog eens = klaar met wat er gehoord is');
+  // geen browserondersteuning
+  delete ctx.webkitSpeechRecognition;
+  err = null; try { await Sp.listen(); } catch (e) { err = e; }
+  ok(err && err.code === 'unsupported' && err.help, 'mic: niet ondersteund');
+  ok(Sp.micError('onbekend').help, 'mic: onbekende fout heeft ook uitleg');
+}
+
+(async () => {
+await micTests();
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);
+})();

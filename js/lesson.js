@@ -329,20 +329,21 @@
         const finish = score => { role.resolve = null; l._extra.innerHTML = ''; if (score !== null) l._extra.append(h('div', { class: 'small rp-score' + (score >= 75 ? ' good' : '') }, (score >= 75 ? '✅ ' : '〰️ ') + score + '%')); resolve(score); };
         const mic = h('button', { class: 'mic mic-sm', type: 'button', 'aria-label': 'Start opnemen', onclick: async e => {
           e.stopPropagation();
-          if (mic.classList.contains('rec')) { Speech.stopListening(); return; }
-          mic.classList.add('rec'); status.textContent = 'Ik luister…';
+          if (mic.classList.contains('rec')) { live.state('stopping'); Speech.stopListening(); return; }
+          mic.classList.add('rec'); status.textContent = ''; live.start();
           try {
-            const alts = await Speech.listen();
-            mic.classList.remove('rec'); tries++;
+            const alts = await Speech.listen(live.hooks());
+            mic.classList.remove('rec'); tries++; live.hide();
             const best = alts.map(a => [a, S.check.similarity(a, l._es)]).sort((a, b) => b[1] - a[1])[0];
             const score = Math.round(best[1] * 100);
             if (best[1] >= 0.75 || tries >= 3) { S.Store.skill('speak', best[1] >= 0.75); if (best[1] >= 0.75) Sound.good(); else Sound.bad(); finish(score); }
             else { Sound.bad(); status.textContent = `Ik hoorde «${best[0]}» (${score}%). Probeer het nog eens (${tries}/3).`; }
-          } catch (err) { mic.classList.remove('rec'); status.textContent = err.message; }
+          } catch (err) { mic.classList.remove('rec'); live.fail(err); }
         } }, '🎙️');
+        const live = S.Mic.live();
         const hint = h('button', { class: 'btn ghost small', type: 'button', onclick: e => { e.stopPropagation(); l._esEl.classList.remove('hide-es'); Speech.say(l._es); } }, '💡 Voorzeggen');
         const skip = h('button', { class: 'btn ghost small', type: 'button', onclick: e => { e.stopPropagation(); finish(null); } }, 'Overslaan');
-        l._extra.append(h('div', { class: 'row gap wrap rp-ctrl' }, mic, hint, skip), status);
+        l._extra.append(h('div', { class: 'row gap wrap rp-ctrl' }, mic, hint, skip), live.el, status);
       });
     }
 
@@ -490,20 +491,21 @@
       const mic = h('button', { class: 'mic', type: 'button', 'aria-label': 'Start opnemen' }, '🎙️');
       const status = h('div', { class: 'muted small center' }, 'Tik op de microfoon en spreek de zin uit');
       mic.onclick = async () => {
-        if (mic.classList.contains('rec')) { Speech.stopListening(); return; }
-        Speech.stop(); mic.classList.add('rec'); status.textContent = 'Ik luister…';
+        if (mic.classList.contains('rec')) { live.state('stopping'); Speech.stopListening(); return; }
+        Speech.stop(); mic.classList.add('rec'); status.textContent = ''; live.start();
         try {
-          const alts = await Speech.listen();
-          mic.classList.remove('rec'); tries++;
+          const alts = await Speech.listen(live.hooks());
+          mic.classList.remove('rec'); tries++; live.hide();
           const best = alts.map(a => [a, S.check.similarity(a, it.text)]).sort((a, b) => b[1] - a[1])[0];
           heard.innerHTML = ''; heard.append(h('div', { class: 'small muted' }, 'Ik hoorde:'), h('div', { class: 'es' }, '«' + best[0] + '»'));
           const score = Math.round(best[1] * 100);
           if (best[1] >= 0.75) { status.textContent = ''; ctx.submit({ ok: true, user: best[0], expected: it.text, speakScore: score }); }
           else if (tries >= 3) { status.textContent = ''; ctx.submit({ ok: false, user: best[0], expected: it.text, speakScore: score }); }
           else { status.textContent = `Score ${score}% — probeer het nog eens (poging ${tries}/3)`; Sound.bad(); }
-        } catch (e) { mic.classList.remove('rec'); status.textContent = e.message; }
+        } catch (e) { mic.classList.remove('rec'); live.fail(e); }
       };
-      wrap.append(h('div', { class: 'center' }, mic), status);
+      const live = S.Mic.live();
+      wrap.append(h('div', { class: 'center' }, mic), live.el, status);
       ctx.skip('🙊 Kan nu niet praten');
     } else {
       wrap.append(h('p', { class: 'muted small' }, 'Spraakherkenning werkt niet in deze browser (probeer Chrome of Safari). Zeg de zin hardop, luister naar het voorbeeld en beoordeel jezelf:'),

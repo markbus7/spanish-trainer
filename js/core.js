@@ -526,23 +526,94 @@
       });
     },
     stop() { try { speechSynthesis.cancel(); } catch (e) { /* */ } try { this.el && this.el.pause(); } catch (e) { /* */ } if (this._end) this._end(true); },
-    listen() {
+    /* Spraakherkenning met terugkoppeling.
+       opt.onInterim(tekst): wat er tot nu toe herkend is (live).
+       opt.onState(s): 'starting' | 'listening' | 'sound' | 'speech' | 'stopping'.
+       Tik nog eens (stopListening) = klaar: wat al herkend is telt dan als antwoord.
+       Fouten hebben .code en .help (uitleg hoe je het oplost, zie micHelp). */
+    listen(opt = {}) {
       const R = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!R) return Promise.reject(new Error('Spraakherkenning wordt niet ondersteund in deze browser'));
+      if (!R) return Promise.reject(this.micError('unsupported'));
+      if (this._rec) { try { this._rec.abort(); } catch (e) { /* */ } this._rec = null; }
+      // Lupe of een opname mag niet meer praten: op iPad deelt de microfoon het geluidskanaal met het voorlezen.
+      this.stop(); this._talk(false);
+      const state = s => { try { opt.onState && opt.onState(s); } catch (e) { /* */ } };
       return new Promise((resolve, reject) => {
         const r = new R();
         const v = this.voice();
-        r.lang = v && !/es-es/i.test(v.lang) ? v.lang : 'es-MX';
-        r.interimResults = false; r.maxAlternatives = 3; r.continuous = false;
-        let done = false;
-        r.onresult = e => { done = true; const alts = []; for (let i = 0; i < e.results[0].length; i++) alts.push(e.results[0][i].transcript); resolve(alts); };
-        r.onerror = e => { if (!done) { done = true; reject(new Error(e.error === 'not-allowed' ? 'Microfoon geen toestemming' : e.error === 'no-speech' ? 'Niets gehoord — probeer opnieuw' : 'Spraakherkenning: ' + e.error)); } };
-        r.onend = () => { if (!done) { done = true; reject(new Error('Niets gehoord — probeer opnieuw')); } };
-        try { r.start(); } catch (e) { reject(e); }
-        Speech._rec = r;
+        r.lang = v && /^es-(mx|us|419|co|ar|cl|pe|ve|uy|cr|ec|gt|pa|pr|do|bo|py|sv|hn|ni|cu)$/i.test(v.lang.replace('_', '-')) ? v.lang.replace('_', '-') : 'es-MX';
+        r.interimResults = true; r.maxAlternatives = 3; r.continuous = false;
+        let done = false, started = false, finalAlts = null, interim = '', silenceT = null;
+        const timers = [];
+        const finish = (ok, val) => {
+          if (done) return; done = true;
+          timers.forEach(clearTimeout); clearTimeout(silenceT);
+          if (this._rec === r) this._rec = null;
+          ok ? resolve(val) : reject(val);
+        };
+        const heardSoFar = () => finalAlts || (interim ? [interim] : null);
+        r.onstart = () => { started = true; state('listening'); };
+        r.onsoundstart = () => state('sound');
+        r.onspeechstart = () => state('speech');
+        r.onresult = e => {
+          let txt = '';
+          for (let i = 0; i < e.results.length; i++) txt += e.results[i][0].transcript;
+          interim = txt.replace(/\s+/g, ' ').trim();
+          const last = e.results[e.results.length - 1];
+          if (last && last.isFinal) {
+            const alts = [];
+            for (let i = 0; i < last.length; i++) alts.push((e.results.length > 1 ? txt.slice(0, txt.length - last[0].transcript.length) : '') + last[i].transcript);
+            finalAlts = alts.map(a => a.replace(/\s+/g, ' ').trim()).filter(Boolean);
+          }
+          state('speech');
+          try { opt.onInterim && opt.onInterim(interim); } catch (err) { /* */ }
+          // Safari op iPad stopt soms niet vanzelf: na een korte stilte ronden we zelf af.
+          clearTimeout(silenceT);
+          silenceT = setTimeout(() => { try { r.stop(); } catch (err) { /* */ } }, finalAlts ? 300 : 1600);
+        };
+        r.onerror = e => {
+          const got = heardSoFar();
+          if (got && got.length && (e.error === 'no-speech' || e.error === 'aborted')) return finish(true, got);
+          finish(false, this.micError(e.error));
+        };
+        r.onend = () => { const got = heardSoFar(); got && got.length ? finish(true, got) : finish(false, this.micError('no-speech')); };
+        // Start de microfoon niet binnen een paar seconden, dan blijft hij anders stil 'hangen' (zo leek het alsof er niets gebeurde).
+        timers.push(setTimeout(() => { if (!started && !done) { try { r.abort(); } catch (e) { /* */ } finish(false, this.micError('start-timeout')); } }, 6000));
+        timers.push(setTimeout(() => { try { r.stop(); } catch (e) { /* */ } }, opt.max || 20000));
+        this._rec = r;
+        state('starting');
+        try { r.start(); } catch (e) { finish(false, this.micError(e && e.name === 'NotAllowedError' ? 'not-allowed' : 'start-failed', e && e.message)); }
       });
     },
-    stopListening() { try { Speech._rec && Speech._rec.stop(); } catch (e) { /* */ } }
+    stopListening() { try { if (this._rec) { this._rec.stop(); } } catch (e) { /* */ } },
+    isListening() { return !!this._rec; },
+    /* iPad/iPhone (iPadOS doet zich voor als Mac, maar heeft een touchscreen) en 'op beginscherm gezet' */
+    isIOS() { const n = window.navigator || {}, ua = n.userAgent || ''; return /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && n.maxTouchPoints > 1); },
+    isStandalone() { try { return !!((window.navigator && window.navigator.standalone) || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)); } catch (e) { return false; } },
+    /* Een duidelijke foutmelding plus wat je eraan kunt doen. */
+    micError(code, detail) {
+      const ios = this.isIOS(), home = this.isStandalone();
+      const M = {
+        'unsupported': ['Deze browser kan geen spraak herkennen.', ios ? 'Gebruik Safari (iPadOS 14.5 of nieuwer). In Chrome of Firefox op de iPad werkt spraakherkenning niet.' : 'Gebruik Chrome, Edge of Safari. In Firefox werkt spraakherkenning niet.'],
+        'not-allowed': ['De app mag je microfoon niet gebruiken.', ios
+          ? 'Geef toestemming: Instellingen › Apps › Safari › Microfoon › Vraag of Sta toe. Controleer ook Instellingen › Privacy en beveiliging › Spraakherkenning › Safari aan. Kreeg je net een vraag om toestemming en tikte je "Sta niet toe"? Laad de pagina opnieuw en tik dan op "Sta toe".'
+          : 'Klik op het slotje of het microfoonicoon in de adresbalk en sta de microfoon toe. Laad de pagina daarna opnieuw.'],
+        'service-not-allowed': ['Spraakherkenning staat uit op dit apparaat.', ios
+          ? 'Zet Dicteren aan: Instellingen › Algemeen › Toetsenbord › Dicteer (aan). ' + (home ? 'Je gebruikt de app vanaf het beginscherm; daar staat iOS spraakherkenning soms niet toe. Werkt het na Dicteren aanzetten nog niet, open de app dan in Safari.' : 'Herlaad daarna de pagina.')
+          : 'Je browser of systeem staat spraakherkenning niet toe. Probeer Chrome of Edge.'],
+        'no-speech': ['Ik hoorde niets.', 'Tik op de microfoon, wacht tot er "Ik luister" staat en spreek dan duidelijk, niet te ver van het apparaat. Is er een andere app die de microfoon gebruikt (FaceTime, een opname, een koptelefoon die net is losgekoppeld)? Sluit die eerst.'],
+        'audio-capture': ['Er is geen microfoon gevonden.', 'Een andere app gebruikt misschien de microfoon, of je koptelefoon of hoes zit ervoor. Sluit andere apps en probeer opnieuw.'],
+        'network': ['Geen verbinding met de spraakdienst.', 'Spraakherkenning werkt via internet. Controleer je wifi en probeer opnieuw.'],
+        'language-not-supported': ['Spaans wordt op dit apparaat niet herkend.', ios ? 'Voeg Spaans (Mexico) toe als toetsenbord: Instellingen › Algemeen › Toetsenbord › Toetsenborden › Nieuw toetsenbord › Spaans (Mexico). Dan kan ook het dicteren in het Spaans.' : 'Probeer een andere browser (Chrome of Edge).'],
+        'start-timeout': ['De microfoon start niet.', ios ? 'Sluit de app helemaal af (veeg hem omhoog in de appkiezer) en open hem opnieuw. Controleer ook of Dicteren aan staat: Instellingen › Algemeen › Toetsenbord › Dicteer.' : 'Laad de pagina opnieuw en probeer het nog eens.'],
+        'aborted': ['Het luisteren is afgebroken.', 'Tik opnieuw op de microfoon.'],
+        'bad-grammar': ['Spraakherkenning gaf een fout.', 'Probeer het opnieuw.'],
+        'start-failed': ['De microfoon kon niet starten.', 'Probeer het opnieuw. ' + (detail || '')]
+      };
+      const [msg, help] = M[code] || ['Spraakherkenning: ' + code, 'Probeer het opnieuw, of doe de microfoontest in Instellingen.'];
+      const err = new Error(msg); err.code = code; err.help = help;
+      return err;
+    }
   };
   S.Speech = Speech;
 

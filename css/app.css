@@ -646,3 +646,33 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .update-bar .btn { white-space: nowrap; }
 .update-x { background: none; border: 0; color: inherit; opacity: .7; font-size: 1rem; padding: .3rem .4rem; cursor: pointer; }
 #lesson:not([hidden]) ~ .update-bar { display: none; } /* niet storen tijdens een les */
+
+/* ---- Microfoon: luisterstatus, live tekst en foutuitleg ---- */
+.mic-live { border: 2px solid var(--line); background: var(--card); border-radius: 14px; padding: .6rem .8rem; margin: .5rem 0; text-align: left; }
+.mic-live[hidden] { display: none; }
+.mic-row { display: flex; align-items: center; gap: .6rem; font-weight: 700; }
+.mic-wave { display: flex; align-items: center; gap: 3px; height: 26px; flex: none; }
+.mic-wave i { display: block; width: 5px; height: 6px; border-radius: 3px; background: var(--muted); transition: height .15s; }
+.mic-live.st-listening, .mic-live.st-sound, .mic-live.st-speech { border-color: var(--bad); }
+.mic-live.st-listening .mic-wave i { background: var(--bad); animation: micwave 1.4s ease-in-out infinite; }
+.mic-live.st-sound .mic-wave i, .mic-live.st-speech .mic-wave i { background: var(--ok); animation: micwave .55s ease-in-out infinite; }
+.mic-live.bump .mic-wave i { height: 24px; }
+.mic-wave i:nth-child(2) { animation-delay: .12s !important; } .mic-wave i:nth-child(3) { animation-delay: .24s !important; }
+.mic-wave i:nth-child(4) { animation-delay: .36s !important; } .mic-wave i:nth-child(5) { animation-delay: .48s !important; }
+@keyframes micwave { 0%, 100% { height: 6px; } 50% { height: 22px; } }
+.mic-live.st-starting .mic-wave i { animation: micwave 2s ease-in-out infinite; opacity: .5; }
+.mic-live.st-done { border-color: var(--ok); }
+.mic-live.st-done .mic-wave, .mic-live.st-error .mic-wave { display: none; }
+.mic-live.st-error { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 8%, var(--card)); }
+.mic-live.st-error .mic-label { color: var(--bad); }
+.mic-text { font-size: 1.1rem; margin-top: .3rem; min-height: 1.2em; }
+.mic-text:empty { display: none; }
+.mic-tip { margin-top: .25rem; }
+.mic-tip[hidden] { display: none; }
+.mic-help:empty { display: none; }
+.mic-help p { margin: .35rem 0; }
+.mic-meter { height: 14px; border-radius: 7px; background: var(--line); overflow: hidden; }
+.mic-meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--ok), var(--gold, #e5a50a)); transition: width .08s; }
+.mic-test .btn.rec { background: var(--bad); border-color: var(--bad); }
+.mic-env { color: var(--muted); }
+.speak-ex .mic-live { margin: .6rem auto; max-width: 520px; }
