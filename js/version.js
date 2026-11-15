@@ -1,3 +1,3 @@
 /* Versie van de app. Verhoog dit nummer (en de datum) bij elke wijziging die live gaat.
    Het staat in Instellingen, en sw.js gebruikt het als naam voor de offline-cache. */
-self.SPT_VERSION = { number: '1.11.3', date: '2026-11-15' };
+self.SPT_VERSION = { number: '1.11.4', date: '2026-11-15' };
