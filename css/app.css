@@ -676,3 +676,30 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .mic-test .btn.rec { background: var(--bad); border-color: var(--bad); }
 .mic-env { color: var(--muted); }
 .speak-ex .mic-live { margin: .6rem auto; max-width: 520px; }
+
+/* ---------- Profe Lupe als begeleider (js/tutor.js: coach/hero) ---------- */
+:root { --lupe-bub: #fde4ee; --lupe-who: #b8336a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --lupe-bub: #3a2230; --lupe-who: #f59cc0; } }
+:root[data-theme="dark"] { --lupe-bub: #3a2230; --lupe-who: #f59cc0; }
+.lupe-coach { display: flex; align-items: flex-end; gap: .6rem; margin: .9rem 0; }
+.lupe-coach.can-talk { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.lupe-coach .coach-av { position: relative; animation: lupe-bob 3.2s infinite ease-in-out; }
+.lc-bubble { position: relative; flex: 1; min-width: 0; background: var(--lupe-bub); color: var(--ink); border-radius: 16px 16px 16px 4px; padding: .55rem .8rem; box-shadow: var(--shadow); }
+.lc-bubble::before { content: ''; position: absolute; left: -7px; bottom: 6px; border-style: solid; border-width: 7px 7px 7px 0; border-color: transparent var(--lupe-bub) transparent transparent; }
+.lc-who { font-size: .72rem; font-weight: 700; color: var(--lupe-who); text-transform: uppercase; letter-spacing: .04em; }
+.lc-es { font-family: var(--serif); font-weight: 600; font-size: 1.05rem; line-height: 1.35; }
+.lc-nl { font-size: .86rem; color: var(--ink2); margin-top: .15rem; }
+.lupe-coach.can-talk .lc-es::after { content: ' 🔊'; font-size: .8em; opacity: .55; }
+.lupe-coach:has(.lupe.talking) .lc-bubble { outline: 2px solid #f0789f; }
+/* groot en gecentreerd: eindscherm van een les of spel, welkom */
+.lupe-coach.lc-hero { flex-direction: column; align-items: center; text-align: center; gap: .7rem; max-width: 420px; margin: .4rem auto 1rem; }
+.lupe-coach.lc-hero .lc-bubble { border-radius: 16px; width: 100%; box-sizing: border-box; }
+.lupe-coach.lc-hero .lc-bubble::before { left: 50%; top: -7px; bottom: auto; margin-left: -7px; border-width: 0 7px 7px 7px; border-color: transparent transparent var(--lupe-bub) transparent; }
+.lupe-coach.lc-hero .coach-av { animation: pop .5s, lupe-bob 3.2s .5s infinite ease-in-out; }
+.lc-badge { position: absolute; right: -10px; bottom: -4px; font-size: 2rem; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,.15)); }
+.lupe-coach.lc-sum { margin: .8rem 0 .2rem; }
+.lupe-coach.lc-sum .lc-es { font-size: .98rem; }
+/* klein naast de feedback na een antwoord */
+.fb-head { display: flex; align-items: center; gap: .5rem; }
+.fb-lupe svg { transition: transform .2s; }
+.fb-lupe.sad svg { transform: rotate(-10deg) translateY(2px); }

@@ -218,7 +218,8 @@
     const wrap = h('div', { class: 'grammar' },
       h('div', { class: 'eyebrow' }, '🧩 ' + (g.es || 'Gramática')),
       h('h2', null, g.t));
-    if (g.sum && es) wrap.append(h('div', { class: 'sum' }, '🇪🇸 ' + g.sum));
+    const sumEl = () => S.Tutor.coach({ es: g.sum, nl: es ? '' : 'Kort samengevat, in het Spaans. Tik om het te horen.' }, { size: 44, label: 'Profe Lupe vat samen', cls: 'lc-sum' }) || h('div', { class: 'sum' }, '🇪🇸 ' + g.sum);
+    if (g.sum && es) wrap.append(sumEl());
     const body = h('div', { class: 'prose', html: g.html });
     if (es) { const d = h('details', null, h('summary', null, 'Uitleg in het Nederlands'), body); wrap.append(d); } else wrap.append(body);
     if (g.table) {
@@ -227,7 +228,7 @@
       wrap.append(h('div', { class: 'table-wrap' }, tb));
     }
     if (g.ex) wrap.append(h('div', { class: 'examples' }, g.ex.map(([e, n]) => h('div', { class: 'ex-line' }, speakBtn(e), h('div', null, h('div', { class: 'es', lang: 'es' }, e), h('div', { class: 'nl' }, n))))));
-    if (g.sum && !es) wrap.append(h('div', { class: 'sum' }, '🇪🇸 ' + g.sum));
+    if (g.sum && !es) wrap.append(sumEl());
     return wrap;
   }
   S.grammarBlock = grammarBlock;
@@ -725,8 +726,11 @@
     function renderFeedback(it, r) {
       foot.classList.add(r.ok ? 'ok' : 'bad');
       fb.className = 'ls-fb show';
-      if (r.silent && r.ok) { fb.append(h('div', { class: 'fb-title' }, U.pick(PRAISE))); return; }
-      fb.append(h('div', { class: 'fb-title' }, r.dontKnow ? 'Geen probleem!' : r.ok ? U.pick(PRAISE) : U.pick(OOPS)));
+      // Profe Lupe reageert op je antwoord (klein, naast de titel)
+      const streakLine = r.ok && session.mode !== 'exam' ? S.Tutor.lines.streak(streak) : null;
+      const fbTitle = t => S.Tutor.coachOn() ? h('div', { class: 'fb-head' }, S.Tutor.avatar(34, 'fb-lupe' + (r.ok ? '' : ' sad')), h('div', { class: 'fb-title' }, streakLine || t)) : h('div', { class: 'fb-title' }, streakLine || t);
+      if (r.silent && r.ok) { fb.append(fbTitle(U.pick(PRAISE))); return; }
+      fb.append(fbTitle(r.dontKnow ? 'Geen probleem!' : r.ok ? U.pick(PRAISE) : U.pick(OOPS)));
       if (r.dontKnow) fb.append(h('div', { class: 'small' }, '🔁 Dit komt later terug in je herhaling.'));
       if (r.ok && r.hinted) fb.append(h('div', { class: 'small' }, '💡 Goed, met ' + (r.hinted === 1 ? 'een hint' : r.hinted + ' hints') + ' — je krijgt hem straks nog een keer.'));
       if (r.matchMistakes) fb.append(h('div', null, r.matchMistakes + (r.matchMistakes === 1 ? ' fout' : ' fouten') + ' — die woorden komen terug in je herhaling.'));
@@ -800,8 +804,9 @@
       const emoji = extra.emoji || (passed === false ? '💪' : pct >= 90 ? '🏆' : pct >= 70 ? '🎉' : '👍');
       if (passed !== false && pct >= 80) S.confetti();
       S.Sound.win();
+      const line = extra.lupe || S.Tutor.lines.summary({ pct, passed, total: sum.total, mistakes: sum.mistakes.length, unitDone: extra.unitDone });
       body.append(h('div', { class: 'summary' },
-        h('div', { class: 'sum-emoji' }, emoji),
+        S.Tutor.hero(line, emoji, { speak: true }) || h('div', { class: 'sum-emoji' }, emoji),
         h('h2', null, extra.title || (pct >= 80 ? '¡Muy bien!' : '¡Buen trabajo!')),
         extra.text ? h('p', { class: 'center' }, extra.text) : null,
         h('div', { class: 'stats-row' },

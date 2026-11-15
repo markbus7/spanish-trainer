@@ -243,7 +243,7 @@
     g.body.innerHTML = ''; g.foot.innerHTML = '';
     if (score >= 0.8 && n) { S.Sound.win(); S.confetti(); }
     g.body.append(h('div', { class: 'gm-result' },
-      h('div', { class: 'gm-result-emoji' }, score >= 0.95 ? '🏆' : score >= 0.7 ? '🎉' : '💪'),
+      (n && S.Tutor.hero(S.Tutor.lines.game(score), score >= 0.95 ? '🏆' : score >= 0.7 ? '🎉' : '💪')) || h('div', { class: 'gm-result-emoji' }, score >= 0.95 ? '🏆' : score >= 0.7 ? '🎉' : '💪'),
       h('h2', null, title || (score >= 0.95 ? '¡Perfecto!' : score >= 0.7 ? '¡Muy bien!' : '¡Sigue así!')),
       h('p', { class: 'muted' }, (typeof text === 'function' ? text() : text) || (good + ' van ' + n + ' woorden in één keer goed · +' + g.xp + ' XP')),
       h('div', { class: 'gm-words' }, list.map(({ w, ok }) => h('div', { class: 'gm-wrow ' + (ok ? 'ok' : 'no') },

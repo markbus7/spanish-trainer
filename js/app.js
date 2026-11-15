@@ -219,7 +219,7 @@
             const nxt = C.next(u.id);
             if (st().current === u.id && nxt) st().current = nxt.id;
             const lvlDone = C.unitsOf(u.level).every(x => P.unitState(x.id).done || P.unitState(x.id).tested);
-            const res = { passed: true, bonusXP: 100 + (sum.score === 1 ? 50 : 0), emoji: '🏅', title: '¡Unidad completada!',
+            const res = { passed: true, unitDone: true, bonusXP: 100 + (sum.score === 1 ? 50 : 0), emoji: '🏅', title: '¡Unidad completada!',
               text: lvlDone ? `Alle units van ${u.level} zijn klaar. Tijd voor het niveau-examen! 🎓` : (nxt ? 'Volgende unit ontgrendeld: ' + nxt.icon + ' ' + nxt.title : ''),
               nextLabel: nxt && !lvlDone ? 'Naar de volgende unit' : 'Klaar', next: () => { location.hash = nxt && !lvlDone ? '#/unit/' + nxt.id : '#/ruta'; } };
             // gaat het heel goed? stel voor om sneller door de stof te gaan
@@ -259,7 +259,7 @@
   function startReview(limit = 25, resumed) {
     const s = resumed || Gen.reviewSession(limit);
     if (!s.items.length && !s.resume) { S.toast('Niets te herhalen. ¡Bien hecho!'); return; }
-    runSession(s, { desc: { kind: 'review', limit }, onFinish: sum => { Store.today().done.review = true; const left = SRS.dueCount(); return { title: 'Herhaling klaar', text: left ? `Er staan nog ${left} items klaar. Ga door of kom later terug.` : 'Alles herhaald voor vandaag! 🎉', nextLabel: left ? 'Nog een ronde' : 'Klaar', next: () => { if (left) startReview(limit); } }; } });
+    runSession(s, { desc: { kind: 'review', limit }, onFinish: sum => { Store.today().done.review = true; const left = SRS.dueCount(); return { lupe: left ? null : S.Tutor.lines.review, title: 'Herhaling klaar', text: left ? `Er staan nog ${left} items klaar. Ga door of kom later terug.` : 'Alles herhaald voor vandaag! 🎉', nextLabel: left ? 'Nog een ronde' : 'Klaar', next: () => { if (left) startReview(limit); } }; } });
   }
 
   /* ================= Router ================= */
@@ -307,7 +307,8 @@
       Store.save(); location.hash = '#/hoy'; render();
     });
     return h('div', { class: 'welcome' },
-      h('div', { class: 'hero' }, h('div', { class: 'hero-emoji' }, '🌎'), h('h1', null, '¡Bienvenido!'), h('p', null, 'Leer Latijns-Amerikaans Spaans stap voor stap: van A1 naar B1 en verder, tot C2.')),
+      h('div', { class: 'hero' }, S.Tutor.coachOn() ? null : h('div', { class: 'hero-emoji' }, '🌎'), h('h1', null, '¡Bienvenido!'), h('p', null, 'Leer Latijns-Amerikaans Spaans stap voor stap: van A1 naar B1 en verder, tot C2.')),
+      S.Tutor.hero(S.Tutor.lines.welcome, '🌎'),
       section('Hoe heet je?', name),
       section('Waar begin je?',
         h('button', { class: 'choice primary', type: 'button', onclick: () => go(() => { location.hash = '#/toets'; }) }, h('b', null, '🧭 Niveautest (aanbevolen)'), h('span', null, '±8 minuten. Ik bepaal je niveau en zet je op de juiste plek. Je kunt de test later altijd opnieuw doen via je profiel.')),
@@ -327,6 +328,10 @@
       h('div', null, h('h1', null, greeting()), h('p', { class: 'muted' }, min >= goal ? '🎯 Dagdoel gehaald! Alles wat je nu nog doet, is extra.' : `Vandaag: ${min} van ${goal} minuten.`),
         h('div', { class: 'chips' }, h('span', { class: 'chip' }, '🔥 ' + U.plural(Store.liveStreak(), 'dag', 'dagen')), h('span', { class: 'chip' }, '📈 ' + P.estimate().label))),
       ring(min / goal, min + "'", 'van ' + goal + "'")));
+    // Profe Lupe begroet je en zegt waar je vandaag het best mee begint
+    const anyDays = Object.values(s.days).some(x => x.min > 0 || x.items > 0);
+    wrap.append(S.Tutor.coach(S.Tutor.lines.hello({ paused: !!Paused.get(), goalDone: min >= goal, streak: Store.liveStreak(), lapsed: anyDays && !Store.liveStreak() && !d.items,
+      due, step: step && step.id, unit: u.title, unitNl: u.nl, min }), { cls: 'hoy-lupe' }));
 
     const plan = h('div', { class: 'plan' });
     // 0. onderbroken oefening
@@ -420,7 +425,7 @@
       L.best = Math.max(L.best || 0, sum.score);
       if (sum.score >= 0.8) {
         L.passed = true; award(lvl); st().fast = 0;
-        const res = { passed: true, bonusXP: 300, emoji: '🎓', title: '¡Nivel ' + lvl + ' aprobado!', text: 'Gefeliciteerd! Je hebt het niveau-examen ' + lvl + ' gehaald met ' + Math.round(sum.score * 100) + '%.', next: () => { location.hash = '#/ruta'; } };
+        const res = { passed: true, unitDone: true, bonusXP: 300, emoji: '🎓', title: '¡Nivel ' + lvl + ' aprobado!', text: 'Gefeliciteerd! Je hebt het niveau-examen ' + lvl + ' gehaald met ' + Math.round(sum.score * 100) + '%.', next: () => { location.hash = '#/ruta'; } };
         const nx = C.LEVELS[lvIdx(lvl) + 1];
         if (nx && C.available(nx.id) && lvIdx(lessonLevel()) <= lvIdx(lvl)) {
           res.text += ` Je lessen staan nog op ${lessonLevel()}. Wil je verder met ${nx.id}? De units die je nog niet had afgerond, blijven open om te herhalen.`;
@@ -730,6 +735,7 @@
         h('h1', null, s.name || 'Mijn profiel'),
         h('p', { class: 'muted small' }, 'Leert Spaans sinds ' + fmtDate(s.created) + ' · ' + U.plural(activeDays, 'dag', 'dagen') + ' geoefend'),
         h('div', { class: 'chips' }, h('span', { class: 'chip' }, '📈 ' + est.label), h('span', { class: 'chip' }, '🔥 ' + U.plural(Store.liveStreak(), 'dag', 'dagen')), h('span', { class: 'chip' }, '⭐ ' + s.xp + ' XP')))));
+    wrap.append(S.Tutor.coach(S.Tutor.lines.profile({ words: wordStats(C.all()).seen, days: activeDays, streak: Store.liveStreak() })));
 
     // ---- niveau ----
     const les = lessonLevel(); const cur = P.current();
@@ -1010,6 +1016,7 @@
     const t = r.rec; const res = Gen.levelTestResult(t.bands, TEST_ORDER);
     const prev = testsOf().filter(x => x.d < t.d).pop();
     const wrap = h('div', { class: 'page' }, h('h1', null, 'Uitslag niveautest'));
+    wrap.append(S.Tutor.coach(S.Tutor.lines.result({ level: t.level, first: !prev, up: prev && lvIdx(t.level) > lvIdx(prev.level), down: prev && lvIdx(t.level) < lvIdx(prev.level) }), { speak: true }));
     const trend = prev ? (lvIdx(t.level) > lvIdx(prev.level) ? '📈 Hoger dan je vorige test (' + (prev.level || 'beginner') + ')' : lvIdx(t.level) < lvIdx(prev.level) ? '📉 Lager dan je vorige test (' + (prev.level || 'beginner') + '). Dat kan gebeuren: doe hem later nog eens.' : '➡️ Gelijk aan je vorige test') : null;
     wrap.append(h('div', { class: 'card level-est' },
       h('div', { class: 'muted small' }, 'Je beheerst'),
@@ -1093,6 +1100,7 @@
       Speech.canSpeak() ? label(Speech.clips ? 'Stem van het apparaat (voor de rest)' : 'Voorleesstem', voiceSel) : h('p', { class: 'warn' }, 'Je browser ondersteunt geen voorlezen.'),
       label('Spreeksnelheid apparaatstem', rate),
       toggle('Dialogen eerst alleen beluisteren', 'De tekst is wazig tot je hem zelf zichtbaar maakt. Goed voor je luistervaardigheid.', s.listenFirst !== false, v => set('listenFirst', v)),
+      toggle('Profe Lupe als begeleider', 'Lupe begroet je op Hoy, reageert op je antwoorden, vat de grammatica samen en feliciteert je na een les. Tik op haar om haar te horen.', S.Tutor.coachOn(), v => set('lupeCoach', v)),
       label('Stem van Lupe (docente)', h('select', { class: 'input', onchange: e => { set('lupeVoice', e.target.value); S.Tutor.say('¡Hola! Soy Lupe. ¿Te gusta mi voz?'); } },
         [['girl', 'Meisje (hoge stem)'], ['woman', 'Vrouw']].map(([v, l]) => h('option', { value: v, selected: (s.lupeVoice || 'girl') === v ? true : null }, l)))),
       h('button', { class: 'btn ghost', type: 'button', onclick: runTest }, '🔊 Test de stemmen'), voiceOut,
