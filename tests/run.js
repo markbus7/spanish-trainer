@@ -310,6 +310,38 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
   S.Store.state = keep;
 }
 
+{ // moeilijk en makkelijk afwisselen
+  const keep = S.Store.state; S.Store.state = JSON.parse(JSON.stringify(keep));
+  const G = S.Gen, t = S.U.dayIndex(); S.Store.state.srs = {};
+  const runOf = xs => { let m = 0, r = 0; xs.forEach(x => { r = G.isHard(x) ? r + 1 : 0; m = Math.max(m, r); }); return m; };
+  const mkH = n => Array.from({ length: n }, (_, i) => ({ kind: 'type', translate: true, n: 'h' + i }));
+  const mkE = n => Array.from({ length: n }, (_, i) => ({ kind: 'mc', n: 'e' + i }));
+  for (const [h, e] of [[10, 5], [6, 10], [3, 3], [12, 4], [1, 9]]) {
+    const out = G.mix(S.U.shuffle(mkH(h).concat(mkE(e))));
+    ok(out.length === h + e && new Set(out).size === h + e, `afwisselen ${h}/${e}: alle vragen blijven`);
+    ok(!G.isHard(out[0]) && !G.isHard(out[out.length - 1]), `afwisselen ${h}/${e}: begint en eindigt makkelijk`);
+    ok(runOf(out) <= Math.max(1, Math.ceil(h / (e - 1))), `afwisselen ${h}/${e}: niet te veel moeilijke op rij (${runOf(out)})`);
+  }
+  ok(runOf(G.mix(mkH(8).concat(mkE(5)))) <= 2, 'afwisselen: 8 moeilijke + 5 makkelijke → max 2 op rij');
+  // keepOrder houdt de opbouw van de lesstof
+  const ord = G.mix(mkE(3).concat(mkH(6)), { keepOrder: true }).filter(G.isHard).map(x => x.n).join();
+  ok(ord === 'h0,h1,h2,h3,h4,h5', 'afwisselen: volgorde van de lesstof blijft');
+  // vaak fout → moeilijker; al lang bekend → makkelijker
+  S.Store.state.srs = { a: { d: t, i: 0, e: 2, r: 0, l: 3, g: 1, f: 4 }, b: { d: t, i: 30, e: 2.8, r: 6, l: 0, g: 6, f: 0 } };
+  ok(G.isHard({ kind: 'mc', fill: true, srsId: 'a' }) && !G.isHard({ kind: 'type', srsId: 'b' }), 'afwisselen: zwakke kaart zwaar, sterke kaart licht');
+  // na fouten op rij: makkelijkere vraag naar voren, niet voorbij een uitleg
+  const q = [{ kind: 'mc' }, ...mkH(2), { kind: 'mc', n: 'x' }, { kind: 'info' }, { kind: 'mc', n: 'y' }];
+  ok(G.easeNext(q, 1) && q[1].n === 'x' && q.length === 6, 'afwisselen: makkelijke vraag naar voren');
+  const q2 = [...mkH(2), { kind: 'card' }, { kind: 'mc' }];
+  ok(!G.easeNext(q2, 0), 'afwisselen: niet voorbij een woordkaart');
+  // echte herhaling: SRS-keuze blijft gelijk
+  S.C.all().slice(0, 4).forEach(u => u.vocab.forEach((_, i) => { S.Store.state.srs['w|' + u.id + '|' + i] = { d: t - 1, i: 30, e: 2.5, r: i % 4, l: i % 3, g: 1, f: i % 5 }; }));
+  const due = S.SRS.due(25), ses = G.reviewSession(25);
+  ok(ses.items.length === due.length && ses.items.every(it => due.includes(it.srsId)), 'afwisselen: herhaling oefent dezelfde items');
+  ok(runOf(ses.items) <= 2 || ses.items.filter(G.isHard).length * 1 > 2 * (ses.items.length - ses.items.filter(G.isHard).length + 1), 'afwisselen: herhaling max 2 moeilijke op rij');
+  S.Store.state = keep;
+}
+
 /* ---------- onderbroken oefening hervatten ---------- */
 {
   const P = S.Paused, G = S.Gen;
