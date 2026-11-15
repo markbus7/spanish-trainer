@@ -264,6 +264,8 @@
     // afwisselen: geen twee vervoegingen achter elkaar als het kan
     return { title: 'Herhaling', items: spread(items), mode: 'review' };
   }
+  // hoeveel verlopen items echt te oefenen zijn (items van verwijderde lesstof tellen niet mee)
+  function reviewCount() { return S.SRS.due().filter(id => resolve(id)).length; }
   function spread(items) {
     const byKind = {}; items.forEach(i => { const k = i.conj ? 'c' : i.word ? 'w' : 'x'; (byKind[k] = byKind[k] || []).push(i); });
     const keys = Object.keys(byKind).map(k => U.shuffle(byKind[k])); const out = [];
@@ -354,5 +356,5 @@
     return { level, next, nextFrac: nb && nb.n ? nb.ok / nb.n : 0 };
   }
 
-  S.Gen = { STEPS, stepSession, reviewSession, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART, forms, wordSynonyms, checkType };
+  S.Gen = { STEPS, stepSession, reviewSession, reviewCount, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART, forms, wordSynonyms, checkType };
 })(window.SPT);
