@@ -461,6 +461,14 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   ok(S.Speech.chunks('¿Cómo estás?').length === 1, 'korte tekst blijft één stuk');
   const sys = S.AI.askSystem();
   ok(/Lupe/.test(sys) && /\*\*bold\*\*/.test(sys), 'docente-prompt noemt Lupe en de vetregel');
+  // «Vraag het Lupe»: het scherm (dialoog, vraag, antwoord) gaat mee in de prompt
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/ask.js'), 'utf8'), ctx, { filename: 'js/ask.js' });
+  const askSys = S.Ask.system({ text: 'Daniel: Bueno, nos vemos en clase. ¡Chao!' });
+  ok(/nos vemos en clase/.test(askSys) && /<screen>/.test(askSys) && /Lupe/.test(askSys), 'vraag-het-Lupe: schermtekst en Lupe in de prompt');
+  ok(/not answered yet/i.test(askSys), 'vraag-het-Lupe: verklapt geen antwoord op een open vraag');
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8'), sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  ok(html.indexOf('js/ask.js') > html.indexOf('js/lesson.js') && html.indexOf('js/ask.js') < html.indexOf('js/app.js'), 'vraag-het-Lupe: script geladen tussen lesson.js en app.js');
+  ok(sw.includes("'js/ask.js'"), 'vraag-het-Lupe: script zit in de offline-cache');
 }
 
 /* ---------- Profe Lupe als begeleider: elke situatie heeft een Spaanse zin, Latijns-Amerikaans ---------- */

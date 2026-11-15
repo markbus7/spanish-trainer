@@ -736,6 +736,8 @@
     if (sp && Speech.canSpeak()) body.append(h('button', { class: 'btn link small replay', type: 'button', title: 'Laat Lupe het nog eens zeggen' , onclick: e => { e.stopPropagation(); S.Tutor.say(sp); } }, '🔊 Nog eens'));
   }
 
+  S.ChatUI = { bubble, fillBubble }; // ook voor «Vraag het Lupe» (js/ask.js)
+
   /* ================= PERFIL (alles over je voortgang) ================= */
   function fmtDate(t, opt) { return new Date(t).toLocaleDateString('nl-NL', opt || { day: 'numeric', month: 'long', year: 'numeric' }); }
   function wordStats(units) {
@@ -1130,6 +1132,7 @@
       Speech.canSpeak() ? label(Speech.clips ? 'Stem van het apparaat (voor de rest)' : 'Voorleesstem', voiceSel) : h('p', { class: 'warn' }, 'Je browser ondersteunt geen voorlezen.'),
       label('Spreeksnelheid apparaatstem', rate),
       toggle('Dialogen eerst alleen beluisteren', 'De tekst is wazig tot je hem zelf zichtbaar maakt. Goed voor je luistervaardigheid.', s.listenFirst !== false, v => set('listenFirst', v)),
+      toggle('Vraag-het-Lupe-knop rechts', 'Een knopje met Lupe aan de rechterkant. Tik erop om haar iets te vragen over wat je op dat moment ziet (dialoog, vraag, je antwoord). Werkt met je API-sleutel van de AI-docent. Je kunt het knopje omhoog of omlaag schuiven.', st().settings.lupeAsk !== false, v => { set('lupeAsk', v); S.Ask && S.Ask.sync(); }),
       toggle('Profe Lupe als begeleider', 'Lupe begroet je op Hoy, reageert op je antwoorden, vat de grammatica samen en feliciteert je na een les. Tik op haar om haar te horen.', S.Tutor.coachOn(), v => set('lupeCoach', v)),
       label('Stem van Lupe (docente)', h('select', { class: 'input', onchange: e => { set('lupeVoice', e.target.value); S.Tutor.say('¡Hola! Soy Lupe. ¿Te gusta mi voz?'); } },
         [['girl', 'Meisje (hoge stem)'], ['woman', 'Vrouw']].map(([v, l]) => h('option', { value: v, selected: (s.lupeVoice || 'girl') === v ? true : null }, l)))),
@@ -1342,6 +1345,7 @@
     const ver = document.getElementById('tb-ver'); if (ver) ver.textContent = appVersion();
     window.addEventListener('hashchange', render);
     render();
+    if (S.Ask) S.Ask.init();
     if (S.Sync) S.Sync.init();
     if ('serviceWorker' in navigator && /^https:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js?v=' + encodeURIComponent(V.number), { updateViaCache: 'none' }).catch(() => {});
     if (location.search.includes('u=')) history.replaceState(null, '', location.pathname + location.hash); // adres na bijwerken weer netjes
