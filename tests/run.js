@@ -127,6 +127,10 @@ for (const u of units) {
     ses.items.forEach(it => { if (it.kind === 'type') ok(it.answers && it.answers.length && it.answers.every(Boolean), where + ' ' + st.id + ' type-item zonder antwoord'); });
   }
 }
+// hervatte toets van vóór v1.16.1 (leesvraag zonder src) krijgt de tekst er weer bij
+{ const u = units.find(u => u.reading); const it = { ...S.Gen.stepSession(u, 'test').items.find(it => it.src) }; delete it.src;
+  const back = S.Paused.unpack(S.Paused.pack({ queue: [it], idx: 0, graded: new Map(), mistakes: [], xp: 0, streak: 0, bestStreak: 0, activeMs: 0, paidXp: 0, paidMs: 0 })).queue;
+  S.Gen.attachSrc(back); ok(back[0].src && back[0].src.reading === u.reading, 'hervatte leesvraag krijgt tekst terug'); }
 // leesvraag in de unittoets brengt de tekst mee (📖 Tekst), anders kun je hem niet beantwoorden
 for (const u of units.filter(u => u.reading)) {
   const rq = S.Gen.stepSession(u, 'test').items.filter(it => it.skill === 'read' && it.q && it.q.startsWith('«'));

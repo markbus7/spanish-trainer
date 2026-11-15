@@ -639,6 +639,7 @@
     // hervatten: de bewaarde rij, antwoorden en score van een onderbroken les terugzetten
     const R0 = session.resume ? S.Paused.unpack(session.resume) : null;
     const queue = R0 ? R0.queue : session.items.filter(Boolean).slice();
+    if (R0) S.Gen.attachSrc(queue); // hervatte toets van vóór v1.16.1: tekst alsnog bij de leesvraag
     const graded = R0 ? R0.graded : new Map(); // item -> first result
     const total = queue.filter(it => !it.orig && isGraded(it)).length;
     let idx = 0, activeMs = 0, last = Date.now(), xp = 0, streak = 0, bestStreak = 0, misses = 0, answered = false, leaveFns = [];

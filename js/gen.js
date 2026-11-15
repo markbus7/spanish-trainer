@@ -210,6 +210,16 @@
     if (u.reading) { const q = U.pick(u.reading.q); items.push({ ...normEx(q, null, null, { noSrs: true, skill: 'read' }), q: '«' + u.reading.t + '» — ' + q.q, skill: 'read', tag: 'vocab', src: { kind: 'reading', reading: u.reading } }); }
     return { title: u.title + ' · Unittoets', items: mix(U.shuffle(items.filter(Boolean))), mode: 'test', pass: 0.8 };
   }
+  /* Oudere (hervatte) toetsen bewaarden de leesvraag zonder tekst: zoek de tekst er weer bij via «titel». */
+  function attachSrc(items) {
+    items.forEach(it => {
+      if (!it || it.src || it.skill !== 'read' || typeof it.q !== 'string') return;
+      const m = it.q.match(/^«(.+?)» — /); if (!m) return;
+      const u = C.all().find(u => u.reading && u.reading.t === m[1]);
+      if (u) it.src = { kind: 'reading', reading: u.reading };
+    });
+    return items;
+  }
   function stepSession(u, step) {
     switch (step) {
       case 'vocab1': return vocabSession(u, 1);
@@ -431,5 +441,5 @@
     return { level, next, nextFrac: nb && nb.n ? nb.ok / nb.n : 0 };
   }
 
-  S.Gen = { difficulty, isHard, mix, easeNext, STEPS, stepSession, reviewSession, reviewCount, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART, forms, wordSynonyms, checkType };
+  S.Gen = { attachSrc, difficulty, isHard, mix, easeNext, STEPS, stepSession, reviewSession, reviewCount, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART, forms, wordSynonyms, checkType };
 })(window.SPT);
