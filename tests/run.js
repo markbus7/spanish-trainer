@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/tutor.js', 'js/ai.js']) {
+for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/tutor.js', 'js/ai.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -421,6 +421,38 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
   let n = 0; units.forEach(u => S.C.words(u).forEach(w => { n += G.wordSynonyms(w).length; }));
   ok(n > 100, 'aantal synoniemen ' + n);
 }
+/* ---------- ⓘ uitleg zonder AI (content/uitleg.js) ---------- */
+{
+  const UL = S.Uitleg;
+  const texts = [];
+  units.forEach(u => {
+    if (u.dialogue) u.dialogue.lines.forEach(l => texts.push(l[1]));
+    if (u.reading) u.reading.p.forEach(p => texts.push(p[0]));
+    u.grammar.forEach(g => (g.ex || []).forEach(e => texts.push(e[0])));
+    u.say.forEach(e => texts.push(e[0]));
+    u.ex.forEach(e => { if (e.s) texts.push(e.a ? e.s.replace('___', e.a[0]) : e.s); (e.a || []).forEach(a => texts.push(a)); });
+  });
+  const normed = texts.map(UL.norm);
+  Object.keys(UL.ZINNEN).forEach(k => { const n = UL.norm(k); ok(normed.some(t => t.includes(n)), 'uitleg: zin staat niet (meer) in de lesstof: ' + k); });
+  UL._patterns.forEach(p => ok(normed.some(t => p.re.test(t)), 'uitleg: patroon raakt geen enkele zin: ' + p.t));
+  const tags = h => ['b', 'i', 's'].every(t => (h.match(new RegExp('<' + t + '>', 'g')) || []).length === (h.match(new RegExp('</' + t + '>', 'g')) || []).length);
+  Object.entries(UL.ZINNEN).forEach(([k, v]) => ok(tags(v) && !/vosotros(?!<\/s>)/.test(v.replace(/<s>[^<]*<\/s>/g, '')), 'uitleg: html/vosotros in ' + k));
+  UL.UITDRUKKINGEN.forEach(([p, t, v]) => ok(tags(v), 'uitleg: html in ' + t));
+  const ex = UL.find('Bueno, nos vemos en clase. ¡Chao!');
+  ok(ex.some(n => /la clase/.test(n.html) && /en casa/.test(n.html)), 'uitleg: en clase (zonder lidwoord) bij «nos vemos en clase»');
+  ok(ex.length <= 5, 'uitleg: niet te veel notities tegelijk');
+  ok(UL.find('Me gustan los perros.').some(n => n.t === 'gustar'), 'uitleg: gustar herkend');
+  ok(!UL.find('Hay que estudiar.').some(n => n.t === 'hay'), 'uitleg: hay que ≠ hay');
+  ok(!UL.find('Soy de Jalisco.').some(n => n.t === 'jalar'), 'uitleg: Jalisco ≠ jalar');
+  const seen = new Set(); UL.find('Me gusta el café.', { seen }); ok(!UL.find('Me gusta el té.', { seen }).some(n => n.t === 'gustar'), 'uitleg: algemene uitleg maar één keer per scherm');
+  ok(UL.find('Hola.', { extra: 'Eigen uitleg' })[0].html === 'Eigen uitleg', 'uitleg: veld in de lesstof gaat voor');
+  // dekking: minstens de helft van de dialoogzinnen A1–B1 heeft uitleg
+  const dl = units.filter(u => u.level < 'B2' && u.dialogue).flatMap(u => u.dialogue.lines.map(l => l[1]));
+  const covered = dl.filter(t => UL.find(t).length).length;
+  ok(covered / dl.length >= 0.5, `uitleg: dekking dialogen A1–B1 ${covered}/${dl.length}`);
+  console.log(`ⓘ uitleg: ${Object.keys(UL.ZINNEN).length} zinnen, ${UL.UITDRUKKINGEN.length} uitdrukkingen · ${covered}/${dl.length} dialoogzinnen A1–B1 hebben uitleg`);
+}
+
 /* ---------- uitleg bij vervoegingsvragen ---------- */
 Object.entries(S.conj.TENSES).forEach(([k, T]) => ok(T.nl && T.tip, 'tijd ' + k + ' mist Nederlandse uitleg (nl/tip)'));
 Object.keys(S.conj.TENSES).forEach(t => S.conj.personsFor(t).forEach(p => ok(S.conj.personNl(t, p), 'geen Nederlandse persoon voor ' + t + '/' + p)));

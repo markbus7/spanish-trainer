@@ -29,6 +29,22 @@
     if (!Speech.canSpeak() || !text) return null;
     return h('button', { class: 'icon-btn speak' + (opt.big ? ' big' : ''), type: 'button', title: 'Beluister', 'aria-label': 'Beluister', onclick: (e) => { e.stopPropagation(); Speech.say(text, opt); } }, opt.slow ? '🐢' : '🔊');
   }
+  /* ⓘ Uitleg zonder AI (content/uitleg.js): een knopje dat vooraf geschreven toelichting openklapt. Kost geen tokens. */
+  function noteToggle(notes, opt = {}) {
+    if (!notes || !notes.length) return null;
+    const box = h('div', { class: 'xi-box' + (opt.open ? '' : ' hidden') },
+      opt.head ? h('div', { class: 'xi-head' }, opt.head) : null,
+      notes.map(n => h('div', { class: 'xi-note' }, n.t ? h('div', { class: 'xi-t', lang: 'es' }, n.t) : null, h('div', { html: n.html }))));
+    const btn = h('button', { class: opt.label ? 'btn small ghost xi-more' : 'xi-btn', type: 'button', title: 'Uitleg (gratis, zonder AI)', 'aria-label': 'Uitleg bij deze zin', 'aria-expanded': String(!!opt.open), onclick: e => {
+      e.stopPropagation();
+      const open = box.classList.toggle('hidden') === false;
+      btn.classList.toggle('on', open); btn.setAttribute('aria-expanded', String(open));
+    } }, opt.label || 'i');
+    if (opt.open) btn.classList.add('on');
+    return { btn, box };
+  }
+  const findNotes = (text, opt) => (S.Uitleg ? S.Uitleg.find(text, opt) : []);
+
   function accentBar(target) {
     const chars = ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü', '¿', '¡'];
     return h('div', { class: 'accent-bar', role: 'toolbar', 'aria-label': 'Speciale tekens' },
@@ -227,7 +243,11 @@
       g.table.forEach((row, ri) => tb.append(h('tr', null, row.map(c => h(ri === 0 ? 'th' : 'td', { html: c })))));
       wrap.append(h('div', { class: 'table-wrap' }, tb));
     }
-    if (g.ex) wrap.append(h('div', { class: 'examples' }, g.ex.map(([e, n]) => h('div', { class: 'ex-line' }, speakBtn(e), h('div', null, h('div', { class: 'es', lang: 'es' }, e), h('div', { class: 'nl' }, n))))));
+    const seen = new Set();
+    if (g.ex) wrap.append(h('div', { class: 'examples' }, g.ex.map(([e, n, x]) => {
+      const nt = noteToggle(findNotes(e, { extra: x, seen }));
+      return h('div', { class: 'ex-line' }, speakBtn(e), h('div', { class: 'grow' }, h('div', { class: 'es', lang: 'es' }, e), h('div', { class: 'nl' }, n), nt && nt.box), nt && nt.btn);
+    })));
     if (g.sum && !es) wrap.append(sumEl());
     return wrap;
   }
@@ -238,16 +258,18 @@
     const set = S.Store.state.settings;
     const speakers = [...new Set(d.lines.map(l => l[0]))];
     let showAll = false;
-    const lines = d.lines.map(([who, es, nl]) => {
+    const seen = new Set();
+    const lines = d.lines.map(([who, es, nl, x]) => {
       const tr = h('div', { class: 'nl hidden' }, nl);
       const esEl = h('div', { class: 'es', lang: 'es' }, es);
       const extra = h('div', { class: 'rp-turn' });
+      const nt = noteToggle(findNotes(es, { extra: x, seen }));
       const line = h('div', { class: 'dl ' + (speakers.indexOf(who) % 2 ? 'right' : 'left') },
         h('div', { class: 'avatar', title: who }, who[0]),
         h('div', { class: 'bubble', onclick: () => { if (line.classList.contains('mine')) return; tr.classList.toggle('hidden'); } },
-          h('div', { class: 'who' }, who), esEl, tr, extra),
-        speakBtn(es));
-      Object.assign(line, { _tr: tr, _es: es, _nl: nl, _who: who, _esEl: esEl, _extra: extra });
+          h('div', { class: 'who' }, who), esEl, tr, nt && nt.box, extra),
+        h('div', { class: 'dl-btns' }, speakBtn(es), nt && nt.btn));
+      Object.assign(line, { _tr: tr, _es: es, _nl: nl, _who: who, _esEl: esEl, _extra: extra, _note: !!nt });
       return line;
     });
     const list = h('div', { class: 'dl-list' }, lines);
@@ -259,7 +281,7 @@
     function mask(on) {
       list.classList.toggle('masked', on);
       maskBtn.textContent = on ? '👀 Toon de tekst' : '🎧 Verberg de tekst';
-      intro.textContent = on ? '🎧 Luister eerst zonder tekst. Hoeveel versta je? Daarna maak je de tekst zichtbaar.' : 'Lees en luister. Tik op een zin voor de vertaling.';
+      intro.textContent = (on ? '🎧 Luister eerst zonder tekst. Hoeveel versta je? Daarna maak je de tekst zichtbaar.' : 'Lees en luister. Tik op een zin voor de vertaling.') + (seen.size || lines.some(l => l._note) ? ' Tik op ⓘ voor extra uitleg.' : '');
     }
     mask(listenFirst);
 
@@ -359,9 +381,11 @@
   R.reading = (it, ctx) => {
     const r = it.reading; ctx.free();
     let showAll = false;
-    const paras = r.p.map(([es, nl]) => {
+    const seen = new Set();
+    const paras = r.p.map(([es, nl, x]) => {
       const tr = h('div', { class: 'nl hidden' }, nl);
-      const p = h('div', { class: 'rd-p' }, h('div', { class: 'rd-text', onclick: () => tr.classList.toggle('hidden') }, h('p', { class: 'es', lang: 'es' }, es), tr), speakBtn(es));
+      const nt = noteToggle(findNotes(es, { extra: x, seen }));
+      const p = h('div', { class: 'rd-p' }, h('div', { class: 'rd-text', onclick: () => tr.classList.toggle('hidden') }, h('p', { class: 'es', lang: 'es' }, es), tr, nt && nt.box), h('div', { class: 'dl-btns' }, speakBtn(es), nt && nt.btn));
       p._tr = tr; p._es = es; return p;
     });
     let playing = false;
@@ -375,7 +399,7 @@
     ctx.onLeave(() => { playing = false; Speech.stop(); });
     return h('div', { class: 'reading' },
       h('div', { class: 'eyebrow' }, '📖 ' + (r.type || 'Lectura')), h('h2', null, r.t),
-      h('p', { class: 'muted small' }, 'Lees eerst zonder vertaling. Tik op een alinea als je vastloopt.'),
+      h('p', { class: 'muted small' }, 'Lees eerst zonder vertaling. Tik op een alinea als je vastloopt.' + (seen.size ? ' Tik op ⓘ voor extra uitleg.' : '')),
       h('div', { class: 'row gap wrap' }, Speech.canSpeak() ? playBtn : null, trBtn),
       h('div', { class: 'rd-body' }, paras),
       r.gl && r.gl.length ? h('details', { class: 'rd-gl' }, h('summary', null, '📝 Woordjes bij de tekst'), h('ul', null, r.gl.map(([es, nl]) => h('li', null, h('b', { lang: 'es' }, es), ' — ' + nl)))) : null);
@@ -755,6 +779,15 @@
       }
     }
 
+    /* Vooraf geschreven uitleg bij de zin van deze oefening (niet bij losse woorden). */
+    function feedbackNotes(it, r) {
+      if (it.word || it.conj || it.kind === 'match') return it.i ? [{ html: it.i }] : [];
+      const exp = r.expected || it.answer || '';
+      const text = it.sentence ? it.sentence.replace('___', exp) : (it.target || it.text || (it.translate ? exp : ''));
+      if (!text && !it.i) return [];
+      return findNotes(text, { extra: it.i });
+    }
+
     function renderFeedback(it, r) {
       foot.classList.add(r.ok ? 'ok' : 'bad');
       fb.className = 'ls-fb show';
@@ -793,6 +826,12 @@
       }
       if (r.nl) fb.append(h('div', { class: 'small muted' }, '🇳🇱 ' + r.nl));
       if (r.x) fb.append(h('div', { class: 'fb-x' }, '💡 ' + r.x));
+      const notes = feedbackNotes(it, r);
+      if (notes.length) {
+        // fout: uitleg staat meteen open; goed: klap hem zelf open als je wilt
+        const nt = noteToggle(notes, { open: !r.ok, label: 'ⓘ Uitleg', head: r.ok ? null : 'ⓘ Uitleg' });
+        fb.append(h('div', { class: 'xi-fb' }, r.ok ? nt.btn : null, nt.box));
+      }
       // AI-beoordeling bij vrije vertaling
       if (!r.ok && it.translate && S.AI.enabled() && r.user) {
         const b = h('button', { class: 'btn small ghost', type: 'button' }, '🤖 Toch goed? Laat de AI het beoordelen');
@@ -912,5 +951,5 @@
     show();
   }
 
-  S.Lesson = { run, grammarBlock, speakBtn, accentBar, T, esMode, conjTable };
+  S.Lesson = { run, grammarBlock, speakBtn, accentBar, T, esMode, conjTable, noteToggle, findNotes };
 })(window.SPT);

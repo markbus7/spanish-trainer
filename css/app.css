@@ -800,3 +800,21 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
   .ask-fab-q { width: 16px; height: 16px; line-height: 16px; font-size: .62rem; }
   body.ask-fab-on #lesson .ls-body { padding-right: 50px; }
 }
+/* ---- ⓘ Uitleg zonder AI (content/uitleg.js) ---- */
+.dl-btns { display: flex; flex-direction: column; align-items: center; gap: .3rem; flex: none; }
+.dl-btns .icon-btn { margin: 0; }
+.xi-btn { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--teal); background: var(--card); color: var(--teal); font: italic 700 .95rem/1 var(--serif); display: inline-flex; align-items: center; justify-content: center; flex: none; padding: 0; }
+.xi-btn.on { background: var(--teal); color: #fff; }
+.xi-btn:active { transform: scale(.94); }
+.xi-box { margin-top: .45rem; background: var(--teal-soft); border-radius: 10px; padding: .5rem .7rem; font-size: .9rem; line-height: 1.45; color: var(--ink); cursor: auto; text-align: left; }
+.xi-box.hidden { display: none; }
+.xi-note + .xi-note { margin-top: .45rem; padding-top: .45rem; border-top: 1px solid color-mix(in srgb, var(--teal) 25%, transparent); }
+.xi-t { font-weight: 700; color: var(--teal); font-size: .82rem; margin-bottom: .1rem; }
+.xi-head { font-weight: 700; color: var(--teal); font-size: .85rem; margin-bottom: .2rem; }
+.xi-box i { color: var(--ink2); }
+.xi-box s { color: var(--bad); }
+.dl-list.masked .xi-box { filter: blur(6px); }
+.ls-fb .xi-box { max-height: 32vh; overflow-y: auto; }
+.xi-fb .xi-more { margin: .15rem 0 0; }
+.xi-more.on { background: var(--teal-soft); }
+.ex-line .xi-btn, .dl-read .xi-btn { align-self: flex-start; }

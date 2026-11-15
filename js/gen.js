@@ -95,7 +95,7 @@
   /* ---------- content-oefeningen normaliseren ---------- */
   function normEx(e, unit, idx, opts = {}) {
     const id = unit && idx != null ? 'x|' + unit.id + '|' + idx : null;
-    const base = { srsId: opts.noSrs ? null : id, tag: e.tag || 'vocab', x: e.x, skill: 'grammar' };
+    const base = { srsId: opts.noSrs ? null : id, tag: e.tag || 'vocab', x: e.x, i: e.i, skill: 'grammar' };
     switch (e.t) {
       case 'mc': return { ...base, kind: 'mc', q: e.q, options: U.shuffle(e.o), answer: e.o[0], skill: opts.skill || base.skill };
       case 'cloze':
@@ -124,8 +124,8 @@
   function shortLines(u, maxWords = 9) {
     return u.dialogue.lines.map((l, i) => ({ l, i })).filter(({ l }) => l[1].split(' ').length <= maxWords && l[1].split(' ').length >= 3);
   }
-  function listenItem(text, nl) { return { kind: 'listen', text, nl, tag: 'vocab', skill: 'listen' }; }
-  function speakItem(text, nl) { return { kind: 'speak', text, nl, tag: 'vocab', skill: 'speak' }; }
+  function listenItem(text, nl, i) { return { kind: 'listen', text, nl, i, tag: 'vocab', skill: 'listen' }; }
+  function speakItem(text, nl, i) { return { kind: 'speak', text, nl, i, tag: 'vocab', skill: 'speak' }; }
 
   /* ---------- stappen van een unit ---------- */
   const STEPS = [
@@ -173,9 +173,9 @@
     const items = [{ kind: 'dialogue', dialogue: d }];
     d.q.forEach(q => items.push({ ...normEx(q, null, null, { noSrs: true, skill: 'read' }), skill: 'read', tag: 'vocab' }));
     const sl = U.shuffle(shortLines(u));
-    sl.slice(0, 2).forEach(({ l }) => items.push(listenItem(l[1], l[2])));
-    if (sl[2]) items.push({ kind: 'order', target: sl[2].l[1], nl: sl[2].l[2], tag: 'vocab', skill: 'read' });
-    sl.slice(3, 5).forEach(({ l }) => items.push(speakItem(l[1], l[2])));
+    sl.slice(0, 2).forEach(({ l }) => items.push(listenItem(l[1], l[2], l[3])));
+    if (sl[2]) items.push({ kind: 'order', target: sl[2].l[1], nl: sl[2].l[2], i: sl[2].l[3], tag: 'vocab', skill: 'read' });
+    sl.slice(3, 5).forEach(({ l }) => items.push(speakItem(l[1], l[2], l[3])));
     return { title: u.title + ' · Dialoog', items, mode: 'learn' };
   }
   function readingSession(u) {
