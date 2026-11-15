@@ -103,7 +103,7 @@
     if (it.tag) Store.mark(it.tag, ok);
     if (it.srsId) {
       if (SRS.has(it.srsId) && ok && r && r.hinted && !r.override) { const c = st().srs[it.srsId]; c.t = Date.now(); c.r = 0; c.i = 1; c.d = Math.min(c.d, U.dayIndex() + 1); }
-      else if (SRS.has(it.srsId)) { if (!r || !r.override) SRS.grade(it.srsId, ok); else { const c = st().srs[it.srsId]; if (c) { c.l = Math.max(0, c.l - 1); } } }
+      else if (SRS.has(it.srsId)) { if (!r || !r.override) SRS.grade(it.srsId, ok); else { const c = st().srs[it.srsId]; if (c) { c.l = Math.max(0, c.l - 1); if (c.f) { c.f--; c.g = (c.g || 0) + 1; } } } }
       else if (!ok) stepWrong.add(it.srsId); else if (r && r.override) stepWrong.delete(it.srsId);
       // zin half goed: bij de volgende herhaling staan de goede woorden er al
       if (it.translate) {
@@ -597,6 +597,8 @@
   routes.tablas.tab = 'practica';
   routes.woorden = () => S.Words.page();
   routes.woorden.tab = 'practica';
+  routes.woordenschat = () => S.Vocab.page();
+  routes.woordenschat.tab = 'perfil';
   routes.juegos = () => S.Games.page();
   routes.juegos.tab = 'practica';
 
@@ -807,7 +809,8 @@
         h('p', null, h('b', null, 'Leeg deel van de balk'), ': woorden die je nog niet gezien hebt.')),
       h('div', { class: 'vocab-levels' }, lvls.map(L => { const ws = wordStats(C.unitsOf(L.id)); return h('div', { class: 'lv-bar' }, h('b', null, L.id), stackBar(ws), h('small', null, ws.seen + '/' + ws.total)); })),
       hard.length ? h('div', null, h('h3', { class: 'sub' }, 'Lastige woorden'), h('div', { class: 'word-list' }, hard.map(w => h('div', { class: 'word-row' }, S.Lesson.speakBtn(w.es), h('div', { class: 'grow' }, h('b', { lang: 'es' }, w.es), h('span', null, w.nl)))))) : null,
-      SRS.dueCount() ? h('button', { class: 'btn primary wide', type: 'button', onclick: () => startReview(25) }, '🔁 Herhaal nu (' + SRS.dueCount() + ' klaar)') : null)));
+      SRS.dueCount() ? h('button', { class: 'btn primary wide', type: 'button', onclick: () => startReview(25) }, '🔁 Herhaal nu (' + SRS.dueCount() + ' klaar)') : null,
+      h('a', { class: 'btn ghost wide voc-open', href: '#/woordenschat' }, '📋 Al je woorden en zinnen bekijken'))));
 
     // ---- grammatica ----
     const tagRows = Object.entries(s.tags).filter(([k, v]) => k !== 'vocab' && v.ok + v.no >= 3).map(([k, v]) => [k, v.ok / (v.ok + v.no), v.ok + v.no]).sort((a, b) => b[1] - a[1]);

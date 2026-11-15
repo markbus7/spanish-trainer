@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/tutor.js', 'js/ai.js']) {
+for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/tutor.js', 'js/ai.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -265,6 +265,36 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
   S.Store.state.updated = Date.now() + 5;
   const m = S.Store.mergeStates(S.Store.state, before);
   ok(m.myWords[key].del && !m.srs[r.id], 'eigen woord: verwijdering overleeft synchroniseren');
+  S.Store.state = keep;
+}
+
+{ // mijn woordenschat: overzicht van alles in de herhaling
+  const keep = S.Store.state; S.Store.state = JSON.parse(JSON.stringify(keep));
+  const V = S.Vocab, t = S.U.dayIndex(), u = S.C.all()[0];
+  S.Store.state.srs = {
+    ['w|' + u.id + '|0']: { d: t, i: 1, e: 2.4, r: 0, l: 2, s: Date.now() },
+    ['w|' + u.id + '|1']: { d: t + 30, i: 30, e: 2.8, r: 5, l: 0, s: Date.now() },
+    ['x|' + u.id + '|0']: { d: t + 8, i: 8, e: 2.5, r: 3, l: 0, s: Date.now() },
+    'c|hablar|pres': { d: t, i: 3, e: 2.5, r: 2, l: 0, s: Date.now() },
+    'w|bestaat-niet|0': { d: t, i: 1, e: 2.5, r: 1, l: 0 }
+  };
+  const list = V.all();
+  ok(list.length === 4, 'woordenschat: onvindbare items vallen weg');
+  ok(list.every(x => x.es && typeof x.nl === 'string'), 'woordenschat: elk item heeft Spaans en Nederlands');
+  const c = V.counts(list);
+  ok(c.weak === 1 && c.mastered === 1 && c.known === 1 && c.learning === 1 && c.w === 2 && c.x === 1 && c.c === 1, 'woordenschat: telling per groep en soort');
+  ok(V.filter(list, { sort: 'weak' })[0].id === 'w|' + u.id + '|0', 'woordenschat: zwakste eerst');
+  ok(V.filter(list, { sort: 'strong' })[0].id === 'w|' + u.id + '|1', 'woordenschat: sterkste eerst');
+  ok(V.filter(list, { type: 'c' }).length === 1 && V.filter(list, { q: 'hablar' }).length === 1, 'woordenschat: filter op soort en zoeken');
+  ok(list.every(x => !x.es.includes('___')), 'woordenschat: invulzinnen staan ingevuld');
+  // voorbeeldzin: 'hola' komt voor in de dialoog van unit 1
+  ok(V.example(V.describe('w|' + u.id + '|0')), 'woordenschat: voorbeeldzin gevonden');
+  // alle oefeningen zijn te beschrijven
+  let bad = 0; S.C.all().forEach(un => un.ex.forEach((_, i) => { S.Store.state.srs['x|' + un.id + '|' + i] = { d: t, i: 0, e: 2.5, r: 0, l: 0 }; if (!V.describe('x|' + un.id + '|' + i)) bad++; }));
+  ok(!bad, 'woordenschat: elke oefening is te tonen (' + bad + ' niet)');
+  // totaal goed/fout wordt geteld
+  const id = 'w|' + u.id + '|1'; S.SRS.grade(id, true); S.SRS.grade(id, false);
+  ok(S.Store.state.srs[id].g === 1 && S.Store.state.srs[id].f === 1, 'woordenschat: totaal goed/fout geteld');
   S.Store.state = keep;
 }
 
