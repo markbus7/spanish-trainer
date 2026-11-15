@@ -290,6 +290,8 @@
       return out;
     }
   };
+  // statusiconen, overal dezelfde: kiempje → boompje → ster
+  SRS.ICON = { learning: '🌱', known: '🌳', mastered: '⭐' };
   S.SRS = SRS;
 
   /* ================= Antwoordcontrole ================= */
