@@ -179,7 +179,7 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
 {
   const list = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/tts-texts.js')], { maxBuffer: 64 << 20 }).toString());
   const have = new Set(list.map(x => x.k));
-  ok(list.every(x => x.k === S.Speech.key(x.text) && /^es-[A-Z]{2}-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
+  ok(list.every(x => x.k === S.Speech.clipKey(x.text, x.ns) && /^es-[A-Z]{2}-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
   ok(S.Speech.key('¿Cómo  está usted?') === S.Speech.key('¿cómo está usted?'), 'opnames: sleutel negeert hoofdletters en spaties');
   const miss = new Set();
   const want = t => { if (t && !have.has(S.Speech.key(t))) miss.add(t); };
@@ -194,6 +194,16 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
     u.dialogue.lines.forEach(l => want(l[1])); u.reading.p.forEach(p => want(p[0]));
   }
   ok(!miss.size, 'opnames: ' + miss.size + ' teksten ontbreken, bv. ' + [...miss].slice(0, 5).join(' | '));
+  // Profe Lupe: vaste zinnen zijn in beide stemvarianten ingesproken, ook die met een getal
+  const L = S.Tutor.lines, lupeMiss = [];
+  const lupe = es => ['girl', 'woman'].forEach(v => { if (!have.has(S.Speech.clipKey(es, 'lupe-' + v))) lupeMiss.push(v + ': ' + es); });
+  [L.hello({ due: 37 }), L.hello({ due: 412 }), L.hello({ streak: 12 }), L.hello({ streak: 250 }), L.hello({ unit: units[0].title }),
+    L.summary({ pct: 100, total: 9 }), L.summary({ pct: 75, total: 9, mistakes: 2 }), L.result({ level: 'B1' }), L.profile({ words: 20, days: 3 }),
+    L.profile({ words: 137, days: 3 }), L.profile({ words: 1234, days: 9 }), L.profile({ words: 9999, days: 9 }), L.game(0.5), L.review, L.welcome]
+    .forEach(x => lupe(x.es));
+  lupe(L.streak(10)); lupe(L.voiceTest); units.forEach(u => (u.grammar || []).forEach(g => g.sum && lupe(g.sum)));
+  ok(!lupeMiss.length, 'opnames: Lupe-zinnen ontbreken: ' + lupeMiss.slice(0, 4).join(' | '));
+  ok(S.Speech.clipKey('Hola', 'lupe-girl') !== S.Speech.key('Hola') && S.Speech.clipKey('Hola') === S.Speech.key('Hola'), 'opnames: Lupe heeft eigen sleutels');
 }
 
 /* ---------- woordspellen ---------- */

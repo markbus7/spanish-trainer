@@ -409,11 +409,13 @@
       h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
       return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
     },
+    /* Lupe heeft eigen opnames van dezelfde zinnen (andere stem): sleutel met naamruimte, bijv. 'lupe-girl'. */
+    clipKey(t, ns) { return this.key(ns ? ns + '|' + this.clean(t) : t); },
     loadClips() {
       if (typeof fetch !== 'function' || typeof Audio !== 'function') return;
       this.clipsLoaded = fetch('audio/index.json').then(r => r.ok ? r.json() : null).then(j => { if (j && j.clips) { this.clips = new Set(j.clips); this.levels = j.levels || null; } }).catch(() => { /* geen opnames */ });
     },
-    hasClip(text) { return !!(this.clips && Store.state.settings.clips !== false && text && this.clips.has(this.key(text))); },
+    hasClip(text, ns) { return !!(this.clips && Store.state.settings.clips !== false && text && this.clips.has(this.clipKey(text, ns))); },
     playClip(text, opt, direct) {
       return new Promise((res, rej) => {
         const a = this.el || (this.el = new Audio());
@@ -427,7 +429,7 @@
           rej();
         };
         this._end = end; // stop() rondt het lopende fragment af
-        a.src = 'audio/' + this.key(text) + '.mp3' + (direct ? '?direct=1' : '');
+        a.src = 'audio/' + this.clipKey(text, opt.clipNs) + '.mp3' + (direct ? '?direct=1' : '');
         a.preservesPitch = true; a.webkitPreservesPitch = true;
         // Op normale snelheid speelt de opname onbewerkt af: versnellen of vertragen met behoud van toonhoogte
         // klinkt in Safari/WebKit metalig en robotachtig. Alleen de 🐢-knop vertraagt (dat is dan de bedoeling).
@@ -498,7 +500,9 @@
       // Is de lijst met opnames nog niet binnen (traag netwerk, net opgestart)? Probeer de opname dan toch:
       // de bestandsnaam volgt uit de tekst. Bestaat hij niet, dan valt het vanzelf terug op de apparaatstem.
       const pending = !this.clips && this.clipsLoaded && Store.state.settings.clips !== false && !opt.noClip;
-      const p = this.hasClip(text) || pending
+      // Lupe: eerst haar eigen opname; is die er niet, dan de gewone opname van de lesstof (zonder naamruimte).
+      if (opt.clipNs && !pending && !this.hasClip(text, opt.clipNs)) opt = Object.assign({}, opt, { clipNs: null });
+      const p = this.hasClip(text, opt.clipNs) || pending
         ? (this.stop(), this.playClip(text, opt).then(() => { this.last = { src: 'clip' }; }, () => { if (!pending) this.clipFailed(); else this.last = { src: 'device' }; return this.speak(text, opt, true); }))
         : this.speak(text, opt);
       return p.then(() => { if (this._talkId === id) this._talk(false); });
