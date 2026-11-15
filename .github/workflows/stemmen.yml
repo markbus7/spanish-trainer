@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main, 'claude/**']
-    paths: ['content/**', 'js/conjugate.js', 'js/curriculum.js', 'tools/**', '.github/workflows/stemmen.yml']
+    paths: ['content/**', 'js/conjugate.js', 'js/curriculum.js', 'js/tutor.js', 'tools/**', '.github/workflows/stemmen.yml']
 permissions:
   contents: write
 concurrency:

@@ -16,7 +16,7 @@ async def make(item, sem, stats):
         for voice in (item['voice'], FALLBACK):
             for attempt in range(3):
                 try:
-                    await edge_tts.Communicate(item['text'], voice).save(path + '.tmp')
+                    await edge_tts.Communicate(item['text'], voice, rate=item.get('rate', '+0%'), pitch=item.get('pitch', '+0Hz')).save(path + '.tmp')
                     if os.path.getsize(path + '.tmp') > 500:
                         os.replace(path + '.tmp', path)
                         stats['ok'] += 1

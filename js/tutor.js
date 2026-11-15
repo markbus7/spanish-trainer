@@ -57,7 +57,10 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     if (!text) return Promise.resolve();
     speaking = text;
     // Lupe is een vrolijke kleine axolotl: een meisjesstem, hoger en iets vlotter dan de gewone voorleesstem.
-    return S.Speech.say(text, VOICES[S.Store.state.settings.lupeVoice] || VOICES.girl);
+    // Vaste zinnen van Lupe zijn vooraf ingesproken (audio/, met een eigen Mexicaanse stem per keuze meisje/vrouw).
+    // Wat niet is ingesproken (AI-antwoorden), leest het apparaat voor met de hoge stem hieronder.
+    const v = S.Store.state.settings.lupeVoice === 'woman' ? 'woman' : 'girl';
+    return S.Speech.say(text, Object.assign({ clipNs: 'lupe-' + v }, VOICES[v]));
   }
   function hookSpeech() {
     const prev = S.Speech.onTalk;
@@ -127,11 +130,9 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
         { es: '¡Meta del día cumplida! Estoy muy orgullosa de ti.', nl: 'Dagdoel gehaald! Ik ben heel trots op je.' },
         { es: '¡Órale! Ya cumpliste tu meta. Todo lo que hagas ahora es extra.', nl: 'Je dagdoel is binnen. Alles wat je nu nog doet, is extra.' }]);
       if (c.lapsed) return { es: '¡Qué gusto verte otra vez! Empecemos con algo cortito.', nl: 'Fijn dat je er weer bent! We beginnen met iets korts.' };
-      if (c.due >= 15) return { es: `Hoy tienes ${c.due} repasos. Empecemos por ahí, así no se te olvida nada.`, nl: `Je hebt vandaag ${c.due} herhalingen. Begin daarmee, dan vergeet je niets.` };
+      if (c.due >= 15) return { es: dueEs(c.due), nl: `Je hebt vandaag ${c.due} herhalingen. Begin daarmee, dan vergeet je niets.` };
       if (c.step === 'test') return { es: '¡Hoy toca la prueba de la unidad! Tú puedes.', nl: 'Vandaag is de unittoets aan de beurt. Jij kunt dit!' };
-      if (c.streak >= 3) return daily([
-        { es: `¡Llevas ${c.streak} días seguidos! ¡Qué padre!`, nl: `Al ${c.streak} dagen op rij! Super.` },
-        { es: `${c.streak} días seguidos. ¡No rompas la racha!`, nl: `${c.streak} dagen op rij. Hou je reeks vast!` }]);
+      if (c.streak >= 3) return daily(streakEs(c.streak).map((es, i) => ({ es, nl: i ? `${c.streak} dagen op rij. Hou je reeks vast!` : `Al ${c.streak} dagen op rij! Super.` })));
       if (c.min > 0) return { es: '¡Vas muy bien hoy! Un poquito más y llegas a tu meta.', nl: 'Je bent goed bezig vandaag. Nog even en je haalt je dagdoel.' };
       return daily([
         { es: `¿Empezamos? Hoy vemos: ${c.unit}.`, nl: `Zullen we beginnen? Vandaag: ${c.unitNl || c.unit}.` },
@@ -166,8 +167,8 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
       // c: { words, days, streak }
       if (!c.days) return { es: 'Aquí vas a ver todo lo que aprendes. ¡Empecemos hoy!', nl: 'Hier zie je straks alles wat je leert. Zullen we vandaag beginnen?' };
       if (c.words >= 20) return daily([
-        { es: `¡Ya conoces ${c.words} palabras! Estoy muy orgullosa de ti.`, nl: `Je kent al ${c.words} woorden. Ik ben heel trots op je!` },
-        { es: `${c.words} palabras en ${c.days} días. ¡Qué padre!`, nl: `${c.words} woorden in ${c.days} ${c.days === 1 ? 'dag' : 'dagen'}. Super!` }]);
+        { es: wordsEs(c.words), nl: `Je kent al ${c.words} woorden. Ik ben heel trots op je!` },
+        { es: 'Cada palabra nueva cuenta. ¡Qué padre!', nl: `${c.words} woorden in ${c.days} ${c.days === 1 ? 'dag' : 'dagen'}. Super!` }]);
       return { es: '¡Buen comienzo! Poco a poco se llega lejos.', nl: 'Goed begin! Beetje bij beetje kom je ver.' };
     },
     game(score) {
@@ -175,8 +176,46 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
       if (score >= 0.7) return { es: '¡Muy bien jugado!', nl: 'Heel goed gespeeld!' };
       return { es: '¡Sigue así! Las palabras difíciles vuelven pronto.', nl: 'Ga zo door! De lastige woorden komen snel terug.' };
     },
-    review: { es: '¡Todo repasado! Nos vemos mañana.', nl: 'Alles herhaald voor vandaag. Tot morgen!' }
+    review: { es: '¡Todo repasado! Nos vemos mañana.', nl: 'Alles herhaald voor vandaag. Tot morgen!' },
+    voiceOn: '¡Perfecto! Ahora te hablo en voz alta.',
+    voiceTest: '¡Hola! Soy Lupe. ¿Te gusta mi voz?',
+    /* Alle vaste zinnen die Lupe kan zeggen, voor het inspreken (tools/tts-texts.js). units: [{ title, level, grammar }] */
+    every(units = []) {
+      const out = new Set(), add = x => { if (x && x.es) out.add(x.es); else if (typeof x === 'string') out.add(x); };
+      // daily() kiest per dag een variant: loop een paar 'dagen' door om ze allemaal te krijgen
+      const U = S.U, pickAll = fn => { const keep = U.dayIndex; for (let d = 0; d < 6; d++) { U.dayIndex = () => d; try { add(fn()); } finally { U.dayIndex = keep; } } };
+      [{ paused: 1 }, { lapsed: 1 }, { step: 'test' }, { min: 1 }].forEach(c => add(L.hello(c)));
+      pickAll(() => L.hello({ goalDone: 1 }));
+      units.forEach(u => pickAll(() => L.hello({ unit: u.title })));
+      for (let n = 15; n <= DUE_MAX + 1; n++) add(dueEs(n));
+      for (let n = 3; n <= STREAK_MAX + 1; n++) streakEs(n).forEach(add);
+      for (let n = 1; n <= 40; n++) add(L.streak(n));
+      add(L.welcome); add(L.review); add(L.voiceOn); add(L.voiceTest);
+      [{ passed: false }, { unitDone: 1 }, { total: 0 }, ...[100, 95, 80, 10].map(pct => ({ pct, total: 1, mistakes: 1 }))].forEach(c => add(L.summary(c)));
+      [{ up: 1 }, { down: 1 }, { first: 1 }, ...['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map(level => ({ level }))].forEach(c => add(L.result(c)));
+      add(L.profile({ days: 0 })); add(L.profile({ days: 1, words: 5 }));
+      for (let n = 20; n <= 6000; n++) add(wordsEs(n));
+      add('Cada palabra nueva cuenta. ¡Qué padre!');
+      [1, 0.8, 0].forEach(x => add(L.game(x)));
+      units.forEach(u => (u.grammar || []).forEach(g => add(g.sum)));
+      return [...out];
+    }
   };
+  /* Zinnen met een getal: per getal vooraf ingesproken, dus binnen een vaste grens (daarboven een vaste zin). */
+  const DUE_MAX = 100, STREAK_MAX = 100;
+  function dueEs(n) {
+    return n > DUE_MAX ? 'Hoy tienes más de cien repasos. Empecemos por ahí, así no se te olvida nada.'
+      : `Hoy tienes ${n} repasos. Empecemos por ahí, así no se te olvida nada.`;
+  }
+  function streakEs(n) {
+    return n > STREAK_MAX ? ['¡Llevas más de cien días seguidos! ¡Qué padre!', 'Más de cien días seguidos. ¡No rompas la racha!']
+      : [`¡Llevas ${n} días seguidos! ¡Qué padre!`, `${n} días seguidos. ¡No rompas la racha!`];
+  }
+  // aantal woorden afgerond (tientallen, boven 100 per 50, boven 1000 per 100): zo blijft het aantal opnames klein
+  function wordsEs(n) {
+    const r = n < 100 ? Math.floor(n / 10) * 10 : n < 1000 ? Math.floor(n / 50) * 50 : Math.min(5000, Math.floor(n / 100) * 100);
+    return r === n ? `¡Ya conoces ${r} palabras! Estoy muy orgullosa de ti.` : `¡Ya conoces más de ${r} palabras! Estoy muy orgullosa de ti.`;
+  }
 
   S.Tutor = Object.assign(LUPE, { svg, avatar, say, spoken, setTalking, hookSpeech, coach, hero, coachOn, lines: L });
 })(window.SPT);

@@ -1,6 +1,6 @@
 /* Verzamelt alle vaste Spaanse teksten die de app voorleest, met een passende stem per regio.
    Gebruik: node tools/tts-texts.js > texts.json   (de GitHub-actie "Stemmen maken" doet dit automatisch)
-   Uitvoer: [{ k: sleutel, text, voice }]; het bestand heet audio/<k>.mp3. */
+   Uitvoer: [{ k: sleutel, text, voice, (ns, pitch, rate) }]; het bestand heet audio/<k>.mp3. */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
@@ -90,6 +90,15 @@ LV = 'X';
 (S.phrases || []).forEach(p => add(p[0]));
 (S.regions || []).forEach(r => { const v = VOICES[r.id.toUpperCase()]; (r.words || []).forEach(([es]) => add(es, v ? v[0] : DEF)); });
 add('¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.');
+
+/* Profe Lupe: al haar vaste zinnen (begroeting, feedback, eindschermen, grammaticasamenvatting), in twee varianten
+   (instelling 'Stem van Lupe': meisje of vrouw). Mexicaanse vrouwenstem; het meisje iets hoger en vlotter.
+   Eigen sleutel (naamruimte lupe-…), zodat dezelfde zin in de lesstof zijn gewone stem houdt. */
+const LUPE = { girl: { voice: 'es-MX-DaliaNeural', pitch: '+30Hz', rate: '+6%' }, woman: { voice: 'es-MX-DaliaNeural', pitch: '+0Hz', rate: '+0%' } };
+for (const es of S.Tutor.lines.every(S.C.all())) for (const [v, o] of Object.entries(LUPE)) {
+  const ns = 'lupe-' + v, k = S.Speech.clipKey(es, ns);
+  if (!out.has(k)) out.set(k, { k, ns, text: S.Speech.clean(es), voice: o.voice, pitch: o.pitch, rate: o.rate, lv: ['X'] });
+}
 
 const list = [...out.values()];
 if (process.argv.includes('--stats')) {
