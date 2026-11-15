@@ -513,15 +513,15 @@
   function statusIcon(s) { return { new: '○', learning: '◔', known: '◑', mastered: '●' }[s]; }
   function statusLabel(s) { return { new: 'nieuw', learning: 'aan het leren', known: 'bekend', mastered: 'beheerst' }[s]; }
   function dialogueRead(u) {
-    const d = u.dialogue;
+    const d = u.dialogue, seen = new Set();
     return h('div', { class: 'dl-list read' }, h('p', { class: 'muted small' }, d.place + ' — ' + d.t),
-      d.lines.map(([who, es, nl]) => h('div', { class: 'dl-read' }, S.Lesson.speakBtn(es), h('div', null, h('b', null, who + ': '), h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl)))));
+      d.lines.map(([who, es, nl, x]) => { const nt = S.Lesson.noteToggle(S.Lesson.findNotes(es, { extra: x, seen })); return h('div', { class: 'dl-read' }, S.Lesson.speakBtn(es), h('div', { class: 'grow' }, h('b', null, who + ': '), h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl), nt && nt.box), nt && nt.btn); }));
   }
 
   function readingRead(u) {
-    const r = u.reading;
+    const r = u.reading, seen = new Set();
     return h('div', { class: 'dl-list read' }, h('p', { class: 'muted small' }, (r.type || 'Lectura') + ' — ' + r.t),
-      r.p.map(([es, nl]) => h('div', { class: 'dl-read' }, S.Lesson.speakBtn(es), h('div', null, h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl)))));
+      r.p.map(([es, nl, x]) => { const nt = S.Lesson.noteToggle(S.Lesson.findNotes(es, { extra: x, seen })); return h('div', { class: 'dl-read' }, S.Lesson.speakBtn(es), h('div', { class: 'grow' }, h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl), nt && nt.box), nt && nt.btn); }));
   }
 
   /* ================= PRÁCTICA ================= */
