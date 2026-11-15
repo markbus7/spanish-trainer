@@ -10,7 +10,7 @@
 
   /* ---------- gegevens (zonder DOM, getest in tests/run.js) ---------- */
   const TYPES = { w: 'woord', x: 'zin / oefening', c: 'werkwoord' };
-  const STATUS = { weak: ['🎯', 'zwak'], learning: ['🌱', 'aan het leren'], known: ['✓', 'bekend'], mastered: ['⭐', 'beheerst'] };
+  const STATUS = { weak: ['🎯', 'zwak'], learning: [S.SRS.ICON.learning, 'aan het leren'], known: [S.SRS.ICON.known, 'bekend'], mastered: [S.SRS.ICON.mastered, 'beheerst'] };
 
   /** Sterkte 0–1: hoe lang je het al onthoudt (interval), min een straf voor fouten en voor lang niet herhaald. */
   function strength(c) {
@@ -206,7 +206,7 @@
       chips.innerHTML = '';
       chips.append(...[
         chipRow('type', [['all', 'Alles'], ['w', '📚 Woorden (' + n.w + ')'], ['x', '💬 Zinnen (' + n.x + ')'], ['c', '🔤 Werkwoorden (' + n.c + ')']]),
-        chipRow('group', [['all', 'Alle'], ['weak', '🎯 Zwak'], ['learning', '🌱 Aan het leren'], ['known', '✓ Bekend'], ['mastered', '⭐ Beheerst']]),
+        chipRow('group', [['all', 'Alle'], ['weak', '🎯 Zwak'], ['learning', STATUS.learning[0] + ' Aan het leren'], ['known', STATUS.known[0] + ' Bekend'], ['mastered', STATUS.mastered[0] + ' Beheerst']]),
         levels.length > 1 ? chipRow('level', [['all', 'Alle niveaus']].concat(levels.map(L => [L, L]))) : null].filter(Boolean));
     }
     const out = h('div', { class: 'voc-list' });

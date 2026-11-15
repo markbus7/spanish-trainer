@@ -64,7 +64,7 @@
   }
 
   /* ---------- scherm ---------- */
-  const STATUS = { new: ['', 'nog niet geleerd'], learning: ['🌱', 'aan het leren'], known: ['✓', 'bekend'], mastered: ['⭐', 'beheerst'] };
+  const STATUS = { new: ['', 'nog niet geleerd'], learning: [S.SRS.ICON.learning, 'aan het leren'], known: [S.SRS.ICON.known, 'bekend'], mastered: [S.SRS.ICON.mastered, 'beheerst'] };
   function page() {
     const wrap = h('div', { class: 'page words-page' });
     wrap.append(h('a', { class: 'back', href: '#/practica' }, '← Práctica'), h('h1', null, '📚 Woordenboek'),
@@ -102,8 +102,8 @@
       const s = S.SRS.status(w.id), inSrs = S.SRS.has(w.id);
       const tail = w.unit === 'my'
         ? h('button', { class: 'icon-btn', type: 'button', title: 'Verwijderen', 'aria-label': 'Verwijderen', onclick: () => S.confirm('Woord verwijderen?', '«' + w.es + '» verdwijnt uit je eigen woorden en je herhaling.', 'Verwijderen', () => { removeMine(w.key); S.Store.save(); drawChips(); draw(); }) }, '🗑')
-        : inSrs ? h('span', { class: 'words-st', title: STATUS[s][1] }, STATUS[s][0] || '🌱')
-          : h('button', { class: 'btn ghost small', type: 'button', title: 'Zet in je herhaling', onclick: e => { S.SRS.add(w.id, 0); S.Store.save(); e.target.replaceWith(h('span', { class: 'words-st' }, '🌱')); S.toast('🔁 In je herhaling'); } }, '+ Leren');
+        : inSrs ? h('span', { class: 'words-st', title: STATUS[s][1] }, STATUS[s][0] || S.SRS.ICON.learning)
+          : h('button', { class: 'btn ghost small', type: 'button', title: 'Zet in je herhaling', onclick: e => { S.SRS.add(w.id, 0); S.Store.save(); e.target.replaceWith(h('span', { class: 'words-st' }, S.SRS.ICON.learning)); S.toast('🔁 In je herhaling'); } }, '+ Leren');
       return h('div', { class: 'words-row' },
         S.Lesson.speakBtn(w.es),
         h('div', { class: 'grow' },
