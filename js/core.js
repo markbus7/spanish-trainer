@@ -259,6 +259,7 @@
       if (!c) return;
       const today = U.dayIndex();
       c.t = Date.now();
+      if (ok) c.g = (c.g || 0) + 1; else c.f = (c.f || 0) + 1; // totaal goed/fout, voor Mijn woordenschat
       if (ok) {
         if (c.d > today) return; // vroeg geoefend: geen sprong
         c.r++;

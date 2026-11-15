@@ -712,3 +712,44 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .fb-head { display: flex; align-items: center; gap: .5rem; }
 .fb-lupe svg { transition: transform .2s; }
 .fb-lupe.sad svg { transform: rotate(-10deg) translateY(2px); }
+
+/* ---------- Mijn woordenschat (#/woordenschat) — eigen voc-voorvoegsel, zodat niets botst ---------- */
+.voc-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; }
+.voc-tile { display: flex; flex-direction: column; align-items: center; gap: .15rem; padding: .7rem .3rem; border-radius: 12px; border: 2px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; font: inherit; }
+.voc-tile b { font-size: 1.5rem; line-height: 1.1; }
+.voc-tile small { font-size: .78rem; color: var(--ink2); text-align: center; }
+.voc-tile.g-weak b { color: var(--bad); } .voc-tile.g-learning b { color: var(--gold); } .voc-tile.g-known b { color: var(--blue); } .voc-tile.g-mastered b { color: var(--teal); }
+.voc-tile.on { border-color: var(--accent); background: var(--accent-soft); }
+.voc-sum > p { margin: .6rem 0 0; }
+.voc-filters { display: flex; flex-direction: column; gap: .6rem; margin-top: .6rem; }
+.voc-qrow { display: grid; grid-template-columns: 1fr auto; gap: .5rem; }
+.voc-sort { width: auto; }
+.voc-chips { display: flex; flex-direction: column; gap: .4rem; }
+.voc-list { display: flex; flex-direction: column; gap: .4rem; margin-top: .6rem; }
+.voc-row { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 12px; }
+.voc-row.g-weak { border-left-color: var(--bad); } .voc-row.g-learning { border-left-color: var(--gold); } .voc-row.g-known { border-left-color: var(--blue); } .voc-row.g-mastered { border-left-color: var(--teal); }
+.voc-row > summary { display: flex; align-items: center; gap: .6rem; padding: .6rem .8rem; margin: 0; list-style: none; color: var(--ink); font-weight: 400; }
+.voc-row > summary::-webkit-details-marker { display: none; }
+.voc-row > summary .grow { display: flex; flex-direction: column; min-width: 0; }
+.voc-row[open] > summary { border-bottom: 1px solid var(--line); }
+.voc-es { font-weight: 700; overflow-wrap: anywhere; }
+.voc-nl { color: var(--ink2); overflow-wrap: anywhere; }
+.voc-st { flex: none; width: 1.8rem; text-align: center; font-size: 1.1rem; }
+.voc-sbar { flex: none; width: 56px; height: 8px; border-radius: 999px; background: var(--bg2); overflow: hidden; }
+.voc-sbar i { display: block; height: 100%; border-radius: 999px; }
+.voc-detail { padding: .6rem .8rem .8rem; display: flex; flex-direction: column; gap: .5rem; }
+.voc-detail p { margin: 0; }
+.voc-say .icon-btn { margin: 0; }
+.voc-example { background: var(--bg2); border-radius: 10px; padding: .5rem .7rem; display: flex; flex-direction: column; gap: .25rem; }
+.voc-example .icon-btn { margin: 0; flex: none; }
+.voc-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem .8rem; }
+.voc-fact { display: flex; flex-direction: column; } .voc-fact b { font-size: .92rem; }
+.voc-actions .btn { margin: 0; }
+.voc-foot .btn.wide { margin-top: .4rem; }
+@media (max-width: 600px) {
+  .voc-tiles { grid-template-columns: repeat(2, 1fr); }
+  .voc-facts { grid-template-columns: repeat(2, 1fr); }
+  .voc-qrow { grid-template-columns: 1fr; }
+  .voc-sort { width: 100%; }
+  .voc-sbar { width: 36px; }
+}

@@ -886,5 +886,5 @@
     show();
   }
 
-  S.Lesson = { run, grammarBlock, speakBtn, accentBar, T, esMode };
+  S.Lesson = { run, grammarBlock, speakBtn, accentBar, T, esMode, conjTable };
 })(window.SPT);
