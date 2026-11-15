@@ -421,6 +421,24 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   ok(/Lupe/.test(sys) && /\*\*bold\*\*/.test(sys), 'docente-prompt noemt Lupe en de vetregel');
 }
 
+/* ---------- Profe Lupe als begeleider: elke situatie heeft een Spaanse zin, Latijns-Amerikaans ---------- */
+{
+  const L = S.Tutor.lines, out = [];
+  const hello = { paused: false, goalDone: false, streak: 0, lapsed: false, due: 0, step: 'vocab', unit: 'Saludos', unitNl: 'Begroeten', min: 0 };
+  [{}, { paused: true }, { goalDone: true }, { lapsed: true }, { due: 20 }, { step: 'test' }, { streak: 4 }, { min: 3 }].forEach(c => out.push(L.hello(Object.assign({}, hello, c))));
+  [{ pct: 100, total: 9 }, { pct: 92, total: 9 }, { pct: 75, total: 9, mistakes: 2 }, { pct: 40, total: 9 }, { passed: false, total: 9, pct: 60 }, { unitDone: true, total: 9, pct: 85 }, { total: 0 }].forEach(c => out.push(L.summary(c)));
+  [{ up: true }, { down: true }, { first: true }, { level: 'A2' }].forEach(c => out.push(L.result(c)));
+  [{ days: 0 }, { days: 3, words: 5 }, { days: 9, words: 120 }].forEach(c => out.push(L.profile(c)));
+  [1, 0.8, 0.2].forEach(x => out.push(L.game(x)));
+  out.push(L.welcome, L.review);
+  out.forEach((l, i) => {
+    ok(l && typeof l.es === 'string' && l.es.length > 3 && typeof l.nl === 'string', 'Lupe-zin ' + i + ' heeft es en nl');
+    ok(l && !/\b(vosotros|vosotras|os|vuestro|vuestra|habéis|tenéis|sois|estáis|vais)\b/i.test(l.es), 'Lupe-zin zonder vosotros: ' + (l && l.es));
+    ok(l && !/undefined|NaN/.test(l.es + l.nl), 'Lupe-zin zonder lege waarde: ' + (l && l.es));
+  });
+  ok(L.streak(5) && L.streak(10) && !L.streak(4), 'Lupe juicht bij 5 en 10 op rij');
+}
+
 /* ---------- microfoon: spraakherkenning met terugkoppeling (nagebootste herkenning) ---------- */
 async function micTests() {
   const Sp = S.Speech;

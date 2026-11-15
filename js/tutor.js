@@ -84,5 +84,99 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     return S.Store.state.settings.explain === 'es' ? clean(text) : '';
   }
 
-  S.Tutor = Object.assign(LUPE, { svg, avatar, say, spoken, setTalking, hookSpeech });
+  /* ---------- Lupe als begeleider door de hele app ----------
+     Kort zinnetje in het Spaans (dat zegt ze als je erop tikt) met de Nederlandse betekenis eronder.
+     Uit te zetten in Instellingen (lupeCoach). */
+  const coachOn = () => S.Store.state.settings.lupeCoach !== false;
+  // vaste keuze per dag, zodat de tekst niet bij elke klik verspringt
+  const daily = (list, salt = 0) => list[(S.U.dayIndex() + salt) % list.length];
+  function coach(line, opt = {}) {
+    if (!line || !coachOn()) return null;
+    const h = S.U.h;
+    const canTalk = S.Speech.canSpeak();
+    const el = h('div', { class: 'lupe-coach' + (opt.cls ? ' ' + opt.cls : '') + (canTalk ? ' can-talk' : ''), role: canTalk ? 'button' : null, tabindex: canTalk ? 0 : null,
+      title: canTalk ? 'Tik om Lupe te horen' : null, 'aria-label': canTalk ? 'Profe Lupe: ' + line.es + '. Tik om te horen.' : null },
+      avatar(opt.size || 52, 'coach-av'),
+      h('div', { class: 'lc-bubble' },
+        opt.label !== false ? h('div', { class: 'lc-who' }, opt.label || 'Profe Lupe') : null,
+        h('div', { class: 'lc-es', lang: 'es' }, line.es),
+        line.nl ? h('div', { class: 'lc-nl' }, line.nl) : null));
+    if (canTalk) {
+      const talk = () => { S.Speech.unlock && S.Speech.unlock(); say(line.es); };
+      el.onclick = e => { if (e.target.closest('a,button')) return; talk(); };
+      el.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); talk(); } };
+    }
+    // Hardop alleen als dat gevraagd wordt (bijv. na een les) en voorlezen voor Lupe aan staat.
+    if (opt.speak && canTalk && S.Store.state.settings.tutorVoice) setTimeout(() => say(line.es), opt.delay || 600);
+    return el;
+  }
+
+  /* Lupe groot in het midden, met een emoji-badge (eindscherm van een les of spel). */
+  function hero(line, emoji, opt = {}) {
+    const el = coach(line, Object.assign({ size: 92, cls: 'lc-hero' }, opt));
+    if (el && emoji) el.querySelector('.coach-av').append(S.U.h('span', { class: 'lc-badge', 'aria-hidden': 'true' }, emoji));
+    return el;
+  }
+
+  /* Wat Lupe zegt. Alles in Latijns-Amerikaans Spaans (ustedes, geen vosotros), zonder mannelijke/vrouwelijke vormen voor de leerling. */
+  const L = {
+    hello(c) {
+      // c: { paused, goalDone, streak, lapsed, due, step, unit, min, goal }
+      if (c.paused) return { es: '¡Hola! Te quedaste a mitad de una lección. ¿Seguimos donde ibas?', nl: 'Je was halverwege een les. Zullen we verdergaan waar je was?' };
+      if (c.goalDone) return daily([
+        { es: '¡Meta del día cumplida! Estoy muy orgullosa de ti.', nl: 'Dagdoel gehaald! Ik ben heel trots op je.' },
+        { es: '¡Órale! Ya cumpliste tu meta. Todo lo que hagas ahora es extra.', nl: 'Je dagdoel is binnen. Alles wat je nu nog doet, is extra.' }]);
+      if (c.lapsed) return { es: '¡Qué gusto verte otra vez! Empecemos con algo cortito.', nl: 'Fijn dat je er weer bent! We beginnen met iets korts.' };
+      if (c.due >= 15) return { es: `Hoy tienes ${c.due} repasos. Empecemos por ahí, así no se te olvida nada.`, nl: `Je hebt vandaag ${c.due} herhalingen. Begin daarmee, dan vergeet je niets.` };
+      if (c.step === 'test') return { es: '¡Hoy toca la prueba de la unidad! Tú puedes.', nl: 'Vandaag is de unittoets aan de beurt. Jij kunt dit!' };
+      if (c.streak >= 3) return daily([
+        { es: `¡Llevas ${c.streak} días seguidos! ¡Qué padre!`, nl: `Al ${c.streak} dagen op rij! Super.` },
+        { es: `${c.streak} días seguidos. ¡No rompas la racha!`, nl: `${c.streak} dagen op rij. Hou je reeks vast!` }]);
+      if (c.min > 0) return { es: '¡Vas muy bien hoy! Un poquito más y llegas a tu meta.', nl: 'Je bent goed bezig vandaag. Nog even en je haalt je dagdoel.' };
+      return daily([
+        { es: `¿Empezamos? Hoy vemos: ${c.unit}.`, nl: `Zullen we beginnen? Vandaag: ${c.unitNl || c.unit}.` },
+        { es: 'Un ratito cada día hace la diferencia. ¡Vamos!', nl: 'Elke dag een beetje maakt het verschil. Kom op!' },
+        { es: '¡Hola! Te preparé un plan para hoy. ¡Vamos!', nl: 'Ik heb een plan voor vandaag voor je klaargezet.' }]);
+    },
+    welcome: { es: '¡Hola! Soy Lupe, tu profe de español.', nl: 'Ik ben Lupe, een axolotl uit Xochimilco in Mexico-Stad. Ik help je stap voor stap. Tik op mij om me te horen!' },
+    streak(n) {
+      if (n === 5) return '¡Cinco seguidas! ¡Órale!';
+      if (n === 10) return '¡Diez seguidas! ¡Qué padre!';
+      if (n === 15 || n === 20 || n === 30) return `¡${n} seguidas! ¡Imparable!`;
+      return null;
+    },
+    summary(c) {
+      // c: { pct, passed, mistakes, unitDone, exam }
+      if (c.passed === false) return { es: 'Casi lo logras. Repasamos un poco y lo intentamos otra vez, ¿va?', nl: 'Bijna! We herhalen even en proberen het dan nog eens, goed?' };
+      if (c.unitDone) return { es: '¡Felicidades! Terminaste la unidad. ¡Qué orgullo!', nl: 'Gefeliciteerd, je hebt de unit afgerond. Ik ben trots op je!' };
+      if (!c.total) return { es: '¡Listo! Buen trabajo.', nl: 'Klaar. Goed gedaan!' };
+      if (c.pct === 100) return { es: '¡Perfecto! Sin ningún error. ¡Eres una estrella!', nl: 'Perfect, geen enkele fout!' };
+      if (c.pct >= 90) return { es: '¡Excelente trabajo! Casi sin errores.', nl: 'Uitstekend, bijna foutloos.' };
+      if (c.pct >= 70) return { es: '¡Muy bien! Vas avanzando.', nl: 'Heel goed, je gaat vooruit.' + (c.mistakes ? ' Kijk nog even naar de woorden hieronder.' : '') };
+      return { es: 'Cada error te enseña algo. ¡Ánimo, vamos bien!', nl: 'Van elke fout leer je iets. De lastige woorden komen vanzelf terug in je herhaling.' };
+    },
+    result(c) {
+      // c: { level, up, down, first }
+      if (c.up) return { es: '¡Subiste de nivel! ¡Qué padre! Se nota que practicas.', nl: 'Je bent een niveau omhoog gegaan. Je merkt dat je oefent!' };
+      if (c.down) return { es: 'No te preocupes, a veces pasa. Repasamos juntos y lo intentas otra vez.', nl: 'Geen zorgen, dat gebeurt soms. We herhalen samen en je probeert het later nog eens.' };
+      if (c.first) return { es: '¡Gracias por hacer la prueba! Ahora sé por dónde empezar contigo.', nl: 'Bedankt voor het maken van de test. Nu weet ik waar we beginnen.' };
+      return { es: `¡Bien hecho! Tu nivel es ${c.level || 'A1'}. Seguimos practicando juntos.`, nl: `Goed gedaan! Je niveau is ${c.level || 'A1'}. We oefenen samen verder.` };
+    },
+    profile(c) {
+      // c: { words, days, streak }
+      if (!c.days) return { es: 'Aquí vas a ver todo lo que aprendes. ¡Empecemos hoy!', nl: 'Hier zie je straks alles wat je leert. Zullen we vandaag beginnen?' };
+      if (c.words >= 20) return daily([
+        { es: `¡Ya conoces ${c.words} palabras! Estoy muy orgullosa de ti.`, nl: `Je kent al ${c.words} woorden. Ik ben heel trots op je!` },
+        { es: `${c.words} palabras en ${c.days} días. ¡Qué padre!`, nl: `${c.words} woorden in ${c.days} ${c.days === 1 ? 'dag' : 'dagen'}. Super!` }]);
+      return { es: '¡Buen comienzo! Poco a poco se llega lejos.', nl: 'Goed begin! Beetje bij beetje kom je ver.' };
+    },
+    game(score) {
+      if (score >= 0.95) return { es: '¡Perfecto! ¡Qué buena memoria!', nl: 'Perfect! Wat een goed geheugen.' };
+      if (score >= 0.7) return { es: '¡Muy bien jugado!', nl: 'Heel goed gespeeld!' };
+      return { es: '¡Sigue así! Las palabras difíciles vuelven pronto.', nl: 'Ga zo door! De lastige woorden komen snel terug.' };
+    },
+    review: { es: '¡Todo repasado! Nos vemos mañana.', nl: 'Alles herhaald voor vandaag. Tot morgen!' }
+  };
+
+  S.Tutor = Object.assign(LUPE, { svg, avatar, say, spoken, setTalking, hookSpeech, coach, hero, coachOn, lines: L });
 })(window.SPT);
