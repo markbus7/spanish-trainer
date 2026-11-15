@@ -637,9 +637,30 @@
     const fb = h('div', { class: 'ls-fb' });
     const mainBtn = h('button', { class: 'btn primary wide', type: 'button' });
     const skipBtn = h('button', { class: 'btn link', type: 'button' });
+    // terug naar uitleg/dialoog/kaart die je net (per ongeluk) wegtikte; nooit naar een al beantwoorde vraag
+    const backBtn = h('button', { class: 'btn ghost ls-back', type: 'button', hidden: true, 'aria-label': 'Terug naar de vorige uitleg', onclick: () => { if (canBack()) { touch(); idx--; show(); } } }, '← Terug');
+    // bij vragen over een dialoog of leestekst: de tekst nog eens bekijken zonder je plek kwijt te raken
+    const peekBtn = h('button', { class: 'btn ghost small ls-peek-btn', type: 'button', hidden: true, onclick: () => openPeek() });
+    let peekEl = null;
+    function peekSource() {
+      if (answered || timerEnd || session.mode === 'exam') return null;
+      for (let i = Math.min(idx, queue.length) - 1; i >= 0; i--) if (['dialogue', 'reading'].includes(queue[i].kind)) return queue[i];
+      return null;
+    }
+    function closePeek() { if (!peekEl) return; peekEl._leave.forEach(f => f()); peekEl.remove(); peekEl = null; }
+    function openPeek() {
+      const src = peekSource(); if (!src) return;
+      closePeek();
+      const leave = [], ctx = { free() {}, auto() {}, onLeave: f => leave.push(f), answered: () => false, submit() {} };
+      peekEl = h('div', { class: 'ls-peek', role: 'dialog', 'aria-modal': 'true' },
+        h('div', { class: 'ls-peek-top' }, h('button', { class: 'btn primary', type: 'button', onclick: closePeek }, '← Terug naar de vraag')),
+        h('div', { class: 'ls-body' }, R[src.kind](src, ctx)));
+      peekEl._leave = leave;
+      root.append(peekEl);
+    }
     const footNote = h('p', { class: 'ls-note small muted', hidden: true });
-    const foot = h('div', { class: 'ls-foot' }, fb, h('div', { class: 'ls-actions' }, skipBtn, mainBtn), footNote);
-    root.append(h('div', { class: 'ls' }, h('div', { class: 'ls-top' }, closeBtn, h('div', { class: 'ls-bar' }, bar), timerEl, count), body, foot));
+    const foot = h('div', { class: 'ls-foot' }, fb, h('div', { class: 'ls-actions' }, backBtn, skipBtn, mainBtn), footNote);
+    root.append(h('div', { class: 'ls' }, h('div', { class: 'ls-top' }, closeBtn, h('div', { class: 'ls-bar' }, bar), timerEl, peekBtn, count), body, foot));
 
     let tick = null;
     if (timerEnd) tick = setInterval(() => { const s = Math.max(0, Math.round((timerEnd - Date.now()) / 1000)); timerEl.textContent = '⏱ ' + s + 's'; if (s <= 0) { clearInterval(tick); finish(); } }, 250);
@@ -665,13 +686,23 @@
     document.addEventListener('keydown', onKey);
     let ctxObj = null;
 
+    function canBack() {
+      if (answered || idx <= 0 || idx > queue.length || timerEnd || session.mode === 'exam') return false;
+      const prev = queue[idx - 1];
+      return !!prev && !prev.orig && ['card', 'info', 'dialogue', 'reading', 'write'].includes(prev.kind);
+    }
     function show() {
+      closePeek();
       leaveFns.forEach(f => f()); leaveFns = [];
       if (idx >= queue.length) return finish();
       progress(); persist(idx);
       const it = queue[idx];
       answered = false; fb.innerHTML = ''; fb.className = 'ls-fb'; foot.classList.remove('ok', 'bad');
       skipBtn.hidden = true; skipBtn.onclick = null;
+      backBtn.hidden = !canBack();
+      if (!backBtn.hidden) { const k = queue[idx - 1].kind; backBtn.textContent = k === 'dialogue' ? '← Dialoog' : k === 'reading' ? '← Tekst' : '← Terug'; }
+      const ps = canBack() ? null : peekSource();
+      peekBtn.hidden = !ps; if (ps) peekBtn.textContent = ps.kind === 'dialogue' ? '💬 Dialoog' : '📖 Tekst';
       mainBtn.disabled = true; mainBtn.textContent = T('check'); mainBtn.hidden = false;
       const ctx = ctxObj = {
         answered: () => answered,
@@ -692,7 +723,7 @@
 
     function feedback(it, r) {
       if (answered) return; answered = true; touch();
-      skipBtn.hidden = true;
+      skipBtn.hidden = true; backBtn.hidden = true; peekBtn.hidden = true; closePeek();
       const first = !graded.has(it.orig || it);
       if (first) graded.set(it.orig || it, r.ok);
       if (r.ok) { streak++; bestStreak = Math.max(bestStreak, streak); xp += it.retry || r.hinted ? 5 : 10; } else streak = 0;
@@ -840,7 +871,7 @@
     }
     function close(silent) {
       touch(); if (tick) clearInterval(tick);
-      leaveFns.forEach(f => f()); Speech.stop(); Speech.stopListening();
+      closePeek(); leaveFns.forEach(f => f()); Speech.stop(); Speech.stopListening();
       document.removeEventListener('keydown', onKey);
       root.hidden = true; root.innerHTML = ''; document.body.classList.remove('in-lesson');
       if (!silent && hooks.onAbort) {
