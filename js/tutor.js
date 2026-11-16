@@ -128,8 +128,8 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
       if (c.paused) return { es: '¡Hola! Te quedaste a mitad de una lección. ¿Seguimos donde ibas?', nl: 'Je was halverwege een les. Zullen we verdergaan waar je was?' };
       if (c.chestReady) return L.chestReady;
       if (c.planDone) return daily([
-        { es: '¡Plan cumplido! Lo que hagas ahora es extra.', nl: 'Je dagplan is af. Alles wat je nu nog doet, is extra.' },
-        { es: '¡Ya terminaste por hoy! Nos vemos mañana.', nl: 'Je bent klaar voor vandaag. Tot morgen!' }]);
+        { es: '¡Plan cumplido! Lo que hagas ahora es extra.', nl: 'Je dagplan is af. Zin in meer? Hieronder staat je volgende stap.' },
+        { es: '¡Plan cumplido! ¿Seguimos con la próxima lección?', nl: 'Je dagplan is af. Zullen we verder met de volgende les? Tik hieronder op «Ga verder».' }]);
       if (c.goalDone) return daily([
         { es: '¡Meta del día cumplida! Estoy muy orgullosa de ti.', nl: 'Dagdoel gehaald! Ik ben heel trots op je.' },
         { es: '¡Órale! Ya cumpliste tu meta. Todo lo que hagas ahora es extra.', nl: 'Je dagdoel is binnen. Alles wat je nu nog doet, is extra.' }]);
