@@ -47,6 +47,7 @@
       skills: { vocab: { ok: 0, no: 0 }, grammar: { ok: 0, no: 0 }, listen: { ok: 0, no: 0 }, speak: { ok: 0, no: 0 }, read: { ok: 0, no: 0 }, write: { ok: 0, no: 0 } },
       days: {}, xp: 0, streak: { cur: 0, best: 0, last: null }, current: null, badges: [], done: {},
       tests: [], games: {}, fast: 0, myWords: {},
+      lupe: { log: [], n: 0 }, // fouten uit gesprekken met Lupe (js/mistakes.js)
       partial: {}, // zinnen met fouten: welke woorden al goed waren (sleutel = srsId)
       paused: { t: 0, data: null } // onderbroken oefening, om later verder te gaan
     };
@@ -202,6 +203,8 @@
     // half goede zinnen: per zin de nieuwste stand (ook 'weer helemaal goed')
     out.partial = Object.assign({}, N.partial || {});
     for (const k in O.partial || {}) { const o = O.partial[k], n = out.partial[k]; if (!n || (o.t || 0) > (n.t || 0)) out.partial[k] = clone(o); }
+    // fouten uit gesprekken met Lupe: alles van beide apparaten
+    if (S.Mistakes) out.lupe = S.Mistakes.merge(N.lupe, O.lupe);
     // onderbroken oefening: de laatst bewaarde (of laatst afgeronde/weggegooide) wint
     const pa = A.paused || {}, pb = B.paused || {};
     out.paused = clone((pa.t || 0) >= (pb.t || 0) ? pa : pb);

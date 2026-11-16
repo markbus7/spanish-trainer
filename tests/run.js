@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/dagplan.js', 'js/tutor.js', 'js/ai.js']) {
+for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/dagplan.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -616,6 +616,41 @@ async function micTests() {
 
 (async () => {
 await micTests();
+
+/* ---------- fouten uit gesprekken met Lupe ---------- */
+{
+  const Mi = S.Mistakes, St = S.Store;
+  const saved = JSON.stringify(St.state);
+  St.state = St.mergeStates({}, {});
+  const reply = '¡Claro! ¿Y tú?\n---\n❌ soy cansado → ✅ estoy cansado — toestand\n<log>[{"w":"soy cansado","c":"estoy cansado","why":"toestand = estar","tag":"ser-estar"},{"w":"el coche","c":"el carro","why":"in Latijns-Amerika","tag":"vocab","es":"el carro","nl":"de auto"},{"w":"x","c":"y","tag":"bestaat-niet"}]</log>';
+  ok(!Mi.strip(reply).includes('<log') && Mi.strip(reply).endsWith('toestand'), 'lupe-log: blok wordt verborgen');
+  ok(Mi.strip('Hola amigo\n<lo') === 'Hola amigo' && Mi.strip('Hola\n<log>[{"w":') === 'Hola', 'lupe-log: half binnengekomen blok ook verborgen');
+  ok(!S.Tutor.spoken(reply, 'roleplay').includes('log') && !S.Tutor.spoken(reply, 'write').includes('carro"'), 'lupe-log: Lupe leest het blok niet voor');
+  const p = Mi.parse(reply);
+  ok(p && p.length === 3 && p[2].tag === 'other' && p[0].es === '', 'lupe-log: onbekend onderwerp wordt overig');
+  ok(Mi.parse('geen blok') === null && Mi.parse('<log>kapot</log>') === null && Mi.parse('<log>[]</log>').length === 0, 'lupe-log: zonder of met kapot blok');
+  const rec = Mi.record(reply, 'roleplay', 'Soy cansado y tengo un coche', { sc: 'En el café' });
+  ok(rec.length === 3 && St.state.lupe.log.length === 3 && St.state.lupe.n === 1, 'lupe-log: fouten bewaard');
+  ok(St.state.tags['ser-estar'] && St.state.tags['ser-estar'].no === 1, 'lupe-log: telt mee in zwakke punten');
+  const w = Mi.findWord('el carro');
+  ok(w && rec[1].srs === w.id && St.state.srs[w.id] && St.state.srs[w.id].d <= S.U.dayIndex(), 'lupe-log: fout woord staat vandaag in de herhaling');
+  Mi.record('ok <log>[{"w":"la problema","c":"el problema","tag":"gender"},{"w":"soy en casa","c":"estoy en casa","tag":"ser-estar"},{"w":"el xyzwort","c":"el gugelhupf","tag":"vocab","es":"el gugelhupf","nl":"tulband"}]</log>', 'write', 'tekst');
+  ok(Object.values(St.state.myWords).some(m => m.es === 'el gugelhupf'), 'lupe-log: onbekend woord wordt eigen woord');
+  const r = Mi.report(30);
+  ok(r.total === 6 && r.topics[0].tag === 'ser-estar' && r.topics[0].n === 2 && r.words.length === 2, 'lupe-log: rapport telt per onderwerp');
+  ok(r.topics[0].units.length === 1 && r.topics[0].units[0].ex.some(e => e.tag === 'ser-estar'), 'lupe-log: rapport noemt de les');
+  ok(Mi.focus(7, 2).length === 1 && Mi.focus(7, 2)[0].tag === 'ser-estar', 'lupe-log: Hoy-focus vanaf 2×');
+  const txt = Mi.asText(r);
+  ok(txt.includes('ser vs. estar: 2×') && txt.includes('«soy cansado» → «estoy cansado»') && txt.includes('el carro = de auto'), 'lupe-log: rapport als tekst');
+  const ses = Mi.practice(['ser-estar'], [w.id]);
+  ok(ses.items.length > 0 && ses.items.some(it => it.tag === 'ser-estar'), 'lupe-log: oefensessie voor de fouten');
+  const A = JSON.parse(JSON.stringify(St.state)), B = JSON.parse(JSON.stringify(St.state));
+  B.lupe.log.push({ t: Date.now() + 99, m: 'write', w: 'a', c: 'b', tag: 'gender' }); B.updated = 5;
+  const m = St.mergeStates(A, B);
+  ok(m.lupe.log.length === 7 && JSON.stringify(St.mergeStates(m, m).lupe) === JSON.stringify(m.lupe) && St.mergeStates(B, A).lupe.log.length === 7, 'lupe-log: sync voegt samen, idempotent');
+  ok(!/vosotros/i.test(S.AI.roleplaySystem({ role: 'x', goal: 'y' }).replace(/never "vosotros"/g, '')) && S.AI.roleplaySystem({ role: 'x', goal: 'y' }).includes('<log>') && S.AI.writingSystem().includes('<log>'), 'lupe-log: prompts vragen om het blok');
+  St.state = JSON.parse(saved);
+}
 
 /* ---------- dagplan op Hoy ---------- */
 {

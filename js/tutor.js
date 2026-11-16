@@ -76,6 +76,7 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   function spoken(text, mode) {
     const clean = t => String(t).replace(/\*\*/g, '').replace(/[*_`#>]/g, '')
       .replace(/\p{Extended_Pictographic}|️|‍/gu, '').replace(/\s*\n+\s*/g, '. ').replace(/\.\s*\./g, '.').replace(/\s+/g, ' ').trim();
+    text = S.Mistakes ? S.Mistakes.strip(text) : text;
     const reply = String(text || '').split(/\n\s*---\s*\n/)[0];
     if (mode === 'roleplay') return clean(reply);
     // Vraag/correctie: de uitleg is meestal Nederlands. Spaanse voorbeelden staan vet; die lezen we voor.
