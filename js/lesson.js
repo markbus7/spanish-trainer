@@ -697,6 +697,17 @@
        vak soms niet opnieuw na het wisselen van de inhoud: dan bleef een strookje van de vorige oefening
        staan en waren de antwoordknoppen grotendeels onzichtbaar. */
     function freshBody() { const nb = h('div', { class: 'ls-body' }); body.replaceWith(nb); body = nb; }
+    /* Ingezoomd blijven hangen (dubbeltik op iPad) liet bij een nieuwe stap alleen een stukje van het
+       scherm zien, bijv. alleen de 🐢-knop en «Verder». Bij elke nieuwe stap zoomen we weer helemaal uit. */
+    function unzoom() {
+      const vv = window.visualViewport;
+      if (!vv || vv.scale <= 1.01) return;
+      const m = document.querySelector('meta[name=viewport]'); if (!m) return;
+      const c = m.getAttribute('content');
+      m.setAttribute('content', c + ', maximum-scale=1');
+      setTimeout(() => m.setAttribute('content', c), 300); // daarna mag je weer zelf knijpzoomen
+      window.scrollTo(0, 0);
+    }
     function isGraded(it) { return !['card', 'info', 'dialogue', 'write'].includes(it.kind); }
     function touch() { const n = Date.now(); activeMs += Math.min(n - last, 60000); last = n; }
     function progress() {
@@ -709,6 +720,12 @@
       if (e.key === 'Escape') { tryClose(); return; }
       if (e.target && e.target.tagName === 'TEXTAREA') return;
       if (e.key === 'Enter') { if (!mainBtn.disabled && mainBtn.offsetParent) { e.preventDefault(); mainBtn.click(); } return; }
+      // spatiebalk = Verder/Controleer, behalve in een tekstveld (daar typ je gewoon een spatie)
+      if (e.key === ' ' && !(e.target && (e.target.tagName === 'INPUT' || e.target.isContentEditable))) {
+        e.preventDefault(); // ook geen klik op een knop die toevallig de focus heeft
+        if (!e.repeat && !mainBtn.disabled && mainBtn.offsetParent) mainBtn.click();
+        return;
+      }
       if (!answered && ctxObj && ctxObj.keys && !(e.target && e.target.tagName === 'INPUT')) ctxObj.keys(e.key);
     }
     document.addEventListener('keydown', onKey);
@@ -720,7 +737,7 @@
       return !!prev && !prev.orig && ['card', 'info', 'dialogue', 'reading', 'write'].includes(prev.kind);
     }
     function show() {
-      closePeek();
+      closePeek(); unzoom();
       leaveFns.forEach(f => f()); leaveFns = [];
       if (idx >= queue.length) return finish();
       progress(); persist(idx);
