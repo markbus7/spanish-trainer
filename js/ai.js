@@ -133,6 +133,7 @@ Do not use Markdown headings or tables. Keep formatting minimal.`;
 
   // De app leest de vetgedrukte stukken voor met een Spaanse stem; daarom alleen Spaans vet.
   const BOLD_RULE = 'Formatting rule: put every Spanish example sentence or Spanish phrase in **bold** (the app reads the bold parts aloud with a Spanish voice). Never put Dutch text or labels in bold.';
+  const logRule = () => (S.Mistakes ? S.Mistakes.promptRule() : '');
   function tutorPersona() { return (S.Tutor && S.Tutor.persona) || ''; }
 
   function roleplaySystem(sc) {
@@ -150,7 +151,8 @@ Rules for every reply:
    - For each real mistake (max 3): "❌ wrong fragment → ✅ correct fragment — very short explanation".
    - If there are no mistakes: "✅ ¡Perfecto!" and optionally one tip to sound more natural ("💡 …").
    Ignore missing accents and punctuation unless they change meaning; mention them once at most.
-4. For your very first message (when the learner says they want to start), greet them in character, set the scene and ask the first question, then "---" and "💡" one useful phrase for this situation.`;
+4. For your very first message (when the learner says they want to start), greet them in character, set the scene and ask the first question, then "---" and "💡" one useful phrase for this situation.
+${logRule()}`;
   }
 
   function askSystem() {
@@ -174,7 +176,8 @@ You correct a short text written by the learner. Respond in ${explainLang()} usi
 ❌ → ✅ Up to 5 most important corrections, one per line, each with a very short explanation.
 💡 One tip to sound more natural.
 ⭐ A score from 1 to 10 for this level, with one encouraging sentence.
-${BOLD_RULE}`;
+${BOLD_RULE}
+${logRule()}`;
   }
 
   async function checkTranslation(nl, user, accepted) {

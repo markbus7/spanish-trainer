@@ -959,3 +959,24 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .dp.compact .dp-card .pc-icon { width: 36px; height: 36px; font-size: 1.1rem; border-radius: 10px; }
 .dp.compact .dp-card small, .dp.compact .dp-card > .btn, .dp.compact .dp-tag, .dp.compact .dp-segs { display: none; }
 .dp.compact .dp-card .pc-body span { font-size: .82rem; }
+
+/* Rapport van Lupe: fouten uit gesprekken */
+.bubble .logged { display: inline-block; margin-top: .45rem; color: var(--ink2); text-decoration: none; border-bottom: 1px dashed var(--line); }
+.lupe-focus .row { align-items: center; }
+.lupe-focus .coach-av { flex: none; }
+.lupe-focus .lf-ex { margin: .2rem 0; }
+.lupe-focus .lf-ex s, .rep-ex s, .rep-recent s { color: #c0392b; text-decoration-thickness: 1.5px; }
+.lupe-focus .btn { margin-top: .7rem; }
+.rep-period { margin: .2rem 0 .8rem; }
+.rep-topic, .rep-recent { border-bottom: 1px solid var(--line); padding: .55rem 0; }
+.rep-topic:last-of-type, .rep-recent:last-child { border-bottom: 0; }
+.rep-topic summary, .rep-recent summary { display: flex; align-items: center; gap: .6rem; cursor: pointer; list-style: none; min-height: 40px; }
+.rep-topic summary::-webkit-details-marker, .rep-recent summary::-webkit-details-marker { display: none; }
+.rep-topic summary .pbar { width: 28%; max-width: 160px; flex: none; }
+.rep-ex { padding: .4rem 0 .1rem .4rem; display: flex; flex-direction: column; gap: .1rem; }
+.rep-topic .btn.link { margin-top: .3rem; padding-left: .4rem; text-align: left; }
+.rapport .card > .btn.wide { margin-top: .8rem; }
+.rep-text pre { white-space: pre-wrap; word-break: break-word; background: var(--bg2); border-radius: 10px; padding: .7rem; margin-top: .5rem; max-height: 320px; overflow: auto; }
+.rep-sum .btn { margin-top: .6rem; }
+.bubble .logged { display: block; width: fit-content; }
+.rep-topic summary b, .rep-recent summary b { color: var(--ink); }

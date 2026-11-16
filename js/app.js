@@ -400,6 +400,9 @@
     }
     wantChest = false;
 
+    // Lupe zag in je gesprekken steeds dezelfde fout: kort oefenen
+    const fc = lupeFocusCard(); if (fc) wrap.append(section('Uit je gesprekken met Lupe', fc));
+
     // frase del día
     const ph = S.phrases[U.dayIndex() % S.phrases.length];
     wrap.append(section('La frase del día', h('div', { class: 'phrase' }, h('div', { class: 'es', lang: 'es' }, ph[2] + ' ' + ph[0], S.Lesson.speakBtn(ph[0])), h('div', { class: 'muted' }, ph[1]))));
@@ -809,8 +812,13 @@
       const msgs = chat.messages.filter(m => m !== am).map(m => ({ role: m.role, content: m.content }));
       try {
         const full = await S.AI.stream({ system: sys, messages: msgs, maxTokens: chat.mode === 'roleplay' ? 1500 : 3000, effort: chat.mode === 'write' ? 'medium' : 'low', onText: t => { am.content = t; fillBubble(b, am); scrollLog(); } });
-        am.content = full; fillBubble(b, am);
-        award('ai'); Store.skill(chat.mode === 'write' ? 'write' : 'speak', true); Store.today().min += 0.5; Store.touchStreak();
+        am.content = full;
+        // fouten uit je bericht noteren voor je rapport (rollenspel en correctie)
+        let found = null;
+        if (!hidden && chat.mode !== 'ask') found = S.Mistakes.record(full, chat.mode, text, { sc: chat.mode === 'roleplay' && chat.scenario ? (chat.scenario.title || chat.scenario.nl) : '' });
+        if (found) am.logged = found.length;
+        fillBubble(b, am);
+        award('ai'); if (!hidden) Store.skill(chat.mode === 'write' ? 'write' : 'speak', !found || !found.length); Store.today().min += 0.5; Store.touchStreak();
         // drie beurten in een rollenspel = de spreektaak van je dagplan
         if (chat.mode === 'roleplay' && !hidden && (chat.turns = (chat.turns || 0) + 1) >= 3 && !Store.today().done.speak) {
           Store.today().done.speak = true; S.Sound.good(); S.toast('🗣️ Gesprek gevoerd: spreken is afgevinkt in je dagplan ✓', 3200);
@@ -881,13 +889,14 @@
   function fillBubble(b, m) {
     const body = b.querySelector('.bubble-body'); body.innerHTML = '';
     if (m.role === 'user') { body.textContent = m.content; return; }
-    const [reply, ...rest] = String(m.content).split(/\n\s*---\s*\n/);
+    const [reply, ...rest] = S.Mistakes.strip(m.content).split(/\n\s*---\s*\n/);
     const r = h('div', { class: 'reply', lang: m.mode === 'roleplay' ? 'es' : null, html: S.md(reply) });
     body.append(r);
     if (rest.length) body.append(h('div', { class: 'correction', html: S.md(rest.join('\n')) }));
     // Spaanse (vetgedrukte) stukken: tik om ze te horen
     body.querySelectorAll('b').forEach(x => { if (/[a-záéíóúñ]/i.test(x.textContent) && !/:\s*$/.test(x.textContent)) { x.classList.add('say-es'); x.lang = 'es'; x.title = 'Tik om te horen'; x.onclick = () => S.Tutor.say(S.Tutor.spoken('**' + x.textContent + '**', 'ask')); } });
     const sp = S.Tutor.spoken(m.content, m.mode);
+    if (m.logged) body.append(h('a', { class: 'logged small', href: '#/rapport', title: 'Bekijk je rapport' }, '📋 ' + U.plural(m.logged, 'fout', 'fouten') + ' genoteerd in je rapport'));
     if (sp && Speech.canSpeak()) body.append(h('button', { class: 'btn link small replay', type: 'button', title: 'Laat Lupe het nog eens zeggen' , onclick: e => { e.stopPropagation(); S.Tutor.say(sp); } }, '🔊 Nog eens'));
   }
 
@@ -905,6 +914,122 @@
     const t = Math.max(1, ws.total); const seg = (n, cls) => n ? h('i', { class: cls, style: { width: (n / t * 100) + '%' } }) : null;
     return h('div', { class: 'wstack' }, seg(ws.mastered, 'm'), seg(ws.known, 'k'), seg(ws.learning, 'l'));
   }
+  /* ================= Rapport van Lupe: fouten uit gesprekken (js/mistakes.js) ================= */
+  const M = () => S.Mistakes;
+  function lupeFocusCard() {
+    const f = M().focus(7, 2); if (!f.length) return null;
+    const top = f[0], ex = top.ex[0];
+    return h('div', { class: 'card lupe-focus' },
+      h('div', { class: 'row gap' }, S.Tutor.avatar(44, 'coach-av'),
+        h('div', { class: 'grow' }, h('b', null, '🎯 ' + top.label + ' ging deze week ' + top.n + '× mis'),
+          ex ? h('div', { class: 'small lf-ex' }, h('s', { lang: 'es' }, ex.w), ' → ', h('b', { lang: 'es' }, ex.c)) : null,
+          f.length > 1 ? h('small', { class: 'muted' }, 'Ook: ' + f.slice(1).map(t => t.label + ' (' + t.n + '×)').join(', ')) : null)),
+      h('div', { class: 'row gap wrap' },
+        h('button', { class: 'btn primary', type: 'button', onclick: () => practiceMistakes(f.map(t => t.tag), []) }, 'Oefen 5 minuten'),
+        h('a', { class: 'btn ghost', href: '#/rapport' }, '📋 Rapport')));
+  }
+  function practiceMistakes(tags, wordIds) {
+    const ses = M().practice(tags, wordIds);
+    if (!ses.items.length) { S.toast('Nog geen oefeningen voor deze onderwerpen. Kijk bij de les die erbij staat.'); return; }
+    runSession(ses);
+  }
+  function reportSummary() {
+    const r = M().report(30);
+    const card = h('div', { class: 'card rep-sum' });
+    if (!r.total) {
+      card.append(h('p', { class: 'small' }, '📋 Lupe houdt hier bij waar je de mist in gaat in je gesprekken (🎭 rollenspel en ✍️ correctie). Nog niets genoteerd in de laatste 30 dagen.'));
+      card.append(h('a', { class: 'btn ghost wide', href: '#/rapport' }, '📋 Naar het rapport'));
+      return card;
+    }
+    card.append(h('p', { class: 'small' }, h('b', null, U.plural(r.total, 'fout', 'fouten')), ' in je gesprekken met Lupe (laatste 30 dagen).'));
+    r.topics.slice(0, 3).forEach(t => card.append(h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, t.label), h('small', { class: 'muted' }, t.n + '×'))));
+    if (r.words.length) card.append(h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, 'woordenschat'), h('small', { class: 'muted' }, r.words.length + ' woorden')));
+    card.append(h('a', { class: 'btn primary wide', href: '#/rapport' }, '📋 Bekijk het hele rapport'));
+    return card;
+  }
+  async function shareReport(text, how) {
+    if (how === 'share' && navigator.share) { try { await navigator.share({ title: 'Rapport van Profe Lupe', text }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+    let done = false;
+    try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); done = true; } } catch (e) { /* hieronder */ }
+    if (!done) { const ta = h('textarea', { style: { position: 'fixed', top: '-1000px' } }); ta.value = text; document.body.append(ta); ta.select(); try { done = document.execCommand('copy'); } catch (e) { /* */ } ta.remove(); }
+    S.toast(done ? '📋 Rapport gekopieerd. Plak het in je chat met je coach.' : 'Kopiëren lukte niet. Selecteer de tekst hieronder en kopieer hem zelf.', 3600);
+  }
+  let repDays = 30;
+  routes.rapport = function () {
+    const wrap = h('div', { class: 'page rapport' });
+    const r = M().report(repDays);
+    wrap.append(h('a', { class: 'back', href: '#/perfil' }, '← Perfil'), h('h1', null, 'Rapport van Lupe'),
+      h('p', { class: 'muted small' }, 'Wat er misging in je gesprekken met Lupe (🎭 rollenspel en ✍️ correctie), zodat je weet waar je op moet letten. Fouten tellen ook mee in je zwakke punten, en woorden die misgingen staan in je herhaling.'));
+    wrap.append(h('div', { class: 'chips rep-period' }, [[7, '7 dagen'], [30, '30 dagen'], [90, '90 dagen']].map(([d, l]) =>
+      h('button', { class: 'chip toggle' + (repDays === d ? ' on' : ''), type: 'button', onclick: () => { repDays = d; render(); } }, l))));
+    const trend = r.prev ? (r.total < r.prev ? '📉 minder dan de ' + r.days + ' dagen ervoor (' + r.prev + ')' : r.total > r.prev ? 'meer dan de ' + r.days + ' dagen ervoor (' + r.prev + ')' : 'evenveel als ervoor') : null;
+    wrap.append(S.Tutor.coach(!r.total ? { es: '¡Platiquemos! Así veo en qué te puedo ayudar.', nl: 'Laten we kletsen! Dan zie ik waarmee ik je kan helpen.' }
+      : r.prev && r.total < r.prev ? { es: '¡Vas mejorando! Cometes menos errores que antes.', nl: 'Je wordt beter! Je maakt minder fouten dan eerst.' }
+        : { es: 'Mira, esto es lo que más practicaría yo.', nl: 'Kijk, dit zou ik het meest oefenen.' }));
+    wrap.append(h('div', { class: 'stat-grid' },
+      statCard('📝', r.total, 'fouten genoteerd', trend || 'laatste ' + r.days + ' dagen'),
+      statCard('🧩', r.topics.length, 'onderwerpen'),
+      statCard('📚', r.words.length, 'woorden', 'in je herhaling')));
+    if (!r.total) {
+      wrap.append(h('div', { class: 'card' }, h('p', null, 'Nog geen fouten genoteerd in deze periode.'),
+        h('p', { class: 'small muted' }, S.AI.enabled() ? 'Voer een 🎭 rollenspel of laat een tekst verbeteren bij ✍️ Correctie. Lupe noteert dan wat er misgaat.' : 'Hiervoor heb je een AI-sleutel nodig (Instellingen). Dan kun je met Lupe praten en noteert ze wat er misgaat.'),
+        h('a', { class: 'btn primary wide', href: '#/docente' }, '🗣️ Praat met Lupe')));
+    }
+    if (r.topics.length) {
+      const tags = r.topics.filter(t => t.tag !== 'other').map(t => t.tag);
+      const mx = Math.max(...r.topics.map(t => t.n));
+      wrap.append(section('Waar je de mist in gaat', h('div', { class: 'card' },
+        r.topics.map(t => h('details', { class: 'rep-topic' },
+          h('summary', null, h('span', { class: 'grow' }, h('b', null, t.label)), bar(t.n / mx, '#e2603a'), h('small', { class: 'muted' }, t.n + '×')),
+          t.ex.map(e => h('div', { class: 'rep-ex' }, h('div', null, '❌ ', h('s', { lang: 'es' }, e.w), ' → ✅ ', h('b', { lang: 'es' }, e.c)), e.why ? h('small', { class: 'muted' }, e.why) : null)),
+          t.units.length ? h('a', { class: 'btn link small', href: '#/unit/' + t.units[0].id }, '📘 Uitleg in de les: ' + t.units[0].level + ' · ' + t.units[0].icon + ' ' + t.units[0].title) : null)),
+        tags.length ? h('button', { class: 'btn primary wide', type: 'button', onclick: () => practiceMistakes(tags.slice(0, 6), r.words.map(e => e.srs).filter(Boolean)) }, '🎯 Oefen deze fouten') : null)));
+    }
+    if (r.words.length) {
+      wrap.append(section('Woorden die misgingen', h('div', { class: 'card' }, h('div', { class: 'word-list' },
+        r.words.slice(0, 20).map(e => h('div', { class: 'word-row' }, S.Lesson.speakBtn(e.es || e.c), h('div', { class: 'grow' }, h('b', { lang: 'es' }, e.es || e.c), h('span', null, (e.nl || '') + (e.w ? ' · jij: «' + e.w + '»' : ''))),
+          e.srs ? h('small', { class: 'muted', title: 'Staat in je herhaling' }, '🔁') : null))),
+        h('small', { class: 'muted' }, '🔁 = staat in je herhaling en komt vandaag terug.'))));
+    }
+    // advies van Lupe
+    const adv = h('div', { class: 'card rep-advice' });
+    const drawAdv = a => {
+      adv.innerHTML = '';
+      if (a && a.text) adv.append(h('div', { class: 'small', html: S.md(a.text) }), h('small', { class: 'muted' }, 'Advies van ' + fmtDate(a.t, { day: 'numeric', month: 'long' })));
+      else adv.append(h('p', { class: 'small muted' }, r.total ? 'Laat Lupe je fouten bekijken en vertellen waar je deze week op moet letten.' : 'Na een paar gesprekken kan Lupe je hier persoonlijk advies geven.'));
+      if (S.AI.enabled() && r.total) {
+        const btn = h('button', { class: 'btn ghost wide', type: 'button' }, a && a.text ? '✨ Nieuw advies' : '✨ Vraag Lupe om advies');
+        btn.onclick = async () => {
+          btn.disabled = true; btn.textContent = 'Lupe denkt na…';
+          try { const x = await M().advise(); save(); drawAdv(x); if (st().settings.tutorVoice) S.Tutor.say(S.Tutor.spoken(x.text, 'ask')); }
+          catch (e) { btn.disabled = false; btn.textContent = '✨ Probeer opnieuw'; S.toast('⚠️ ' + e.message, 4000); }
+        };
+        adv.append(btn);
+      }
+      adv.querySelectorAll('b').forEach(x => { if (/[a-záéíóúñ]/i.test(x.textContent)) { x.classList.add('say-es'); x.lang = 'es'; x.onclick = () => S.Tutor.say(x.textContent); } });
+    };
+    drawAdv(r.advice);
+    wrap.append(section('Advies van Lupe', adv));
+    // terugkoppelen aan je coach
+    const text = M().asText(r);
+    wrap.append(section('Delen met je coach', h('div', { class: 'card' },
+      h('p', { class: 'small muted' }, 'Kopieer het rapport als tekst en plak het in je chat met je coach. Dan kunnen de lessen daarop worden aangepast.'),
+      h('div', { class: 'row gap wrap' },
+        h('button', { class: 'btn primary grow', type: 'button', onclick: () => shareReport(text, 'copy') }, '📋 Kopieer rapport'),
+        navigator.share ? h('button', { class: 'btn ghost grow', type: 'button', onclick: () => shareReport(text, 'share') }, '📤 Delen') : null),
+      h('details', { class: 'rep-text' }, h('summary', { class: 'small' }, 'Tekst bekijken'), h('pre', { class: 'small' }, text)))));
+    // laatste fouten
+    if (r.recent.length) {
+      wrap.append(section('Laatste fouten', h('div', { class: 'card' }, r.recent.map(e => h('details', { class: 'rep-recent' },
+        h('summary', null, h('span', { class: 'grow' }, '❌ ', h('s', { lang: 'es' }, e.w), ' → ', h('b', { lang: 'es' }, e.c)), h('small', { class: 'muted' }, fmtDate(e.t, { day: 'numeric', month: 'short' }))),
+        h('small', { class: 'muted' }, (e.m === 'write' ? '✍️ Correctie' : '🎭 ' + (e.sc || 'Rollenspel')) + ' · ' + (e.tag === 'vocab' ? 'woordenschat' : e.tag === 'other' ? 'overig' : C.tag(e.tag))),
+        e.why ? h('p', { class: 'small' }, e.why) : null,
+        e.u ? h('p', { class: 'small muted', lang: 'es' }, 'Jij schreef: «' + e.u + '»') : null)))));
+    }
+    return wrap;
+  };
+  routes.rapport.tab = 'perfil';
+
   routes.perfil = function () {
     const s = st(); const wrap = h('div', { class: 'page profile' });
     const est = P.estimate(); const t = lastTest();
@@ -932,6 +1057,8 @@
     const adv = levelAdvice();
     if (adv) wrap.append(adviceCard(adv));
     else wrap.append(h('div', { class: 'card advice' }, h('b', null, '🧭 Weet je hoe goed je echt bent?'), h('p', { class: 'small' }, 'Doe de niveautest (±8 min). Dan zie je of je hoger zit dan de lessen die je nu krijgt, en kun je meteen hoger instappen.')));
+
+    wrap.append(section('Rapport van Lupe', reportSummary()));
 
     // ---- niveautests: historie ----
     const tests = testsOf().slice().reverse();
