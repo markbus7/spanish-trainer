@@ -940,3 +940,22 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 }
 @media (max-width: 560px) { .dp-item.done .dp-card > .btn { flex: 0 0 auto; margin-left: auto; padding-top: .45rem; padding-bottom: .45rem; } }
 .wk-day.miss .wk-dot { border-color: var(--line); }
+
+/* ---------- Ga verder (na een voltooid dagplan) ---------- */
+.go-on { background: linear-gradient(135deg, var(--accent-soft), var(--card) 70%); border: 2px solid var(--accent); border-radius: var(--r); padding: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: .8rem; }
+.go-main { display: flex; align-items: center; gap: .9rem; }
+.go-icon { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; font-size: 1.8rem; background: var(--card); flex: none; }
+.go-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.go-body b { font-size: 1.1rem; overflow-wrap: anywhere; } .go-body span { color: var(--ink2); font-size: .88rem; }
+.go-prog { display: flex; align-items: center; gap: .5rem; margin-top: .4rem; max-width: 320px; } .go-prog .pbar { flex: 1; } .go-prog small { color: var(--muted); font-size: .75rem; white-space: nowrap; }
+.go-btn { flex: none; font-size: 1.05rem; padding-left: 1.4rem; padding-right: 1.4rem; }
+.go-alts { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; border-top: 1px solid var(--line); padding-top: .7rem; }
+.go-alts small { color: var(--muted); font-size: .8rem; margin-right: .2rem; }
+@media (max-width: 560px) { .go-main { flex-wrap: wrap; } .go-btn { flex: 1 1 100%; } }
+/* voltooid dagplan: compact, zodat «Ga verder» de aandacht krijgt */
+.dp.compact .dp-path { gap: .45rem; }
+.dp.compact .dp-item:not(:last-child)::before { height: calc(100% + .45rem); }
+.dp.compact .dp-card { padding: 9px 12px; }
+.dp.compact .dp-card .pc-icon { width: 36px; height: 36px; font-size: 1.1rem; border-radius: 10px; }
+.dp.compact .dp-card small, .dp.compact .dp-card > .btn, .dp.compact .dp-tag, .dp.compact .dp-segs { display: none; }
+.dp.compact .dp-card .pc-body span { font-size: .82rem; }

@@ -388,6 +388,8 @@
     const plan = h('div', { class: 'plan' });
     // 0. onderbroken oefening
     const pc = pausedCard(); if (pc) plan.append(pc);
+    // dagplan af en beloning binnen: één duidelijke volgende stap bovenaan
+    if (ds.chest && !pc) wrap.append(section('Ga verder', goOn({ due, u, step })));
     plan.append(dayPlan(ds, just, { d, due, u, step }));
     wrap.append(section(null, h('div', { class: 'dp-title' }, h('h2', { class: 'sec-title' }, 'Je plan voor vandaag'),
       h('span', { class: 'dp-count' + (ds.all ? ' all' : '') }, ds.chest ? '⭐ Voltooid' : `${ds.n} van ${ds.total}`)), plan));
@@ -470,7 +472,27 @@
     const path = h('div', { class: 'dp-path' }, items, chest);
     // de segmenten van zojuist afgevinkte taken vullen zich zichtbaar
     if (just.length) setTimeout(() => path.querySelectorAll('.dp-segs i.late').forEach(i => i.classList.remove('late')), 450);
-    return h('div', { class: 'dp' }, path, weekStrip());
+    return h('div', { class: 'dp' + (ds.chest && !just.length ? ' compact' : '') }, path, weekStrip());
+  }
+  /* Na een voltooid dagplan: één aanbevolen vervolg, met een paar kleine alternatieven eronder. */
+  function goOn({ due, u, step }) {
+    const main = step
+      ? { icon: step.icon, kicker: step.id === 'test' ? 'Volgende: de unittoets' : 'Volgende les', title: `${step.nl} · ${u.icon} ${u.title}`,
+        sub: `${u.level} · unit ${C.unitsOf(u.level).indexOf(u) + 1} — ${u.nl} · ±${step.min} min`, label: step.id === 'test' ? '▶ Start toets' : '▶ Ga verder', fn: () => startStep(u, step.id) }
+      : { icon: '🎓', kicker: 'Volgende stap', title: 'Niveau-examen ' + u.level, sub: 'Alle units van ' + u.level + ' zijn klaar. Haal het examen en ga door naar het volgende niveau.', label: '▶ Naar het examen', fn: () => { location.hash = '#/ruta'; } };
+    const prog = P.unitProgress(u);
+    const alts = [
+      due ? h('button', { class: 'chip toggle', type: 'button', onclick: () => startReview(25) }, `🔁 ${U.plural(due, 'herhaling', 'herhalingen')}`) : null,
+      h('button', { class: 'chip toggle', type: 'button', onclick: () => runSession(Gen.sprint(30), { desc: { kind: 'plain', mark: 'sprint' } }) }, '⚡ Woordensprint'),
+      h('button', { class: 'chip toggle', type: 'button', onclick: () => { location.hash = '#/juegos'; } }, '🎲 Woordspel'),
+      S.AI.enabled() ? h('button', { class: 'chip toggle', type: 'button', onclick: () => { startRoleplay(unitScenario(u)); location.hash = '#/docente'; } }, '🗣️ Praten met Lupe') : null];
+    return h('div', { class: 'go-on' },
+      h('div', { class: 'go-main' },
+        h('div', { class: 'go-icon' }, main.icon),
+        h('div', { class: 'go-body' }, h('em', { class: 'dp-tag' }, main.kicker), h('b', null, main.title), h('span', null, main.sub),
+          step ? h('div', { class: 'go-prog' }, bar(prog), h('small', null, `Unit ${Math.round(prog * 100)}% klaar`)) : null),
+        h('button', { class: 'btn primary go-btn', type: 'button', onclick: main.fn }, main.label)),
+      h('div', { class: 'go-alts' }, h('small', null, 'Of liever iets anders:'), alts));
   }
   function weekStrip(big) {
     const wk = S.Dagplan.week(st().days), streak = Store.liveStreak();
