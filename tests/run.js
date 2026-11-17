@@ -776,7 +776,7 @@ await micTests();
     const K = c.SPT, us = K.C.all(), w = course + ': ';
     ok(K.course.id === course && K.course.ui === 'es' && K.i18n.on, w + 'cursus actief met Spaanse schermteksten');
     ok(us.length >= 5 && us.every(u => u.id.startsWith(course.slice(0, 2) + '-')), w + 'alleen eigen lesstof (' + us.length + ' units)');
-    ok(K.placement.length >= 12 && K.placement.every(q => q.lv === 'A1') && K.scenarios.length >= 4 && K.phrases.length >= 10 && !K.regions.length, w + 'niveautest, gesprekken en uitdrukkingen');
+    ok(K.placement.length >= 12 && K.placement.every(q => K.C.available(q.lv)) && K.scenarios.length >= 4 && K.phrases.length >= 10 && !K.regions.length, w + 'niveautest, gesprekken en uitdrukkingen');
     const latam = /vosotros|vuestr|\b(sois|habéis|tenéis|podéis|queréis|coche|ordenador|móvil|zumo|vale)\b/i;
     const ids = new Set();
     for (const u of us) {
@@ -813,8 +813,14 @@ await micTests();
       }
       u.dialogue.lines.forEach(l => ok(have.has(K.Speech.clipKey(l[1], course)), where + ' dialoog-opname: ' + l[1]));
     }
-    for (let r = 0; r < 5; r++) { const b = K.Gen.levelTestBand('A1'); ok(b.items.length >= 8 && b.items.every(it => it.options.includes(it.answer)), w + 'niveautest A1'); }
-    ok(!K.Gen.levelTestBand('A2').items.length && K.C.available('A1') && !K.C.available('A2'), w + 'alleen A1 beschikbaar');
+    const lvls = K.C.LEVELS.map(L => L.id).filter(l => K.C.available(l));
+    ok(lvls[0] === 'A1' && lvls.every((l, i) => l === K.C.LEVELS[i].id), w + 'niveaus op volgorde: ' + lvls.join(','));
+    for (const l of lvls) {
+      ok(K.C.unitsOf(l).length === 10 && K.placement.filter(q => q.lv === l).length >= 12, w + l + ': 10 units en 12+ toetsvragen');
+      for (let r = 0; r < 5; r++) { const b = K.Gen.levelTestBand(l); ok(b.items.length >= 8 && b.items.every(it => it.options.includes(it.answer)), w + 'niveautest ' + l); }
+    }
+    const nx = K.C.LEVELS[lvls.length];
+    ok(!nx || (!K.Gen.levelTestBand(nx.id).items.length && !K.C.available(nx.id)), w + 'volgend niveau nog niet beschikbaar');
     // antwoordcontrole: lidwoorden van de doeltaal
     const it = { answers: [course === 'en-es' ? 'the house' : 'het huis'], articleOptional: true };
     ok(K.Gen.checkType(course === 'en-es' ? 'house' : 'huis', it).ok, w + 'lidwoord mag ontbreken');
