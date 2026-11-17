@@ -365,9 +365,23 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .6rem; margin: 1rem 0; }
 .stat-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: flex; flex-direction: column; box-shadow: var(--shadow); }
 .stat-card .si { font-size: 1.3rem; } .stat-card b { font-family: var(--serif); font-size: 1.6rem; line-height: 1.1; } .stat-card span { color: var(--ink2); font-size: .85rem; }
-.heat { display: grid; grid-template-rows: repeat(7, 1fr); grid-auto-flow: column; gap: 3px; overflow-x: auto; }
-.heat i, .heat-key { width: 14px; height: 14px; border-radius: 3px; background: var(--bg2); display: inline-block; }
-.heat i.pad { visibility: hidden; }
+.heat-card { --hc: 18px; --hg: 3px; }
+@media (min-width: 600px) { .heat-card { --hc: 30px; --hg: 5px; } .heat-m, .heat-d { font-size: .8rem; } }
+.heat-sum { margin: 0 0 .3rem; font-weight: 600; }
+.heat { display: flex; gap: var(--hg); overflow-x: auto; margin: .8rem 0 .4rem; padding: 3px; }
+.heat-col { display: flex; flex-direction: column; gap: var(--hg); flex: none; }
+.heat-m, .heat-d { height: var(--hc); font-size: .68rem; line-height: var(--hc); color: var(--muted); white-space: nowrap; width: var(--hc); overflow: visible; }
+.heat-d { width: 1.5rem; }
+.heat-cell, .heat-key { width: var(--hc, 14px); height: var(--hc, 14px); border-radius: 4px; background: var(--line); display: inline-block; border: 0; padding: 0; flex: none; }
+.heat-cell { cursor: pointer; }
+.heat-cell.future { visibility: hidden; }
+.heat-cell.today { box-shadow: 0 0 0 2px var(--accent); }
+.heat-cell.sel { box-shadow: 0 0 0 2px var(--ink); }
+.heat-cell.today.sel { box-shadow: 0 0 0 2px var(--accent), 0 0 0 4px var(--ink); }
+.heat-detail { min-height: 2.6em; margin: .3rem 0 .6rem; font-size: .9rem; }
+.heat-legend { display: flex; flex-wrap: wrap; gap: .3rem .9rem; align-items: center; }
+.heat-legend span { display: inline-flex; align-items: center; gap: .35rem; }
+.heat-legend .heat-key { --hc: 14px; }
 .l1 { background: color-mix(in srgb, var(--teal) 30%, var(--bg2)) !important; } .l2 { background: color-mix(in srgb, var(--teal) 55%, var(--bg2)) !important; }
 .l3 { background: color-mix(in srgb, var(--teal) 80%, var(--bg2)) !important; } .l4 { background: var(--teal) !important; }
 .forecast { display: flex; align-items: flex-end; gap: .5rem; justify-content: space-between; }
