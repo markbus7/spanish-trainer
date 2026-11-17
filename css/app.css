@@ -1044,3 +1044,10 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .pin-input { letter-spacing: .3em; max-width: 12rem; }
 .grow { flex: 1; min-width: 0; }
 @media (max-width: 560px) { .tb-prof-name { display: none; } }
+.admin-list { display: flex; flex-direction: column; }
+.admin-card { display: flex; flex-direction: column; gap: .6rem; }
+.admin-name { font-size: 1.1rem; margin-right: .4rem; }
+.admin-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }
+.admin-stat { background: var(--bg2); border-radius: 10px; padding: .5rem .6rem; display: flex; flex-direction: column; gap: .15rem; }
+.admin-stat small { line-height: 1.25; }
+@media (max-width: 560px) { .admin-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
