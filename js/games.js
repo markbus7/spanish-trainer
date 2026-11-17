@@ -151,11 +151,11 @@
   }
 
   const GAMES = [
-    { id: 'sopa', icon: '🔎', es: 'Sopa de letras', nl: 'Woordzoeker', desc: 'Zoek de Spaanse woorden in het letterveld. Je ziet de Nederlandse betekenis.', min: 4 },
-    { id: 'cruci', icon: '✏️', es: 'Crucigrama', nl: 'Kruiswoord', desc: 'Vul het kruiswoord in met Spaanse woorden. Accenten hoef je niet te typen.', min: 6 },
-    { id: 'revoltijo', icon: '🔀', es: 'Revoltijo', nl: 'Letterhusselaar', desc: 'Zet de door elkaar gehusselde letters in de goede volgorde.', min: 3 },
-    { id: 'volcan', icon: '🌋', es: 'El volcán', nl: 'Raad het woord', desc: 'Raad het woord letter voor letter, voordat de vulkaan uitbarst.', min: 4 },
-    { id: 'parejas', icon: '🃏', es: 'Parejas', nl: 'Memory', desc: 'Draai kaartjes om en vind steeds het Spaanse woord met de Nederlandse betekenis. Telt als extra oefening, nooit als fout.', min: 3, practice: true }
+    { id: 'sopa', tip: 'Zoek Spaanse woorden in een letterveld', icon: '🔎', es: 'Sopa de letras', nl: 'Woordzoeker', desc: 'Zoek de Spaanse woorden in het letterveld. Je ziet de Nederlandse betekenis.', min: 4 },
+    { id: 'cruci', tip: 'Vul Spaanse woorden in een kruiswoord', icon: '✏️', es: 'Crucigrama', nl: 'Kruiswoord', desc: 'Vul het kruiswoord in met Spaanse woorden. Accenten hoef je niet te typen.', min: 6 },
+    { id: 'revoltijo', tip: 'Zet door elkaar gehusselde letters op volgorde', icon: '🔀', es: 'Revoltijo', nl: 'Letterhusselaar', desc: 'Zet de door elkaar gehusselde letters in de goede volgorde.', min: 3 },
+    { id: 'volcan', tip: 'Raad het woord letter voor letter', icon: '🌋', es: 'El volcán', nl: 'Raad het woord', desc: 'Raad het woord letter voor letter, voordat de vulkaan uitbarst.', min: 4 },
+    { id: 'parejas', tip: 'Draai kaartjes om en zoek de paren', icon: '🃏', es: 'Parejas', nl: 'Memory', desc: 'Draai kaartjes om en vind steeds het Spaanse woord met de Nederlandse betekenis. Telt als extra oefening, nooit als fout.', min: 3, practice: true }
   ];
 
   S.Games = { GAMES, gen: { gameWord, plain, FIT, wordSearch, crossword, scramble, poolFor, pickWords, sourceUnits } };
