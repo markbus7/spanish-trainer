@@ -674,7 +674,7 @@
     });
     return list;
   }
-  function statusIcon(s) { return { new: '○', learning: '◔', known: '◑', mastered: '●' }[s]; }
+  function statusIcon(s) { return s === 'new' ? '○' : SRS.ICON[s]; }
   function statusLabel(s) { return { new: 'nieuw', learning: 'aan het leren', known: 'bekend', mastered: 'beheerst' }[s]; }
   function dialogueRead(u) {
     const d = u.dialogue, seen = new Set();
@@ -925,7 +925,7 @@
   }
   function stackBar(ws) {
     const t = Math.max(1, ws.total); const seg = (n, cls) => n ? h('i', { class: cls, style: { width: (n / t * 100) + '%' } }) : null;
-    return h('div', { class: 'wstack' }, seg(ws.mastered, 'm'), seg(ws.known, 'k'), seg(ws.learning, 'l'));
+    return h('div', { class: 'wstack' }, seg(ws.learning, 'l'), seg(ws.known, 'k'), seg(ws.mastered, 'm'));
   }
   /* ================= Rapport van Lupe: fouten uit gesprekken (js/mistakes.js) ================= */
   const M = () => S.Mistakes;
@@ -1093,19 +1093,23 @@
     // ---- woordenschat ----
     const lvls = C.LEVELS.filter(L => C.available(L.id));
     const allW = wordStats(C.all());
+    // lastig = woorden die je het vaakst fout had (c.l = keer fout), ongeacht hoe ver ze nu zijn
     const hard = Object.entries(s.srs).filter(([k, c]) => k.startsWith('w|') && c.l > 0).sort((a, b) => b[1].l - a[1].l || a[1].i - b[1].i).slice(0, 8)
-      .map(([k]) => { const [, uid, i] = k.split('|'); const u = C.get(uid); return u ? C.word(u, +i) : null; }).filter(Boolean);
+      .map(([k, c]) => { const [, uid, i] = k.split('|'); const u = C.get(uid); const w = u ? C.word(u, +i) : null; return w ? { w, st: SRS.status(k), fout: c.l } : null; }).filter(Boolean);
     wrap.append(section('Woordenschat', h('div', { class: 'card' },
       h('div', { class: 'vocab-big' }, h('b', null, allW.seen), h('span', null, ' van ' + allW.total + ' woorden geleerd')),
       stackBar(allW),
-      h('div', { class: 'legend small' }, h('span', null, h('i', { class: 'm' }), allW.mastered + ' ' + SRS.ICON.mastered + ' beheerst'), h('span', null, h('i', { class: 'k' }), allW.known + ' ' + SRS.ICON.known + ' bekend'), h('span', null, h('i', { class: 'l' }), allW.learning + ' ' + SRS.ICON.learning + ' aan het leren')),
+      h('div', { class: 'legend small' }, h('span', null, SRS.ICON.learning + ' ' + allW.learning + ' aan het leren'), h('span', null, SRS.ICON.known + ' ' + allW.known + ' bekend'), h('span', null, SRS.ICON.mastered + ' ' + allW.mastered + ' beheerst')),
       h('div', { class: 'small muted vocab-uitleg' },
         h('p', null, h('b', null, SRS.ICON.learning + ' Aan het leren'), ': al gehad in een les, komt binnen een week terug.'),
         h('p', null, h('b', null, SRS.ICON.known + ' Bekend'), ': zo vaak goed dat het pas over een week of later terugkomt.'),
         h('p', null, h('b', null, SRS.ICON.mastered + ' Beheerst'), ': je weet het na 3 weken of langer nog.'),
         h('p', null, h('b', null, 'Leeg deel van de balk'), ': woorden die je nog niet gezien hebt.')),
       h('div', { class: 'vocab-levels' }, lvls.map(L => { const ws = wordStats(C.unitsOf(L.id)); return h('div', { class: 'lv-bar' }, h('b', null, L.id), stackBar(ws), h('small', null, ws.seen + '/' + ws.total)); })),
-      hard.length ? h('div', null, h('h3', { class: 'sub' }, 'Lastige woorden'), h('div', { class: 'word-list' }, hard.map(w => h('div', { class: 'word-row' }, S.Lesson.speakBtn(w.es), h('div', { class: 'grow' }, h('b', { lang: 'es' }, w.es), h('span', null, w.nl)))))) : null,
+      hard.length ? h('div', null, h('h3', { class: 'sub' }, 'Lastige woorden'),
+        h('p', { class: 'small muted hard-uitleg' }, 'De woorden die je het vaakst fout had. Het symbool erachter laat zien hoe ver je er nu mee bent: een lastig woord kan inmiddels ook al ' + SRS.ICON.known + ' bekend zijn.'),
+        h('div', { class: 'word-list' }, hard.map(({ w, st, fout }) => h('div', { class: 'word-row' }, S.Lesson.speakBtn(w.es), h('div', { class: 'grow' }, h('b', { lang: 'es' }, w.es), h('span', null, w.nl)),
+          h('span', { class: 'hard-st', title: statusLabel(st) }, h('span', { class: 'ico' }, SRS.ICON[st] || SRS.ICON.learning), h('small', null, fout + '× fout')))))) : null,
       SRS.dueCount() ? h('button', { class: 'btn primary wide', type: 'button', onclick: () => startReview(25) }, '🔁 Herhaal nu (' + SRS.dueCount() + ' klaar)') : null,
       h('a', { class: 'btn ghost wide voc-open', href: '#/woordenschat' }, '📋 Al je woorden en zinnen bekijken'))));
 
