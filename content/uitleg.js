@@ -14,6 +14,7 @@
    tests/run.js controleert dat elke zin-sleutel nog in de lesstof staat en dat elk patroon ergens raakt. */
 (function (S) {
   'use strict';
+  if (S.isCourse && !S.isCourse('es-nl')) return; // lesstof van de cursus Spaans (uitleg in het Nederlands)
 
   const ZINNEN = {
     /* ── A1 · 1 Primer día en la universidad ── */

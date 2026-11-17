@@ -107,12 +107,12 @@
     if (n <= 0) return n < 0 ? 'vandaag (' + U.plural(-n, 'dag', 'dagen') + ' over tijd)' : 'vandaag';
     if (n === 1) return 'morgen';
     const d = new Date((day + 0.5) * 864e5);
-    return 'over ' + n + ' dagen · ' + d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+    return 'over ' + n + ' dagen · ' + d.toLocaleDateString(S.LOC, { day: 'numeric', month: 'short' });
   }
   function fmtAgo(ms) {
     if (!ms) return '—';
     const n = U.dayIndex() - U.dayIndex(new Date(ms));
-    const d = new Date(ms).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: new Date(ms).getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined });
+    const d = new Date(ms).toLocaleDateString(S.LOC, { day: 'numeric', month: 'short', year: new Date(ms).getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined });
     return (n <= 0 ? 'vandaag' : n === 1 ? 'gisteren' : n + ' dagen geleden') + ' · ' + d;
   }
   function sbar(fr) {
@@ -218,7 +218,7 @@
       out.innerHTML = ''; foot.innerHTML = '';
       if (!res.length) out.append(h('p', { class: 'muted center' }, 'Niets gevonden met deze filters.'));
       res.slice(0, shown).forEach(x => out.append(row(x)));
-      foot.append(h('p', { class: 'small muted center' }, res.length > shown ? `${shown} van ${res.length.toLocaleString('nl-NL')} getoond` : U.plural(res.length, 'item', 'items')));
+      foot.append(h('p', { class: 'small muted center' }, res.length > shown ? `${shown} van ${res.length.toLocaleString(S.LOC)} getoond` : U.plural(res.length, 'item', 'items')));
       if (res.length > shown) foot.append(h('button', { class: 'btn ghost wide', type: 'button', onclick: () => { shown += PAGE * 2; draw(); } }, 'Toon meer'));
       if (res.length) foot.append(h('button', { class: 'btn ghost wide', type: 'button', onclick: () => practice(res.slice(0, 20).map(x => x.id), 'Gericht oefenen') }, '🔁 Oefen de eerste ' + Math.min(20, res.length) + ' uit deze lijst'));
     }

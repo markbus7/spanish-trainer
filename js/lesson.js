@@ -8,6 +8,7 @@
   const OOPS = ['Casi…', 'No exactamente', 'Ups…', 'Todavía no'];
 
   function esMode() {
+    if (S.course.ui !== 'nl') return false; // uitleg staat al in het Spaans
     const e = S.Store.state.settings.explain;
     if (e === 'es') return true;
     if (e === 'nl' || e === 'mix') return false;
@@ -242,7 +243,7 @@
     const wrap = h('div', { class: 'grammar' },
       h('div', { class: 'eyebrow' }, '🧩 ' + (g.es || 'Gramática')),
       h('h2', null, g.t));
-    const sumEl = () => S.Tutor.coach({ es: g.sum, nl: es ? '' : 'Kort samengevat, in het Spaans. Tik om het te horen.' }, { size: 44, label: 'Profe Lupe vat samen', cls: 'lc-sum' }) || h('div', { class: 'sum' }, '🇪🇸 ' + g.sum);
+    const sumEl = () => S.Tutor.coach({ es: g.sum, lang: S.course.target, nl: es ? '' : 'Kort samengevat, in het Spaans. Tik om het te horen.' }, { size: 44, label: 'Profe Lupe vat samen', cls: 'lc-sum' }) || h('div', { class: 'sum', lang: S.course.target }, (S.course.target === 'es' ? '🇪🇸 ' : S.course.flag + ' ') + g.sum);
     if (g.sum && es) wrap.append(sumEl());
     const body = h('div', { class: 'prose', html: g.html });
     if (es) { const d = h('details', null, h('summary', null, 'Uitleg in het Nederlands'), body); wrap.append(d); } else wrap.append(body);
@@ -713,7 +714,7 @@
         if (ta.value.trim().length < 10) { S.toast('Schrijf eerst een paar zinnen 🙂'); return; }
         aiBtn.disabled = true; out.innerHTML = ''; const box = h('div', { class: 'ai-feedback' }, '…'); out.append(box);
         try {
-          await S.AI.stream({ system: S.AI.writingSystem(), messages: [{ role: 'user', content: 'Task (in Dutch): ' + it.task.nl + '\n\nMy text:\n' + ta.value.trim() }], maxTokens: 2000, effort: 'medium', onText: t => { box.innerHTML = S.md(t); } });
+          await S.AI.stream({ system: S.AI.writingSystem(), messages: [{ role: 'user', content: 'Task (in ' + (S.course.ui === 'es' ? 'Spanish' : 'Dutch') + '): ' + it.task.nl + '\n\nMy text:\n' + ta.value.trim() }], maxTokens: 2000, effort: 'medium', onText: t => { box.innerHTML = S.md(t); } });
           S.Store.skill('write', true); S.Store.save();
         } catch (e) { box.textContent = '⚠️ ' + e.message; }
         aiBtn.disabled = false;

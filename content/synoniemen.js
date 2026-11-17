@@ -7,6 +7,7 @@
    zijn (coche, zumo, ordenador, móvil…) staan hier bewust NIET in. */
 (function (S) {
   'use strict';
+  if (S.isCourse && !S.isCourse('es-nl')) return; // lesstof van de cursus Spaans (uitleg in het Nederlands)
   S.synonyms = {
     /* ── A1 ── */
     'el idioma': ['la lengua'],

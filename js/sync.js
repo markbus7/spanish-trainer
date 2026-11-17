@@ -7,7 +7,14 @@
   const CFG_KEY = Profiles ? Profiles.syncKey(Profiles.activeId()) : 'spt.sync';
   const FILE = 'espanol-latino-voortgang.json';
   const FILE_RE = /^espanol-latino-voortgang(-[a-z0-9-]+)?\.json$/;
-  const fileOf = c => c.file || FILE;
+  // Volgt een profiel meer cursussen, dan krijgt elke extra cursus een eigen bestand naast het hoofdbestand: <hoofd>--en-es.json
+  const COURSE = S.course ? S.course.id : 'es-nl';
+  const prof = Profiles && Profiles.active();
+  const SUB = !!(prof && prof.courses && prof.courses[0] !== COURSE);
+  const fileOf = c => SUB ? (c.file || FILE).replace(/\.json$/, '') + '--' + COURSE + '.json' : (c.file || FILE);
+  // gist-id van de actieve cursus
+  const gid = () => SUB ? ((cfg.c && cfg.c[COURSE] && cfg.c[COURSE].gistId) || '') : cfg.gistId;
+  const setGid = id => { if (SUB) { cfg.c = cfg.c || {}; cfg.c[COURSE] = { gistId: id }; } else cfg.gistId = id; };
   const DESC = 'Español Latino – voortgang (automatisch gesynchroniseerd, niet bewerken)';
   const API = 'https://api.github.com';
 
@@ -54,7 +61,7 @@
     return '';
   }
   async function readRemote(direct) {
-    const g = await gh('/gists/' + (direct ? direct.gistId : cfg.gistId));
+    const g = await gh('/gists/' + (direct ? direct.gistId : gid()));
     const f = g.files && g.files[direct ? direct.file : fileOf(cfg)];
     if (!f) return null;
     let text = f.content;
@@ -63,10 +70,10 @@
   }
   async function writeRemote(text) {
     const file = fileOf(cfg);
-    if (cfg.gistId) await gh('/gists/' + cfg.gistId, { method: 'PATCH', body: JSON.stringify({ files: { [file]: { content: text } } }) });
+    if (gid()) await gh('/gists/' + gid(), { method: 'PATCH', body: JSON.stringify({ files: { [file]: { content: text } } }) });
     else {
       const g = await gh('/gists', { method: 'POST', body: JSON.stringify({ description: DESC, public: false, files: { [file]: { content: text } } }) });
-      cfg.gistId = g.id; writeCfg();
+      setGid(g.id); writeCfg();
     }
   }
 
@@ -79,8 +86,8 @@
   async function run() {
     if (!cfg.token) return;
     if (lessonOpen()) { Sync.changed(); return { deferred: true }; } // niet midden in een les de voortgang vervangen
-    if (!cfg.gistId) cfg.gistId = await findGist();
-    const remote = cfg.gistId ? await readRemote() : null;
+    if (!gid()) setGid(await findGist());
+    const remote = gid() ? await readRemote() : null;
     if (lessonOpen()) { Sync.changed(); return { deferred: true }; }
     const before = normal(Store.state);
     const merged = remote ? Store.mergeStates(Store.state, remote) : Store.state;
@@ -108,7 +115,7 @@
   const Sync = {
     FILE,
     enabled: () => !!cfg.token,
-    status: () => ({ enabled: !!cfg.token, login: cfg.login, gistId: cfg.gistId, file: fileOf(cfg), last: cfg.last, error: cfg.error, busy: !!busy, pending: !!pushTimer }),
+    status: () => ({ enabled: !!cfg.token, login: cfg.login, gistId: gid(), file: fileOf(cfg), last: cfg.last, error: cfg.error, busy: !!busy, pending: !!pushTimer }),
     onChange(fn) { listeners.add(fn); return () => listeners.delete(fn); },
     /* Welke voortgangen staan er al in de gists van dit token? Zo kies je bij het koppelen welke bij dit profiel hoort. */
     async scan(token) {
@@ -121,7 +128,7 @@
         const found = [];
         for (let page = 1; page <= 5; page++) {
           const list = await gh('/gists?per_page=100&page=' + page);
-          for (const g of list) for (const name of Object.keys(g.files || {})) if (FILE_RE.test(name)) found.push({ gistId: g.id, file: name, updated: Date.parse(g.updated_at) || 0 });
+          for (const g of list) for (const name of Object.keys(g.files || {})) if (FILE_RE.test(name) && !name.includes('--')) found.push({ gistId: g.id, file: name, updated: Date.parse(g.updated_at) || 0 });
           if (list.length < 100) break;
         }
         // naam en XP uit elke voortgang, zodat je ziet van wie hij is

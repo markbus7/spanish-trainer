@@ -1,6 +1,7 @@
 /* Niveau A2 — Latijns-Amerikaans Spaans. Zie a1.js voor het formaat. */
 (function (S) {
   'use strict';
+  if (S.isCourse && !S.isCourse('es-nl')) return; // lesstof van de cursus Spaans (uitleg in het Nederlands)
   const U = S.addUnit;
 
   /* ───────────────────────── A2 · 1 ───────────────────────── */

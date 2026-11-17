@@ -108,12 +108,16 @@
     const grammar = done.concat(cur ? [cur] : []).flatMap(u => u.grammar.map(g => g.es || g.t));
     return { level, cur, grammar: [...new Set(grammar)].slice(-14), weak, name: st.name };
   }
+  /* Taalnamen voor de prompts, per cursus. TL = doeltaal, NL = moedertaal/uitlegtaal van de leerling. */
+  const CO = () => S.course;
+  const TL = () => CO().target === 'es' ? 'Spanish' : CO().target === 'en' ? 'English' : 'Dutch';
+  const NL = () => CO().ui === 'nl' ? 'Dutch' : 'Spanish';
   function explainLang() {
     const e = S.Store.state.settings.explain;
-    if (e === 'es') return 'Spanish';
-    if (e === 'nl') return 'Dutch';
+    if (e === 'es') return TL();
+    if (e === 'nl') return NL() === 'Spanish' ? 'Latin American Spanish' : NL();
     const lvl = learnerProfile().level;
-    return (e === 'mix' || lvl >= 'B1') ? 'simple Spanish, with a Dutch translation of difficult words in brackets' : 'Dutch';
+    return (e === 'mix' || lvl >= 'B1') ? 'simple ' + TL() + ', with a ' + NL() + ' translation of difficult words in brackets' : (NL() === 'Spanish' ? 'Latin American Spanish' : NL());
   }
   const LEVEL_GUIDE = {
     A1: 'Use very short, simple sentences in the present tense, plus "ir a + infinitive" and "estar + gerundio". High-frequency words only.',
@@ -121,8 +125,23 @@
     B1: 'Use natural everyday Spanish, including the present subjunctive and conditional, at a moderate pace.',
     B2: 'Use natural, fluent Spanish with idioms and all tenses.'
   };
+  const LEVEL_GENERIC = {
+    A1: 'Use very short, simple sentences in the present tense and the most frequent words only.',
+    A2: 'Use short sentences. Simple past, future and common modal verbs are fine; avoid complex structures.',
+    B1: 'Use natural everyday language at a moderate pace, including conditionals and common idioms.',
+    B2: 'Use natural, fluent language with idioms and all tenses.'
+  };
 
   function baseRules(p) {
+    if (CO().target !== 'es') {
+      return `You are an expert, warm and encouraging ${CO().ai.target} teacher, working inside a learning app for a native speaker of Latin American Spanish from Panama${p.name ? ' named ' + p.name : ''}.
+Learner level: ${p.level} (CEFR). ${LEVEL_GENERIC[p.level] || LEVEL_GENERIC.B1}
+Grammar the learner has studied so far: ${p.grammar.join('; ') || 'basics'}.
+${p.weak.length ? 'Known weak points to watch for: ' + p.weak.join(', ') + '.' : ''}
+Teach ${CO().ai.target}${CO().target === 'en' ? ' (US spelling and vocabulary: color, apartment, cell phone)' : ''}. Pay attention to typical mistakes of Spanish speakers.
+Whenever you write Spanish (explanations, translations), use Latin American Spanish: "ustedes" (never "vosotros"), and Latin American words such as celular, carro, computadora, jugo. Never use Spain-only forms.
+Do not use Markdown headings or tables. Keep formatting minimal.`;
+    }
     return `You are an expert, warm and encouraging Spanish teacher specialised in LATIN AMERICAN Spanish, working inside a learning app for a native Dutch speaker${p.name ? ' named ' + p.name : ''}.
 Learner level: ${p.level} (CEFR). ${LEVEL_GUIDE[p.level] || LEVEL_GUIDE.B1}
 Grammar the learner has studied so far: ${p.grammar.join('; ') || 'basics'}.
@@ -132,7 +151,7 @@ Do not use Markdown headings or tables. Keep formatting minimal.`;
   }
 
   // De app leest de vetgedrukte stukken voor met een Spaanse stem; daarom alleen Spaans vet.
-  const BOLD_RULE = 'Formatting rule: put every Spanish example sentence or Spanish phrase in **bold** (the app reads the bold parts aloud with a Spanish voice). Never put Dutch text or labels in bold.';
+  const BOLD_RULE_ = () => `Formatting rule: put every ${TL()} example sentence or ${TL()} phrase in **bold** (the app reads the bold parts aloud with a ${TL()} voice). Never put ${NL()} text or labels in bold.`;
   const logRule = () => (S.Mistakes ? S.Mistakes.promptRule() : '');
   function tutorPersona() { return (S.Tutor && S.Tutor.persona) || ''; }
 
@@ -145,8 +164,8 @@ Character and setting: ${sc.role}${sc.place ? ' (Location: ' + sc.place + ')' : 
 Learner's goal: ${sc.goal}
 
 Rules for every reply:
-1. Stay in character and reply ONLY in Spanish, 1–3 short sentences adapted to the learner's level, and usually end with a question to keep the conversation going.
-2. If the learner writes in Dutch or asks how to say something, help briefly in Dutch and give the Spanish phrase, then continue the role-play.
+1. Stay in character and reply ONLY in ${TL()}, 1–3 short sentences adapted to the learner's level, and usually end with a question to keep the conversation going.
+2. If the learner writes in ${NL()} or asks how to say something, help briefly in ${NL()} and give the ${TL()} phrase, then continue the role-play.
 3. After your in-character reply, write a line containing only "---", then feedback on the learner's LAST message in ${explainLang()}:
    - For each real mistake (max 3): "❌ wrong fragment → ✅ correct fragment — very short explanation".
    - If there are no mistakes: "✅ ¡Perfecto!" and optionally one tip to sound more natural ("💡 …").
@@ -161,8 +180,8 @@ ${logRule()}`;
 
 ${tutorPersona()}
 
-You answer the learner's questions about Spanish grammar, vocabulary, pronunciation and culture. Answer in ${explainLang()}, clearly and concisely (max ~150 words), with 2–4 short Latin American Spanish example sentences and their translations. Mention regional differences when relevant (e.g. Mexico vs. Argentina vs. Spain). End with one tiny practice question when it fits.
-${BOLD_RULE}`;
+You answer the learner's questions about ${TL()} grammar, vocabulary, pronunciation and culture. Answer in ${explainLang()}, clearly and concisely (max ~150 words), with 2–4 short ${CO().ai.target} example sentences and their translations. ${CO().target === 'es' ? 'Mention regional differences when relevant (e.g. Mexico vs. Argentina vs. Spain).' : 'Point out where Spanish speakers typically go wrong when relevant.'} End with one tiny practice question when it fits.
+${BOLD_RULE_()}`;
   }
 
   function writingSystem() {
@@ -172,22 +191,22 @@ ${BOLD_RULE}`;
 ${tutorPersona()}
 
 You correct a short text written by the learner. Respond in ${explainLang()} using exactly this structure (no headings):
-✍️ Corrected version: the full corrected text in Spanish (keep the learner's ideas; only fix errors and make it natural Latin American Spanish).
+✍️ Corrected version: the full corrected text in ${TL()} (keep the learner's ideas; only fix errors and make it natural ${CO().ai.target}).
 ❌ → ✅ Up to 5 most important corrections, one per line, each with a very short explanation.
 💡 One tip to sound more natural.
 ⭐ A score from 1 to 10 for this level, with one encouraging sentence.
-${BOLD_RULE}
+${BOLD_RULE_()}
 ${logRule()}`;
   }
 
   async function checkTranslation(nl, user, accepted) {
     const p = learnerProfile();
     const sys = `${baseRules(p)}\nYou grade translations strictly but fairly. Reply ONLY with a JSON object.`;
-    const prompt = `Dutch sentence: "${nl}"
-Learner's Spanish translation: "${user}"
+    const prompt = `${NL()} sentence: "${nl}"
+Learner's ${TL()} translation: "${user}"
 Model answers: ${JSON.stringify(accepted)}
-Is the learner's translation grammatically correct, natural for Latin America, and does it mean the same as the Dutch? Missing accents alone still count as correct (mention them in the feedback).
-Reply with JSON: {"correct": true|false, "feedback": "max 2 short sentences in Dutch", "better": "the corrected or more natural Spanish version"}`;
+Is the learner's translation grammatically correct, natural${CO().target === 'es' ? ' for Latin America' : ' ' + CO().ai.target}, and does it mean the same as the ${NL()}? Missing accents alone still count as correct (mention them in the feedback).
+Reply with JSON: {"correct": true|false, "feedback": "max 2 short sentences in ${NL() === 'Spanish' ? 'Latin American Spanish' : NL()}", "better": "the corrected or more natural ${TL()} version"}`;
     const text = await ask({ system: sys, prompt, maxTokens: 600 });
     const j = parseJSON(text);
     if (!j || typeof j.correct !== 'boolean') throw new Error('Onverwacht antwoord van de AI.');

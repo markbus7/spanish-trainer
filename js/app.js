@@ -186,7 +186,7 @@
   function pausedCard() {
     const p = Paused.get(); if (!p) return null;
     const at = Math.min(p.idx + 1, p.n), ago = Date.now() - (st().paused.t || 0);
-    const when = ago < 36e5 ? 'zojuist' : ago < 864e5 ? 'vandaag' : 'op ' + new Date(st().paused.t).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' });
+    const when = ago < 36e5 ? 'zojuist' : ago < 864e5 ? 'vandaag' : 'op ' + new Date(st().paused.t).toLocaleDateString(S.LOC, { day: 'numeric', month: 'long' });
     return h('div', { class: 'plan-card paused' },
       h('div', { class: 'pc-icon' }, '⏸️'),
       h('div', { class: 'pc-body' }, h('b', null, 'Verder waar je was'), h('span', null, `${p.title} · vraag ${at} van ${p.n}`),
@@ -415,13 +415,13 @@
     const fc = lupeFocusCard(); if (fc) wrap.append(section('Uit je gesprekken met Lupe', fc));
 
     // frase del día
-    const ph = S.phrases[U.dayIndex() % S.phrases.length];
-    wrap.append(section('La frase del día', h('div', { class: 'phrase' }, h('div', { class: 'es', lang: 'es' }, ph[2] + ' ' + ph[0], S.Lesson.speakBtn(ph[0])), h('div', { class: 'muted' }, ph[1]))));
+    const ph = S.phrases && S.phrases.length ? S.phrases[U.dayIndex() % S.phrases.length] : null;
+    if (ph) wrap.append(section(S.course.target === 'es' ? 'La frase del día' : 'Frase del día', h('div', { class: 'phrase' }, h('div', { class: 'es', lang: 'es' }, ph[2] + ' ' + ph[0], S.Lesson.speakBtn(ph[0])), h('div', { class: 'muted' }, ph[1]))));
 
     // snelle training
     wrap.append(section('Extra oefenen', h('div', { class: 'quick' },
       quick('⚡', 'Woordensprint', '2 min of zelf kiezen', () => { location.hash = '#/woordtoets'; }, d.done.sprint, 'Zoveel mogelijk woorden op tijd, of test nieuwe woorden'),
-      quick('🧩', 'Werkwoorden', '20 vragen', () => { location.hash = '#/practica'; }, null, 'Vervoeg werkwoorden in de tijden die je kiest'),
+      S.course.target !== 'es' ? null : quick('🧩', 'Werkwoorden', '20 vragen', () => { location.hash = '#/practica'; }, null, 'Vervoeg werkwoorden in de tijden die je kiest'),
       quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10), { desc: { kind: 'plain', mark: 'listen' } }), d.done.listen, 'Luister naar een zin en typ wat je hoort'),
       quick('🎲', 'Woordspellen', '5 spellen', () => { location.hash = '#/juegos'; }, d.done.games, 'Woordzoeker, kruiswoord, memory en meer'))));
     if (!Store.ok) wrap.append(h('p', { class: 'warn' }, '⚠️ Je browser staat opslaan niet toe (privévenster?). Je voortgang wordt niet bewaard.'));
@@ -568,7 +568,9 @@
     const wrap = h('div', { class: 'page' });
     wrap.append(h('h1', null, 'Tu ruta'), h('p', { class: 'muted' }, 'Van beginner tot meesterschap. Elke unit: woorden → grammatica → dialoog → lezen → toepassen → toets.'));
     const cur = P.current();
-    C.LEVELS.forEach(L => {
+    // andere cursussen: alleen de niveaus met lesstof, plus het eerstvolgende als 'komt later'
+    const lvls = S.course.target === 'es' ? C.LEVELS : C.LEVELS.filter((L, i) => C.available(L.id) || (i > 0 && C.available(C.LEVELS[i - 1].id)));
+    lvls.forEach(L => {
       const us = C.unitsOf(L.id); const avail = us.length > 0;
       const prog = P.levelProgress(L.id); const lv = st().levels[L.id];
       const card = h('div', { class: 'level' + (avail ? '' : ' soon'), style: { '--lc': L.color } });
@@ -596,7 +598,7 @@
       wrap.append(card);
     });
     wrap.append(section('Extra', h('div', { class: 'quick' },
-      quick('🌎', 'Regio’s', 'Mexico tot Argentinië', () => { location.hash = '#/regios'; }, null, 'Lees hoe het Spaans per land verschilt'),
+      !S.regions || !S.regions.length ? null : quick('🌎', 'Regio’s', 'Mexico tot Argentinië', () => { location.hash = '#/regios'; }, null, 'Lees hoe het Spaans per land verschilt'),
       quick('🧭', 'Niveautest', '±8 min', () => { location.hash = '#/toets'; }, null, 'Korte toets die laat zien op welk niveau je zit'))));
     return wrap;
   };
@@ -693,8 +695,9 @@
   routes.practica = function () {
     const wrap = h('div', { class: 'page' });
     wrap.append(h('h1', null, 'Práctica'), h('p', { class: 'muted' }, 'Gericht oefenen naast je dagelijkse les.'));
-    // werkwoordtrainer
+    // werkwoordtrainer (alleen Spaans)
     const learned = Gen.learnedUnits();
+    if (S.course.target === 'es') {
     const unlockedTenses = new Set(['pres']);
     learned.forEach(u => (u.tenses || []).forEach(t => unlockedTenses.add(t)));
     const allTenses = Object.keys(S.conj.TENSES);
@@ -718,6 +721,7 @@
         const ses = Gen.conjTraining(tenses, verbs, 20); if (!ses) { S.toast('Geen combinaties gevonden'); return; }
         runSession(ses);
       } }, 'Start (20 vragen)'), h('button', { class: 'btn ghost wide', type: 'button', onclick: () => { location.hash = '#/tablas'; } }, '📋 Vervoegingstabellen bekijken'))));
+    }
     // zwakke punten
     const weak = weakTags();
     wrap.append(section('🎯 Zwakke punten', weak.length ? h('div', { class: 'card' },
@@ -882,7 +886,7 @@
     const on = () => !!st().settings.tutorVoice;
     const tg = h('button', { class: 'chip toggle voice-tg' + (on() ? ' on' : ''), type: 'button', 'aria-pressed': on() ? 'true' : 'false' });
     const paint = () => { tg.textContent = on() ? '🔊 Ze praat hardop' : '🔇 Alleen tekst'; tg.classList.toggle('on', on()); tg.setAttribute('aria-pressed', on() ? 'true' : 'false'); };
-    tg.onclick = () => { st().settings.tutorVoice = !on(); save(); paint(); if (on()) { Speech.unlock(); S.Tutor.say(S.Tutor.lines.voiceOn); } else Speech.stop(); };
+    tg.onclick = () => { st().settings.tutorVoice = !on(); save(); paint(); if (on()) { Speech.unlock(); S.Tutor.say(S.Tutor.lines.voiceOn, 'es'); } else Speech.stop(); };
     paint();
     // Lupe praat met de stem van het apparaat. Is dat een eenvoudige (robotachtige) stem, wijs dan de weg naar een betere.
     const voiceHint = h('a', { class: 'small voice-hint', href: '#/ajustes' }, '🎙️ Klinkt Lupe robotachtig? Zo krijgt ze een natuurlijke stem ›');
@@ -917,7 +921,7 @@
   S.ChatUI = { bubble, fillBubble }; // ook voor «Vraag het Lupe» (js/ask.js)
 
   /* ================= PERFIL (alles over je voortgang) ================= */
-  function fmtDate(t, opt) { return new Date(t).toLocaleDateString('nl-NL', opt || { day: 'numeric', month: 'long', year: 'numeric' }); }
+  function fmtDate(t, opt) { return new Date(t).toLocaleDateString(S.LOC, opt || { day: 'numeric', month: 'long', year: 'numeric' }); }
   function wordStats(units) {
     const out = { total: 0, learning: 0, known: 0, mastered: 0 };
     units.forEach(u => C.words(u).forEach(w => { out.total++; const sx = SRS.status(w.id); if (sx !== 'new') out[sx]++; }));
@@ -1423,7 +1427,7 @@
     const goal = h('select', { class: 'input', onchange: e => set('goal', +e.target.value) }, [10, 15, 20, 30, 45].map(n => h('option', { value: n, selected: s.goal === n ? true : null }, n + ' minuten per dag')));
     const expl = h('select', { class: 'input', onchange: e => set('explain', e.target.value) },
       [['auto', 'Automatisch (NL tot A2, daarna steeds meer Spaans)'], ['nl', 'Altijd Nederlands'], ['mix', 'Nederlands met Spaanse samenvattingen'], ['es', 'Zoveel mogelijk Spaans']].map(([v, l]) => h('option', { value: v, selected: s.explain === v ? true : null }, l)));
-    wrap.append(section('Algemeen', h('div', { class: 'card form' }, label('Naam', name), label('Dagdoel', goal), label('Taal van uitleg en instructies', expl),
+    wrap.append(section('Algemeen', h('div', { class: 'card form' }, label('Naam', name), label('Dagdoel', goal), S.course.ui === 'nl' ? label('Taal van uitleg en instructies', expl) : null,
       toggle('Accenten streng beoordelen', 'Een ontbrekend accent telt dan als fout (aanrader vanaf B1).', s.strictAccents, v => set('strictAccents', v)),
       toggle('Geluidseffecten', null, s.sound, v => set('sound', v)),
       toggle('Antwoorden automatisch voorlezen', 'Na elke vraag hoor je het juiste Spaanse antwoord.', s.autoSpeak, v => set('autoSpeak', v)),
@@ -1450,25 +1454,25 @@
     drawTip(); setTimeout(drawTip, 700);
     const runTest = async () => {
       voiceOut.textContent = '…';
-      const clipText = '¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.';
+      const clipText = S.course.hello;
       let msg = [];
       if (Speech.hasClip(clipText)) {
         await Speech.say(clipText);
         msg.push(Speech.last && Speech.last.src === 'clip' ? '✅ Lesstof: natuurlijke opname speelt goed af.' : '⚠️ De opname speelde niet af (' + ((Speech.last && Speech.last.err) || 'onbekend') + '). Je hoorde de apparaatstem.');
       } else if (s.clips === false) msg.push('ℹ️ Opnames staan uit.');
       const v = Speech.voice();
-      await Speech.speak('Y esto es la voz de tu dispositivo.');
+      await Speech.speak(S.course.device);
       msg.push(v ? 'Apparaatstem (voor de AI-docent en eigen woorden): ' + v.name + (Speech.quality(v) >= 2 ? ' ✅ ' + Speech.qualityLabel(v) : ' — eenvoudig; zie de tip hieronder voor een natuurlijkere stem.') : 'Geen apparaatstem.');
       voiceOut.textContent = msg.join(' ');
     };
     wrap.append(section('Stem & uitspraak', h('div', { class: 'card form' },
-      Speech.clips ? toggle('Ingesproken opnames gebruiken', '🎧 ' + Speech.clips.size.toLocaleString('nl-NL') + ' woorden en zinnen zijn ingesproken met natuurlijke Latijns-Amerikaanse stemmen. Wat niet is ingesproken, leest je apparaat zelf voor.', s.clips !== false, v => set('clips', v)) : null,
+      Speech.clips ? toggle('Ingesproken opnames gebruiken', '🎧 ' + Speech.clips.size.toLocaleString(S.LOC) + ' woorden en zinnen zijn ingesproken met natuurlijke Latijns-Amerikaanse stemmen. Wat niet is ingesproken, leest je apparaat zelf voor.', s.clips !== false, v => set('clips', v)) : null,
       Speech.canSpeak() ? label(Speech.clips ? 'Stem van het apparaat (voor de rest)' : 'Voorleesstem', voiceSel) : h('p', { class: 'warn' }, 'Je browser ondersteunt geen voorlezen.'),
       label('Spreeksnelheid apparaatstem', rate),
       toggle('Dialogen eerst alleen beluisteren', 'De tekst is wazig tot je hem zelf zichtbaar maakt. Goed voor je luistervaardigheid.', s.listenFirst !== false, v => set('listenFirst', v)),
       toggle('Vraag-het-Lupe-knop rechts', 'Een knopje met Lupe aan de rechterkant. Tik erop om haar iets te vragen over wat je op dat moment ziet (dialoog, vraag, je antwoord). Werkt met je API-sleutel van de AI-docent. Je kunt het knopje omhoog of omlaag schuiven.', st().settings.lupeAsk !== false, v => { set('lupeAsk', v); S.Ask && S.Ask.sync(); }),
       toggle('Profe Lupe als begeleider', 'Lupe begroet je op Hoy, reageert op je antwoorden, vat de grammatica samen en feliciteert je na een les. Tik op haar om haar te horen.', S.Tutor.coachOn(), v => set('lupeCoach', v)),
-      label('Stem van Lupe (docente)', h('select', { class: 'input', onchange: e => { set('lupeVoice', e.target.value); S.Tutor.say(S.Tutor.lines.voiceTest); } },
+      label('Stem van Lupe (docente)', h('select', { class: 'input', onchange: e => { set('lupeVoice', e.target.value); S.Tutor.say(S.Tutor.lines.voiceTest, 'es'); } },
         [['girl', 'Meisje (hoge stem)'], ['woman', 'Vrouw']].map(([v, l]) => h('option', { value: v, selected: (s.lupeVoice || 'girl') === v ? true : null }, l)))),
       h('button', { class: 'btn ghost', type: 'button', onclick: runTest }, '🔊 Test de stemmen'), voiceOut,
       voiceTip,
@@ -1500,14 +1504,14 @@
       h('a', { class: 'btn ghost', href: '#/toets' }, '🧭 Niveautest opnieuw doen'))));
     wrap.append(section('Gegevens', dataTools(), h('div', { class: 'card' }, h('button', { class: 'btn danger', type: 'button', onclick: () => guard(() => S.confirm('Alles wissen?', 'Al je voortgang, woorden en statistieken worden verwijderd' + (S.Sync && S.Sync.enabled() ? ', ook op je andere gekoppelde apparaten' : '') + '. Dit kan niet ongedaan worden gemaakt. Maak eerst een back-up!', 'Alles wissen', () => { Store.reset(); location.hash = '#/hoy'; render(); })) }, '🗑 Voortgang wissen'))));
     wrap.append(section('ℹ️ Over de app', versionCard()));
-    wrap.append(h('p', { class: 'muted small center' }, 'Español Latino ' + appVersion() + ' · lesstof ' + availLevels().join('–').replace(/–.*–/, '–') + ' · ' + C.all().length + ' units · ' + C.all().reduce((a, u) => a + u.vocab.length, 0) + ' woorden · ' + Object.keys(S.conj.VERBS).length + ' werkwoorden'));
+    wrap.append(h('p', { class: 'muted small center' }, S.course.title + ' ' + appVersion() + ' · lesstof ' + availLevels().join('–').replace(/–.*–/, '–') + ' · ' + C.all().length + ' units · ' + C.all().reduce((a, u) => a + u.vocab.length, 0) + ' woorden' + (S.course.target === 'es' ? ' · ' + Object.keys(S.conj.VERBS).length + ' werkwoorden' : '')));
     return wrap;
   };
   routes.ajustes.tab = 'perfil';
   function ago(t) {
     if (!t) return 'nog nooit';
     const m = Math.round((Date.now() - t) / 60000);
-    return m < 1 ? 'zojuist' : m < 60 ? m + ' min geleden' : m < 1440 ? Math.round(m / 60) + ' uur geleden' : new Date(t).toLocaleDateString('nl-NL');
+    return m < 1 ? 'zojuist' : m < 60 ? m + ' min geleden' : m < 1440 ? Math.round(m / 60) + ' uur geleden' : new Date(t).toLocaleDateString(S.LOC);
   }
   /* ================= profielen ================= */
   const P_ = () => S.Profiles;
@@ -1536,7 +1540,7 @@
       const pk = Pr.peek(p.id), me = p.id === Pr.activeId();
       return h('button', { class: 'prof-pick' + (me ? ' on' : ''), type: 'button', onclick: () => { if (me) { close(); try { sessionStorage.setItem('spt.picked', '1'); } catch (e) { /* negeer */ } } else Pr.switchTo(p.id); } },
         h('span', { class: 'prof-av', 'aria-hidden': 'true' }, p.avatar || '🙂'),
-        h('span', { class: 'grow' }, h('b', null, Pr.label(p.id)), h('small', { class: 'muted' }, (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
+        h('span', { class: 'grow' }, h('b', null, Pr.label(p.id)), h('small', { class: 'muted' }, CNAME(p.course) + ' · ' + (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
         me ? h('span', { class: 'small muted' }, 'nu actief') : null);
     });
     root.append(h('div', { class: 'modal-bg', onclick: e => { if (!opts.start && e.target.classList.contains('modal-bg')) close(); } },
@@ -1547,9 +1551,12 @@
   S.profilePicker = profilePicker;
   function updateProfileChip() {
     const el = document.getElementById('tb-prof'), Pr = P_(); if (!el || !Pr) return;
-    el.hidden = !Pr.many();
-    if (Pr.many()) { const p = Pr.active(); el.innerHTML = ''; el.append(p.avatar || '🙂', h('span', { class: 'tb-prof-name' }, ' ' + Pr.label(p.id))); el.title = 'Profiel: ' + Pr.label(p.id) + ' (tik om te wisselen)'; }
+    const p = Pr.active(), show = Pr.many() || p.courses.length > 1;
+    el.hidden = !show;
+    if (show) { el.innerHTML = ''; el.append(p.avatar || '🙂', h('span', { class: 'tb-prof-name' }, ' ' + Pr.label(p.id)), p.courses.length > 1 ? ' ' + S.course.flag : ''); el.title = 'Profiel: ' + Pr.label(p.id) + ' (tik om te wisselen)'; }
   }
+  const CNAME = c => { const x = S.COURSES[c]; return x ? x.flag + ' ' + (S.course.ui === 'es' ? x.name.es.replace(/^./, m => m.toUpperCase()) : x.name.nl) : c; };
+  const CLONG = { 'es-nl': 'Spaans leren · uitleg in het Nederlands', 'en-es': 'Inglés · explicaciones en español', 'nl-es': 'Neerlandés · explicaciones en español' };
   function profilesCard() {
     const Pr = P_(); const card = h('div', { class: 'card form prof-card' });
     const draw = () => {
@@ -1560,19 +1567,29 @@
         const pk = Pr.peek(p.id), me = p.id === Pr.activeId();
         list.append(h('div', { class: 'prof-row' + (me ? ' on' : '') },
           h('span', { class: 'prof-av', 'aria-hidden': 'true' }, p.avatar || '🙂'),
-          h('div', { class: 'grow' }, h('b', null, Pr.label(p.id)), h('small', { class: 'muted', style: { display: 'block' } }, (me ? 'Actief · ' : '') + (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
+          h('div', { class: 'grow' }, h('b', null, Pr.label(p.id)), h('small', { class: 'muted', style: { display: 'block' } }, (me ? 'Actief · ' : '') + p.courses.map(CNAME).join(' · ')), h('small', { class: 'muted', style: { display: 'block' } }, (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
           me ? null : h('button', { class: 'btn ghost small', type: 'button', onclick: () => Pr.switchTo(p.id) }, 'Wissel'),
           p.id === Pr.MAIN || me ? null : h('button', { class: 'btn link small', type: 'button', 'aria-label': 'Verwijder ' + Pr.label(p.id), onclick: () => guard(() => S.confirm('Profiel verwijderen?', 'De voortgang van ' + Pr.label(p.id) + ' wordt van dit apparaat gewist. Staat die voortgang ook in een gist, dan blijft hij daar bewaard.', 'Verwijderen', () => { Pr.remove(p.id); draw(); updateProfileChip(); })) }, '🗑')));
       });
       card.append(list);
+      // cursus van dit profiel: wisselen of er een bij nemen
+      const me = Pr.active();
+      const csel = h('select', { class: 'input', 'aria-label': 'Cursus' }, Object.keys(S.COURSES).map(c => h('option', { value: c, selected: c === me.course ? true : null }, CLONG[c] + (me.courses.includes(c) ? '' : ' (nieuw)'))));
+      csel.onchange = () => {
+        const c = csel.value; if (c === me.course) return;
+        if (me.courses.includes(c)) { Pr.switchCourse(me.id, c); return; }
+        S.confirm('Nieuwe cursus?', Pr.label(me.id) + ' begint met ' + CLONG[c] + ', met een eigen, lege voortgang. De voortgang van de andere cursus blijft bewaard; je kunt altijd terugwisselen.', 'Begin', () => Pr.switchCourse(me.id, c), 'Annuleren', () => { csel.value = me.course; });
+      };
+      card.append(label('Cursus van ' + Pr.label(me.id), csel));
       // nieuw profiel
       let av = Pr.AVATARS[1];
       const nameIn = h('input', { class: 'input', placeholder: 'Naam', maxlength: '30' });
       const avs = h('div', { class: 'chips prof-avs' }, Pr.AVATARS.map(a => h('button', { class: 'chip toggle' + (a === av ? ' on' : ''), type: 'button', 'aria-label': 'Kies ' + a, onclick: e => { av = a; avs.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === e.currentTarget)); } }, a)));
       const out = h('p', { class: 'small warn', role: 'status' });
-      const form = h('div', { class: 'prof-new', hidden: true }, label('Naam van het nieuwe profiel', nameIn), avs, out,
+      const ncs = h('select', { class: 'input' }, Object.keys(S.COURSES).map(c => h('option', { value: c }, CLONG[c])));
+      const form = h('div', { class: 'prof-new', hidden: true }, label('Naam van het nieuwe profiel', nameIn), avs, label('Wat wil deze persoon leren?', ncs), out,
         h('div', { class: 'row gap wrap' },
-          h('button', { class: 'btn primary', type: 'button', onclick: () => { try { const id = Pr.add(nameIn.value, av); S.confirm('Profiel gemaakt', 'Wil je nu naar het profiel van ' + Pr.label(id) + ' gaan? Daar begin je met een lege voortgang en de niveautest.', 'Ga naar ' + Pr.label(id), () => Pr.switchTo(id), 'Later', () => { draw(); updateProfileChip(); }); } catch (e) { out.textContent = '⚠️ ' + e.message; } } }, 'Profiel maken'),
+          h('button', { class: 'btn primary', type: 'button', onclick: () => { try { const id = Pr.add(nameIn.value, av, ncs.value); S.confirm('Profiel gemaakt', 'Wil je nu naar het profiel van ' + Pr.label(id) + ' gaan? Daar begin je met een lege voortgang en de niveautest.', 'Ga naar ' + Pr.label(id), () => Pr.switchTo(id), 'Later', () => { draw(); updateProfileChip(); }); } catch (e) { out.textContent = '⚠️ ' + e.message; } } }, 'Profiel maken'),
           h('button', { class: 'btn link', type: 'button', onclick: () => { form.hidden = true; addBtn.hidden = false; } }, 'Annuleren')));
       const addBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => guard(() => { form.hidden = false; addBtn.hidden = true; nameIn.focus(); }) }, '＋ Nieuw profiel');
       card.append(h('div', { class: 'row gap wrap' }, addBtn), form);
@@ -1603,7 +1620,7 @@
     if (!S.Sync || !S.Sync.enabled()) { wrap.append(h('div', { class: 'card' }, h('p', null, 'Zet eerst synchroniseren aan in dit profiel (Instellingen › Synchroniseren). Het overzicht leest alle voortgangen op dat GitHub-account.'))); return wrap; }
     const box = h('div', { class: 'admin-list' }, h('p', { class: 'muted' }, '🔄 Voortgangen ophalen…'));
     wrap.append(h('p', { class: 'small muted' }, 'Alle voortgangen op @' + S.Sync.status().login + ', de nieuwste bovenaan. Dit leest alleen; er verandert niets.'), box);
-    const fmtDay = k => { if (!k) return 'nog nooit'; const t = U.todayKey(), y = U.todayKey(new Date(Date.now() - 864e5)); if (k === t) return 'vandaag'; if (k === y) return 'gisteren'; const d = new Date(k + 'T12:00:00'); return d.toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' }); };
+    const fmtDay = k => { if (!k) return 'nog nooit'; const t = U.todayKey(), y = U.todayKey(new Date(Date.now() - 864e5)); if (k === t) return 'vandaag'; if (k === y) return 'gisteren'; const d = new Date(k + 'T12:00:00'); return d.toLocaleDateString(S.LOC, { weekday: 'short', day: 'numeric', month: 'short' }); };
     const courseOf = f => { const m = /--([a-z]{2}-[a-z]{2})\.json$/.exec(f); const c = S.COURSES && S.COURSES[m ? m[1] : 'es-nl']; return c ? c.flag + ' ' + c.name.nl : '🌎 Spaans'; };
     S.Sync.overview().then(list => {
       box.innerHTML = '';
@@ -1691,7 +1708,7 @@
   /* ---------- versie en updates ---------- */
   const V = self.SPT_VERSION || { number: '?', date: '' };
   function appVersion() { return 'v' + V.number; }
-  function versionDate(d) { return d ? new Date(d + 'T12:00:00').toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) : ''; }
+  function versionDate(d) { return d ? new Date(d + 'T12:00:00').toLocaleDateString(S.LOC, { day: 'numeric', month: 'long', year: 'numeric' }) : ''; }
   async function latestVersion() {
     const r = await fetch('js/version.js?t=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) throw new Error('Kon de nieuwste versie niet ophalen (' + r.status + ').');
@@ -1772,7 +1789,7 @@
       for (const lv of Object.keys(Speech.levels)) {
         const keys = Speech.levels[lv], n = await have(keys).catch(() => 0), all = keys.length;
         const mb = Math.round(all * 17 / 1024);
-        const out = h('small', { class: 'muted' }, n >= all ? '✅ Alles offline beschikbaar' : `${n.toLocaleString('nl-NL')} van ${all.toLocaleString('nl-NL')} opnames offline · ±${mb} MB`);
+        const out = h('small', { class: 'muted' }, n >= all ? '✅ Alles offline beschikbaar' : `${n.toLocaleString(S.LOC)} van ${all.toLocaleString(S.LOC)} opnames offline · ±${mb} MB`);
         const dl = h('button', { class: 'btn ' + (n >= all ? 'ghost' : 'primary'), type: 'button', disabled: n >= all ? true : null, onclick: () => get(lv, keys, out, dl) }, n >= all ? 'Klaar' : '📥 Download');
         const rm = n ? h('button', { class: 'btn ghost', type: 'button', title: 'Verwijderen', onclick: () => drop(keys) }, '🗑') : null;
         rows.append(h('div', { class: 'row gap between wrap offline-row' }, h('div', null, h('b', null, LV_NAMES[lv] || lv), h('div', null, out)), h('div', { class: 'row gap' }, dl, rm)));
@@ -1787,7 +1804,7 @@
         while (todo.length) {
           const k = todo.shift();
           try { const r = await fetch(url(k), { cache: 'no-store' }); if (r.ok && r.status === 200) await c.put(url(k), r); else fail++; } catch (e) { fail++; }
-          done++; if (done % 20 === 0 || !todo.length) out.textContent = `⏳ ${done.toLocaleString('nl-NL')} van ${keys.length.toLocaleString('nl-NL')}…`;
+          done++; if (done % 20 === 0 || !todo.length) out.textContent = `⏳ ${done.toLocaleString(S.LOC)} van ${keys.length.toLocaleString(S.LOC)}…`;
         }
       };
       await Promise.all([step(), step(), step(), step(), step(), step()]);
@@ -1818,6 +1835,11 @@
     if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme');
   }
   function boot() {
+    if (S.i18n) S.i18n.start();
+    if (S.course.id !== 'es-nl') {
+      const logo = document.querySelector('.logo'); if (logo) logo.innerHTML = S.course.flag + ' ' + S.course.brand;
+      document.title = S.course.title;
+    }
     Store.load(); migrateTests();
     applyTheme(); Speech.init(); S.Tutor.hookSpeech();
     const ver = document.getElementById('tb-ver'); if (ver) ver.textContent = appVersion();
