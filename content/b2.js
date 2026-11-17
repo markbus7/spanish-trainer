@@ -433,4 +433,224 @@
       ]
     }
   });
+
+  /* ───────────────────────── B2 · 5 ───────────────────────── */
+  U({
+    id: 'b2-05', level: 'B2', icon: '🚢', title: 'El canal fue construido…', nl: 'Passief en se: wat er gedaan wordt en wat je per ongeluk overkomt',
+    goals: ['Het passief met ser + voltooid deelwoord herkennen en gebruiken (fue construido)', 'Met se + werkwoord zeggen wat er in het algemeen gebeurt (se venden casas, se dice que…)', 'Ongelukjes vertellen zonder schuld: se me olvidó, se me cayó, se me rompió'],
+    vocab: [
+      ['el canal', 'het kanaal'], ['la esclusa', 'de sluis'], ['el buque', 'het (grote) schip'], ['la carga', 'de lading, vracht'], ['la construcción', 'de bouw'],
+      ['inaugurar', 'openen, inwijden'], ['ampliar', 'uitbreiden'], ['la ampliación', 'de uitbreiding'], ['diseñar', 'ontwerpen'], ['fundar', 'stichten, oprichten'],
+      ['el ingeniero / la ingeniera', 'de ingenieur'], ['el trabajador / la trabajadora', 'de arbeider, werknemer'], ['la obra', 'het bouwwerk; het (kunst)werk'],
+      ['ser + participio', 'worden (passief): fue construido = werd gebouwd'], ['se dice que', 'men zegt dat'], ['se habla español', 'hier wordt Spaans gesproken'],
+      ['se me olvidó', 'ik ben het vergeten (per ongeluk)'], ['se me cayó', 'het is uit mijn handen gevallen'], ['se me perdió', 'ik ben het kwijtgeraakt'],
+      ['se me rompió', 'het is (bij mij) kapotgegaan'], ['se me acabó', 'het is op (bij mij)'], ['a cargo de', 'verantwoordelijk voor, onder leiding van'],
+      ['el peaje', 'de tol'], ['la selva', 'het oerwoud'], ['el lago', 'het meer'], ['el mirador', 'het uitkijkpunt'], ['la noticia', 'het nieuwsbericht'],
+      ['el periódico', 'de krant'], ['según', 'volgens'], ['la sequía', 'de droogte'], ['la sombrilla', 'de paraplu; de parasol', 'PA · CO · MX'],
+      ['¡Qué xopá!', 'hoi, hoe is het?', 'PA (informeel, van ¿qué pasó?)'], ['¡Chuleta!', 'jeetje!, wauw!', 'PA (informeel)'], ['el chantin', 'het huis, thuis', 'PA (informeel)'],
+      ['el pelao', 'het kind, de jongen', 'PA (informeel)']
+    ],
+    grammar: [
+      { t: 'Het passief met ser', es: 'La voz pasiva con ser',
+        html: `<p>In het passief staat niet de dader centraal, maar <b>wat er gebeurt</b>. Je maakt het met <b>ser + voltooid deelwoord</b>. De dader zet je erachter met <b>por</b>: <i>El canal <b>fue construido</b> por Estados Unidos.</i> (Het kanaal werd door de VS gebouwd.)</p>
+<p>📌 Het deelwoord past zich aan het onderwerp aan: <i>la ciudad fue fundad<b>a</b></i>, <i>las esclusas fueron construid<b>as</b></i>.</p>
+<p>📌 Dit passief zie je vooral in <b>nieuws, geschiedenis en formele teksten</b>. In een gewoon gesprek zeggen Latijns-Amerikanen liever de actieve zin (<i>Estados Unidos construyó el canal</i>) of een zin met <b>se</b>.</p>
+<p>⚠️ Verwar het niet met <b>estar + deelwoord</b>, dat een toestand beschrijft: <i>La tienda <b>fue</b> abierta en 2010</i> (werd geopend) ↔ <i>La tienda <b>está</b> abierta</i> (is open).</p>`,
+        table: [['tijd', 'passief', 'betekenis'], ['presente', 'es construido', 'wordt gebouwd'], ['indefinido', 'fue construido', 'werd gebouwd'], ['perfecto', 'ha sido construido', 'is gebouwd'], ['futuro', 'será construido', 'zal worden gebouwd']],
+        ex: [['La Ciudad de Panamá fue fundada en 1519.', 'Panama-Stad werd in 1519 gesticht.'], ['Las esclusas nuevas fueron inauguradas en 2016.', 'De nieuwe sluizen werden in 2016 geopend.']],
+        sum: 'Voz pasiva: ser + participio (concuerda con el sujeto) + por. Típica de noticias y textos formales.' },
+      { t: 'Se + werkwoord: men, je, er wordt…', es: 'La pasiva refleja y el se impersonal',
+        html: `<p>Veel vaker dan het passief met ser hoor je <b>se + werkwoord</b>. Het betekent «men…», «je…» of «er wordt…».</p>
+<p>Gaat het over een <b>ding</b>, dan past het werkwoord zich daaraan aan: <i>Se <b>vende</b> casa.</i> (Huis te koop.) · <i>Se <b>venden</b> casas.</i> (Huizen te koop.)</p>
+<p>Zonder ding, of met een <b>persoon na a</b>, blijft het werkwoord enkelvoud: <i>Aquí se <b>vive</b> bien.</i> (Hier woon je fijn.) · <i>Se <b>busca</b> a los responsables.</i> (Men zoekt de verantwoordelijken.)</p>
+<p>Handige vaste vormen: <i>se dice que</i> (men zegt dat), <i>¿cómo se dice…?</i> (hoe zeg je…?), <i>se prohíbe fumar</i> (roken verboden).</p>`,
+        table: [['', 'enkelvoud', 'meervoud'], ['ding', 'Se vende carro.', 'Se venden carros.'], ['zonder ding', 'Aquí se come bien.', '—'], ['persoon (a)', 'Se busca a un ingeniero.', 'Se busca a dos ingenieros.']],
+        ex: [['En Panamá se usa el dólar.', 'In Panama gebruik je de dollar.'], ['Se dice que el canal da trabajo a miles de personas.', 'Men zegt dat het kanaal duizenden mensen werk geeft.']],
+        sum: 'Se + verbo en 3.ª persona: concuerda con la cosa (se venden casas); sin cosa o con «a» + persona, singular.' },
+      { t: 'Het «oeps-se»: se me olvidó', es: 'El se accidental',
+        html: `<p>Als iets je <b>per ongeluk</b> overkomt, gebruik je <b>se + me/te/le/nos/les + werkwoord</b>. Het ding is het onderwerp; jij bent alleen «degene bij wie het gebeurde». Zo klinkt het minder als jouw schuld.</p>
+<p><i>Rompí el vaso.</i> = Ik heb het glas gebroken (misschien expres). <br><i>Se me rompió el vaso.</i> = Het glas is bij mij gebroken (oeps).</p>
+<p>📌 Het werkwoord past zich aan het <b>ding</b> aan, niet aan de persoon: <i>Se me <b>cayó</b> el celular.</i> · <i>Se me <b>cayeron</b> las llaves.</i></p>
+<p>📌 Met een naam erbij zet je <b>a</b> ervoor: <i>A Mark se le olvidó el pasaporte.</i></p>
+<p>Werkwoorden die je zo vaak hoort: <i>olvidar, caer, perder, romper, acabar, quedar</i> (laten liggen): <i>Se me quedó la sombrilla en el taxi.</i></p>`,
+        table: [['wie', 'enkelvoud ding', 'meervoud ding'], ['yo', 'se me olvidó', 'se me olvidaron'], ['tú', 'se te olvidó', 'se te olvidaron'], ['él / ella / usted', 'se le olvidó', 'se le olvidaron'], ['nosotros', 'se nos olvidó', 'se nos olvidaron'], ['ellos / ustedes', 'se les olvidó', 'se les olvidaron']],
+        ex: [['Perdón, se me olvidó tu nombre.', 'Sorry, ik ben je naam vergeten.'], ['Se nos acabó la gasolina en la carretera.', 'Onze benzine raakte op onderweg.']],
+        sum: 'Se accidental: se + me/te/le/nos/les + verbo que concuerda con la cosa: se me cayeron las llaves.' }
+    ],
+    verbs: ['construir', 'abrir', 'vender', 'descubrir', 'escribir', 'romper', 'caer', 'perder', 'olvidar', 'acabar', 'hacer', 'decir', 'terminar', 'pagar', 'ver'], tenses: ['pret', 'pres'],
+    dialogue: {
+      t: 'En las esclusas de Miraflores', place: 'Ciudad de Panamá 🇵🇦',
+      lines: [
+        ['Yaritza', '¡Qué xopá, Mark! Llegaste justo a tiempo: en diez minutos pasa un buque por la esclusa.', 'Hoi Mark! Je bent precies op tijd: over tien minuten gaat er een schip door de sluis.'],
+        ['Mark', 'Perdona la demora. Se me perdió la tarjeta del metro y tuve que comprar otra.', 'Sorry dat ik laat ben. Ik was mijn metrokaart kwijt en moest een nieuwe kopen.'],
+        ['Yaritza', 'No pasa nada. Mira, ¿sabías que el canal fue inaugurado en 1914?', 'Geeft niks. Kijk, wist je dat het kanaal in 1914 werd geopend?'],
+        ['Mark', '¿Y quién lo construyó? Se dice que primero lo intentaron los franceses.', 'En wie heeft het gebouwd? Men zegt dat de Fransen het eerst probeerden.'],
+        ['Yaritza', 'Así es. El proyecto fue iniciado por los franceses, pero fue terminado por Estados Unidos. Miles de trabajadores del Caribe murieron en la selva.', 'Klopt. Het project werd door de Fransen begonnen, maar door de Verenigde Staten afgemaakt. Duizenden arbeiders uit het Caribisch gebied stierven in het oerwoud.'],
+        ['Mark', '¡Chuleta! ¿Y desde cuándo es de Panamá?', 'Jeetje! En sinds wanneer is het van Panama?'],
+        ['Yaritza', 'Desde el 31 de diciembre de 1999. Ese día se celebró en todo el país. Y en 2016 se inauguraron las esclusas nuevas, mucho más grandes.', 'Sinds 31 december 1999. Die dag werd in het hele land feestgevierd. En in 2016 werden de nieuwe, veel grotere sluizen geopend.'],
+        ['Mark', '¿Y cuánto se paga por pasar?', 'En hoeveel betaal je om erdoor te varen?'],
+        ['Yaritza', 'Depende del buque. Los más grandes pagan cientos de miles de dólares de peaje. Ay, ¡se me olvidó traer el agua!', 'Dat hangt af van het schip. De grootste betalen honderdduizenden dollars tol. Oei, ik ben vergeten water mee te nemen!'],
+        ['Mark', 'Tranquila, en el mirador se vende agua. Yo te invito.', 'Rustig maar, bij het uitkijkpunt wordt water verkocht. Ik trakteer.']
+      ],
+      q: [
+        { t: 'mc', q: '¿Por qué llegó tarde Mark?', o: ['Se le perdió la tarjeta del metro', 'Se le olvidó la hora', 'Se le rompió el celular'] },
+        { t: 'mc', q: '¿Quién terminó la construcción del canal?', o: ['Estados Unidos', 'Francia', 'Panamá'] },
+        { t: 'mc', q: '¿Qué pasó en 2016?', o: ['Se inauguraron las esclusas nuevas', 'El canal pasó a ser de Panamá', 'Se empezó la construcción'] }
+      ]
+    },
+    culture: { t: 'Panamá: het land van het kanaal', html: `<p>🚢 Het <b>Panamakanaal</b> verbindt de Atlantische en de Stille Oceaan. Een schip doet er zo'n 8 tot 10 uur over. Sinds 31 december 1999 is het kanaal helemaal in Panamese handen; daarvoor had de VS het bijna een eeuw lang in beheer.</p>
+<p>💵 In Panama betaal je met de <b>Amerikaanse dollar</b>. Het land heeft ook een eigen munt, de <i>balboa</i>, maar die bestaat alleen als munten.</p>
+<p>🗣️ Panamezen praten snel en «slikken» vaak de s in, net als in het Caribisch gebied. Groeten doe je met <b>¡Qué xopá!</b> (van <i>¿qué pasó?</i>, met de lettergrepen omgedraaid). Een kind is een <i>pelao</i>, je huis is je <i>chantin</i> en als iets je verbaast, roep je <b>¡Chuleta!</b></p>` },
+    ex: [
+      { t: 'cloze', s: 'El canal ___ inaugurado en 1914.', a: ['fue'], o: ['fue', 'era', 'estuvo'], nl: 'Het kanaal werd in 1914 geopend.', x: 'Een gebeurtenis op één moment → passief met ser in de indefinido: fue.', tag: 'passive' },
+      { t: 'cloze', s: 'Las esclusas nuevas fueron ___ por un consorcio internacional.', h: 'construir', a: ['construidas'], nl: 'De nieuwe sluizen werden door een internationaal consortium gebouwd.', x: 'Het deelwoord past zich aan: las esclusas → construidas.', tag: 'passive' },
+      { t: 'cloze', s: 'Cien años de soledad ___ escrita por Gabriel García Márquez.', h: 'ser, indefinido', a: ['fue'], nl: 'Honderd jaar eenzaamheid werd door Gabriel García Márquez geschreven.', tag: 'passive' },
+      { t: 'cloze', s: 'En esta tienda se ___ celulares usados.', h: 'vender', a: ['venden'], nl: 'In deze winkel worden gebruikte mobieltjes verkocht.', x: 'Celulares is meervoud → se venden.', tag: 'se-impersonal' },
+      { t: 'cloze', s: '¿Cómo se ___ «lock» en español?', h: 'decir', a: ['dice'], nl: 'Hoe zeg je «lock» in het Spaans?', tag: 'se-impersonal' },
+      { t: 'cloze', s: 'En Panamá se ___ el dólar.', h: 'usar', a: ['usa', 'utiliza'], nl: 'In Panama gebruik je de dollar.', tag: 'se-impersonal' },
+      { t: 'cloze', s: 'Ay, se me ___ las llaves en el taxi.', h: 'olvidar', a: ['olvidaron', 'quedaron'], nl: 'Oei, ik heb mijn sleutels in de taxi laten liggen.', x: 'Las llaves is meervoud → se me olvidaron.', tag: 'se-accidental' },
+      { t: 'cloze', s: 'A Mark se ___ cayó el celular en el agua.', a: ['le'], o: ['le', 'lo', 'se'], nl: 'Mark liet zijn mobiel in het water vallen.', x: 'Voor één andere persoon: se le…', tag: 'se-accidental' },
+      { t: 'cloze', s: 'Se nos ___ la gasolina en medio de la carretera.', h: 'acabar', a: ['acabó', 'terminó'], nl: 'Onze benzine raakte op midden op de weg.', tag: 'se-accidental' },
+      { t: 'mc', q: '«Se me rompió el vaso.» betekent:', o: ['Het glas is (per ongeluk) bij me gebroken.', 'Ik heb het glas expres kapotgemaakt.', 'Het glas is van mij.'], tag: 'se-accidental' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['Se venden casas.', 'Se vende casas.', 'Se venden la casa.'], x: 'Casas is meervoud, dus het werkwoord ook.', tag: 'se-impersonal' },
+      { t: 'mc', q: 'Waar zie je het passief met ser vooral?', o: ['In nieuws, geschiedenis en formele teksten', 'In gesprekken met vrienden', 'Alleen in Spanje'], tag: 'passive' },
+      { t: 'mc', q: 'Welke zin betekent «De winkel werd in 2010 geopend»?', o: ['La tienda fue abierta en 2010.', 'La tienda está abierta en 2010.', 'La tienda se me abrió en 2010.'], x: 'Fue abierta = werd geopend (gebeurtenis). Está abierta = is open (toestand).', tag: 'passive' },
+      { t: 'order', s: 'La ciudad fue fundada en el año 1519.', nl: 'De stad werd in het jaar 1519 gesticht.', tag: 'passive' },
+      { t: 'tr', nl: 'Ik ben mijn paraplu vergeten.', a: ['Se me olvidó la sombrilla.', 'Se me olvidó el paraguas.', 'Se me quedó la sombrilla.', 'Se me quedó el paraguas.', 'Olvidé la sombrilla.', 'Olvidé el paraguas.'], tag: 'se-accidental' },
+      { t: 'tr', nl: 'Hier wordt Spaans gesproken.', a: ['Aquí se habla español.', 'Acá se habla español.', 'Se habla español aquí.', 'Se habla español acá.', 'Se habla español.'], tag: 'se-impersonal' },
+      { t: 'match', p: [['la esclusa', 'de sluis'], ['el buque', 'het schip'], ['el peaje', 'de tol'], ['¡Qué xopá!', 'hoi, hoe is het? (PA)'], ['¡Chuleta!', 'jeetje! (PA)']], tag: 'vocab' }
+    ],
+    say: [['El canal fue inaugurado en 1914.', 'Het kanaal werd in 1914 geopend.'], ['Aquí se habla español.', 'Hier wordt Spaans gesproken.'], ['Perdón, se me olvidó tu nombre.', 'Sorry, ik ben je naam vergeten.'], ['Se me cayó el celular y se me rompió la pantalla.', 'Mijn mobiel viel en het scherm ging kapot.']],
+    task: { nl: 'Schrijf een kort nieuwsbericht (6 tot 8 zinnen) over een gebouw, brug of monument in jouw stad. Gebruik minstens twee keer het passief met ser en twee keer se + werkwoord. Vertel aan het eind iets wat je per ongeluk overkwam (se me olvidó, se me cayó…).', model: 'El puente Erasmus de Róterdam fue diseñado por el arquitecto Ben van Berkel y fue inaugurado en 1996. Por su forma, en la ciudad se le conoce como «el Cisne». Desde el puente se ve todo el puerto. Cada año es visitado por miles de turistas. En verano se organizan conciertos y carreras cerca del río. Ayer fui a tomarle fotos, pero se me olvidó cargar la cámara. ¡Qué mala suerte!' },
+    scenario: { nl: 'Je bent bij de sluizen van Miraflores en praat met een Panamese gids over de geschiedenis van het kanaal.', role: 'Eres Yaritza, una guía panameña de 30 años que trabaja en el centro de visitantes de las esclusas de Miraflores. Eres simpática y estás orgullosa de tu país. Explicas la historia del canal usando la voz pasiva («fue construido», «fue inaugurado») y el se («se paga», «se dice que»). A veces usas expresiones panameñas como «¡Qué xopá!», «chuleta» y «pelao». Haces preguntas al estudiante y, si se le olvida algo, le enseñas a decir «se me olvidó».', goal: 'Gebruik minstens twee zinnen met het passief (fue + -do) en één met se me … (per ongeluk).' },
+    reading: {
+      t: 'Un canal con sed', type: 'Nieuwsbericht',
+      p: [
+        ['Ciudad de Panamá. — Por el canal de Panamá pasa cerca del cinco por ciento del comercio marítimo mundial. Sin embargo, pocas personas saben que cada barco que lo cruza necesita millones de litros de agua dulce.',
+          'Panama-Stad. — Door het Panamakanaal gaat ongeveer vijf procent van de wereldwijde zeehandel. Toch weten weinig mensen dat elk schip dat erdoor vaart miljoenen liters zoet water nodig heeft.'],
+        ['Esa agua viene del lago Gatún, que fue creado durante la construcción del canal. En cada paso, el agua se usa para subir y bajar los buques en las esclusas, y después se va al mar.',
+          'Dat water komt uit het Gatúnmeer, dat tijdens de bouw van het kanaal werd aangelegd. Bij elke doorvaart wordt het water gebruikt om de schepen in de sluizen omhoog en omlaag te brengen, en daarna stroomt het naar zee.'],
+        ['En 2023 se registró una de las peores sequías de la historia del país. El número de pasos diarios fue reducido y muchos barcos tuvieron que esperar semanas. Algunas empresas decidieron mandar su carga por otras rutas.',
+          'In 2023 werd een van de ergste droogtes uit de geschiedenis van het land gemeten. Het aantal doorvaarten per dag werd verlaagd en veel schepen moesten weken wachten. Sommige bedrijven besloten hun lading via andere routes te sturen.'],
+        ['Las esclusas nuevas, inauguradas en 2016, reutilizan parte del agua. Aun así, se buscan nuevas soluciones, como un embalse en el río Indio. «El agua no es solo para los barcos; también es la que se toma en nuestras casas», recuerda una vecina de Colón.',
+          'De nieuwe sluizen, geopend in 2016, hergebruiken een deel van het water. Toch wordt er naar nieuwe oplossingen gezocht, zoals een stuwmeer bij de Río Indio. «Het water is niet alleen voor de schepen; het is ook het water dat we thuis drinken», zegt een bewoonster van Colón.']
+      ],
+      gl: [['el comercio marítimo', 'de zeehandel'], ['el agua dulce', 'het zoete water'], ['registrar', 'meten, optekenen'], ['reutilizar', 'hergebruiken'], ['el embalse', 'het stuwmeer']],
+      q: [
+        { t: 'mc', q: '¿De dónde viene el agua que usa el canal?', o: ['Del lago Gatún', 'Del mar Caribe', 'Del océano Pacífico'] },
+        { t: 'mc', q: '¿Qué pasó durante la sequía de 2023?', o: ['Se redujo el número de barcos por día', 'Se cerró el canal para siempre', 'Se construyeron esclusas nuevas'] },
+        { t: 'mc', q: '¿Qué ventaja tienen las esclusas nuevas?', o: ['Reutilizan parte del agua', 'Son gratis', 'No necesitan agua'] },
+        { t: 'mc', q: '¿Qué quiere decir la vecina de Colón?', o: ['Que el agua del lago también es para la gente', 'Que los barcos no necesitan agua', 'Que el agua del canal está sucia'] }
+      ]
+    }
+  });
+
+  /* ───────────────────────── B2 · 6 ───────────────────────── */
+  U({
+    id: 'b2-06', level: 'B2', icon: '🌴', title: '¿Qué tú quieres, mi pana?', nl: 'Caribisch Spaans verstaan: Cuba, Puerto Rico en de Dominicaanse Republiek',
+    goals: ['De Caribische uitspraak herkennen: weggevallen s, -ao in plaats van -ado, pa\' in plaats van para', 'Vragen als «¿Qué tú quieres?» begrijpen en zelf stellen', 'Caribische woorden per land kennen (guagua, pana, china, colmado…)'],
+    vocab: [
+      ['la guagua', 'de bus', 'CU · PR · RD'], ['el pana / la pana', 'de maat, vriend(in)', 'PR · RD · VE · PA'], ['chévere', 'tof, gaaf', 'PR · RD · VE'],
+      ['la vaina', 'het ding, gedoe', 'RD · VE · CO'], ['¿Qué lo que?', 'hoe is het?, wat is er?', 'RD (informeel)'], ['¿Qué bolá?', 'hoe is het?', 'CU (informeel)'],
+      ['¿Qué es la que hay?', 'hoe gaat het?, wat is er?', 'PR (informeel)'], ['asere', 'maat, makker', 'CU (informeel)'], ['la china', 'de sinaasappel', 'PR'],
+      ['la chinola', 'de passievrucht', 'RD'], ['el colmado', 'de buurtwinkel', 'RD · PR'], ['el jevo / la jeva', 'het vriendje / het vriendinnetje', 'PR · RD (informeel)'],
+      ['el zafacón', 'de vuilnisbak', 'PR · RD'], ['janguear', 'uitgaan, rondhangen', 'PR (van Engels hang out)'], ['bregar', 'zich redden, ploeteren; regelen', 'PR · RD'],
+      ['un chin', 'een klein beetje', 'RD'], ['¡Wepa!', 'joepie!, hup!', 'PR'], ['el plátano', 'de bakbanaan'], ['los tostones', 'gefrituurde schijfjes bakbanaan'],
+      ['el mofongo', 'fijngestampte bakbanaan met knoflook', 'PR'], ['el moro', 'rijst met zwarte bonen', 'CU'], ['la yuca', 'de cassave'],
+      ['el malecón', 'de boulevard langs de zee'], ['coger la guagua', 'de bus nemen'], ['tremendo / tremenda', 'geweldig; enorm'], ['¿tú sabes?', 'weet je?, snap je?'],
+      ['mi amor', 'schat (ook tegen onbekenden)'], ['la bachata', 'de bachata (muziek en dans)', 'RD'], ['comerse las eses', 'de s\'en inslikken'], ['estar cansao', 'moe zijn (uitspraak van cansado)', 'Caribisch, gesproken']
+    ],
+    grammar: [
+      { t: 'De Caribische uitspraak', es: 'La pronunciación caribeña',
+        html: `<p>In Cuba, Puerto Rico en de Dominicaanse Republiek (en aan de kust van Venezuela, Colombia en Panama) klinkt Spaans anders dan in Mexico of Bogotá. Je hoeft het niet na te doen, maar wel te <b>verstaan</b>.</p>
+<p>📌 <b>De s aan het eind van een lettergreep</b> wordt een zachte h of valt weg: <i>¿cómo estás?</i> → «¿cómo ehtá?», <i>los amigos</i> → «loh amigo».</p>
+<p>📌 <b>-ado wordt -ao</b>: <i>cansado</i> → «cansao», <i>pescado</i> → «pescao». En <i>para</i> wordt vaak <b>pa'</b>: «¿Pa' dónde vas?»</p>
+<p>📌 In <b>Puerto Rico</b> wordt een r aan het eind van een lettergreep vaak een l: <i>puerta</i> → «puelta», <i>verdad</i> → «veldá». In Havana hoor je soms een dubbele medeklinker: <i>puerta</i> → «puetta».</p>`,
+        table: [['geschreven', 'je hoort', 'waar'], ['los amigos', 'loh amigo', 'hele Caribisch gebied'], ['cansado', 'cansao', 'hele Caribisch gebied'], ['para', 'pa\'', 'hele Caribisch gebied'], ['puerta', 'puelta', 'Puerto Rico'], ['puerta', 'puetta', 'Cuba']],
+        ex: [['¿Pa\' dónde tú vas?', 'Waar ga jij naartoe?'], ['Estoy cansao, mi pana.', 'Ik ben moe, maat.']],
+        sum: 'En el Caribe la -s final se aspira o se pierde, -ado suena -ao y «para» suena «pa\'». En Puerto Rico la -r final puede sonar -l.' },
+      { t: 'Vragen zonder omdraaien: ¿Qué tú quieres?', es: 'El sujeto antes del verbo',
+        html: `<p>In de meeste landen zet je het onderwerp in een vraag <b>achter</b> het werkwoord, of laat je het weg: <i>¿Qué quieres (tú)?</i></p>
+<p>In het Caribisch gebied blijft <b>tú vóór het werkwoord</b> staan: <i>¿Qué <b>tú</b> quieres?</i> · <i>¿Dónde <b>tú</b> vives?</i> · <i>¿Cómo <b>tú</b> te llamas?</i></p>
+<p>Ook zeggen Caribiërs vaker <b>yo, tú, él</b> waar anderen het voornaamwoord weglaten. Een verklaring: door de weggevallen s klinken <i>está</i> en <i>estás</i> hetzelfde, dus het voornaamwoord maakt duidelijk wie er bedoeld wordt.</p>
+<p>Je hoort zelfs <b>para + onderwerp + infinitief</b>: <i>Te lo explico <b>para tú entender</b>.</i> (Ik leg het uit zodat jij het begrijpt.) Elders zeg je <i>para que entiendas</i>.</p>`,
+        table: [['Mexico / Colombia', 'Caribisch gebied'], ['¿Qué quieres?', '¿Qué tú quieres?'], ['¿Dónde vives?', '¿Dónde tú vives?'], ['para que entiendas', 'para tú entender']],
+        ex: [['¿Y qué tú haces por aquí?', 'En wat doe jij hier?'], ['¿De dónde tú eres?', 'Waar kom jij vandaan?']],
+        sum: 'En el Caribe se dice «¿Qué tú quieres?»: el pronombre va antes del verbo y se usa más que en otros países.' },
+      { t: 'Hetzelfde ding, ander woord', es: 'Palabras de cada país',
+        html: `<p>Veel gewone dingen hebben in elk land een eigen woord. In het Caribisch gebied valt vooral de <b>guagua</b> (bus) op, en in Puerto Rico de <b>china</b> (sinaasappel).</p>
+<p>📌 <i>Coger</i> (nemen, pakken) is in het Caribisch gebied en Colombia heel gewoon: <i>coger la guagua</i>. In Mexico en Argentinië is het een plat woord; zeg daar <i>tomar el camión / el colectivo</i>.</p>
+<p>📌 <i>Mi amor</i> en <i>mi vida</i> zeggen verkopers en buschauffeurs ook tegen onbekenden. Dat is gewoon vriendelijk, niet vrijpostig.</p>`,
+        table: [['', 'bus', 'vriend', 'sinaasappel'], ['Caribisch', 'la guagua', 'el pana, asere (CU)', 'la china (PR)'], ['Mexico', 'el camión', 'el cuate', 'la naranja'], ['Colombia', 'el bus', 'el parce', 'la naranja'], ['Argentinië', 'el colectivo', 'el amigo', 'la naranja']],
+        ex: [['Vamos a coger la guagua al malecón.', 'We nemen de bus naar de boulevard.'], ['Dame un jugo de china, por favor.', 'Een sinaasappelsap, alsjeblieft.']],
+        sum: 'Guagua = bus (CU, PR, RD). China = naranja (PR). «Coger» es normal en el Caribe, pero evítalo en México y Argentina.' }
+    ],
+    verbs: ['querer', 'vivir', 'estar', 'ser', 'tener', 'hacer', 'ir', 'saber', 'decir', 'poder', 'comer', 'hablar'], tenses: ['pres'],
+    dialogue: {
+      t: 'Esperando la guagua', place: 'San Juan 🇵🇷',
+      lines: [
+        ['Coralis', '¡Wepa, Mark! ¿Qué es la que hay? ¿Qué tú haces por aquí?', 'Hé Mark! Hoe is het? Wat doe jij hier?'],
+        ['Mark', 'Hola, Coralis. Estoy esperando la guagua para ir a la playa, pero no llega.', 'Hoi Coralis. Ik wacht op de bus naar het strand, maar hij komt niet.'],
+        ['Coralis', 'Ay, mi amor, aquí la guagua llega cuando quiere. ¿Pa\' dónde tú vas?', 'Ach schat, hier komt de bus wanneer hij zin heeft. Waar ga jij naartoe?'],
+        ['Mark', 'A Ocean Park. Un pana me dijo que es la mejor playa de San Juan.', 'Naar Ocean Park. Een maat zei dat het het beste strand van San Juan is.'],
+        ['Coralis', 'Es chévere, sí. Pero mira, yo tengo carro. Si quieres, te llevo ahorita y de camino comemos un mofongo.', 'Het is tof, ja. Maar kijk, ik heb een auto. Als je wilt, breng ik je zo en eten we onderweg een mofongo.'],
+        ['Mark', 'Perdona, ¿un qué? Es que hablas muy rápido y no oigo las eses.', 'Sorry, een wat? Je praat zo snel en ik hoor de s\'en niet.'],
+        ['Coralis', '¡Jajaja! Es que aquí nos comemos las eses. Un mofongo es plátano majado con ajo. Es tremendo.', 'Haha! Hier slikken we de s\'en nu eenmaal in. Een mofongo is fijngestampte bakbanaan met knoflook. Het is geweldig.'],
+        ['Mark', '¿Y qué tú me recomiendas para tomar?', 'En wat raad jij me aan om te drinken?'],
+        ['Coralis', 'Un jugo de china bien frío. China es naranja, ¿tú sabes? Después vamos a janguear a La Placita.', 'Een ijskoud sinaasappelsap. China is sinaasappel, weet je? Daarna gaan we uit op La Placita.'],
+        ['Mark', '¡Dale! Pero hoy no bailo, que estoy cansao.', 'Oké! Maar vandaag dans ik niet, want ik ben moe.']
+      ],
+      q: [
+        { t: 'mc', q: '¿Por qué Mark no entiende bien a Coralis?', o: ['Porque ella habla rápido y no pronuncia las eses', 'Porque ella habla inglés', 'Porque hay mucho ruido en la calle'] },
+        { t: 'mc', q: '¿Qué es la «china» en Puerto Rico?', o: ['Una naranja', 'Una muchacha de China', 'Un tipo de guagua'] },
+        { t: 'mc', q: '¿Cómo van a ir a la playa?', o: ['En el carro de Coralis', 'En guagua', 'Caminando'] }
+      ]
+    },
+    culture: { t: 'Drie eilanden, één zee', html: `<p>🇨🇺 In <b>Cuba</b> groet je een vriend met <i>¿Qué bolá, asere?</i>. Je hoort er veel salsa en son, en in Havana rijden nog steeds oude Amerikaanse auto's uit de jaren vijftig.</p>
+<p>🇵🇷 <b>Puerto Rico</b> hoort bij de Verenigde Staten, maar thuis en op straat spreekt bijna iedereen Spaans. Daardoor zitten er veel Engelse woorden in het dagelijks Spaans: <i>janguear</i> (hang out), <i>parquear</i> (parkeren), <i>el bizcocho de birthday</i>. Reggaeton werd groot in San Juan.</p>
+<p>🇩🇴 In de <b>Dominicaanse Republiek</b> zeg je <i>¿Qué lo que?</i> en koop je alles in de <i>colmado</i> op de hoek, waar ook muziek speelt en buren samenkomen. Bachata en merengue komen hiervandaan.</p>
+<p>🇵🇦 Ook aan de kust van <b>Panama</b>, Colombia en Venezuela klinkt het Spaans zo: wie Caribisch Spaans verstaat, verstaat ook een Panamees.</p>` },
+    ex: [
+      { t: 'mc', q: 'Een Puerto Ricaan zegt «Estoy cansao». Wat bedoelt hij?', o: ['Estoy cansado.', 'Estoy casado.', 'Estoy cansando.'], x: 'Caribisch: -ado klinkt als -ao.', tag: 'caribe' },
+      { t: 'mc', q: 'Je hoort «loh amigo». Wat wordt er gezegd?', o: ['los amigos', 'lo amigo', 'la amiga'], x: 'De s aan het eind van een lettergreep wordt een zachte h of valt weg.', tag: 'caribe' },
+      { t: 'mc', q: 'In Puerto Rico klinkt «puerta» vaak als:', o: ['puelta', 'puesta', 'pueda'], tag: 'caribe' },
+      { t: 'mc', q: '«¿Dónde tú vives?» zeg je in Mexico of Colombia meestal als:', o: ['¿Dónde vives?', '¿Dónde vive tú?', '¿Tú dónde vivir?'], tag: 'caribe' },
+      { t: 'mc', q: '«¿Qué bolá, asere?» hoor je vooral in:', o: ['Cuba', 'Argentinië', 'Mexico'], tag: 'caribe' },
+      { t: 'mc', q: '«¿Qué lo que?» betekent:', o: ['Hoe is het?, wat is er?', 'Wat is dat?', 'Wie is dat?'], tag: 'caribe' },
+      { t: 'mc', q: 'Wat bestel je in Puerto Rico als je sinaasappelsap wilt?', o: ['un jugo de china', 'un jugo de chinola', 'un jugo de yuca'], x: 'Chinola is passievrucht (RD).', tag: 'vocab' },
+      { t: 'mc', q: 'Waar kun je «coger» (nemen) beter vermijden?', o: ['In Mexico en Argentinië', 'In Cuba en Puerto Rico', 'In Colombia'], tag: 'vocab' },
+      { t: 'cloze', s: 'Voy a coger la ___ para ir al centro.', a: ['guagua'], o: ['guagua', 'china', 'vaina'], nl: 'Ik neem de bus naar het centrum.', tag: 'vocab' },
+      { t: 'cloze', s: '¿Qué ___ quieres comer, mi pana?', a: ['tú'], o: ['tú', 'te', 'ti'], nl: 'Wat wil jij eten, maat?', x: 'Caribisch: het onderwerp blijft in de vraag vóór het werkwoord.', tag: 'caribe' },
+      { t: 'cloze', s: 'Ella es mi ___; la conozco desde la escuela.', a: ['pana'], o: ['pana', 'guagua', 'vaina'], nl: 'Zij is mijn maatje; ik ken haar al van school.', tag: 'vocab' },
+      { t: 'cloze', s: 'Pásame esa ___ que está en la mesa.', a: ['vaina'], o: ['vaina', 'guagua', 'chinola'], nl: 'Geef me dat ding op tafel even aan.', tag: 'vocab' },
+      { t: 'cloze', s: 'Esta noche vamos a ___ en La Placita.', a: ['janguear'], o: ['janguear', 'bregar', 'coger'], nl: 'Vanavond gaan we uit op La Placita.', tag: 'vocab' },
+      { t: 'order', s: '¿Qué tú vas a hacer esta noche?', nl: 'Wat ga jij vanavond doen?', tag: 'caribe' },
+      { t: 'tr', nl: 'Waar kom jij vandaan? (Caribisch: tú vóór het werkwoord)', a: ['¿De dónde tú eres?'], tag: 'caribe' },
+      { t: 'tr', nl: 'Wat wil jij? (Caribisch: tú vóór het werkwoord)', a: ['¿Qué tú quieres?'], tag: 'caribe' },
+      { t: 'match', p: [['la guagua', 'de bus'], ['la china', 'de sinaasappel (PR)'], ['el colmado', 'de buurtwinkel'], ['el zafacón', 'de vuilnisbak'], ['janguear', 'uitgaan']], tag: 'vocab' }
+    ],
+    say: [['¿Qué tú quieres comer?', 'Wat wil jij eten?'], ['Voy a coger la guagua.', 'Ik neem de bus.'], ['Ella es mi pana.', 'Zij is mijn maatje.'], ['Perdona, ¿me lo puedes repetir más despacio?', 'Sorry, kun je het langzamer herhalen?']],
+    task: { nl: 'Je bent een week in San Juan of Santo Domingo. Schrijf een bericht van 6 tot 8 zinnen aan een vriend over wat je hoorde en zag. Gebruik minstens vier Caribische woorden (guagua, pana, chévere, colmado…) en één vraag in Caribische stijl (¿Qué tú…?).', model: '¡Hola, pana! Llevo una semana en Santo Domingo y todo es chévere. Aquí la gente se come las eses y al principio no entendía nada. Ayer cogí la guagua al malecón y un señor me preguntó: «¿De dónde tú eres?». En el colmado de la esquina compro jugo de chinola todos los días. Por la noche la gente baila bachata en la calle. ¿Y qué tú haces? ¿Cuándo vienes?' },
+    scenario: { nl: 'Je bent in Santo Domingo en vraagt in een colmado de weg naar de boulevard. De eigenaar praat snel en Caribisch.', role: 'Eres Wilson, el dueño dominicano de un colmado en la Zona Colonial de Santo Domingo. Tienes 50 años, eres muy amable y hablas rápido, con expresiones dominicanas como «¿Qué lo que?», «un chin», «vaina», «chévere» y «mi pana». Haces preguntas como «¿Qué tú quieres?» y «¿De dónde tú eres?». Si el estudiante no entiende, repites más despacio y le explicas la palabra.', goal: 'Vraag de weg en koop iets te drinken; vraag één keer om uitleg van een Dominicaans woord.' },
+    reading: {
+      t: '¿Por qué nos comemos las eses?', type: 'Blog van een taalcoach',
+      p: [
+        ['«¿Cómo ehtá? ¿Tú ehtá bien?» Si viajas a Cuba, Puerto Rico o la República Dominicana, vas a oír frases como esta. No es que la gente hable mal: el español del Caribe tiene sus propias reglas, igual que el de México o el de Argentina.',
+          '«Hoe is het? Gaat het goed met je?» Als je naar Cuba, Puerto Rico of de Dominicaanse Republiek reist, hoor je zulke zinnen. Het is niet zo dat mensen slecht praten: het Spaans van het Caribisch gebied heeft zijn eigen regels, net als dat van Mexico of Argentinië.'],
+        ['La característica más famosa es la ese al final de la sílaba, que se pronuncia como una hache suave o desaparece. Por eso «los amigos» suena como «loh amigo». Esto también pasa en la costa de Venezuela, Colombia y Panamá.',
+          'Het bekendste kenmerk is de s aan het eind van een lettergreep, die als een zachte h wordt uitgesproken of verdwijnt. Daarom klinkt «los amigos» als «loh amigo». Dat gebeurt ook aan de kust van Venezuela, Colombia en Panama.'],
+        ['Como las eses se pierden, a veces no se sabe si alguien dice «está» o «estás». Muchos lingüistas creen que por eso los caribeños usan más los pronombres: «tú estás», «¿qué tú quieres?». Así queda claro quién hace qué.',
+          'Omdat de s\'en wegvallen, weet je soms niet of iemand «está» of «estás» zegt. Veel taalkundigen denken dat Caribiërs daarom vaker voornaamwoorden gebruiken: «tú estás», «¿qué tú quieres?». Zo is duidelijk wie wat doet.'],
+        ['Mi consejo: no intentes imitar todo desde el primer día. Escucha mucha música, como bachata, salsa o reguetón, y fíjate en el contexto. Y si no entiendes, pregunta sin miedo: «Perdona, ¿me lo puedes repetir más despacio?». Nadie se va a molestar.',
+          'Mijn advies: probeer niet alles vanaf de eerste dag na te doen. Luister veel muziek, zoals bachata, salsa of reggaeton, en let op de context. En als je iets niet begrijpt, vraag het gerust: «Sorry, kun je het langzamer herhalen?». Niemand neemt je dat kwalijk.']
+      ],
+      gl: [['la sílaba', 'de lettergreep'], ['desaparecer', 'verdwijnen'], ['el lingüista / la lingüista', 'de taalkundige'], ['imitar', 'nadoen, imiteren'], ['fijarse en', 'letten op']],
+      q: [
+        { t: 'mc', q: '¿Qué pasa con la ese en el Caribe?', o: ['Suena como una hache suave o desaparece', 'Suena como una zeta', 'Se pronuncia más fuerte'] },
+        { t: 'mc', q: 'Según muchos lingüistas, ¿por qué los caribeños usan más los pronombres?', o: ['Porque sin las eses no siempre queda claro quién hace qué', 'Porque es más formal', 'Porque lo aprendieron del inglés'] },
+        { t: 'mc', q: '¿Dónde más se oye esta pronunciación?', o: ['En la costa de Venezuela, Colombia y Panamá', 'En Buenos Aires', 'En el centro de México'] },
+        { t: 'mc', q: '¿Qué recomienda la autora?', o: ['Escuchar música y preguntar sin miedo', 'Imitar todo desde el primer día', 'Evitar hablar con caribeños'] }
+      ]
+    }
+  });
 })(window.SPT);

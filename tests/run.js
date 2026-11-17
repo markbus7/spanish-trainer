@@ -70,7 +70,7 @@ ok(C('ano', ['año']).warn === 'enye', 'ñ-waarschuwing');
 
 /* ---------- lesstof ---------- */
 const units = S.C.all();
-ok(units.length === 36, 'aantal units = ' + units.length);
+ok(units.length === 38, 'aantal units = ' + units.length);
 const ids = new Set();
 const tags = S.C.TAGS;
 for (const u of units) {
