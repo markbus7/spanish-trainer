@@ -525,6 +525,10 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   ok(q && q.a === 'me llamo Ana.' && q.k.join() === '0,1', 'optioneel (yo): ' + (q && q.a));
   ok(P('tengo hambre mucho', ['Tengo mucha hambre.', 'Tengo hambre.']).a === 'Tengo hambre.', 'beste alternatief gekozen');
   ok(P('', ['Hola']) === null, 'leeg antwoord');
+  // dictee: verkeerd gehoorde naam, de rest goed → alleen de naam opnieuw
+  const dct = P('akika es japonesa y artista', ['Aiko es japonesa y artista.']);
+  ok(dct && dct.st.join() === 'bad,ok,ok,ok,ok' && S.check.partsUsable(dct), 'dictee per woord: ' + (dct && dct.st.join()));
+  ok(/R\.listen[\s\S]{0,400}partialInput\(it\.keep/.test(fs.readFileSync(path.join(root, 'js/lesson.js'), 'utf8')), 'dictee-herkansing vult goede woorden in');
   // samenvoegen tussen apparaten: nieuwste stand per zin
   const A = { updated: 2, partial: { 'x|a|1': { a: 'Hola amigo', k: [0], t: 5 }, 'x|a|2': { t: 9 } } };
   const B = { updated: 1, partial: { 'x|a|1': { t: 7 }, 'x|a|2': { a: 'Buen día', k: [0], t: 3 } } };

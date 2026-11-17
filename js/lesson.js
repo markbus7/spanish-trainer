@@ -494,23 +494,44 @@
 
   R.listen = (it, ctx) => {
     setTimeout(() => Speech.say(it.text), 300);
-    const inp = textInput('Typ wat je hoort…');
-    inp.addEventListener('input', () => ctx.can(inp.value.trim().length > 0));
-    setTimeout(() => inp.focus({ preventScroll: true }), 80);
-    const help = typeHelp(inp, ctx, () => it.text, () => ctx.submit({ ok: false, dontKnow: true, user: '', expected: it.text, nl: it.nl }));
+    // Herkansing van een dictee met fouten: de woorden die je goed had staan er al, alleen de foute zijn vakjes
+    let part = S.check.partsUsable(it.keep) ? partialInput(it.keep, ctx) : null;
+    let inp = part ? null : textInput('Typ wat je hoort…');
+    const field = () => part || inp;
+    const help = typeHelp({ focus: o => field().focus(o), set disabled(v) { field().disabled = v; } }, ctx, () => it.text,
+      () => ctx.submit({ ok: false, dontKnow: true, user: '', expected: it.text, nl: it.nl }));
+    const bar = accentBar(() => part ? part.current() : inp);
+    const body = [];
+    if (part) {
+      const note = h('div', { class: 'p-note' }, '🔁 De woorden die je de vorige keer goed had, staan er al. Luister en vul alleen de lege vakjes in.');
+      const whole = h('button', { class: 'btn link small p-whole', type: 'button', onclick: () => {
+        if (ctx.answered()) return;
+        // toch liever de hele zin zelf typen
+        inp = textInput('Typ wat je hoort…'); inp.addEventListener('input', () => ctx.can(inp.value.trim().length > 0));
+        part.el.replaceWith(inp); part = null; whole.remove(); note.remove(); ctx.can(false); inp.focus({ preventScroll: true });
+      } }, '✏️ Liever de hele zin typen');
+      body.push(note, part.el, bar, help.el, whole);
+    } else {
+      inp.addEventListener('input', () => ctx.can(inp.value.trim().length > 0));
+      body.push(inp, bar, help.el);
+    }
+    setTimeout(() => field().focus({ preventScroll: true }), 80);
     ctx.evaluate = () => {
       help.done();
-      const user = inp.value.trim(); inp.disabled = true; const hinted = help.hints();
+      const user = (part ? part.value() : inp.value).trim(); field().disabled = true; const hinted = help.hints();
+      if (part) { part.mark(user, [it.text]); const w = wrap.querySelector('.p-whole'); if (w) w.remove(); }
       const r = S.check.check(user, [it.text]);
       if (r.ok) return { ok: true, user, expected: it.text, warn: r.warn, nl: it.nl, hinted };
       const sim = S.check.similarity(user, it.text);
       if (sim >= 0.88) return { ok: true, user, expected: it.text, warn: 'typo', nl: it.nl, hinted };
-      return { ok: false, user, expected: it.text, nl: it.nl, hinted };
+      // per woord: wat had je al goed? (groen/rood in de feedback, en bij de herkansing alvast ingevuld)
+      return { ok: false, user, expected: it.text, nl: it.nl, hinted, parts: S.check.parts(user, [it.text]) };
     };
-    return h('div', { class: 'listen' },
+    const wrap = h('div', { class: 'listen' },
       h('div', { class: 'instr' }, T('listen')),
       Speech.canSpeak() ? h('div', { class: 'row gap center' }, speakBtn(it.text, { big: true }), speakBtn(it.text, { slow: true })) : h('p', { class: 'warn' }, 'Je browser heeft geen voorleesfunctie. Lees de zin: ' + it.text),
-      inp, accentBar(inp), help.el);
+      ...body);
+    return wrap;
   };
 
   R.speak = (it, ctx) => {
