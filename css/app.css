@@ -1026,3 +1026,21 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .hard-st .ico { font-size: 1.15rem; line-height: 1; }
 .hard-st small { font-size: .72rem; color: var(--muted); white-space: nowrap; }
 .hard-uitleg { margin: -.1rem 0 .3rem; }
+
+/* ---------- profielen ---------- */
+.tb-prof { border: 0; cursor: pointer; font: inherit; font-size: .85rem; font-weight: 600; max-width: 9.5rem; overflow: hidden; text-overflow: ellipsis; }
+.prof-list { display: flex; flex-direction: column; gap: .5rem; margin: .5rem 0 .75rem; }
+.prof-row { display: flex; align-items: center; gap: .6rem; padding: .55rem .7rem; border: 1px solid var(--line); border-radius: 12px; }
+.prof-row.on { border-color: var(--accent); }
+.prof-av { font-size: 1.6rem; line-height: 1; width: 2.2rem; text-align: center; flex: none; }
+.prof-avs .chip { font-size: 1.15rem; padding: .25rem .5rem; }
+.prof-new, .prof-pin { margin-top: .75rem; }
+.prof-lock { margin-top: 1rem; padding-top: .9rem; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: .6rem; }
+.prof-picks { display: flex; flex-direction: column; gap: .5rem; margin: .75rem 0; }
+.prof-pick { display: flex; align-items: center; gap: .7rem; width: 100%; text-align: left; padding: .7rem .8rem; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: inherit; font: inherit; cursor: pointer; }
+.prof-pick small { display: block; }
+.prof-pick.on { border-color: var(--accent); }
+.prof-pick:hover { background: var(--bg2); }
+.pin-input { letter-spacing: .3em; max-width: 12rem; }
+.grow { flex: 1; min-width: 0; }
+@media (max-width: 560px) { .tb-prof-name { display: none; } }

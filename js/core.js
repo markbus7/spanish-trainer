@@ -33,8 +33,87 @@
   U.debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
   S.U = U;
 
+  /* ================= Profielen =================
+     Meerdere mensen op één apparaat, elk met een eigen voortgang en eigen synchronisatie.
+     Het eerste profiel ("main") gebruikt de oude opslagsleutels (spt.v1, spt.sync), zodat bestaande voortgang
+     nooit verplaatst wordt. Het register (spt.profiles) wordt pas geschreven als er iets aan profielen verandert. */
+  const PKEY = 'spt.profiles', MAIN = 'main';
+  const AVATARS = ['🙂', '😎', '🦊', '🐢', '🦜', '🌺', '🌵', '⚽', '🎸', '☕', '🌊', '🦥'];
+  const Profiles = {
+    MAIN, AVATARS,
+    reg: null,
+    unlocked: false, // beheerderspincode ingevuld in deze sessie
+    init() {
+      let r = null;
+      try { r = JSON.parse(localStorage.getItem(PKEY) || 'null'); } catch (e) { r = null; }
+      if (!r || !Array.isArray(r.list) || !r.list.length) r = { active: MAIN, list: [], pin: '' };
+      if (!r.list.some(p => p.id === MAIN)) r.list.unshift({ id: MAIN, name: '', avatar: '🙂', created: 0 });
+      if (!r.list.some(p => p.id === r.active)) r.active = MAIN;
+      this.reg = r; return r;
+    },
+    write() { try { localStorage.setItem(PKEY, JSON.stringify(this.reg)); } catch (e) { /* opslag vol of geblokkeerd */ } },
+    list() { return this.reg.list.slice(); },
+    get(id) { return this.reg.list.find(p => p.id === id) || null; },
+    activeId() { return this.reg.active; },
+    active() { return this.get(this.reg.active); },
+    many() { return this.reg.list.length > 1; },
+    storeKey: id => id === MAIN ? 'spt.v1' : 'spt.p.' + id,
+    syncKey: id => id === MAIN ? 'spt.sync' : 'spt.p.' + id + '.sync',
+    /* Korte blik in de voortgang van een profiel, zonder het te laden (voor de profielkiezer). */
+    peek(id) {
+      try {
+        const d = JSON.parse(localStorage.getItem(this.storeKey(id)) || 'null') || {};
+        return { name: d.name || '', xp: d.xp || 0, level: d.placement && d.placement.level || null, updated: d.updated || 0 };
+      } catch (e) { return { name: '', xp: 0, level: null, updated: 0 }; }
+    },
+    label(id) { const p = this.get(id); if (!p) return ''; return p.name || this.peek(id).name || (id === MAIN ? 'Profiel 1' : 'Profiel'); },
+    add(name, avatar) {
+      name = String(name || '').trim().slice(0, 30);
+      if (!name) throw new Error('Vul een naam in');
+      let id; do { id = Math.random().toString(36).slice(2, 8); } while (this.get(id) || id === MAIN);
+      this.reg.list.push({ id, name, avatar: avatar || AVATARS[0], created: Date.now() });
+      const fresh = defaults(); fresh.name = name;
+      try { localStorage.setItem(this.storeKey(id), JSON.stringify(fresh)); } catch (e) { /* negeer */ }
+      this.write(); return id;
+    },
+    update(id, patch) { const p = this.get(id); if (!p) return; Object.assign(p, patch); this.write(); },
+    /* Profiel en zijn gegevens van dit apparaat halen. Het eerste profiel kan niet weg. */
+    remove(id) {
+      if (id === MAIN || !this.get(id)) return false;
+      try { localStorage.removeItem(this.storeKey(id)); localStorage.removeItem(this.syncKey(id)); } catch (e) { /* negeer */ }
+      this.reg.list = this.reg.list.filter(p => p.id !== id);
+      if (this.reg.active === id) this.reg.active = MAIN;
+      this.write(); return true;
+    },
+    /* Wisselen = actief profiel opslaan en de app opnieuw laden, zodat alles schoon met de nieuwe voortgang begint. */
+    switchTo(id) {
+      if (!this.get(id)) return;
+      this.reg.active = id; this.write();
+      try { sessionStorage.setItem('spt.picked', '1'); } catch (e) { /* negeer */ }
+      if (typeof location !== 'undefined' && location.reload) location.reload();
+    },
+    /* Beheerderspincode: beschermt het synchroniseren (token) en het profielbeheer.
+       Een slot op de deur, geen kluis: wie de browseropslag kan uitlezen, kan er omheen. */
+    async hash(pin) {
+      const data = new TextEncoder().encode('spt-pin|' + String(pin).trim());
+      const buf = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    },
+    hasPin() { return !!this.reg.pin; },
+    locked() { return this.hasPin() && !this.unlocked; },
+    async setPin(pin) {
+      pin = String(pin || '').trim();
+      if (!/^\d{4,8}$/.test(pin)) throw new Error('Kies 4 tot 8 cijfers');
+      this.reg.pin = await this.hash(pin); this.unlocked = true; this.write();
+    },
+    clearPin() { this.reg.pin = ''; this.unlocked = false; this.write(); },
+    async unlock(pin) { if (!this.hasPin()) return true; const ok = (await this.hash(pin)) === this.reg.pin; if (ok) this.unlocked = true; return ok; }
+  };
+  try { Profiles.init(); } catch (e) { Profiles.reg = { active: MAIN, list: [{ id: MAIN, name: '', avatar: '🙂', created: 0 }], pin: '' }; }
+  S.Profiles = Profiles;
+
   /* ================= Opslag ================= */
-  const KEY = 'spt.v1';
+  const KEY = Profiles.storeKey(Profiles.activeId());
   function defaults() {
     return {
       v: 1, created: Date.now(), updated: 0, epoch: 0, name: '',
