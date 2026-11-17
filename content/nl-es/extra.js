@@ -3,7 +3,7 @@
   'use strict';
   if (!S.isCourse || !S.isCourse('nl-es')) return;
 
-  /* Prueba de nivel A1 y A2: la primera opción es la correcta. */
+  /* Prueba de nivel A1, A2 y B1: la primera opción es la correcta. */
   S.placement = [
     { lv: 'A1', q: 'Ik ___ uit Panama.', o: ['kom', 'komt', 'komen'] },
     { lv: 'A1', q: 'Zij ___ docent.', o: ['is', 'ben', 'zijn'] },
@@ -32,7 +32,21 @@
     { lv: 'A2', q: 'Ik ga naar de markt ___ groente te kopen.', o: ['om', 'voor', 'want'] },
     { lv: 'A2', q: 'Hoeveel appels heb je? Ik heb ___ drie.', o: ['er', 'het', 'ze'] },
     { lv: 'A2', q: 'Ik ___ me een beetje moe.', o: ['voel', 'voelt', 'voelen'] },
-    { lv: 'A2', q: 'Als het morgen regent, ___ ik thuis.', o: ['blijf', 'blijft', 'blijven'] }
+    { lv: 'A2', q: 'Als het morgen regent, ___ ik thuis.', o: ['blijf', 'blijft', 'blijven'] },
+    { lv: 'B1', q: 'Ik vind dat Amsterdam te duur ___.', o: ['is', 'zijn', 'ben'] },
+    { lv: 'B1', q: 'Weet jij ___ de winkel open is?', o: ['of', 'dat', 'als'] },
+    { lv: 'B1', q: 'Het huis ___ ik zoek, moet een balkon hebben.', o: ['dat', 'die', 'wat'] },
+    { lv: 'B1', q: 'De wijk ___ ik woon, is rustig.', o: ['waar', 'die', 'wat'] },
+    { lv: 'B1', q: 'Kaas ___ in Gouda gemaakt.', o: ['wordt', 'worden', 'heeft'] },
+    { lv: 'B1', q: 'Als ik rijk was, ___ ik een wereldreis maken.', o: ['zou', 'zal', 'ik zou'] },
+    { lv: 'B1', q: 'Toen ik aankwam, ___ de trein al vertrokken.', o: ['was', 'had', 'is'] },
+    { lv: 'B1', q: 'Hij zei dat hij moe ___.', o: ['was', 'is geweest is', 'ben'] },
+    { lv: 'B1', q: 'Wacht je op de bus? Ja, ik wacht ___.', o: ['erop', 'op het', 'op hem'] },
+    { lv: 'B1', q: 'Ik denk vaak ___ mijn familie.', o: ['aan', 'over', 'op'] },
+    { lv: 'B1', q: 'Ik probeer elke dag Nederlands ___ spreken.', o: ['te', 'om', 'voor'] },
+    { lv: 'B1', q: 'Ik heb twee uur moeten ___.', o: ['wachten', 'gewacht', 'te wachten'] },
+    { lv: 'B1', q: '___ u mij kunnen helpen?', o: ['Zou', 'Zal', 'Wil het'] },
+    { lv: 'B1', q: 'De kat ligt op de bank te ___.', o: ['slapen', 'slaapt', 'geslapen'] }
   ];
 
   /* Conversaciones libres con Profe Lupe. */
@@ -44,6 +58,9 @@
     { id: 'nl-weekend', icon: '🕰️', lv: 'A2', title: 'Contar tu fin de semana', place: 'Den Haag 🇳🇱', role: 'Je bent Lotte, een collega in Den Haag. Het is maandag. Vraag wat de leerling in het weekend heeft gedaan en stel vervolgvragen in het perfectum. Vertel ook kort over je eigen weekend. Spreek eenvoudig Nederlands (A2).', goal: 'Cuenta qué hiciste el fin de semana y reacciona a su historia.' },
     { id: 'nl-huisarts', icon: '🩺', lv: 'A2', title: 'Llamar a la huisarts', place: 'Leiden 🇳🇱', role: 'Je bent doktersassistente bij een huisartsenpraktijk in Leiden. De patiënt belt. Vraag naar de klachten en sinds wanneer, en maak een afspraak. Spreek eenvoudig, beleefd Nederlands (A2) en gebruik "u".', goal: 'Explica qué te pasa y haz una cita para hoy o mañana.' },
     { id: 'nl-stad', icon: '🏙️', lv: 'A2', title: 'Comparar ciudades', place: 'Groningen 🇳🇱', role: 'Je bent Bram, een student in Groningen. Vraag de leerling om zijn of haar stad te vergelijken met Groningen (groter, duurder, gezelliger) en vraag "Ben je ooit in … geweest?". Spreek eenvoudig Nederlands (A2).', goal: 'Compara tu ciudad con una ciudad neerlandesa.' },
+    { id: 'nl-sollicitatie', icon: '💼', lv: 'B1', title: 'Entrevista de trabajo', place: 'Utrecht 🇳🇱', role: 'Je bent Karin, HR-manager bij een bedrijf in Utrecht, en je houdt een sollicitatiegesprek met de leerling. Vraag naar ervaring, sterke punten, een moeilijke situatie (wat was er gebeurd?) en een hypothetische vraag (Wat zou je doen als…?). Spreek Nederlands op B1-niveau en gebruik "u".', goal: 'Habla de tu experiencia y contesta preguntas hipotéticas.' },
+    { id: 'nl-klacht', icon: '📦', lv: 'B1', title: 'Hacer un reclamo', place: 'Eindhoven 🇳🇱', role: 'Je bent medewerker van de klantenservice van een webwinkel en neemt de telefoon op. De bestelling van de leerling is beschadigd aangekomen. Wees beleefd, vraag naar het ordernummer en details, en bied oplossingen. Spreek Nederlands op B1-niveau en gebruik "u".', goal: 'Explica el problema con cortesía y consigue una solución.' },
+    { id: 'nl-discussie', icon: '🗳️', lv: 'B1', title: 'Dar tu opinión', place: 'Nijmegen 🇳🇱', role: 'Je bent Bas, een student in Nijmegen met een duidelijke mening. Bespreek een onderwerp (thuiswerken, sociale media of toerisme in Amsterdam). Vraag naar de mening van de leerling, ben het soms beleefd oneens en vraag waarom. Spreek Nederlands op B1-niveau.', goal: 'Da tu opinión con argumentos y reacciona a la suya.' },
     { id: 'nl-vrij', icon: '💬', lv: 'A1', title: 'Conversación libre', place: 'Países Bajos 🇳🇱', role: 'Je bent een vriendelijke Nederlander (kies een stad en noem die aan het begin). Praat op een natuurlijke, eenvoudige manier over het dagelijks leven, hobby’s en plannen.', goal: 'Habla de lo que quieras.' }
   ];
 
