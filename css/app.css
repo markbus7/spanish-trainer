@@ -3,6 +3,8 @@
   --bg: #fbf7f1; --bg2: #f3ece2; --card: #ffffff; --ink: #24201b; --ink2: #5d554b; --muted: #8a8075; --line: #e7ddd0;
   --accent: #e2603a; --accent-ink: #ffffff; --accent-soft: #fde7de; --teal: #1b998b; --teal-soft: #dcf3ef; --gold: #f2b134; --gold-soft: #fdf1d6;
   --ok: #1f9d55; --ok-soft: #e3f6ea; --bad: #d64545; --bad-soft: #fbe5e5; --blue: #2f80ed;
+  /* statuskleuren passen bij het symbool: 🌱 lichtgroen → 🌳 donkergroen → ⭐ goud/oranje (-ink = voor tekst) */
+  --st-l: #9bd46f; --st-l-ink: #4a8f26; --st-k: #1d7a3d; --st-k-ink: #1d7a3d; --st-m: #f39a1e; --st-m-ink: #c46f00;
   --shadow: 0 1px 2px rgba(60, 40, 20, .06), 0 4px 16px rgba(60, 40, 20, .06);
   --r: 16px; --r-sm: 10px; --tab-h: 64px;
   --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; --serif: 'Fraunces', Georgia, serif;
@@ -13,6 +15,7 @@
     --bg: #15120f; --bg2: #1e1a16; --card: #221d18; --ink: #f3ece3; --ink2: #cfc5b8; --muted: #9a8f82; --line: #352e27;
     --accent: #f07a55; --accent-soft: #3a241b; --teal: #3cc2b1; --teal-soft: #17302c; --gold: #f2b134; --gold-soft: #3a2f17;
     --ok: #46c37b; --ok-soft: #17301f; --bad: #f06a6a; --bad-soft: #3a1c1c; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+  --st-l: #b4e88c; --st-l-ink: #b4e88c; --st-k: #2e9a52; --st-k-ink: #4cc173; --st-m: #f7a933; --st-m-ink: #f7b04a;
     color-scheme: dark;
   }
 }
@@ -20,6 +23,7 @@
   --bg: #15120f; --bg2: #1e1a16; --card: #221d18; --ink: #f3ece3; --ink2: #cfc5b8; --muted: #9a8f82; --line: #352e27;
   --accent: #f07a55; --accent-soft: #3a241b; --teal: #3cc2b1; --teal-soft: #17302c; --gold: #f2b134; --gold-soft: #3a2f17;
   --ok: #46c37b; --ok-soft: #17301f; --bad: #f06a6a; --bad-soft: #3a1c1c; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+  --st-l: #b4e88c; --st-l-ink: #b4e88c; --st-k: #2e9a52; --st-k-ink: #4cc173; --st-m: #f7a933; --st-m-ink: #f7b04a;
   color-scheme: dark;
 }
 
@@ -156,7 +160,7 @@ main { max-width: 760px; margin: 0 auto; padding: 16px 16px calc(var(--tab-h) + 
 .word-row { display: flex; align-items: center; gap: .6rem; padding: .55rem 0; border-bottom: 1px solid var(--line); }
 .word-row .grow { display: flex; flex-direction: column; } .word-row span { color: var(--ink2); font-size: .9rem; } .word-row small { color: var(--muted); font-size: .78rem; }
 .word-row .icon-btn { margin: 0; }
-.wstat { font-size: 1.1rem; color: var(--muted); } .wstat.known, .wstat.mastered { color: var(--ok); } .wstat.learning { color: var(--gold); }
+.wstat { font-size: 1.1rem; color: var(--muted); } .wstat.learning { color: var(--st-l-ink); } .wstat.known { color: var(--st-k-ink); } .wstat.mastered { color: var(--st-m-ink); } .wstat.new { opacity: .55; }
 .dl-read { display: flex; gap: .5rem; align-items: flex-start; padding: .45rem 0; border-bottom: 1px solid var(--line); }
 .dl-read .icon-btn { margin: 0; }
 
@@ -580,7 +584,7 @@ input[type=range] { width: 100%; accent-color: var(--teal); }
 /* .wstack, niet .stack: die naam botste met de antwoordknoppen (.options) en drukte ze plat tot één strookje. */
 .wstack { display: flex; height: 12px; border-radius: 999px; background: var(--bg2); overflow: hidden; flex: 1; }
 .wstack i { display: block; height: 100%; }
-.wstack .m, .legend .m { background: var(--teal); } .wstack .k, .legend .k { background: var(--blue); } .wstack .l, .legend .l { background: var(--gold); }
+.wstack .m { background: var(--st-m); } .wstack .k { background: var(--st-k); } .wstack .l { background: var(--st-l); }
 .legend { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin: .5rem 0 .2rem; color: var(--ink2); }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: .35rem; }
 .vocab-uitleg { margin: .4rem 0 .8rem; }
@@ -741,7 +745,7 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .voc-tile { display: flex; flex-direction: column; align-items: center; gap: .15rem; padding: .7rem .3rem; border-radius: 12px; border: 2px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; font: inherit; }
 .voc-tile b { font-size: 1.5rem; line-height: 1.1; }
 .voc-tile small { font-size: .78rem; color: var(--ink2); text-align: center; }
-.voc-tile.g-weak b { color: var(--bad); } .voc-tile.g-learning b { color: var(--gold); } .voc-tile.g-known b { color: var(--blue); } .voc-tile.g-mastered b { color: var(--teal); }
+.voc-tile.g-weak b { color: var(--bad); } .voc-tile.g-learning b { color: var(--st-l-ink); } .voc-tile.g-known b { color: var(--st-k-ink); } .voc-tile.g-mastered b { color: var(--st-m-ink); }
 .voc-tile.on { border-color: var(--accent); background: var(--accent-soft); }
 .voc-sum > p { margin: .6rem 0 0; }
 .voc-filters { display: flex; flex-direction: column; gap: .6rem; margin-top: .6rem; }
@@ -750,7 +754,7 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .voc-chips { display: flex; flex-direction: column; gap: .4rem; }
 .voc-list { display: flex; flex-direction: column; gap: .4rem; margin-top: .6rem; }
 .voc-row { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 12px; }
-.voc-row.g-weak { border-left-color: var(--bad); } .voc-row.g-learning { border-left-color: var(--gold); } .voc-row.g-known { border-left-color: var(--blue); } .voc-row.g-mastered { border-left-color: var(--teal); }
+.voc-row.g-weak { border-left-color: var(--bad); } .voc-row.g-learning { border-left-color: var(--st-l); } .voc-row.g-known { border-left-color: var(--st-k); } .voc-row.g-mastered { border-left-color: var(--st-m); }
 .voc-row > summary { display: flex; align-items: center; gap: .6rem; padding: .6rem .8rem; margin: 0; list-style: none; color: var(--ink); font-weight: 400; }
 .voc-row > summary::-webkit-details-marker { display: none; }
 .voc-row > summary .grow { display: flex; flex-direction: column; min-width: 0; }
@@ -1016,3 +1020,9 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .wt-mode .wt-mi { font-size: 1.5rem; } .wt-mode small { color: var(--muted); }
 .wt-mode.on { border-color: var(--accent); background: var(--accent-soft); }
 .wt-intro { margin-top: 0; }
+
+/* Lastige woorden (Perfil): statussymbool en aantal keer fout rechts */
+.hard-st { flex: none; display: flex; flex-direction: column; align-items: center; gap: .05rem; min-width: 3.2rem; }
+.hard-st .ico { font-size: 1.15rem; line-height: 1; }
+.hard-st small { font-size: .72rem; color: var(--muted); white-space: nowrap; }
+.hard-uitleg { margin: -.1rem 0 .3rem; }
