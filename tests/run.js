@@ -708,6 +708,23 @@ await micTests();
   ok(W.sentPool('A1', 'all').every(([e]) => e.t !== 'match'), 'woordtoets: geen koppelvragen als zin');
   S.Store.state = keep;
 }
+{ // snelle sprint: eerst wat aan de beurt is, dan zwakke woorden, dan de rest
+  const keep = S.Store.state; S.Store.state = JSON.parse(JSON.stringify(keep));
+  const t = S.U.dayIndex(), all = S.C.all(), u0 = all[0], uFar = all[all.length - 1];
+  S.Store.state.units = { [u0.id]: { steps: { vocab1: 1 } } };
+  const id = (u, i) => 'w|' + u.id + '|' + i;
+  S.Store.state.srs = {
+    [id(uFar, 0)]: { d: t - 2, i: 1, e: 2.4, r: 1, l: 0 }, // aan de beurt, uit een unit waar je nog niet aan begon
+    [id(u0, 1)]: { d: t, i: 3, e: 2.4, r: 1, l: 0 },
+    [id(u0, 2)]: { d: t + 3, i: 3, e: 2.4, r: 0, l: 4 }, // zwak
+    [id(u0, 3)]: { d: t + 30, i: 30, e: 2.8, r: 5, l: 0 }
+  };
+  const pk = S.Gen.sprintPick(10).map(([w]) => w.id);
+  ok(pk.length === 10 && pk[0] === id(uFar, 0) && pk[1] === id(u0, 1) && pk[2] === id(u0, 2), 'sprint: eerst aan de beurt (oudste eerst), dan zwak');
+  ok(pk.slice(3).every(x => x.startsWith('w|' + u0.id + '|')), 'sprint: aanvullen alleen uit begonnen units');
+  ok(S.Gen.sprint(30).items.length === 30 && S.Gen.sprint(30).timer === 120, 'sprint: 30 vragen, 2 minuten');
+  S.Store.state = keep;
+}
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);
