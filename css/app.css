@@ -281,6 +281,12 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .note { display: inline-block; background: var(--gold-soft); border-radius: 999px; padding: .3rem .8rem; font-size: .88rem; font-weight: 600; margin-bottom: 1rem; }
 .tiles { display: flex; flex-wrap: wrap; gap: .45rem; min-height: 54px; }
 .tiles.line { border-bottom: 2px solid var(--line); padding: .5rem 0 .8rem; margin-bottom: 1.2rem; min-height: 64px; }
+.tile.typed { border-color: var(--teal); background: var(--teal-soft); }
+.tile .tl-hit { color: var(--teal); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tile.dim { opacity: .4; } .tile.picked { transform: scale(1.06); }
+.order-kb { margin-top: 1rem; }
+@media (hover: none) and (pointer: coarse) { .order-kb:not(.show) { display: none; } }
+.order-kb.show { color: var(--teal); font-weight: 600; }
 .tiles.line.right { border-color: var(--ok); } .tiles.line.wrong { border-color: var(--bad); }
 .tile { padding: .55rem .8rem; border-radius: 12px; border: 2px solid var(--line); background: var(--card); font-size: 1.05rem; font-weight: 600; box-shadow: 0 2px 0 var(--line); }
 .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }

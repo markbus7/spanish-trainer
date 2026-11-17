@@ -557,23 +557,89 @@
     let order = U.shuffle(words.map((w, i) => ({ w, i })));
     if (order.every((o, i) => o.i === i) && words.length > 1) order = order.reverse();
     const chosen = [];
+    /* Typen kiest een tegel (zoals bij Duolingo): "e" → ¿Eres. Beginnen meer woorden zo, typ dan verder.
+       Leestekens (¿ ¡ . ,) tellen niet mee en accenten/ñ mogen zonder (e = é, n = ñ). */
+    const fold = s => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\p{L}\p{N}]/gu, '');
+    let buf = '';
+    const tiles = [];
+    const KB_TIP = '⌨️ Met een toetsenbord: typ de eerste letters van een woord.';
+    const kbTip = h('p', { class: 'muted small order-kb' }, KB_TIP);
+    function paint() {
+      const cands = buf ? tiles.filter(x => x.t.parentNode === pool && x.key.startsWith(buf)) : [];
+      tiles.forEach(x => {
+        const on = buf && x.t.parentNode === pool && x.key.startsWith(buf);
+        x.t.classList.toggle('typed', !!on);
+        x.t.classList.toggle('dim', !!buf && x.t.parentNode === pool && !on);
+        x.t.textContent = '';
+        if (!on) { x.t.textContent = x.o.w; return; }
+        // markeer de getypte letters: tel letters (zonder leestekens) tot buf.length
+        let n = 0, cut = 0;
+        for (const ch of x.o.w) { cut += ch.length; if (fold(ch)) n++; if (n >= buf.length) break; }
+        x.t.append(h('span', { class: 'tl-hit' }, x.o.w.slice(0, cut)), x.o.w.slice(cut));
+      });
+      const ex = cands.find(x => x.key === buf);
+      kbTip.textContent = ex ? '⏎ Enter of spatie kiest «' + ex.o.w + '», of typ verder.' : KB_TIP;
+      kbTip.classList.toggle('show', !!ex);
+      return cands;
+    }
+    function move(x) {
+      if (x.t.parentNode === pool) { line.append(x.t); chosen.push(x.o); } else { pool.append(x.t); chosen.splice(chosen.indexOf(x.o), 1); }
+      buf = ''; paint();
+      ctx.can(chosen.length === words.length);
+    }
     order.forEach(o => {
       const t = h('button', { class: 'tile', type: 'button', lang: 'es' }, o.w);
+      const x = { o, t, key: fold(o.w) };
+      tiles.push(x);
       t.onclick = () => {
         if (ctx.answered()) return;
-        Sound.tap();
-        if (t.parentNode === pool) { line.append(t); chosen.push(o); } else { pool.append(t); chosen.splice(chosen.indexOf(o), 1); }
-        ctx.can(chosen.length === words.length);
+        Sound.tap(); move(x);
       };
       pool.append(t);
     });
+    ctx.keys = (k, e) => {
+      if (ctx.answered()) return false;
+      if (k === 'Backspace') {
+        if (buf) { buf = buf.slice(0, -1); paint(); }
+        else if (chosen.length) { const last = chosen[chosen.length - 1]; move(tiles.find(x => x.o === last)); Sound.tap(); }
+        if (e) e.preventDefault();
+        return true;
+      }
+      if (k === 'Escape' && buf) { buf = ''; paint(); return true; }
+      // Enter/spatie met getypte letters: kies het woord dat precies zo heet (bijv. "de" naast "del")
+      if ((k === 'Enter' || k === ' ') && buf) {
+        const ex = tiles.filter(x => x.t.parentNode === pool && x.key === buf);
+        if (ex.length) { Sound.tap(); move(ex[0]); }
+        if (e) e.preventDefault();
+        return true;
+      }
+      if (typeof k !== 'string' || k.length !== 1) return false;
+      const c = fold(k); if (!c) return false;
+      const next = buf + c;
+      const cands = tiles.filter(x => x.t.parentNode === pool && x.key.startsWith(next));
+      if (!cands.length) { // niets past: tegels even laten schudden
+        pool.classList.remove('shake'); void pool.offsetWidth; pool.classList.add('shake');
+        setTimeout(() => pool.classList.remove('shake'), 400);
+        return true;
+      }
+      buf = next;
+      // uniek (of alleen dezelfde woorden, bijv. twee keer "de")? Dan meteen kiezen.
+      if (cands.every(x => x.key === cands[0].key)) {
+        const x = cands[0]; paint(); Sound.tap();
+        x.t.classList.add('picked');
+        setTimeout(() => { x.t.classList.remove('picked'); }, 250);
+        move(x);
+      } else paint();
+      return true;
+    };
     ctx.evaluate = () => {
+      buf = ''; paint();
       const user = chosen.map(c => c.w).join(' ');
       const ok = S.check.norm(user) === S.check.norm(it.target);
       line.classList.add(ok ? 'right' : 'wrong');
       return { ok, user, expected: it.target, nl: it.nl };
     };
-    return h('div', { class: 'order' }, h('div', { class: 'instr' }, T('order')), it.nl ? h('div', { class: 'prompt small' }, it.nl) : null, line, pool);
+    return h('div', { class: 'order' }, h('div', { class: 'instr' }, T('order')), it.nl ? h('div', { class: 'prompt small' }, it.nl) : null, line, pool, kbTip);
   };
 
   R.match = (it, ctx) => {
@@ -725,6 +791,9 @@
       count.textContent = Math.min(idx + 1, queue.length) + '/' + queue.length;
     }
     function onKey(e) {
+      // een vraag die zelf toetsen afhandelt (bijv. woordtegels typen) mag eerst; die geeft true terug als hij de toets gebruikt
+      if (!answered && ctxObj && ctxObj.keys && !e.metaKey && !e.ctrlKey && !(e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable))
+        && ['Escape', 'Enter', ' ', 'Backspace'].includes(e.key) && ctxObj.keys(e.key, e) === true) return;
       if (e.key === 'Escape') { tryClose(); return; }
       if (e.target && e.target.tagName === 'TEXTAREA') return;
       if (e.key === 'Enter') { if (!mainBtn.disabled && mainBtn.offsetParent) { e.preventDefault(); mainBtn.click(); } return; }
@@ -734,7 +803,7 @@
         if (!e.repeat && !mainBtn.disabled && mainBtn.offsetParent) mainBtn.click();
         return;
       }
-      if (!answered && ctxObj && ctxObj.keys && !(e.target && e.target.tagName === 'INPUT')) ctxObj.keys(e.key);
+      if (!answered && ctxObj && ctxObj.keys && !e.metaKey && !e.ctrlKey && !(e.target && e.target.tagName === 'INPUT')) ctxObj.keys(e.key, e);
     }
     document.addEventListener('keydown', onKey);
     let ctxObj = null;
