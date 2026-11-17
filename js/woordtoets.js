@@ -9,7 +9,7 @@
   // Alleen goed getypt (zonder hint) telt als bekend (>= 7 dagen); goed bij meerkeuze = aan het leren, over 3 dagen terug.
   const KNOWN = { type: 14, mc: 3 };
   const KEY = 'spt-woordtoets';
-  const DEF = { src: '', which: 'new', len: 'n50', form: 'type', what: 'w' };
+  const DEF = { mode: 'new', src: '', which: 'new', len: 'n50', form: 'type', what: 'w' };
   function prefs() { try { return Object.assign({}, DEF, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { return Object.assign({}, DEF); } }
   function savePrefs(p) { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) { /* privévenster */ } }
 
@@ -83,7 +83,7 @@
     const ses = session(p);
     if (!ses.items.length) { S.toast(p.which === 'new' ? 'Alles hiervan staat al in je herhaling. Kies «Alles».' : 'Geen woorden gevonden'); return; }
     const t0 = Date.now();
-    S.runSession(ses, { desc: { kind: 'woordtoets', t0 }, onFinish: sum => summary(Object.assign({ items: ses.items }, sum), t0) });
+    S.runSession(ses, { desc: { kind: 'woordtoets', t0, mark: 'sprint' }, onFinish: sum => summary(Object.assign({ items: ses.items }, sum), t0) });
   }
   /** Hervatten na verversen: de rij komt uit de pauze, de samenvatting kan nog steeds via t0. */
   function resume(session, d) {
@@ -102,8 +102,9 @@
     if (!/^(n\d+|all)$/.test(p.len)) p.len = DEF.len;
     if (!FORMS[p.form]) p.form = DEF.form;
     const wrap = h('div', { class: 'page wt-page' });
-    wrap.append(h('a', { class: 'back', href: '#/practica' }, '← Práctica'), h('h1', null, '⚡ Woordensprint: nieuwe woorden'),
-      h('p', { class: 'muted' }, 'Ga snel door veel woorden en zinnen, ook van units die je nog niet gedaan hebt. Wat je al kent, zet je zo meteen in je woordenschat, en wat nieuw is komt in je herhaling.'));
+    if (p.mode !== 'quick') p.mode = 'new';
+    wrap.append(h('a', { class: 'back', href: '#/practica' }, '← Práctica'), h('h1', null, '⚡ Woordensprint'),
+      h('p', { class: 'muted' }, 'Kies eerst wat voor sprint je wilt doen.'));
 
     const all = [];
     const redraw = () => { savePrefs(p); all.forEach(f => f()); };
@@ -137,8 +138,24 @@
       go.disabled = !n;
       go.textContent = !n ? 'Hier is niets nieuws meer' : '▶ Start · ' + U.plural(n, 'vraag', 'vragen') + ' · ±' + Math.max(1, Math.round(n * (p.form === 'fast' ? 5 : 10) / 60)) + ' min';
     });
-    wrap.append(h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, 'Uit'), h('div', { class: 'card' }, srcChips, unitSel, srcInfo)));
-    wrap.append(h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, 'Jouw sprint'), h('div', { class: 'card wt-card' },
+    // eerst kiezen: snel met wat je al hebt, of nieuwe woorden
+    const modes = h('div', { class: 'wt-modes' });
+    const quickBox = h('div', { class: 'card wt-card' },
+      h('p', null, '30 woorden uit de units waar je al mee bezig bent, tegen de klok: 2 minuten. Goed of fout telt mee in je herhaling.'),
+      h('button', { class: 'btn primary wide', type: 'button', onclick: () => S.runSession(S.Gen.sprint(30), { desc: { kind: 'plain', mark: 'sprint' } }) }, '▶ Start · 2 minuten'));
+    const quickSec = h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, 'Snelle sprint'), quickBox);
+    const newSecs = h('div');
+    all.push(() => {
+      modes.innerHTML = '';
+      [['quick', '⏱️', 'Snelle sprint', 'Woorden die je al hebt · 2 minuten'], ['new', '🆕', 'Nieuwe woorden', 'Kies niveau of unit en hoeveel · ook wat je nog niet deed']].forEach(([v, ic, t, sub]) =>
+        modes.append(h('button', { class: 'wt-mode' + (p.mode === v ? ' on' : ''), type: 'button', 'aria-pressed': String(p.mode === v), onclick: () => { p.mode = v; redraw(); } },
+          h('span', { class: 'wt-mi' }, ic), h('b', null, t), h('small', null, sub))));
+      quickSec.hidden = p.mode !== 'quick'; newSecs.hidden = p.mode !== 'new';
+    });
+    wrap.append(modes, quickSec, newSecs);
+    newSecs.append(h('p', { class: 'muted wt-intro' }, 'Ga door veel woorden en zinnen, ook van units die je nog niet gedaan hebt. Wat je al kent, zet je zo meteen in je woordenschat, en wat nieuw is komt in je herhaling.'));
+    newSecs.append(h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, 'Uit'), h('div', { class: 'card' }, srcChips, unitSel, srcInfo)));
+    newSecs.append(h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, 'Jouw sprint'), h('div', { class: 'card wt-card' },
       lbl('Wat'), whatChips, lbl('Welke'), whichChips, lbl('Hoeveel'), lenChips, lbl('Vraagvorm'), formChips, formInfo,
       h('ul', { class: 'wt-how small' },
         h('li', null, h('b', null, 'Goed getypt'), ' (zonder hint): staat meteen als ' + S.SRS.ICON.known + ' bekend in je woordenschat. Je ziet het pas over twee weken terug.'),

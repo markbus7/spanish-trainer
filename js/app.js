@@ -419,11 +419,10 @@
 
     // snelle training
     wrap.append(section('Extra oefenen', h('div', { class: 'quick' },
-      quick('⚡', 'Woordensprint', '2 min', () => runSession(Gen.sprint(30), { desc: { kind: 'plain', mark: 'sprint' } }), d.done.sprint),
+      quick('⚡', 'Woordensprint', 'snel of nieuwe woorden', () => { location.hash = '#/woordtoets'; }, d.done.sprint),
       quick('🧩', 'Werkwoorden', '20 vragen', () => { location.hash = '#/practica'; }),
       quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10), { desc: { kind: 'plain', mark: 'listen' } }), d.done.listen),
-      quick('🎲', 'Woordspellen', 'puzzels en memory', () => { location.hash = '#/juegos'; }, d.done.games),
-      quick('🆕', 'Nieuwe woorden', 'sprint, kies niveau', () => { location.hash = '#/woordtoets'; }))));
+      quick('🎲', 'Woordspellen', 'puzzels en memory', () => { location.hash = '#/juegos'; }, d.done.games))));
     if (!Store.ok) wrap.append(h('p', { class: 'warn' }, '⚠️ Je browser staat opslaan niet toe (privévenster?). Je voortgang wordt niet bewaard.'));
     return wrap;
   };
@@ -497,7 +496,7 @@
     const prog = P.unitProgress(u);
     const alts = [
       due ? h('button', { class: 'chip toggle', type: 'button', onclick: () => startReview(25) }, `🔁 ${U.plural(due, 'herhaling', 'herhalingen')}`) : null,
-      h('button', { class: 'chip toggle', type: 'button', onclick: () => runSession(Gen.sprint(30), { desc: { kind: 'plain', mark: 'sprint' } }) }, '⚡ Woordensprint'),
+      h('button', { class: 'chip toggle', type: 'button', onclick: () => { location.hash = '#/woordtoets'; } }, '⚡ Woordensprint'),
       h('button', { class: 'chip toggle', type: 'button', onclick: () => { location.hash = '#/juegos'; } }, '🎲 Woordspel'),
       S.AI.enabled() ? h('button', { class: 'chip toggle', type: 'button', onclick: () => { startRoleplay(unitScenario(u)); location.hash = '#/docente'; } }, '🗣️ Praten met Lupe') : null];
     return h('div', { class: 'go-on' },
@@ -728,8 +727,7 @@
       quick('🗂️', 'Alle spellen', 'kies je woorden', () => { location.hash = '#/juegos'; }))));
     wrap.append(section('Meer', h('div', { class: 'quick' },
       quick('📚', 'Woordenboek', 'zoeken + eigen woorden', () => { location.hash = '#/woorden'; }),
-      quick('🆕', 'Sprint nieuwe woorden', 'kies niveau en aantal', () => { location.hash = '#/woordtoets'; }),
-      quick('⚡', 'Woordensprint', '2 minuten', () => runSession(Gen.sprint(30))),
+      quick('⚡', 'Woordensprint', 'snel of nieuwe woorden', () => { location.hash = '#/woordtoets'; }),
       quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10))),
       quick('🎙️', 'Uitspraak', '8 zinnen', () => startSpeak()),
       quick('🔀', 'Extra herhaling', 'ook niet-verlopen', () => { const ids = U.sample(Object.keys(st().srs), 20); if (!ids.length) { S.toast('Nog niets geleerd'); return; } runSession(Gen.reviewSession(20, ids)); }))));
