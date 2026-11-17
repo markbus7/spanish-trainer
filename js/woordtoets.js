@@ -141,7 +141,9 @@
     // eerst kiezen: snel met wat je al hebt, of nieuwe woorden
     const modes = h('div', { class: 'wt-modes' });
     const quickBox = h('div', { class: 'card wt-card' },
-      h('p', null, '30 woorden uit de units waar je al mee bezig bent, tegen de klok: 2 minuten. Goed of fout telt mee in je herhaling.'),
+      h('p', null, '30 woorden tegen de klok: 2 minuten. Eerst komen de woorden die vandaag aan de beurt zijn in je herhaling, dan woorden die je vaak fout hebt, en de rest vult de sprint aan met woorden uit je units.'),
+      (() => { const db = S.Store.state.srs, t = U.dayIndex(); const due = Object.keys(db).filter(k => k[0] === 'w' && !k.startsWith('w|my|') && db[k].d <= t).length;
+        return h('p', { class: 'small muted' }, due ? '🔁 ' + U.plural(due, 'woord is', 'woorden zijn') + ' nu aan de beurt. Een goed antwoord zet ze een stap verder in je herhaling, een fout zet ze terug op vandaag.' : 'Er zijn nu geen woorden aan de beurt, dus de sprint is vooral extra oefenen. Een fout zet een woord terug op vandaag.'); })(),
       h('button', { class: 'btn primary wide', type: 'button', onclick: () => S.runSession(S.Gen.sprint(30), { desc: { kind: 'plain', mark: 'sprint' } }) }, '▶ Start · 2 minuten'));
     const quickSec = h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, 'Snelle sprint'), quickBox);
     const newSecs = h('div');

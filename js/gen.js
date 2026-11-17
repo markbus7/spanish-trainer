@@ -393,10 +393,31 @@
     const lines = us.flatMap(u => u.say).concat(us.flatMap(u => shortLines(u, 9).map(x => [x.l[1], x.l[2]])));
     return { title: 'Uitspraak & spreken', items: U.sample(lines, n).map(([es, nl]) => speakItem(es, nl)), mode: 'learn' };
   }
+  /** Snelle sprint: eerst woorden die aan de beurt zijn, dan woorden die je vaak fout hebt, dan aanvullen met de rest.
+      Ook woorden uit units waar je nog niet aan begon, als ze al in je herhaling staan (bijv. via de sprint met nieuwe woorden). */
+  function sprintPick(n = 20) {
+    const db = S.Store.state.srs, today = U.dayIndex();
+    const learned = new Set((learnedUnits().length ? learnedUnits() : C.all().slice(0, 1)).map(u => u.id));
+    const seen = new Set(), due = [], weak = [], rest = [];
+    C.all().forEach(u => C.words(u).forEach(w => {
+      const c = db[w.id];
+      if (!w || seen.has(w.es) || (!c && !learned.has(u.id))) return;
+      seen.add(w.es);
+      if (c && c.d <= today) due.push([w, u, c]);
+      else if (c && c.l > 0 && c.i < 7) weak.push([w, u, c]);
+      else rest.push([w, u, c]);
+    }));
+    due.sort((a, b) => a[2].d - b[2].d || a[2].i - b[2].i);
+    weak.sort((a, b) => b[2].l - a[2].l || a[2].i - b[2].i);
+    const pick = due.slice(0, n);
+    pick.push(...weak.slice(0, n - pick.length));
+    pick.push(...U.sample(rest, n - pick.length));
+    return pick;
+  }
   function sprint(n = 20) {
-    const us = learnedUnits().length ? learnedUnits() : C.all().slice(0, 1);
-    const ws = us.flatMap(u => C.words(u).map(w => [w, u]));
-    return { title: 'Woordensprint', items: mix(U.sample(ws, n).map(([w, u]) => wordItem(w, U.pick(['mc-es', 'mc-nl', 'listen-mc', 'type']), u))), mode: 'learn', timer: 120 };
+    // volgorde binnen de sprint door elkaar; wat aan de beurt is staat wel vooraan in de selectie
+    const items = U.shuffle(sprintPick(n)).map(([w, u]) => wordItem(w, U.pick(['mc-es', 'mc-nl', 'listen-mc', 'type']), u));
+    return { title: 'Woordensprint', items: mix(items), mode: 'learn', timer: 120 };
   }
   function placementBand(lvl) {
     const qs = S.placement.filter(q => q.lv === lvl);
@@ -441,5 +462,5 @@
     return { level, next, nextFrac: nb && nb.n ? nb.ok / nb.n : 0 };
   }
 
-  S.Gen = { attachSrc, difficulty, isHard, mix, easeNext, STEPS, stepSession, reviewSession, reviewCount, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART, forms, wordSynonyms, checkType };
+  S.Gen = { attachSrc, difficulty, isHard, mix, easeNext, STEPS, stepSession, reviewSession, reviewCount, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, sprintPick, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART, forms, wordSynonyms, checkType };
 })(window.SPT);
