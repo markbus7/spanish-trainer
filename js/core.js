@@ -436,12 +436,20 @@
         a.preservesPitch = true; a.webkitPreservesPitch = true;
         // Op normale snelheid speelt de opname onbewerkt af: versnellen of vertragen met behoud van toonhoogte
         // klinkt in Safari/WebKit metalig en robotachtig. Alleen de 🐢-knop vertraagt (dat is dan de bedoeling).
-        a.defaultPlaybackRate = a.playbackRate = opt.slow ? 0.75 : 1;
+        a.defaultPlaybackRate = a.playbackRate = this.slowFactor(opt.slow, true);
         a.onended = () => end(true);
         a.onerror = () => { this.clipError = 'laden mislukt (code ' + (a.error ? a.error.code : '?') + (direct ? ', ook rechtstreeks' : '') + ')'; end(false); };
         const p = a.play(); if (p && p.catch) p.catch(e => { if (e && e.name !== 'AbortError') { err = e; this.clipError = e.name + ': ' + e.message; } end(e && e.name === 'AbortError'); });
         setTimeout(() => end(true), 60000);
       });
+    },
+    /* Hoe langzaam de 🐢-knop afspeelt. slow: 1 = langzaam (eerste tik), 2 = heel langzaam 🐌 (nog eens tikken).
+       Opnames gaan via playbackRate met behoud van toonhoogte; onder 0,5 vervormt WebKit het geluid te veel.
+       De apparaatstem kan verder omlaag (u.rate wordt nog met de spreeksnelheid uit Instellingen vermenigvuldigd). */
+    SLOW: { clip: [1, 0.62, 0.5], device: [1, 0.55, 0.4] },
+    slowFactor(slow, clip) {
+      const t = this.SLOW[clip ? 'clip' : 'device'];
+      return t[Math.max(0, Math.min(t.length - 1, slow === true ? 1 : (+slow || 0)))];
     },
     /* Valt de lesstof terug op de apparaatstem, zeg dan één keer waarom: dan klinkt het niet ineens 'robotachtig' zonder uitleg. */
     clipFailed() {
@@ -541,7 +549,7 @@
           parts.forEach((p, i) => {
             const u = new SpeechSynthesisUtterance(p);
             if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'es-MX';
-            u.rate = (opt.slow ? 0.65 : 1) * (opt.rate || 1) * (Store.state.settings.rate || 0.9);
+            u.rate = this.slowFactor(opt.slow) * (opt.rate || 1) * (Store.state.settings.rate || 0.9);
             if (opt.pitch) u.pitch = opt.pitch;
             if (i === parts.length - 1) u.onend = () => res();
             u.onerror = () => res();
