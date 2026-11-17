@@ -53,9 +53,9 @@
     }
     return '';
   }
-  async function readRemote() {
-    const g = await gh('/gists/' + cfg.gistId);
-    const f = g.files && g.files[fileOf(cfg)];
+  async function readRemote(direct) {
+    const g = await gh('/gists/' + (direct ? direct.gistId : cfg.gistId));
+    const f = g.files && g.files[direct ? direct.file : fileOf(cfg)];
     if (!f) return null;
     let text = f.content;
     if (f.truncated && f.raw_url) { const r = await fetch(f.raw_url); if (!r.ok) throw new Error('Kon voortgang niet downloaden'); text = await r.text(); }
@@ -126,10 +126,49 @@
         }
         // naam en XP uit elke voortgang, zodat je ziet van wie hij is
         for (const f of found.slice(0, 12)) {
-          try { cfg.gistId = f.gistId; cfg.file = f.file; const d = await readRemote(); if (d) { f.name = d.name || ''; f.xp = d.xp || 0; } } catch (e) { /* zonder naam tonen */ }
+          try { const d = await readRemote(f); if (d) { f.name = d.name || ''; f.xp = d.xp || 0; } } catch (e) { /* zonder naam tonen */ }
         }
         return { login: me.login || '', found: found.sort((a, b) => b.updated - a.updated) };
       } finally { cfg = prev; }
+    },
+    /* Beheerdersoverzicht: alle voortgangen op dit GitHub-account (ook van vrienden op andere toestellen), kort samengevat. */
+    async overview() {
+      if (!cfg.token) throw new Error('Zet eerst synchroniseren aan');
+      const found = [];
+      for (let page = 1; page <= 5; page++) {
+        const list = await gh('/gists?per_page=100&page=' + page);
+        for (const g of list) for (const name of Object.keys(g.files || {})) if (FILE_RE.test(name)) found.push({ gistId: g.id, file: name, updated: Date.parse(g.updated_at) || 0 });
+        if (list.length < 100) break;
+      }
+      found.sort((a, b) => b.updated - a.updated);
+      const out = [];
+      for (const f of found.slice(0, 25)) {
+        try { const d = await readRemote(f); if (d) out.push(Object.assign(Sync.summary(d), { file: f.file, updated: f.updated, mine: f.file === fileOf(cfg) })); }
+        catch (e) { out.push({ file: f.file, updated: f.updated, error: e.message }); }
+      }
+      return out;
+    },
+    /* Samenvatting van één voortgang (zonder iets op te slaan). */
+    summary(d) {
+      const U = S.U, C = S.C;
+      const today = U.todayKey(), yest = U.todayKey(new Date(Date.now() - 864e5));
+      const st = d.streak || {};
+      const days = Object.keys(d.days || {}).filter(k => (d.days[k].min || 0) > 0 || (d.days[k].items || 0) > 0).sort();
+      const week = Object.keys(d.days || {}).filter(k => k > U.todayKey(new Date(Date.now() - 7 * 864e5))).reduce((a, k) => a + (d.days[k].min || 0), 0);
+      const cur = C && d.current ? C.get(d.current) : null;
+      const weak = Object.entries(d.tags || {}).filter(([, t]) => t.ok + t.no >= 3 && t.ok / (t.ok + t.no) < 0.75)
+        .sort((a, b) => a[1].ok / (a[1].ok + a[1].no) - b[1].ok / (b[1].ok + b[1].no)).slice(0, 3)
+        .map(([k, t]) => ({ label: C ? C.tag(k) : k, pct: Math.round(t.ok / (t.ok + t.no) * 100) }));
+      const words = Object.keys(d.srs || {}).filter(k => k.startsWith('w|')).length;
+      const tests = (d.tests || []).slice().sort((a, b) => (b.date || 0) - (a.date || 0));
+      return {
+        name: d.name || '', xp: d.xp || 0, words,
+        level: (tests[0] && tests[0].level) || (d.placement && d.placement.level) || (cur && cur.level) || null,
+        unit: cur ? cur.level + ' · ' + cur.title : (d.current || ''),
+        unitsDone: Object.values(d.units || {}).filter(u => u && u.done).length,
+        streak: st.last === today || st.last === yest ? (st.cur || 0) : 0, best: st.best || 0,
+        lastDay: days[days.length - 1] || st.last || null, weekMin: Math.round(week), weak
+      };
     },
     /* Koppelen. pick = { gistId, file } van een bestaande voortgang, of { fresh: true } voor een nieuwe, lege voortgang.
        Zonder pick (oude manier): het standaardbestand. */

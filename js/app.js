@@ -309,7 +309,7 @@
     document.querySelectorAll('.tabbar a').forEach(a => a.classList.toggle('active', a.dataset.tab === (fn.tab || name)));
     updateTopbar();
     const v = view(); v.innerHTML = '';
-    const showOnboarding = !st().placement.done && !Object.keys(st().units).length && name !== 'toets' && name !== 'ajustes';
+    const showOnboarding = !st().placement.done && !Object.keys(st().units).length && name !== 'toets' && name !== 'ajustes' && name !== 'beheer';
     v.append(showOnboarding ? routes.welkom() : fn(arg));
     v.scrollTop = 0; window.scrollTo(0, 0);
   }
@@ -1588,11 +1588,40 @@
         h('div', { class: 'row gap wrap' },
           h('button', { class: 'btn ghost small', type: 'button', onclick: () => guard(() => { pinBox.hidden = false; pinIn.focus(); }) }, Pr.hasPin() ? 'Wijzigen' : 'Pincode instellen'),
           Pr.hasPin() ? h('button', { class: 'btn link small', type: 'button', onclick: () => guard(() => { Pr.clearPin(); S.toast('🔓 Pincode uit'); draw(); render(); }) }, 'Uitzetten') : null),
-        pinBox));
+        pinBox),
+        h('div', { class: 'prof-lock' }, h('div', null, h('b', null, '📊 Overzicht van iedereen'), h('small', { class: 'muted', style: { display: 'block' } }, 'Zie per profiel het niveau, de reeks, de laatste oefendag en de zwakke punten. Ook van vrienden op hun eigen telefoon, zolang hun voortgang via jouw GitHub-token synchroniseert.')),
+          h('div', { class: 'row gap wrap' }, h('button', { class: 'btn ghost small', type: 'button', onclick: () => guard(() => { location.hash = '#/beheer'; }) }, 'Overzicht openen'))));
     };
     draw();
     return card;
   }
+  /* Beheerdersoverzicht (#/beheer): alle voortgangen uit de gists van het gekoppelde GitHub-account. */
+  routes.beheer = function () {
+    const wrap = h('div', { class: 'page' });
+    wrap.append(h('a', { class: 'btn link', href: '#/ajustes' }, '← Instellingen'), h('h1', null, '📊 Overzicht van iedereen'));
+    if (S.Profiles && S.Profiles.locked()) { wrap.append(h('div', { class: 'card' }, h('p', null, 'Dit overzicht zit achter de pincode van de beheerder.'), h('button', { class: 'btn primary', type: 'button', onclick: () => guard(render) }, '🔒 Ontgrendelen'))); return wrap; }
+    if (!S.Sync || !S.Sync.enabled()) { wrap.append(h('div', { class: 'card' }, h('p', null, 'Zet eerst synchroniseren aan in dit profiel (Instellingen › Synchroniseren). Het overzicht leest alle voortgangen op dat GitHub-account.'))); return wrap; }
+    const box = h('div', { class: 'admin-list' }, h('p', { class: 'muted' }, '🔄 Voortgangen ophalen…'));
+    wrap.append(h('p', { class: 'small muted' }, 'Alle voortgangen op @' + S.Sync.status().login + ', de nieuwste bovenaan. Dit leest alleen; er verandert niets.'), box);
+    const fmtDay = k => { if (!k) return 'nog nooit'; const t = U.todayKey(), y = U.todayKey(new Date(Date.now() - 864e5)); if (k === t) return 'vandaag'; if (k === y) return 'gisteren'; const d = new Date(k + 'T12:00:00'); return d.toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' }); };
+    const courseOf = f => { const m = /--([a-z]{2}-[a-z]{2})\.json$/.exec(f); const c = S.COURSES && S.COURSES[m ? m[1] : 'es-nl']; return c ? c.flag + ' ' + c.name.nl : '🌎 Spaans'; };
+    S.Sync.overview().then(list => {
+      box.innerHTML = '';
+      if (!list.length) { box.append(h('p', { class: 'muted' }, 'Nog geen voortgangen gevonden.')); return; }
+      list.forEach(r => {
+        if (r.error) { box.append(h('div', { class: 'card admin-card' }, h('b', null, r.file), h('p', { class: 'small warn' }, '⚠️ ' + r.error))); return; }
+        const stat = (v, l) => h('div', { class: 'admin-stat' }, h('b', null, v), h('small', { class: 'muted' }, l));
+        box.append(h('div', { class: 'card admin-card' },
+          h('div', { class: 'row gap between wrap' }, h('div', null, h('b', { class: 'admin-name' }, r.name || 'Zonder naam'), r.mine ? h('span', { class: 'chip ok' }, 'dit profiel') : null, h('small', { class: 'muted', style: { display: 'block' } }, courseOf(r.file) + (r.unit ? ' · nu bij ' + r.unit : ''))),
+            h('span', { class: 'chip' }, r.level || '–')),
+          h('div', { class: 'admin-stats' }, stat('🔥 ' + r.streak, 'dagen op rij (record ' + r.best + ')'), stat(fmtDay(r.lastDay), 'laatst geoefend'), stat(r.weekMin + ' min', 'deze week'), stat('⭐ ' + r.xp, U.plural(r.words, 'woord', 'woorden') + ' · ' + U.plural(r.unitsDone, 'unit', 'units'))),
+          r.weak.length ? h('div', { class: 'small' }, h('b', null, '🎯 Zwakke punten: '), r.weak.map(w => w.label + ' (' + w.pct + '%)').join(', ')) : h('div', { class: 'small muted' }, 'Nog geen zwakke punten.'),
+          h('small', { class: 'muted' }, 'Gesynchroniseerd ' + ago(r.updated))));
+      });
+    }).catch(e => { box.innerHTML = ''; box.append(h('p', { class: 'warn' }, '⚠️ ' + e.message)); });
+    return wrap;
+  };
+  routes.beheer.tab = 'perfil';
   /* Na het token: kies welke voortgang bij dit profiel hoort, of begin een nieuwe. */
   function chooseRemote(r, myName, finish, cancel) {
     const root = document.getElementById('modal-root');
