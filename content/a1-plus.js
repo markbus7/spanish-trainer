@@ -2,6 +2,7 @@
    Alles wordt achteraan de bestaande unit toegevoegd (zie S.extendUnit), zodat je voortgang blijft kloppen. */
 (function (S) {
   'use strict';
+  if (S.isCourse && !S.isCourse('es-nl')) return; // lesstof van de cursus Spaans (uitleg in het Nederlands)
   const X = S.extendUnit;
 
   /* ───────── A1 · 1 ───────── */

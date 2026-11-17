@@ -68,7 +68,7 @@
   function page() {
     const wrap = h('div', { class: 'page words-page' });
     wrap.append(h('a', { class: 'back', href: '#/practica' }, '← Práctica'), h('h1', null, '📚 Woordenboek'),
-      h('p', { class: 'muted' }, 'Zoek in alle ' + index().length.toLocaleString('nl-NL') + ' woorden uit de lessen, in het Spaans of het Nederlands. Eigen woorden komen in je herhaling.'));
+      h('p', { class: 'muted' }, 'Zoek in alle ' + index().length.toLocaleString(S.LOC) + ' woorden uit de lessen, in het Spaans of het Nederlands. Eigen woorden komen in je herhaling.'));
 
     // eigen woord toevoegen
     const esIn = h('input', { class: 'input', lang: 'es', placeholder: 'Spaans, bijv. la chamba', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
@@ -117,7 +117,7 @@
       out.innerHTML = '';
       if (!res.length) out.append(h('p', { class: 'muted center' }, filter === 'my' && !q.value ? 'Nog geen eigen woorden. Voeg er hierboven een toe.' : 'Niets gevonden.'));
       res.slice(0, MAX).forEach(w => out.append(row(w)));
-      more.textContent = res.length > MAX ? `Eerste ${MAX} van ${res.length.toLocaleString('nl-NL')}. Typ meer letters om te zoeken.` : res.length === 1 ? '1 woord' : res.length ? res.length.toLocaleString('nl-NL') + ' woorden' : '';
+      more.textContent = res.length > MAX ? `Eerste ${MAX} van ${res.length.toLocaleString(S.LOC)}. Typ meer letters om te zoeken.` : res.length === 1 ? '1 woord' : res.length ? res.length.toLocaleString(S.LOC) + ' woorden' : '';
     }
     drawChips(); draw();
     const addBox = h('details', { class: 'card words-add-box' }, h('summary', null, h('b', null, '➕ Eigen woord toevoegen')), form);

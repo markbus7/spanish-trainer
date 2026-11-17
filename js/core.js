@@ -33,6 +33,19 @@
   U.debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
   S.U = U;
 
+  /* ================= Cursussen =================
+     Een cursus is een taalpaar: target = wat je leert, ui = taal van menu's en uitleg.
+     In de lesstof heten de velden historisch 'es' (doeltaal) en 'nl' (uitlegtaal); dat blijft zo voor elke cursus. */
+  const COURSES = {
+    'es-nl': { id: 'es-nl', target: 'es', ui: 'nl', speak: 'es-MX', listen: 'es-MX', flag: '🌎', ns: null, hello: '¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.', device: 'Y esto es la voz de tu dispositivo.',
+      brand: 'Español <em>latino</em>', title: 'Español Latino', name: { nl: 'Spaans', es: 'español' }, ai: { target: 'Latin American Spanish', native: 'Dutch' } },
+    'en-es': { id: 'en-es', target: 'en', ui: 'es', speak: 'en-US', listen: 'en-US', flag: '🇺🇸', ns: 'en-es', hello: 'Hello! How are you? Welcome to your English class.', device: 'And this is the voice of your device.',
+      brand: 'English <em>fácil</em>', title: 'English Fácil', name: { nl: 'Engels', es: 'inglés' }, ai: { target: 'American English', native: 'Latin American Spanish' } },
+    'nl-es': { id: 'nl-es', target: 'nl', ui: 'es', speak: 'nl-NL', listen: 'nl-NL', flag: '🇳🇱', ns: 'nl-es', hello: 'Hallo! Hoe gaat het? Welkom bij je les Nederlands.', device: 'En dit is de stem van je apparaat.',
+      brand: 'Neerlandés <em>fácil</em>', title: 'Neerlandés Fácil', name: { nl: 'Nederlands', es: 'neerlandés' }, ai: { target: 'Dutch (as spoken in the Netherlands)', native: 'Latin American Spanish' } }
+  };
+  S.COURSES = COURSES;
+
   /* ================= Profielen =================
      Meerdere mensen op één apparaat, elk met een eigen voortgang en eigen synchronisatie.
      Het eerste profiel ("main") gebruikt de oude opslagsleutels (spt.v1, spt.sync), zodat bestaande voortgang
@@ -49,38 +62,61 @@
       if (!r || !Array.isArray(r.list) || !r.list.length) r = { active: MAIN, list: [], pin: '' };
       if (!r.list.some(p => p.id === MAIN)) r.list.unshift({ id: MAIN, name: '', avatar: '🙂', created: 0 });
       if (!r.list.some(p => p.id === r.active)) r.active = MAIN;
+      r.list.forEach(p => { if (!Array.isArray(p.courses) || !p.courses.length) p.courses = ['es-nl']; p.courses = p.courses.filter(c => COURSES[c]); if (!p.courses.length) p.courses = ['es-nl']; if (!p.courses.includes(p.course)) p.course = p.courses[0]; });
       this.reg = r; return r;
     },
+    /* Actieve cursus van een profiel. */
+    courseOf(id) { const p = this.get(id); return (p && p.course) || 'es-nl'; },
     write() { try { localStorage.setItem(PKEY, JSON.stringify(this.reg)); } catch (e) { /* opslag vol of geblokkeerd */ } },
     list() { return this.reg.list.slice(); },
     get(id) { return this.reg.list.find(p => p.id === id) || null; },
     activeId() { return this.reg.active; },
     active() { return this.get(this.reg.active); },
     many() { return this.reg.list.length > 1; },
-    storeKey: id => id === MAIN ? 'spt.v1' : 'spt.p.' + id,
+    /* Opslag per profiel en cursus. Main + Spaans = de oude sleutel; de eerste (Spaanse) cursus van andere profielen houdt spt.p.<id>. */
+    storeKey(id, course) {
+      course = course || this.courseOf(id);
+      if (course === 'es-nl') return id === MAIN ? 'spt.v1' : 'spt.p.' + id;
+      return 'spt.p.' + id + '.' + course;
+    },
     syncKey: id => id === MAIN ? 'spt.sync' : 'spt.p.' + id + '.sync',
     /* Korte blik in de voortgang van een profiel, zonder het te laden (voor de profielkiezer). */
-    peek(id) {
+    peek(id, course) {
       try {
-        const d = JSON.parse(localStorage.getItem(this.storeKey(id)) || 'null') || {};
+        const d = JSON.parse(localStorage.getItem(this.storeKey(id, course)) || 'null') || {};
         return { name: d.name || '', xp: d.xp || 0, level: d.placement && d.placement.level || null, updated: d.updated || 0 };
       } catch (e) { return { name: '', xp: 0, level: null, updated: 0 }; }
     },
     label(id) { const p = this.get(id); if (!p) return ''; return p.name || this.peek(id).name || (id === MAIN ? 'Profiel 1' : 'Profiel'); },
-    add(name, avatar) {
+    add(name, avatar, course) {
       name = String(name || '').trim().slice(0, 30);
       if (!name) throw new Error('Vul een naam in');
+      course = COURSES[course] ? course : 'es-nl';
       let id; do { id = Math.random().toString(36).slice(2, 8); } while (this.get(id) || id === MAIN);
-      this.reg.list.push({ id, name, avatar: avatar || AVATARS[0], created: Date.now() });
+      this.reg.list.push({ id, name, avatar: avatar || AVATARS[0], created: Date.now(), courses: [course], course });
       const fresh = defaults(); fresh.name = name;
-      try { localStorage.setItem(this.storeKey(id), JSON.stringify(fresh)); } catch (e) { /* negeer */ }
+      try { localStorage.setItem(this.storeKey(id, course), JSON.stringify(fresh)); } catch (e) { /* negeer */ }
       this.write(); return id;
+    },
+    /* Een cursus toevoegen aan een profiel (eigen voortgang) en/of ernaar overschakelen. */
+    addCourse(id, course) {
+      const p = this.get(id); if (!p || !COURSES[course]) return;
+      if (!p.courses.includes(course)) {
+        p.courses.push(course);
+        const k = this.storeKey(id, course);
+        try { if (!localStorage.getItem(k)) { const fresh = defaults(); fresh.name = this.label(id); localStorage.setItem(k, JSON.stringify(fresh)); } } catch (e) { /* negeer */ }
+      }
+      this.write();
+    },
+    switchCourse(id, course) {
+      const p = this.get(id); if (!p || !COURSES[course]) return;
+      this.addCourse(id, course); p.course = course; this.switchTo(id);
     },
     update(id, patch) { const p = this.get(id); if (!p) return; Object.assign(p, patch); this.write(); },
     /* Profiel en zijn gegevens van dit apparaat halen. Het eerste profiel kan niet weg. */
     remove(id) {
       if (id === MAIN || !this.get(id)) return false;
-      try { localStorage.removeItem(this.storeKey(id)); localStorage.removeItem(this.syncKey(id)); } catch (e) { /* negeer */ }
+      try { this.get(id).courses.forEach(c => localStorage.removeItem(this.storeKey(id, c))); localStorage.removeItem(this.syncKey(id)); } catch (e) { /* negeer */ }
       this.reg.list = this.reg.list.filter(p => p.id !== id);
       if (this.reg.active === id) this.reg.active = MAIN;
       this.write(); return true;
@@ -109,11 +145,16 @@
     clearPin() { this.reg.pin = ''; this.unlocked = false; this.write(); },
     async unlock(pin) { if (!this.hasPin()) return true; const ok = (await this.hash(pin)) === this.reg.pin; if (ok) this.unlocked = true; return ok; }
   };
-  try { Profiles.init(); } catch (e) { Profiles.reg = { active: MAIN, list: [{ id: MAIN, name: '', avatar: '🙂', created: 0 }], pin: '' }; }
+  try { Profiles.init(); } catch (e) { Profiles.reg = { active: MAIN, list: [{ id: MAIN, name: '', avatar: '🙂', created: 0, courses: ['es-nl'], course: 'es-nl' }], pin: '' }; }
   S.Profiles = Profiles;
+  // De actieve cursus. Tests en hulpscripts kunnen SPT_COURSE zetten om een andere cursus te laden.
+  S.course = COURSES[(typeof self !== 'undefined' && self.SPT_COURSE) || Profiles.courseOf(Profiles.activeId())] || COURSES['es-nl'];
+  /* Lesstof hoort bij één cursus: contentbestanden beginnen met if (!S.isCourse('en-es')) return; */
+  S.isCourse = id => S.course.id === id;
+  S.LOC = S.course.ui === 'es' ? 'es-PA' : 'nl-NL'; // datums en getallen
 
   /* ================= Opslag ================= */
-  const KEY = Profiles.storeKey(Profiles.activeId());
+  const KEY = Profiles.storeKey(Profiles.activeId(), S.course.id);
   function defaults() {
     return {
       v: 1, created: Date.now(), updated: 0, epoch: 0, name: '',
@@ -378,7 +419,7 @@
 
   /* ================= Antwoordcontrole ================= */
   const PRON = /^(yo|tú|tu|él|el|ella|usted|nosotros|nosotras|ellos|ellas|ustedes)\s+/;
-  const ARTS = /^(el|la|los|las|un|una)\s+/;
+  const ARTS = S.course && S.course.target === 'nl' ? /^(de|het|een)\s+/ : S.course && S.course.target === 'en' ? /^(the|a|an)\s+/ : /^(el|la|los|las|un|una)\s+/;
   function norm(s) {
     return String(s || '').toLowerCase().normalize('NFC')
       .replace(/[“”«»"]/g, '').replace(/[‘’`´]/g, "'")
@@ -479,7 +520,9 @@
 
   /* ================= Spraak ================= */
   const Speech = {
-    voices: [], ready: false,
+    voices: [], all: [], ready: false,
+    /* Stemmen voor een taal ('es', 'en', 'nl'). this.voices = die van de doeltaal van de cursus. */
+    forLang(lang) { const re = new RegExp('^' + lang, 'i'); return (this.all || []).filter(v => re.test(v.lang)); },
     /* Opnames: vaste lesstof is vooraf ingesproken (audio/<sleutel>.mp3, zie tools/). Anders de stem van het apparaat. */
     clips: null, levels: null, el: null,
     clean(t) { return String(t).normalize('NFC').replace(/\s*\/\s*/g, ', ').replace(/\s+/g, ' ').trim(); },
@@ -492,12 +535,21 @@
       return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
     },
     /* Lupe heeft eigen opnames van dezelfde zinnen (andere stem): sleutel met naamruimte, bijv. 'lupe-girl'. */
+    /* Niveaus om offline te downloaden: Spaans 'A1', andere cursussen 'en-es:A1'. Alleen die van de eigen cursus. */
+    courseLevels(all) {
+      if (!all) return null;
+      const pre = S.course.ns ? S.course.ns + ':' : null, out = {};
+      for (const k in all) { if (pre ? k.startsWith(pre) : !k.includes(':')) out[pre ? k.slice(pre.length) : k] = all[k]; }
+      return Object.keys(out).length ? out : null;
+    },
     clipKey(t, ns) { return this.key(ns ? ns + '|' + this.clean(t) : t); },
     loadClips() {
       if (typeof fetch !== 'function' || typeof Audio !== 'function') return;
-      this.clipsLoaded = fetch('audio/index.json').then(r => r.ok ? r.json() : null).then(j => { if (j && j.clips) { this.clips = new Set(j.clips); this.levels = j.levels || null; } }).catch(() => { /* geen opnames */ });
+      this.clipsLoaded = fetch('audio/index.json').then(r => r.ok ? r.json() : null).then(j => { if (j && j.clips) { this.clips = new Set(j.clips); this.levels = Speech.courseLevels(j.levels); } }).catch(() => { /* geen opnames */ });
     },
-    hasClip(text, ns) { return !!(this.clips && Store.state.settings.clips !== false && text && this.clips.has(this.clipKey(text, ns))); },
+    /* Opnames van een andere cursus staan in een eigen naamruimte (bijv. 'en-es|hello'). undefined = die van de cursus. */
+    nsOf(ns) { return ns === undefined ? S.course.ns : ns; },
+    hasClip(text, ns) { ns = this.nsOf(ns); return !!(this.clips && Store.state.settings.clips !== false && text && this.clips.has(this.clipKey(text, ns))); },
     playClip(text, opt, direct) {
       return new Promise((res, rej) => {
         const a = this.el || (this.el = new Audio());
@@ -511,7 +563,7 @@
           rej();
         };
         this._end = end; // stop() rondt het lopende fragment af
-        a.src = 'audio/' + this.clipKey(text, opt.clipNs) + '.mp3' + (direct ? '?direct=1' : '');
+        a.src = 'audio/' + this.clipKey(text, this.nsOf(opt.clipNs)) + '.mp3' + (direct ? '?direct=1' : '');
         a.preservesPitch = true; a.webkitPreservesPitch = true;
         // Op normale snelheid speelt de opname onbewerkt af: versnellen of vertragen met behoud van toonhoogte
         // klinkt in Safari/WebKit metalig en robotachtig. Alleen de 🐢-knop vertraagt (dat is dan de bedoeling).
@@ -539,7 +591,7 @@
     init() {
       this.loadClips();
       if (!('speechSynthesis' in window)) return;
-      const load = () => { this.voices = speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)); this.ready = true; };
+      const load = () => { this.all = speechSynthesis.getVoices(); this.voices = this.forLang(S.course.target); this.ready = true; };
       load();
       speechSynthesis.addEventListener ? speechSynthesis.addEventListener('voiceschanged', load) : (speechSynthesis.onvoiceschanged = load);
     },
@@ -559,6 +611,14 @@
     rank(v) {
       const l = v.lang.replace('_', '-').toLowerCase();
       let s = 0;
+      if (!/^es/.test(l)) { // Engels, Nederlands: de taalvariant van de cursus eerst (en-US, nl-NL)
+        const want = (S.course.target === l.slice(0, 2) ? S.course.speak : l).toLowerCase();
+        s = l === want ? 100 : 75;
+        s += [0, 8, 20, 30][this.quality(v)];
+        if (/compact/i.test(v.voiceURI)) s -= 3;
+        if (this.isEffect(v)) s -= 70;
+        return s;
+      }
       if (l === 'es-mx') s = 100; else if (l === 'es-us') s = 95; else if (l === 'es-419') s = 92;
       else if (/es-(co|ar|cl|pe|ve|uy|cr|ec|gt|pa|pr|do|bo|py|sv|hn|ni|cu)/.test(l)) s = 85; else if (l === 'es-es') s = 30; else s = 50;
       // Een verbeterde of premium-stem klinkt veel natuurlijker: die wint van een compacte stem uit een ander Latijns-Amerikaans land.
@@ -574,11 +634,12 @@
     /* Bekende vrouwenstemmen (iOS/macOS, Edge, Chrome). Voor Lupe. */
     isFemale(v) { return /paulina|m[oó]nica|marisol|ang[eé]lica|soledad|isabela|francisca|dalia|elvira|paloma|salome|elena|catalina|camila|helena|laura|sabina|google español/i.test(v.name); },
     voice(opt = {}) {
-      if (!this.voices.length && 'speechSynthesis' in window) this.voices = speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang));
+      if (!this.voices.length && 'speechSynthesis' in window) { this.all = speechSynthesis.getVoices(); this.voices = this.forLang(S.course.target); }
+      const lang = opt.lang || S.course.target, list = lang === S.course.target ? this.voices : this.forLang(lang);
       const want = Store.state.settings.voice;
-      if (want) { const v = this.voices.find(x => x.voiceURI === want || x.name === want); if (v) return v; }
+      if (want && lang === S.course.target) { const v = list.find(x => x.voiceURI === want || x.name === want); if (v) return v; }
       const score = v => this.rank(v) + (opt.female && this.isFemale(v) ? 6 : 0);
-      return this.voices.slice().sort((a, b) => score(b) - score(a))[0] || null;
+      return list.slice().sort((a, b) => score(b) - score(a))[0] || null;
     },
     /* Wie wil weten of er gesproken wordt (bijv. de docente die haar mond beweegt): Speech.onTalk = (aan, tekst) => … */
     onTalk: null, _talkId: 0,
@@ -591,7 +652,7 @@
       // de bestandsnaam volgt uit de tekst. Bestaat hij niet, dan valt het vanzelf terug op de apparaatstem.
       const pending = !this.clips && this.clipsLoaded && Store.state.settings.clips !== false && !opt.noClip;
       // Lupe: eerst haar eigen opname; is die er niet, dan de gewone opname van de lesstof (zonder naamruimte).
-      if (opt.clipNs && !pending && !this.hasClip(text, opt.clipNs)) opt = Object.assign({}, opt, { clipNs: null });
+      if (opt.clipNs && !pending && !this.hasClip(text, opt.clipNs)) opt = Object.assign({}, opt, { clipNs: undefined });
       const p = this.hasClip(text, opt.clipNs) || pending
         ? (this.stop(), this.playClip(text, opt).then(() => { this.last = { src: 'clip' }; }, () => { if (!pending) this.clipFailed(); else this.last = { src: 'device' }; return this.speak(text, opt, true); }))
         : this.speak(text, opt);
@@ -627,7 +688,7 @@
           if (this.last) this.last.voice = v ? v.name : null;
           parts.forEach((p, i) => {
             const u = new SpeechSynthesisUtterance(p);
-            if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'es-MX';
+            if (v) { u.voice = v; u.lang = v.lang; } else u.lang = opt.lang === 'es' ? 'es-MX' : S.course.speak;
             u.rate = this.slowFactor(opt.slow) * (opt.rate || 1) * (Store.state.settings.rate || 0.9);
             if (opt.pitch) u.pitch = opt.pitch;
             if (i === parts.length - 1) u.onend = () => res();
@@ -654,7 +715,8 @@
       return new Promise((resolve, reject) => {
         const r = new R();
         const v = this.voice();
-        r.lang = v && /^es-(mx|us|419|co|ar|cl|pe|ve|uy|cr|ec|gt|pa|pr|do|bo|py|sv|hn|ni|cu)$/i.test(v.lang.replace('_', '-')) ? v.lang.replace('_', '-') : 'es-MX';
+        r.lang = S.course.target !== 'es' ? S.course.listen
+          : v && /^es-(mx|us|419|co|ar|cl|pe|ve|uy|cr|ec|gt|pa|pr|do|bo|py|sv|hn|ni|cu)$/i.test(v.lang.replace('_', '-')) ? v.lang.replace('_', '-') : 'es-MX';
         r.interimResults = true; r.maxAlternatives = 3; r.continuous = false;
         let done = false, started = false, finalAlts = null, interim = '', silenceT = null;
         const timers = [];

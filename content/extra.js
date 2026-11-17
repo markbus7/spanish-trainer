@@ -1,6 +1,7 @@
 /* Plaatsingstoets, vrije gesprekssituaties, regio’s en uitdrukkingen. */
 (function (S) {
   'use strict';
+  if (S.isCourse && !S.isCourse('es-nl')) return; // lesstof van de cursus Spaans (uitleg in het Nederlands)
 
   /* Plaatsingstoets: per niveau 8 vragen, eerste optie is juist. */
   S.placement = [

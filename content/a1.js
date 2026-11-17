@@ -2,6 +2,7 @@
    Oefeningen: mc (eerste optie = juist), cloze (___ = gat; o = keuzeknoppen, eerste = juist), tr (vertalen NL→ES), order, match. */
 (function (S) {
   'use strict';
+  if (S.isCourse && !S.isCourse('es-nl')) return; // lesstof van de cursus Spaans (uitleg in het Nederlands)
   const U = S.addUnit;
 
   /* ───────────────────────── A1 · 1 ───────────────────────── */

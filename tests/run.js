@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js']) {
+for (const f of ['js/core.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -188,7 +188,7 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
 {
   const list = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/tts-texts.js')], { maxBuffer: 64 << 20 }).toString());
   const have = new Set(list.map(x => x.k));
-  ok(list.every(x => x.k === S.Speech.clipKey(x.text, x.ns) && /^es-[A-Z]{2}-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
+  ok(list.every(x => x.k === S.Speech.clipKey(x.text, x.ns) && /^(es-[A-Z]{2}|en-US|nl-NL)-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
   ok(S.Speech.key('¿Cómo  está usted?') === S.Speech.key('¿cómo está usted?'), 'opnames: sleutel negeert hoofdletters en spaties');
   const miss = new Set();
   const want = t => { if (t && !have.has(S.Speech.key(t))) miss.add(t); };
@@ -202,6 +202,7 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
     }
     u.dialogue.lines.forEach(l => want(l[1])); u.reading.p.forEach(p => want(p[0]));
   }
+  ok(list.some(x => x.ns === 'en-es') && list.some(x => x.ns === 'nl-es') && list.filter(x => x.ns && !x.ns.startsWith('lupe')).every(x => x.lv.every(l => l.startsWith(x.ns + ':'))), 'opnames: Engels en Nederlands met eigen naamruimte en niveaus');
   ok(!miss.size, 'opnames: ' + miss.size + ' teksten ontbreken, bv. ' + [...miss].slice(0, 5).join(' | '));
   // Profe Lupe: vaste zinnen zijn in beide stemvarianten ingesproken, ook die met een getal
   const L = S.Tutor.lines, lupeMiss = [];
@@ -763,6 +764,67 @@ await micTests();
   let bad = false; try { await P3.Profiles.setPin('12'); } catch (e) { bad = true; }
   ok(bad, 'pincode: te kort wordt geweigerd');
   ok(!P3.Profiles.remove('main') && P3.Profiles.remove(id) && !('spt.p.' + id in mem) && P3.Profiles.activeId() === 'main' && mem['spt.v1'] === old, 'profielen: main kan niet weg; ander profiel wel, en dan terug naar main');
+}
+{ // cursussen met uitleg in het Spaans: Engels (en-es) en Nederlands (nl-es)
+  const list = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/tts-texts.js')], { maxBuffer: 64 << 20 }).toString());
+  const have = new Set(list.map(x => x.k));
+  const files = [...fs.readFileSync(path.join(root, 'index.html'), 'utf8').matchAll(/src="((?:js|content)\/[^"?]+\.js)(?:\?[^"]*)?"/g)].map(m => m[1])
+    .filter(f => !/(app|lesson|ai|sync|ask)\.js$/.test(f));
+  for (const course of ['en-es', 'nl-es']) {
+    const c = vm.createContext({ console, setTimeout, clearTimeout }); c.window = c; c.globalThis = c; c.self = c; c.SPT_COURSE = course;
+    for (const f of files) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), c, { filename: f });
+    const K = c.SPT, us = K.C.all(), w = course + ': ';
+    ok(K.course.id === course && K.course.ui === 'es' && K.i18n.on, w + 'cursus actief met Spaanse schermteksten');
+    ok(us.length >= 5 && us.every(u => u.id.startsWith(course.slice(0, 2) + '-')), w + 'alleen eigen lesstof (' + us.length + ' units)');
+    ok(K.placement.length >= 12 && K.placement.every(q => q.lv === 'A1') && K.scenarios.length >= 4 && K.phrases.length >= 10 && !K.regions.length, w + 'niveautest, gesprekken en uitdrukkingen');
+    const latam = /vosotros|vuestr|\b(sois|habéis|tenéis|podéis|queréis|coche|ordenador|móvil|zumo|vale)\b/i;
+    const ids = new Set();
+    for (const u of us) {
+      const where = w + u.id;
+      ok(!ids.has(u.id), where + ' dubbel id'); ids.add(u.id);
+      ['id', 'level', 'title', 'nl', 'icon'].forEach(k => ok(typeof u[k] === 'string' && u[k], where + ' mist ' + k));
+      ok(u.goals.length >= 2 && u.vocab.length >= 20 && u.grammar.length >= 2 && u.ex.length >= 12, where + ' omvang');
+      const seen = new Set(); u.vocab.forEach(v => { ok(v.length >= 2 && v.every(x => typeof x === 'string' && x.trim()), where + ' woord ' + v[0]); ok(!seen.has(v[0]), where + ' dubbel woord ' + v[0]); seen.add(v[0]); });
+      u.grammar.forEach((g, gi) => {
+        const open = (g.html.match(/<(b|i|p|s)>/g) || []).length, close = (g.html.match(/<\/(b|i|p|s)>/g) || []).length;
+        ok(g.t && open === close, where + ' grammatica ' + gi + ' html');
+        if (g.table) ok(g.table.every(r => r.length === g.table[0].length), where + ' tabel ' + gi);
+      });
+      u.ex.forEach((e, i) => {
+        const x = where + ' ex' + i;
+        ok(!e.tag || K.C.TAGS[e.tag], x + ' tag ' + e.tag);
+        if (e.t === 'mc') ok(new Set(e.o).size === e.o.length, x + ' mc');
+        if (e.t === 'cloze') ok((e.s.match(/___/g) || []).length === 1 && (!e.o || (e.o[0] === e.a[0] && new Set(e.o).size === e.o.length)), x + ' cloze');
+        if (e.t === 'tr') ok(e.nl && e.a.length, x + ' tr');
+        if (e.t === 'order') ok(e.s.split(' ').length >= 3, x + ' order');
+        if (e.t === 'match') ok(e.p.length >= 3 && e.p.length <= 6, x + ' match');
+      });
+      ok(u.dialogue.lines.length >= 6 && u.dialogue.lines.every(l => l.length === 3 && l.every(Boolean)) && u.dialogue.q.length >= 3, where + ' dialoog');
+      ok(u.reading.p.length >= 3 && u.reading.q.length >= 3 && u.say.length >= 2 && u.task.model && u.scenario.role, where + ' lezen/toepassen');
+      // Spaanse uitleg: Latijns-Amerikaans
+      const esText = [u.nl, ...u.goals, ...u.grammar.map(g => g.t + ' ' + g.html), u.culture.html, ...u.vocab.map(v => v[1]), ...u.ex.map(e => (e.nl || '') + ' ' + (e.q || '') + ' ' + (e.x || '')), u.task.nl, u.scenario.nl, u.scenario.goal].join(' ');
+      ok(!latam.test(esText), where + ' uitleg niet Latijns-Amerikaans: ' + (esText.match(latam) || [])[0]);
+      for (const st of K.Gen.STEPS) {
+        const ses = K.Gen.stepSession(u, st.id);
+        ok(ses && ses.items.length && ses.items.every(Boolean), where + ' sessie ' + st.id);
+        ses.items.forEach(it => { if (it.kind === 'mc') ok(it.options.includes(it.answer) && new Set(it.options).size === it.options.length, where + ' ' + st.id + ' mc-item ' + (it.prompt || it.q || it.sentence)); });
+        // alles wat voorgelezen wordt, is ingesproken met de stem van deze cursus
+        ses.items.forEach(it => { [it.audio, it.word && it.word.es].forEach(t => t && ok(have.has(K.Speech.clipKey(t, course)), where + ' opname ontbreekt: ' + t)); });
+      }
+      u.dialogue.lines.forEach(l => ok(have.has(K.Speech.clipKey(l[1], course)), where + ' dialoog-opname: ' + l[1]));
+    }
+    for (let r = 0; r < 5; r++) { const b = K.Gen.levelTestBand('A1'); ok(b.items.length >= 8 && b.items.every(it => it.options.includes(it.answer)), w + 'niveautest A1'); }
+    ok(!K.Gen.levelTestBand('A2').items.length && K.C.available('A1') && !K.C.available('A2'), w + 'alleen A1 beschikbaar');
+    // antwoordcontrole: lidwoorden van de doeltaal
+    const it = { answers: [course === 'en-es' ? 'the house' : 'het huis'], articleOptional: true };
+    ok(K.Gen.checkType(course === 'en-es' ? 'house' : 'huis', it).ok, w + 'lidwoord mag ontbreken');
+    if (course === 'nl-es') ok(!K.Gen.checkType('de huis', it).ok && K.Gen.checkType('de huis', it).warn === 'article-wrong', w + 'verkeerd lidwoord de/het');
+    ok(K.check.check("I'm from Panama", ["I'm from Panama."]).ok || course !== 'en-es', w + 'apostrof');
+    // schermteksten
+    ok(K.t('Vandaag') !== 'Vandaag' && K.t('Instellingen') !== 'Instellingen', w + 'schermteksten vertaald');
+    ok(K.t(K.U.plural(3, 'dag', 'dagen')) === '3 días', w + 'meervoud vertaald: ' + K.U.plural(3, 'dag', 'dagen'));
+    ok(Object.values(K.i18n.dict).every(v => !latam.test(v)), w + 'vertaling Latijns-Amerikaans');
+  }
 }
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);

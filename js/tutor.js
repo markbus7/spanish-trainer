@@ -5,7 +5,7 @@
     name: 'Lupe',
     title: 'Profe Lupe',
     tagline: 'Ajolota uit Xochimilco · jouw docente',
-    persona: `Your name is Lupe ("Profe Lupe"). You are a cheerful pink axolotl (ajolote) from the canals of Xochimilco in Mexico City, and you are the learner's personal Spanish teacher in this app.
+    persona: `Your name is Lupe ("Profe Lupe"). You are a cheerful pink axolotl (ajolote) from the canals of Xochimilco in Mexico City, and you are the learner's personal ${S.course.ai.target} teacher in this app${S.course.target !== 'es' ? ' (you are a native Spanish speaker who teaches ' + S.course.ai.target + ' to Spanish speakers)' : ''}.
 Personality: warm, patient, playful and encouraging; you love tacos al pastor, music and boat trips on the trajineras. Now and then (not every message) you use a light Mexican expression such as "¡Órale!", "¡Qué padre!" or "¡Ánimo!". Keep the jokes short and never let them get in the way of the teaching.
 Speak as Lupe in the first person. Do not mention being an AI or a language model unless the learner asks.`
   };
@@ -53,14 +53,15 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     document.querySelectorAll('.lupe').forEach(el => el.classList.toggle('talking', !!on));
   }
   /* Laat Lupe iets zeggen (met bewegende mond). */
-  function say(text) {
+  /* lang: 'es' voor Lupes eigen Spaanse zinnetjes; leeg = de doeltaal van de cursus (voorbeelden uit haar antwoorden). */
+  function say(text, lang) {
     if (!text) return Promise.resolve();
     speaking = text;
     // Lupe is een vrolijke kleine axolotl: een meisjesstem, hoger en iets vlotter dan de gewone voorleesstem.
     // Vaste zinnen van Lupe zijn vooraf ingesproken (audio/, met een eigen Mexicaanse stem per keuze meisje/vrouw).
     // Wat niet is ingesproken (AI-antwoorden), leest het apparaat voor met de hoge stem hieronder.
     const v = S.Store.state.settings.lupeVoice === 'woman' ? 'woman' : 'girl';
-    return S.Speech.say(text, Object.assign({ clipNs: 'lupe-' + v }, VOICES[v]));
+    return S.Speech.say(text, Object.assign({ clipNs: 'lupe-' + v, lang: lang || S.course.target }, VOICES[v]));
   }
   function hookSpeech() {
     const prev = S.Speech.onTalk;
@@ -103,15 +104,15 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
       avatar(opt.size || 52, 'coach-av'),
       h('div', { class: 'lc-bubble' },
         opt.label !== false ? h('div', { class: 'lc-who' }, opt.label || 'Profe Lupe') : null,
-        h('div', { class: 'lc-es', lang: 'es' }, line.es),
-        line.nl ? h('div', { class: 'lc-nl' }, line.nl) : null));
+        h('div', { class: 'lc-es', lang: line.lang || 'es' }, line.es),
+        line.nl && S.course.ui === 'nl' ? h('div', { class: 'lc-nl' }, line.nl) : null));
     if (canTalk) {
-      const talk = () => { S.Speech.unlock && S.Speech.unlock(); say(line.es); };
+      const talk = () => { S.Speech.unlock && S.Speech.unlock(); say(line.es, line.lang || 'es'); };
       el.onclick = e => { if (e.target.closest('a,button')) return; talk(); };
       el.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); talk(); } };
     }
     // Hardop alleen als dat gevraagd wordt (bijv. na een les) en voorlezen voor Lupe aan staat.
-    if (opt.speak && canTalk && S.Store.state.settings.tutorVoice) setTimeout(() => say(line.es), opt.delay || 600);
+    if (opt.speak && canTalk && S.Store.state.settings.tutorVoice) setTimeout(() => say(line.es, line.lang || 'es'), opt.delay || 600);
     return el;
   }
 
@@ -146,7 +147,7 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
         { es: 'Un ratito cada día hace la diferencia. ¡Vamos!', nl: 'Elke dag een beetje maakt het verschil. Kom op!' },
         { es: '¡Hola! Te preparé un plan para hoy. ¡Vamos!', nl: 'Ik heb een plan voor vandaag voor je klaargezet.' }]);
     },
-    welcome: { es: '¡Hola! Soy Lupe, tu profe de español.', nl: 'Ik ben Lupe, een axolotl uit Xochimilco in Mexico-Stad. Ik help je stap voor stap. Tik op mij om me te horen!' },
+    welcome: { es: '¡Hola! Soy Lupe, tu profe de ' + ((S.course && S.course.name.es) || 'español') + '.', nl: 'Ik ben Lupe, een axolotl uit Xochimilco in Mexico-Stad. Ik help je stap voor stap. Tik op mij om me te horen!' },
     streak(n) {
       if (n === 5) return '¡Cinco seguidas! ¡Órale!';
       if (n === 10) return '¡Diez seguidas! ¡Qué padre!';

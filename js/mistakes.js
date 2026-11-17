@@ -16,12 +16,13 @@
   /* ---------- prompt: wat Lupe onder elk antwoord zet ---------- */
   function promptRule() {
     const tags = Object.entries(C.TAGS).filter(([k]) => k !== 'conj').map(([k, v]) => k + ' (' + v + ')').join(', ');
+    const es = S.course.target !== 'es', TLn = es ? (S.course.target === 'en' ? 'English' : 'Dutch') : 'Spanish', NLn = S.course.ui === 'es' ? 'Latin American Spanish' : 'Dutch';
     return `LOGGING (required, invisible to the learner): at the very end of EVERY reply, after everything else, add one line with the learner's mistakes from their LAST message, in this exact format:
-<log>[{"w":"wrong fragment","c":"corrected fragment","why":"very short explanation in Dutch","tag":"topic key","es":"","nl":""}]</log>
+<log>[{"w":"wrong fragment","c":"corrected fragment","why":"very short explanation in ${NLn}","tag":"topic key","es":"","nl":""}]</log>
 - One object per real mistake (max 5), the same mistakes you corrected above. Ignore missing accents, capitals and punctuation.
 - "tag" is ONE key from this list: ${tags}, or "vocab" for a wrong, invented or misspelled word, or "other".
-- For "vocab" mistakes, also fill "es" with the correct Spanish word in its dictionary form (infinitive / singular, with article for nouns, e.g. "el carro") and "nl" with its Dutch meaning. Leave them empty otherwise.
-- If the learner wrote Dutch, asked a question, or made no mistakes: <log>[]</log>
+- For "vocab" mistakes, also fill "es" with the correct ${TLn} word in its dictionary form (${es ? 'base form' : 'infinitive / singular, with article for nouns, e.g. "el carro"'}) and "nl" with its ${NLn} meaning. Leave them empty otherwise.
+- If the learner wrote ${NLn}, asked a question, or made no mistakes: <log>[]</log>
 - Never mention this log in your visible text.`;
   }
 
@@ -137,11 +138,11 @@
   }
 
   /* ---------- als tekst, om te kopiëren of te delen ---------- */
-  function fmtD(t) { return new Date(t).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }); }
+  function fmtD(t) { return new Date(t).toLocaleDateString(S.LOC, { day: 'numeric', month: 'short' }); }
   function asText(r = report(30), opt = {}) {
     const s = st(), p = S.AI ? S.AI.learnerProfile() : { level: '' };
     const lines = [];
-    lines.push(`Rapport van Profe Lupe — ${new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}`);
+    lines.push(`Rapport van Profe Lupe — ${new Date().toLocaleDateString(S.LOC, { day: 'numeric', month: 'long', year: 'numeric' })}`);
     lines.push(`Lesniveau: ${p.level || '?'}${p.cur ? ' (' + p.cur.title + ')' : ''} · laatste ${r.days} dagen · ${r.total} fouten in gesprekken${r.prev ? ' (periode ervoor: ' + r.prev + ')' : ''}`);
     if (!r.total) lines.push('', 'Nog geen fouten uit gesprekken genoteerd.');
     if (r.topics.length) {
@@ -168,7 +169,11 @@
   /* ---------- advies van Lupe (met AI-sleutel) ---------- */
   async function advise() {
     const r = report(30);
-    const sys = `You are Profe Lupe, a warm Latin American Spanish teacher in a learning app for a Dutch speaker. Always Latin American norms (ustedes, never vosotros).
+    const other = S.course.target !== 'es', T = S.course.ai.target;
+    const sys = other
+      ? `You are Profe Lupe, a warm ${T} teacher in a learning app for a native speaker of Latin American Spanish. When you write Spanish, use Latin American norms (ustedes, never vosotros; celular, carro, computadora).
+Write in Latin American Spanish, max ~120 words, no headings, no tables. Based on the learner's mistake report: name the 2–3 most important things to improve, explain each in one short sentence with one ${T} example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).`
+      : `You are Profe Lupe, a warm Latin American Spanish teacher in a learning app for a Dutch speaker. Always Latin American norms (ustedes, never vosotros).
 Write in Dutch, max ~120 words, no headings, no tables. Based on the learner's mistake report: name the 2–3 most important things to improve, explain each in one short sentence with one Latin American Spanish example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).`;
     const text = await S.AI.ask({ system: sys, prompt: asText(r, { advice: false }), maxTokens: 700 });
     db().advice = { t: Date.now(), text: text.trim() };

@@ -3,6 +3,7 @@
    Vanaf B1 toont de app (instelling «Automatisch») de Spaanse samenvatting (sum) en zit de Nederlandse uitleg achter een klapmenu. */
 (function (S) {
   'use strict';
+  if (S.isCourse && !S.isCourse('es-nl')) return; // lesstof van de cursus Spaans (uitleg in het Nederlands)
   const U = S.addUnit;
 
   /* ───────────────────────── B1 · 1 ───────────────────────── */

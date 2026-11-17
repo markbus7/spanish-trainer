@@ -4,12 +4,17 @@
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
-const ctx = vm.createContext({ console, setTimeout, clearTimeout });
-ctx.window = ctx; ctx.globalThis = ctx; ctx.self = ctx;
+const out = new Map();
 const files = [...fs.readFileSync(path.join(root, 'index.html'), 'utf8').matchAll(/src="((?:js|content)\/[^"?]+\.js)(?:\?[^"]*)?"/g)].map(m => m[1])
   .filter(f => !/(app|lesson|ai|sync)\.js$/.test(f));
-for (const f of files) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
-const S = ctx.SPT;
+/* Elke cursus wordt apart geladen (self.SPT_COURSE), zodat alleen de lesstof van die cursus meedoet. */
+function load(course) {
+  const ctx = vm.createContext({ console, setTimeout, clearTimeout });
+  ctx.window = ctx; ctx.globalThis = ctx; ctx.self = ctx; ctx.SPT_COURSE = course;
+  for (const f of files) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
+  return ctx.SPT;
+}
+let S = load('es-nl');
 
 /* Edge-neurale stemmen per land: [vrouw, man]. Standaard Mexicaans. */
 const VOICES = {
@@ -26,7 +31,6 @@ function country(place) {
   const cps = [...String(place || '')].map(c => c.codePointAt(0)).filter(c => c >= 0x1F1E6 && c <= 0x1F1FF);
   return cps.length >= 2 ? String.fromCharCode(cps[0] - 0x1F1E6 + 65, cps[1] - 0x1F1E6 + 65) : null;
 }
-const out = new Map();
 let LV = 'X'; // niveau van de unit die nu wordt doorlopen (voor 'offline downloaden per niveau'); X = overig
 function add(text, voice = DEF) {
   if (!text || !/[a-záéíóúñü]/i.test(text)) return;
@@ -100,6 +104,47 @@ for (const es of S.Tutor.lines.every(S.C.all())) for (const [v, o] of Object.ent
   if (!out.has(k)) out.set(k, { k, ns, text: S.Speech.clean(es), voice: o.voice, pitch: o.pitch, rate: o.rate, lv: ['X'] });
 }
 
+
+/* Andere cursussen (uitleg in het Spaans): Amerikaans-Engelse en Nederlandse stemmen, eigen naamruimte (= cursus-id),
+   en per niveau 'cursus:niveau' voor offline downloaden. */
+const OTHER = { 'en-es': ['en-US-JennyNeural', 'en-US-GuyNeural'], 'nl-es': ['nl-NL-FennaNeural', 'nl-NL-MaartenNeural'] };
+for (const [course, [vf, vm_]] of Object.entries(OTHER)) {
+  S = load(course);
+  const ns = S.course.ns;
+  let lv = 'X';
+  const put = (text, voice = vf) => {
+    if (!text || !/[a-z]/i.test(text)) return;
+    const k = S.Speech.clipKey(text, ns), L = course + ':' + lv;
+    if (!out.has(k)) out.set(k, { k, ns, text: S.Speech.clean(text), voice, lv: [L] });
+    else if (!out.get(k).lv.includes(L)) out.get(k).lv.push(L);
+  };
+  for (const u of S.C.all()) {
+    lv = u.level;
+    u.vocab.forEach(w => { put(w[0]); put(w[0].replace(/…/g, '').trim()); });
+    (u.grammar || []).forEach(g => { (g.ex || []).forEach(([e]) => put(e)); put(g.sum); });
+    const who = [...new Set(u.dialogue.lines.map(l => l[0]))];
+    u.dialogue.lines.forEach(([w, t]) => put(t, who.indexOf(w) % 2 ? vm_ : vf));
+    u.reading.p.forEach(([t]) => { put(t); t.split(/(?<=[.!?»”])\s+/).forEach(x => put(x.replace(/[«»“”]/g, '').trim())); });
+    (u.say || []).forEach(([t]) => put(t));
+    if (u.task && u.task.model) put(u.task.model);
+    u.ex.forEach(e => {
+      if (e.t === 'order') put(e.s);
+      if (e.t === 'tr') put(e.a[0]);
+      if (e.t === 'cloze') { const a = (e.o || e.a)[0]; put(e.s.replace('___', a)); put(a); }
+      if (e.t === 'match') e.p.forEach(([t]) => put(t));
+    });
+    S.C.words(u).forEach(w => put(String(w.es).split(/\s*\/\s*/)[0].replace(/…|\.\.\./g, '').trim()));
+  }
+  (S.placement || []).forEach(q => { lv = q.lv; if (q.q.includes('___')) put(q.q.replace('___', q.o[0])); });
+  lv = 'X';
+  (S.phrases || []).forEach(p => put(p[0]));
+  put(S.course.hello);
+  // Lupes eigen Spaanse zinnen in deze cursus (bijv. «tu profe de inglés»), met haar Mexicaanse stem
+  for (const es of S.Tutor.lines.every([])) for (const [v, o] of Object.entries(LUPE)) {
+    const lns = 'lupe-' + v, k = S.Speech.clipKey(es, lns);
+    if (!out.has(k)) out.set(k, { k, ns: lns, text: S.Speech.clean(es), voice: o.voice, pitch: o.pitch, rate: o.rate, lv: ['X'] });
+  }
+}
 const list = [...out.values()];
 if (process.argv.includes('--stats')) {
   const chars = list.reduce((s, x) => s + x.text.length, 0);
