@@ -25,9 +25,17 @@
   function T(k) { const v = T_[k]; return v ? v[esMode() ? 1 : 0] : k; }
   const Q_MAP = { 'Wat betekent dit?': 'meaning', 'Hoe zeg je dit in het Spaans?': 'howsay', 'Wat hoor je?': 'hear', 'Typ in het Spaans': 'type', 'Vertaal naar het Spaans': 'translate', 'Vervoeg': 'conj' };
 
+  /* 🔊 normaal, 🐢 langzaam. Tik je nog eens op de 🐢, dan wordt het een 🐌: heel langzaam (en dat blijft hij bij deze vraag). */
   function speakBtn(text, opt = {}) {
     if (!Speech.canSpeak() || !text) return null;
-    return h('button', { class: 'icon-btn speak' + (opt.big ? ' big' : ''), type: 'button', title: 'Beluister', 'aria-label': 'Beluister', onclick: (e) => { e.stopPropagation(); Speech.say(text, opt); } }, opt.slow ? '🐢' : '🔊');
+    if (!opt.slow) return h('button', { class: 'icon-btn speak' + (opt.big ? ' big' : ''), type: 'button', title: 'Beluister', 'aria-label': 'Beluister', onclick: (e) => { e.stopPropagation(); Speech.say(text, opt); } }, '🔊');
+    let level = 1;
+    const btn = h('button', { class: 'icon-btn speak slow' + (opt.big ? ' big' : ''), type: 'button', title: 'Langzaam (tik nog eens: nog langzamer)', 'aria-label': 'Langzaam beluisteren', onclick: (e) => {
+      e.stopPropagation();
+      Speech.say(text, Object.assign({}, opt, { slow: level }));
+      if (level === 1) { level = 2; btn.textContent = '🐌'; btn.title = 'Heel langzaam beluisteren'; btn.setAttribute('aria-label', 'Heel langzaam beluisteren'); btn.classList.add('slower'); }
+    } }, '🐢');
+    return btn;
   }
   /* ⓘ Uitleg zonder AI (content/uitleg.js): een knopje dat vooraf geschreven toelichting openklapt. Kost geen tokens. */
   function noteToggle(notes, opt = {}) {

@@ -542,6 +542,7 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   const long = 'Hola. '.repeat(60);
   ok(S.Speech.chunks(long).length > 1 && S.Speech.chunks(long).every(c => c.length <= 190), 'lange tekst in stukken voor de stem');
   ok(S.Speech.chunks('¿Cómo estás?').length === 1, 'korte tekst blijft één stuk');
+  ok(S.Speech.slowFactor(false, true) === 1 && S.Speech.slowFactor(true, true) <= 0.65 && S.Speech.slowFactor(2, true) < S.Speech.slowFactor(1, true) && S.Speech.slowFactor(2) < S.Speech.slowFactor(1) && S.Speech.slowFactor(9, true) >= 0.5, '🐢 langzaam en 🐌 heel langzaam');
   const sys = S.AI.askSystem();
   ok(/Lupe/.test(sys) && /\*\*bold\*\*/.test(sys), 'docente-prompt noemt Lupe en de vetregel');
   // «Vraag het Lupe»: het scherm (dialoog, vraag, antwoord) gaat mee in de prompt
