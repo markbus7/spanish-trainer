@@ -1148,7 +1148,8 @@
       statCard('🔥', Store.liveStreak(), 'dagen op rij', 'record: ' + s.streak.best),
       statCard('⏱️', Math.round(totalMin), 'minuten geoefend', Math.round(totalMin / 60 * 10) / 10 + ' uur'),
       statCard('🎯', totItems ? Math.round(totOk / totItems * 100) + '%' : '—', 'goed beantwoord', totItems + ' antwoorden'),
-      statCard('📅', activeDays, 'dagen geoefend')), heatmap()));
+      statCard('📅', activeDays, 'dagen geoefend'))));
+    wrap.append(section('📅 Je oefenkalender', heatmap()));
     const fc = SRS.forecast(7); const mx = Math.max(1, ...fc);
     wrap.append(section('Herhaling komende 7 dagen', h('div', { class: 'card forecast' }, fc.map((n, i) => h('div', { class: 'fc' }, h('i', { style: { height: Math.max(3, n / mx * 70) + 'px' } }), h('b', null, n), h('small', null, i === 0 ? 'vandaag' : ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'][new Date(Date.now() + i * 864e5).getDay()]))))));
     // ---- badges en gegevens ----
@@ -1172,16 +1173,45 @@
     return h('div', { class: 'test-chart', html: `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Niveau per test">${g}<path d="${path}"/>${dots}${labels}</svg>` });
   }
   function statCard(icon, v, l, sub) { return h('div', { class: 'stat-card' }, h('span', { class: 'si' }, icon), h('b', null, String(v)), h('span', null, l), sub ? h('small', { class: 'muted' }, sub) : null); }
+  /* Oefenkalender: elk vakje een dag, elke kolom een week; tik voor wat je die dag deed. */
   function heatmap() {
-    const days = st().days; const grid = h('div', { class: 'heat' });
-    const today = new Date(); const start = new Date(today.getTime() - 83 * 864e5);
-    const pad = (start.getDay() + 6) % 7; for (let i = 0; i < pad; i++) grid.append(h('i', { class: 'pad' }));
-    for (let i = 0; i < 84; i++) {
-      const d = new Date(start.getTime() + i * 864e5); const k = U.todayKey(new Date(d.getTime() + 4 * 3600e3)); const m = days[k] ? days[k].min : 0;
-      const lv = m <= 0 ? 0 : m < 5 ? 1 : m < 15 ? 2 : m < 25 ? 3 : 4;
-      grid.append(h('i', { class: 'l' + lv, title: k + ': ' + Math.round(m) + ' min' }));
-    }
-    return h('div', { class: 'card' }, grid, h('div', { class: 'row gap small muted' }, 'minder', [0, 1, 2, 3, 4].map(l => h('i', { class: 'heat-key l' + l })), 'meer'));
+    const cal = S.Dagplan.calendar(st().days, new Date(), 12);
+    const DAYS = ['ma', '', 'wo', '', 'vr', '', 'zo'];
+    const detail = h('p', { class: 'heat-detail', 'aria-live': 'polite' });
+    let sel = null;
+    const show = (c, el) => {
+      if (sel) sel.classList.remove('sel'); sel = el; if (el) el.classList.add('sel');
+      const x = c.day; const when = (c.today ? 'Vandaag, ' : '') + fmtDate(c.date, { weekday: 'long', day: 'numeric', month: 'long' });
+      let what;
+      if (!c.level) what = c.today ? 'nog niet geoefend' : 'niet geoefend';
+      else {
+        const parts = [Math.max(1, Math.round(x.min || 0)) + ' min'];
+        if (x.xp) parts.push(x.xp + ' XP');
+        if (x.items) parts.push(U.plural(x.items, 'antwoord', 'antwoorden') + ' (' + Math.round((x.ok || 0) / x.items * 100) + '% goed)');
+        what = parts.join(' · ') + (c.plan ? ' · ⭐ dagplan af' : '');
+      }
+      detail.replaceChildren(h('b', null, when[0].toUpperCase() + when.slice(1)), h('br'), h('span', { class: 'muted' }, what));
+    };
+    const grid = h('div', { class: 'heat', role: 'grid', 'aria-label': 'Oefenkalender van de laatste 12 weken' },
+      h('div', { class: 'heat-col heat-days' }, h('span', { class: 'heat-m' }), DAYS.map(d => h('span', { class: 'heat-d' }, d))));
+    let todayEl = null, todayCell = null;
+    cal.weeks.forEach(w => grid.append(h('div', { class: 'heat-col' }, h('span', { class: 'heat-m' }, w.month), w.cells.map(c => {
+      if (c.future) return h('i', { class: 'heat-cell future', 'aria-hidden': 'true' });
+      const el = h('button', { type: 'button', class: 'heat-cell l' + c.level + (c.today ? ' today' : ''), 'aria-label': c.key + (c.level ? ': geoefend' : ': niet geoefend') });
+      el.addEventListener('click', () => show(c, el));
+      if (c.today) { todayEl = el; todayCell = c; }
+      return el;
+    }))));
+    if (todayCell) show(todayCell, todayEl);
+    const summary = cal.active
+      ? 'In de laatste 12 weken heb je op ' + U.plural(cal.active, 'dag', 'dagen') + ' geoefend, samen ' + Math.round(cal.min) + ' minuten. Deze week: ' + cal.weekActive + ' van de ' + cal.weekPast + ' dagen.'
+      : 'Nog geen oefendagen. Zodra je oefent, kleurt het vakje van die dag groen.';
+    const LEG = [[0, 'niet geoefend'], [1, '< 5 min'], [2, '5–15'], [3, '15–25'], [4, '25+ min']];
+    return h('div', { class: 'card heat-card' },
+      h('p', { class: 'heat-sum' }, summary),
+      h('p', { class: 'small muted' }, 'Elk vakje is één dag, elke kolom één week, met de nieuwste week rechts. Hoe sterker de kleur, hoe langer je die dag oefende. Het omrande vakje is vandaag. Tik op een vakje om te zien wat je die dag deed.'),
+      grid, detail,
+      h('div', { class: 'heat-legend small muted' }, LEG.map(([l, t]) => h('span', null, h('i', { class: 'heat-key l' + l }), t))));
   }
   function dataTools() {
     const file = h('input', { type: 'file', accept: '.json,application/json', hidden: true, onchange: async e => {
