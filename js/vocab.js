@@ -178,9 +178,10 @@
     const wrap = h('div', { class: 'page voc-page' });
     const list = all(); const n = counts(list);
     wrap.append(h('a', { class: 'back', href: '#/perfil' }, '← Perfil'), h('h1', null, '📋 Mijn woordenschat'),
-      h('p', { class: 'muted' }, 'Alles wat in je herhaling staat: ' + U.plural(n.w, 'woord', 'woorden') + ', ' + U.plural(n.x, 'zin of oefening', 'zinnen en oefeningen') + ' en ' + U.plural(n.c, 'werkwoordstijd', 'werkwoordstijden') + '. Tik op een regel voor details.'));
+      h('p', { class: 'muted' }, 'Alles wat in je herhaling staat: ' + U.plural(n.w, 'woord', 'woorden') + ', ' + U.plural(n.x, 'zin of oefening', 'zinnen en oefeningen') + ' en ' + U.plural(n.c, 'werkwoordstijd', 'werkwoordstijden') + '. Tik op een regel voor details.'),
+      h('a', { class: 'btn ghost small', href: '#/woordtoets' }, '🆕 Sprint met nieuwe woorden: zet wat je al kent er snel bij'));
     if (!list.length) {
-      wrap.append(h('div', { class: 'card' }, h('p', null, 'Nog niets geleerd. Na je eerste les staan je woorden en zinnen hier.'), h('a', { class: 'btn primary', href: '#/hoy' }, 'Naar Hoy')));
+      wrap.append(h('div', { class: 'card' }, h('p', null, 'Nog niets geleerd. Na je eerste les staan je woorden en zinnen hier.'), h('a', { class: 'btn primary', href: '#/hoy' }, 'Naar Hoy'), ' ', h('a', { class: 'btn ghost', href: '#/woordtoets' }, '🆕 Sprint nieuwe woorden')));
       return wrap;
     }
     // overzicht: tegels die ook als filter werken

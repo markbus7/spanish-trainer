@@ -102,7 +102,16 @@
     const d = Store.today(); d.items++; if (ok) d.ok++;
     if (it.skill) Store.skill(it.skill, ok);
     if (it.tag) Store.mark(it.tag, ok);
-    if (it.srsId) {
+    if (it.srsId && it.wt && (!SRS.has(it.srsId) || (r && r.override && (st().srs[it.srsId].s || 0) >= Date.now() - 864e5 && st().srs[it.srsId].i === 0))) {
+      // woordtoets: nieuw woord goed = meteen bekend (interval it.wt), fout of met hint = vandaag in de herhaling
+      const known = ok && !(r && r.hinted);
+      if (!SRS.has(it.srsId)) SRS.add(it.srsId, known ? it.wt : 0);
+      else if (known) { const c = st().srs[it.srsId]; c.i = it.wt; c.d = U.dayIndex() + it.wt; c.l = Math.max(0, c.l - 1); }
+      const c = st().srs[it.srsId]; c.t = Date.now(); if (known) c.g = (c.g || 0) + 1; else c.f = (c.f || 0) + 1;
+      if (r && r.override && c.f) { c.f--; }
+      // zin half goed: bij de herhaling staan de goede woorden er al (zoals bij gewone lessen)
+      if (it.translate && !ok && r && S.check.partsUsable(r.parts)) (st().partial || (st().partial = {}))[it.srsId] = { a: r.parts.a, k: r.parts.k, t: Date.now() };
+    } else if (it.srsId) {
       if (SRS.has(it.srsId) && ok && r && r.hinted && !r.override) { const c = st().srs[it.srsId]; c.t = Date.now(); c.r = 0; c.i = 1; c.d = Math.min(c.d, U.dayIndex() + 1); }
       else if (SRS.has(it.srsId)) { if (!r || !r.override) SRS.grade(it.srsId, ok); else { const c = st().srs[it.srsId]; if (c) { c.l = Math.max(0, c.l - 1); if (c.f) { c.f--; c.g = (c.g || 0) + 1; } } } }
       else if (!ok) stepWrong.add(it.srsId); else if (r && r.override) stepWrong.delete(it.srsId);
@@ -171,6 +180,7 @@
     if (d.kind === 'step') { const u = C.get(d.unit); if (!u) { Paused.clear(); render(); return; } startStep(u, d.step, session); }
     else if (d.kind === 'review') startReview(d.limit, session);
     else if (d.kind === 'exam') startLevelExam(d.lvl, session);
+    else if (d.kind === 'woordtoets') S.WordTest.resume(session, d);
     else runSession(session, { desc: d });
   }
   function pausedCard() {
@@ -412,7 +422,8 @@
       quick('⚡', 'Woordensprint', '2 min', () => runSession(Gen.sprint(30), { desc: { kind: 'plain', mark: 'sprint' } }), d.done.sprint),
       quick('🧩', 'Werkwoorden', '20 vragen', () => { location.hash = '#/practica'; }),
       quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10), { desc: { kind: 'plain', mark: 'listen' } }), d.done.listen),
-      quick('🎲', 'Woordspellen', 'puzzels en memory', () => { location.hash = '#/juegos'; }, d.done.games))));
+      quick('🎲', 'Woordspellen', 'puzzels en memory', () => { location.hash = '#/juegos'; }, d.done.games),
+      quick('🆕', 'Nieuwe woorden', 'sprint, kies niveau', () => { location.hash = '#/woordtoets'; }))));
     if (!Store.ok) wrap.append(h('p', { class: 'warn' }, '⚠️ Je browser staat opslaan niet toe (privévenster?). Je voortgang wordt niet bewaard.'));
     return wrap;
   };
@@ -717,6 +728,7 @@
       quick('🗂️', 'Alle spellen', 'kies je woorden', () => { location.hash = '#/juegos'; }))));
     wrap.append(section('Meer', h('div', { class: 'quick' },
       quick('📚', 'Woordenboek', 'zoeken + eigen woorden', () => { location.hash = '#/woorden'; }),
+      quick('🆕', 'Sprint nieuwe woorden', 'kies niveau en aantal', () => { location.hash = '#/woordtoets'; }),
       quick('⚡', 'Woordensprint', '2 minuten', () => runSession(Gen.sprint(30))),
       quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10))),
       quick('🎙️', 'Uitspraak', '8 zinnen', () => startSpeak()),
@@ -752,6 +764,8 @@
   routes.woorden.tab = 'practica';
   routes.woordenschat = () => S.Vocab.page();
   routes.woordenschat.tab = 'perfil';
+  routes.woordtoets = () => S.WordTest.page();
+  routes.woordtoets.tab = 'practica';
   routes.juegos = () => S.Games.page();
   routes.juegos.tab = 'practica';
 

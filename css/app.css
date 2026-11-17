@@ -1001,3 +1001,12 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .rep-sum .btn { margin-top: .6rem; }
 .bubble .logged { display: block; width: fit-content; }
 .rep-topic summary b, .rep-recent summary b { color: var(--ink); }
+
+/* Woordensprint met nieuwe woorden (#/woordtoets) */
+.wt-card .chips { margin-bottom: .2rem; }
+.wt-lbl { font-size: .78rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin: .9rem 0 .4rem; }
+.wt-lbl:first-child { margin-top: 0; }
+.wt-unit { margin-top: .6rem; width: 100%; }
+.wt-how { margin: 1rem 0; padding-left: 1.2rem; color: var(--muted); }
+.wt-how li { margin: .25rem 0; }
+.wt-go { margin-top: .2rem; }

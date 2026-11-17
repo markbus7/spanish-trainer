@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/dagplan.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js']) {
+for (const f of ['js/core.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -690,6 +690,23 @@ await micTests();
   const L = S.Tutor.lines;
   ok(L.hello({ chestReady: 1 }).es === L.chestReady.es && L.hello({ paused: 1, chestReady: 1 }).es !== L.chestReady.es, 'Lupe: beloning klaar, maar onderbroken les gaat voor');
   ok(L.every([]).includes(L.planDone({ streak: 12 }).es) && L.every([]).includes(L.hello({ planLeft: 1 }).es), 'Lupe: dagplanzinnen worden ingesproken');
+}
+{ // woordtoets: veel woorden in één keer testen, ook van units die je nog niet deed
+  const keep = S.Store.state; S.Store.state = JSON.parse(JSON.stringify(keep));
+  const W = S.WordTest, u = S.C.all()[0];
+  S.Store.state.srs = { ['w|' + u.id + '|0']: { d: 0, i: 1, e: 2.4, r: 1, l: 0 } };
+  const all = W.pool('A1', 'all'), nw = W.pool('A1', 'new');
+  ok(all.length > 200 && new Set(all.map(([w]) => w.es)).size === all.length, 'woordtoets: heel A1, elk woord één keer');
+  ok(nw.length === all.length - 1 && !nw.some(([w]) => w.id === 'w|' + u.id + '|0'), 'woordtoets: «alleen nieuwe» slaat woorden in je herhaling over');
+  const ses = W.session({ src: 'A1', which: 'new', len: 'n50', form: 'type', what: 'w' });
+  ok(ses.items.length === 50 && ses.items.every(it => it.srsId && it.srsId[0] === 'w' && it.kind === 'type' && it.wt === W.KNOWN.type && it.wt >= 7), 'woordtoets: 50 getypte woorden, goed = bekend (>= 7 dagen)');
+  ok(W.session({ src: u.id, which: 'all', len: 'n25', form: 'fast', what: 'w' }).items.every(it => it.kind === 'mc' && it.wt === W.KNOWN.mc && it.wt < 7), 'woordtoets: meerkeuze goed = aan het leren, niet bekend');
+  ok(W.session({ src: u.id, which: 'all', len: 'all', form: 'fast', what: 'w' }).items.length === W.pool(u.id, 'all').length, 'woordtoets: «alles» = hele unit');
+  const tz = W.session({ src: 'A1', which: 'new', len: 'n100', form: 'type', what: 'ws' });
+  const nx = tz.items.filter(it => it.srsId[0] === 'x').length;
+  ok(!tz.timer && tz.items.length === 100 && nx >= 25 && nx <= 40 && tz.items.every(it => it.kind === 'type' && it.wt === W.KNOWN.type), 'woordtoets: 100 vragen, ±1 zin op 3 woorden, bij typen alleen typzinnen');
+  ok(W.sentPool('A1', 'all').every(([e]) => e.t !== 'match'), 'woordtoets: geen koppelvragen als zin');
+  S.Store.state = keep;
 }
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
