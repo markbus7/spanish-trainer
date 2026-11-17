@@ -322,6 +322,7 @@
       else xEl.textContent = '⭐ ' + xp;
     }
     shown.xp = xp; shown.streak = streak;
+    updateProfileChip();
     if (dEl) { const n = SRS.dueCount(); dEl.textContent = '🔁 ' + n; dEl.hidden = !n; }
   }
   S.render = render;
@@ -1414,7 +1415,11 @@
     const s = st().settings; const wrap = h('div', { class: 'page' });
     const set = (k, v) => { s[k] = v; Store.save(); };
     wrap.append(h('h1', null, '⚙️ Instellingen'));
-    const name = h('input', { class: 'input', value: st().name || '', placeholder: 'Je naam', onchange: e => { st().name = e.target.value.trim(); Store.save(); } });
+    if (S.Profiles) wrap.append(section('👥 Profielen', profilesCard()));
+    const name = h('input', { class: 'input', value: st().name || '', placeholder: 'Je naam', onchange: e => {
+      st().name = e.target.value.trim(); Store.save();
+      if (S.Profiles && S.Profiles.active().name) { S.Profiles.update(S.Profiles.activeId(), { name: st().name || S.Profiles.active().name }); updateProfileChip(); }
+    } });
     const goal = h('select', { class: 'input', onchange: e => set('goal', +e.target.value) }, [10, 15, 20, 30, 45].map(n => h('option', { value: n, selected: s.goal === n ? true : null }, n + ' minuten per dag')));
     const expl = h('select', { class: 'input', onchange: e => set('explain', e.target.value) },
       [['auto', 'Automatisch (NL tot A2, daarna steeds meer Spaans)'], ['nl', 'Altijd Nederlands'], ['mix', 'Nederlands met Spaanse samenvattingen'], ['es', 'Zoveel mogelijk Spaans']].map(([v, l]) => h('option', { value: v, selected: s.explain === v ? true : null }, l)));
@@ -1493,7 +1498,7 @@
     wrap.append(section('Lessen', h('div', { class: 'card form' },
       toggle('Alle units ontgrendelen', 'Vrij door de stof bladeren, zonder volgorde.', s.unlockAll, v => set('unlockAll', v)),
       h('a', { class: 'btn ghost', href: '#/toets' }, '🧭 Niveautest opnieuw doen'))));
-    wrap.append(section('Gegevens', dataTools(), h('div', { class: 'card' }, h('button', { class: 'btn danger', type: 'button', onclick: () => S.confirm('Alles wissen?', 'Al je voortgang, woorden en statistieken worden verwijderd' + (S.Sync && S.Sync.enabled() ? ', ook op je andere gekoppelde apparaten' : '') + '. Dit kan niet ongedaan worden gemaakt. Maak eerst een back-up!', 'Alles wissen', () => { Store.reset(); location.hash = '#/hoy'; render(); }) }, '🗑 Voortgang wissen'))));
+    wrap.append(section('Gegevens', dataTools(), h('div', { class: 'card' }, h('button', { class: 'btn danger', type: 'button', onclick: () => guard(() => S.confirm('Alles wissen?', 'Al je voortgang, woorden en statistieken worden verwijderd' + (S.Sync && S.Sync.enabled() ? ', ook op je andere gekoppelde apparaten' : '') + '. Dit kan niet ongedaan worden gemaakt. Maak eerst een back-up!', 'Alles wissen', () => { Store.reset(); location.hash = '#/hoy'; render(); })) }, '🗑 Voortgang wissen'))));
     wrap.append(section('ℹ️ Over de app', versionCard()));
     wrap.append(h('p', { class: 'muted small center' }, 'Español Latino ' + appVersion() + ' · lesstof ' + availLevels().join('–').replace(/–.*–/, '–') + ' · ' + C.all().length + ' units · ' + C.all().reduce((a, u) => a + u.vocab.length, 0) + ' woorden · ' + Object.keys(S.conj.VERBS).length + ' werkwoorden'));
     return wrap;
@@ -1504,17 +1509,132 @@
     const m = Math.round((Date.now() - t) / 60000);
     return m < 1 ? 'zojuist' : m < 60 ? m + ' min geleden' : m < 1440 ? Math.round(m / 60) + ' uur geleden' : new Date(t).toLocaleDateString('nl-NL');
   }
+  /* ================= profielen ================= */
+  const P_ = () => S.Profiles;
+  /* Vraag de beheerderspincode (als die er is) en voer daarna fn uit. */
+  function guard(fn) {
+    const Pr = P_();
+    if (!Pr || !Pr.locked()) { fn(); return; }
+    const root = document.getElementById('modal-root');
+    const close = () => { root.innerHTML = ''; };
+    const inp = h('input', { class: 'input pin-input', type: 'password', inputmode: 'numeric', autocomplete: 'off', placeholder: '••••', 'aria-label': 'Pincode' });
+    const out = h('p', { class: 'small warn', role: 'status' });
+    const go = async () => { if (await Pr.unlock(inp.value)) { close(); fn(); } else { out.textContent = '⚠️ Verkeerde pincode'; inp.value = ''; inp.focus(); } };
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    root.append(h('div', { class: 'modal-bg', onclick: e => { if (e.target.classList.contains('modal-bg')) close(); } },
+      h('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true' }, h('h3', null, '🔒 Pincode van de beheerder'),
+        h('p', null, 'Dit deel van de instellingen is afgeschermd.'), inp, out,
+        h('div', { class: 'row gap end' }, h('button', { class: 'btn ghost', type: 'button', onclick: close }, 'Annuleren'), h('button', { class: 'btn primary', type: 'button', onclick: go }, 'Ontgrendelen')))));
+    setTimeout(() => inp.focus(), 50);
+  }
+  S.guard = guard;
+  /* Kiezer: wie oefent er? Op de topbalk en bij het opstarten als er meer profielen zijn. */
+  function profilePicker(opts = {}) {
+    const Pr = P_(); const root = document.getElementById('modal-root');
+    const close = () => { root.innerHTML = ''; };
+    const rows = Pr.list().map(p => {
+      const pk = Pr.peek(p.id), me = p.id === Pr.activeId();
+      return h('button', { class: 'prof-pick' + (me ? ' on' : ''), type: 'button', onclick: () => { if (me) { close(); try { sessionStorage.setItem('spt.picked', '1'); } catch (e) { /* negeer */ } } else Pr.switchTo(p.id); } },
+        h('span', { class: 'prof-av', 'aria-hidden': 'true' }, p.avatar || '🙂'),
+        h('span', { class: 'grow' }, h('b', null, Pr.label(p.id)), h('small', { class: 'muted' }, (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
+        me ? h('span', { class: 'small muted' }, 'nu actief') : null);
+    });
+    root.append(h('div', { class: 'modal-bg', onclick: e => { if (!opts.start && e.target.classList.contains('modal-bg')) close(); } },
+      h('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true' }, h('h3', null, opts.start ? '👋 Wie oefent er?' : '👥 Profiel kiezen'),
+        h('div', { class: 'prof-picks' }, rows),
+        h('div', { class: 'row gap end' }, h('a', { class: 'btn link', href: '#/ajustes', onclick: close }, 'Profielen beheren')))));
+  }
+  S.profilePicker = profilePicker;
+  function updateProfileChip() {
+    const el = document.getElementById('tb-prof'), Pr = P_(); if (!el || !Pr) return;
+    el.hidden = !Pr.many();
+    if (Pr.many()) { const p = Pr.active(); el.innerHTML = ''; el.append(p.avatar || '🙂', h('span', { class: 'tb-prof-name' }, ' ' + Pr.label(p.id))); el.title = 'Profiel: ' + Pr.label(p.id) + ' (tik om te wisselen)'; }
+  }
+  function profilesCard() {
+    const Pr = P_(); const card = h('div', { class: 'card form prof-card' });
+    const draw = () => {
+      card.innerHTML = '';
+      card.append(h('p', { class: 'small muted' }, 'Iedereen op dit apparaat kan een eigen profiel hebben, met een eigen voortgang en een eigen synchronisatie. Wissel van profiel via de knop bovenin.'));
+      const list = h('div', { class: 'prof-list' });
+      Pr.list().forEach(p => {
+        const pk = Pr.peek(p.id), me = p.id === Pr.activeId();
+        list.append(h('div', { class: 'prof-row' + (me ? ' on' : '') },
+          h('span', { class: 'prof-av', 'aria-hidden': 'true' }, p.avatar || '🙂'),
+          h('div', { class: 'grow' }, h('b', null, Pr.label(p.id)), h('small', { class: 'muted', style: { display: 'block' } }, (me ? 'Actief · ' : '') + (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
+          me ? null : h('button', { class: 'btn ghost small', type: 'button', onclick: () => Pr.switchTo(p.id) }, 'Wissel'),
+          p.id === Pr.MAIN || me ? null : h('button', { class: 'btn link small', type: 'button', 'aria-label': 'Verwijder ' + Pr.label(p.id), onclick: () => guard(() => S.confirm('Profiel verwijderen?', 'De voortgang van ' + Pr.label(p.id) + ' wordt van dit apparaat gewist. Staat die voortgang ook in een gist, dan blijft hij daar bewaard.', 'Verwijderen', () => { Pr.remove(p.id); draw(); updateProfileChip(); })) }, '🗑')));
+      });
+      card.append(list);
+      // nieuw profiel
+      let av = Pr.AVATARS[1];
+      const nameIn = h('input', { class: 'input', placeholder: 'Naam', maxlength: '30' });
+      const avs = h('div', { class: 'chips prof-avs' }, Pr.AVATARS.map(a => h('button', { class: 'chip toggle' + (a === av ? ' on' : ''), type: 'button', 'aria-label': 'Kies ' + a, onclick: e => { av = a; avs.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === e.currentTarget)); } }, a)));
+      const out = h('p', { class: 'small warn', role: 'status' });
+      const form = h('div', { class: 'prof-new', hidden: true }, label('Naam van het nieuwe profiel', nameIn), avs, out,
+        h('div', { class: 'row gap wrap' },
+          h('button', { class: 'btn primary', type: 'button', onclick: () => { try { const id = Pr.add(nameIn.value, av); S.confirm('Profiel gemaakt', 'Wil je nu naar het profiel van ' + Pr.label(id) + ' gaan? Daar begin je met een lege voortgang en de niveautest.', 'Ga naar ' + Pr.label(id), () => Pr.switchTo(id), 'Later', () => { draw(); updateProfileChip(); }); } catch (e) { out.textContent = '⚠️ ' + e.message; } } }, 'Profiel maken'),
+          h('button', { class: 'btn link', type: 'button', onclick: () => { form.hidden = true; addBtn.hidden = false; } }, 'Annuleren')));
+      const addBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => guard(() => { form.hidden = false; addBtn.hidden = true; nameIn.focus(); }) }, '＋ Nieuw profiel');
+      card.append(h('div', { class: 'row gap wrap' }, addBtn), form);
+      // pincode
+      const pinIn = h('input', { class: 'input pin-input', type: 'password', inputmode: 'numeric', autocomplete: 'new-password', placeholder: '4 tot 8 cijfers' });
+      const pinOut = h('p', { class: 'small', role: 'status' });
+      const pinBox = h('div', { class: 'prof-pin', hidden: true }, label(Pr.hasPin() ? 'Nieuwe pincode' : 'Pincode', pinIn), pinOut,
+        h('div', { class: 'row gap wrap' }, h('button', { class: 'btn primary', type: 'button', onclick: async () => { try { await Pr.setPin(pinIn.value); S.toast('🔒 Pincode ingesteld'); draw(); render(); } catch (e) { pinOut.textContent = '⚠️ ' + e.message; } } }, 'Opslaan')));
+      card.append(h('div', { class: 'prof-lock' },
+        h('div', null, h('b', null, '🔒 Pincode van de beheerder'), h('small', { class: 'muted', style: { display: 'block' } }, Pr.hasPin()
+          ? 'Aan. Nodig voor synchroniseren, profielen toevoegen of verwijderen en alles wissen. Zo kan iemand anders je token niet zien of veranderen.'
+          : 'Uit. Zet een pincode als je dit apparaat voor iemand anders instelt: dan kan die het token voor synchroniseren niet zien of veranderen.')),
+        h('div', { class: 'row gap wrap' },
+          h('button', { class: 'btn ghost small', type: 'button', onclick: () => guard(() => { pinBox.hidden = false; pinIn.focus(); }) }, Pr.hasPin() ? 'Wijzigen' : 'Pincode instellen'),
+          Pr.hasPin() ? h('button', { class: 'btn link small', type: 'button', onclick: () => guard(() => { Pr.clearPin(); S.toast('🔓 Pincode uit'); draw(); render(); }) }, 'Uitzetten') : null),
+        pinBox));
+    };
+    draw();
+    return card;
+  }
+  /* Na het token: kies welke voortgang bij dit profiel hoort, of begin een nieuwe. */
+  function chooseRemote(r, myName, finish, cancel) {
+    const root = document.getElementById('modal-root');
+    const close = () => { root.innerHTML = ''; };
+    const legacy = f => f.file === S.Sync.FILE;
+    const rows = r.found.map(f => h('button', { class: 'prof-pick', type: 'button', onclick: () => {
+      const who = f.name || 'zonder naam';
+      if (f.name && myName && f.name.toLowerCase() !== myName.toLowerCase()) S.confirm('Voortgang van ' + who + '?', 'Dit profiel heet ' + myName + '. Als je deze voortgang kiest, wordt hij samengevoegd met de voortgang van dit profiel. Weet je het zeker?', 'Ja, samenvoegen', () => finish({ gistId: f.gistId, file: f.file }), 'Terug', () => chooseRemote(r, myName, finish, cancel));
+      else { close(); finish({ gistId: f.gistId, file: f.file }); }
+    } },
+      h('span', { class: 'prof-av', 'aria-hidden': 'true' }, '☁️'),
+      h('span', { class: 'grow' }, h('b', null, f.name || (legacy(f) ? 'Eerste voortgang' : f.file)), h('small', { class: 'muted' }, (f.xp != null ? f.xp + ' XP · ' : '') + 'bijgewerkt ' + ago(f.updated)))));
+    root.append(h('div', { class: 'modal-bg' },
+      h('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true' }, h('h3', null, 'Welke voortgang hoort bij ' + (myName || 'dit profiel') + '?'),
+        h('p', { class: 'small muted' }, 'Op @' + r.login + ' staan al ' + U.plural(r.found.length, 'voortgang', 'voortgangen') + '. Kies die van ' + (myName || 'dit profiel') + ', of begin een nieuwe als het om iemand anders gaat.'),
+        h('div', { class: 'prof-picks' }, rows,
+          h('button', { class: 'prof-pick', type: 'button', onclick: () => { close(); finish({ fresh: true, name: myName }); } },
+            h('span', { class: 'prof-av', 'aria-hidden': 'true' }, '✨'), h('span', { class: 'grow' }, h('b', null, 'Nieuwe voortgang'), h('small', { class: 'muted' }, 'Een eigen bestand voor ' + (myName || 'dit profiel') + ', los van de andere')))),
+        h('div', { class: 'row gap end' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => { close(); cancel(); } }, 'Annuleren')))));
+  }
   function syncCard() {
     const Sync = S.Sync; const card = h('div', { class: 'card form sync-card' }); let msg = '';
     const draw = () => {
       const s = Sync.status(); card.innerHTML = '';
+      if (S.Profiles && S.Profiles.locked()) {
+        card.append(h('div', { class: 'row gap between wrap' },
+          h('div', null, h('b', null, s.enabled ? '✅ Synchroniseren staat aan' : 'Synchroniseren staat uit'), h('small', { class: 'muted', style: { display: 'block' } }, s.enabled ? (s.error ? '⚠️ ' + s.error : 'Bijgewerkt ' + ago(s.last)) : 'De beheerder kan dit aanzetten.')),
+          h('button', { class: 'btn ghost small', type: 'button', onclick: () => guard(draw) }, '🔒 Beheer')));
+        return;
+      }
       if (!s.enabled) {
         const tokIn = h('input', { class: 'input', type: 'password', placeholder: 'github_pat_… of ghp_…', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
         const out = h('p', { class: 'small' + (msg ? ' warn' : ''), role: 'status' }, msg);
         const btn = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
           btn.disabled = true; out.textContent = 'Verbinden…'; msg = '';
-          try { const r = await Sync.connect(tokIn.value); S.toast('☁️ Verbonden als @' + r.login); render(); }
-          catch (e) { msg = '⚠️ ' + e.message; draw(); }
+          try {
+            const token = tokIn.value, r = await Sync.scan(token);
+            const finish = async pick => { try { const s2 = await Sync.connect(token, pick); S.toast('☁️ Verbonden als @' + s2.login); render(); } catch (e) { msg = '⚠️ ' + e.message; draw(); } };
+            const myName = S.Profiles ? S.Profiles.label(S.Profiles.activeId()) : (st().name || '');
+            if (!r.found.length) { await finish(S.Profiles && S.Profiles.activeId() !== S.Profiles.MAIN ? { fresh: true, name: myName } : null); return; }
+            chooseRemote(r, myName, finish, () => { btn.disabled = false; out.textContent = ''; });
+          } catch (e) { msg = '⚠️ ' + e.message; draw(); }
         } }, 'Verbinden');
         card.append(
           h('p', { class: 'small muted' }, 'Wil je op je iPad, telefoon en computer met dezelfde voortgang verder? Koppel dan een GitHub-token. Je voortgang wordt dan in een geheime gist op je eigen GitHub-account bewaard en op elk apparaat automatisch bijgewerkt.'),
@@ -1676,6 +1796,9 @@
     render();
     if (S.Ask) S.Ask.init();
     if (S.Sync) S.Sync.init();
+    const pb = document.getElementById('tb-prof'); if (pb) pb.addEventListener('click', () => profilePicker());
+    let picked = false; try { picked = sessionStorage.getItem('spt.picked') === '1'; } catch (e) { /* negeer */ }
+    if (S.Profiles && S.Profiles.many() && !picked) profilePicker({ start: true });
     if ('serviceWorker' in navigator && /^https:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js?v=' + encodeURIComponent(V.number), { updateViaCache: 'none' }).catch(() => {});
     if (location.search.includes('u=')) history.replaceState(null, '', location.pathname + location.hash); // adres na bijwerken weer netjes
     setTimeout(autoCheck, 2500);

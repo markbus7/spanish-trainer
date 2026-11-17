@@ -2,9 +2,12 @@
    Het token staat alleen in deze browser (eigen opslagsleutel), nooit in de voortgang, back-ups of de gist zelf. */
 (function (S) {
   'use strict';
-  const { Store } = S;
-  const CFG_KEY = 'spt.sync';
+  const { Store, Profiles } = S;
+  // Elk profiel heeft een eigen instelling en een eigen bestand in de gist. Het eerste profiel houdt de oude sleutel en het oude bestand.
+  const CFG_KEY = Profiles ? Profiles.syncKey(Profiles.activeId()) : 'spt.sync';
   const FILE = 'espanol-latino-voortgang.json';
+  const FILE_RE = /^espanol-latino-voortgang(-[a-z0-9-]+)?\.json$/;
+  const fileOf = c => c.file || FILE;
   const DESC = 'Español Latino – voortgang (automatisch gesynchroniseerd, niet bewerken)';
   const API = 'https://api.github.com';
 
@@ -13,8 +16,8 @@
   const listeners = new Set();
 
   function readCfg() {
-    try { return Object.assign({ token: '', gistId: '', login: '', last: 0, error: '' }, JSON.parse(localStorage.getItem(CFG_KEY) || '{}')); }
-    catch (e) { return { token: '', gistId: '', login: '', last: 0, error: '' }; }
+    try { return Object.assign({ token: '', gistId: '', file: '', login: '', last: 0, error: '' }, JSON.parse(localStorage.getItem(CFG_KEY) || '{}')); }
+    catch (e) { return { token: '', gistId: '', file: '', login: '', last: 0, error: '' }; }
   }
   function writeCfg() { try { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) { /* opslag vol of geblokkeerd */ } }
   function emit() { listeners.forEach(fn => { try { fn(Sync.status()); } catch (e) { /* negeer */ } }); }
@@ -44,7 +47,7 @@
   async function findGist() {
     for (let page = 1; page <= 5; page++) {
       const list = await gh('/gists?per_page=100&page=' + page);
-      const hit = list.find(g => g.files && g.files[FILE]);
+      const hit = list.find(g => g.files && g.files[fileOf(cfg)]);
       if (hit) return hit.id;
       if (list.length < 100) break;
     }
@@ -52,16 +55,17 @@
   }
   async function readRemote() {
     const g = await gh('/gists/' + cfg.gistId);
-    const f = g.files && g.files[FILE];
+    const f = g.files && g.files[fileOf(cfg)];
     if (!f) return null;
     let text = f.content;
     if (f.truncated && f.raw_url) { const r = await fetch(f.raw_url); if (!r.ok) throw new Error('Kon voortgang niet downloaden'); text = await r.text(); }
     try { return JSON.parse(text); } catch (e) { return null; }
   }
   async function writeRemote(text) {
-    if (cfg.gistId) await gh('/gists/' + cfg.gistId, { method: 'PATCH', body: JSON.stringify({ files: { [FILE]: { content: text } } }) });
+    const file = fileOf(cfg);
+    if (cfg.gistId) await gh('/gists/' + cfg.gistId, { method: 'PATCH', body: JSON.stringify({ files: { [file]: { content: text } } }) });
     else {
-      const g = await gh('/gists', { method: 'POST', body: JSON.stringify({ description: DESC, public: false, files: { [FILE]: { content: text } } }) });
+      const g = await gh('/gists', { method: 'POST', body: JSON.stringify({ description: DESC, public: false, files: { [file]: { content: text } } }) });
       cfg.gistId = g.id; writeCfg();
     }
   }
@@ -104,13 +108,38 @@
   const Sync = {
     FILE,
     enabled: () => !!cfg.token,
-    status: () => ({ enabled: !!cfg.token, login: cfg.login, gistId: cfg.gistId, last: cfg.last, error: cfg.error, busy: !!busy, pending: !!pushTimer }),
+    status: () => ({ enabled: !!cfg.token, login: cfg.login, gistId: cfg.gistId, file: fileOf(cfg), last: cfg.last, error: cfg.error, busy: !!busy, pending: !!pushTimer }),
     onChange(fn) { listeners.add(fn); return () => listeners.delete(fn); },
-    async connect(token) {
+    /* Welke voortgangen staan er al in de gists van dit token? Zo kies je bij het koppelen welke bij dit profiel hoort. */
+    async scan(token) {
       token = String(token || '').trim();
       if (!token) throw new Error('Vul eerst een token in');
       const prev = cfg;
-      cfg = { token, gistId: '', login: '', last: 0, error: '' };
+      cfg = { token, gistId: '', file: '', login: '', last: 0, error: '' };
+      try {
+        const me = await gh('/user');
+        const found = [];
+        for (let page = 1; page <= 5; page++) {
+          const list = await gh('/gists?per_page=100&page=' + page);
+          for (const g of list) for (const name of Object.keys(g.files || {})) if (FILE_RE.test(name)) found.push({ gistId: g.id, file: name, updated: Date.parse(g.updated_at) || 0 });
+          if (list.length < 100) break;
+        }
+        // naam en XP uit elke voortgang, zodat je ziet van wie hij is
+        for (const f of found.slice(0, 12)) {
+          try { cfg.gistId = f.gistId; cfg.file = f.file; const d = await readRemote(); if (d) { f.name = d.name || ''; f.xp = d.xp || 0; } } catch (e) { /* zonder naam tonen */ }
+        }
+        return { login: me.login || '', found: found.sort((a, b) => b.updated - a.updated) };
+      } finally { cfg = prev; }
+    },
+    /* Koppelen. pick = { gistId, file } van een bestaande voortgang, of { fresh: true } voor een nieuwe, lege voortgang.
+       Zonder pick (oude manier): het standaardbestand. */
+    async connect(token, pick) {
+      token = String(token || '').trim();
+      if (!token) throw new Error('Vul eerst een token in');
+      const prev = cfg;
+      cfg = { token, gistId: '', file: '', login: '', last: 0, error: '' };
+      if (pick && pick.gistId) { cfg.gistId = pick.gistId; cfg.file = pick.file || ''; }
+      else if (pick && pick.fresh) cfg.file = Sync.freshFile(pick.name);
       try {
         const me = await gh('/user');
         cfg.login = me.login || '';
@@ -119,7 +148,12 @@
       } catch (e) { cfg = prev; writeCfg(); emit(); throw e; }
       return Sync.status();
     },
-    disconnect() { clearTimeout(pushTimer); pushTimer = null; cfg = { token: '', gistId: '', login: '', last: 0, error: '' }; try { localStorage.removeItem(CFG_KEY); } catch (e) { /* negeer */ } emit(); },
+    /* Bestandsnaam voor een nieuwe voortgang: naam van het profiel plus een kort toeval, zodat twee profielen nooit hetzelfde bestand delen. */
+    freshFile(name) {
+      const slug = String(name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 20) || 'profiel';
+      return 'espanol-latino-voortgang-' + slug + '-' + Math.random().toString(36).slice(2, 6) + '.json';
+    },
+    disconnect() { clearTimeout(pushTimer); pushTimer = null; cfg = { token: '', gistId: '', file: '', login: '', last: 0, error: '' }; try { localStorage.removeItem(CFG_KEY); } catch (e) { /* negeer */ } emit(); },
     syncNow,
     // aangeroepen door Store.save(): even wachten en dan in één keer uploaden
     changed() {

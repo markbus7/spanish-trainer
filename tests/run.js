@@ -725,6 +725,45 @@ await micTests();
   ok(S.Gen.sprint(30).items.length === 30 && S.Gen.sprint(30).timer === 120, 'sprint: 30 vragen, 2 minuten');
   S.Store.state = keep;
 }
+{ // profielen: bestaande voortgang (spt.v1) blijft onaangeroerd, nieuwe profielen krijgen eigen sleutels
+  const mem = {};
+  const ls = { getItem: k => (k in mem ? mem[k] : null), setItem: (k, v) => { mem[k] = String(v); }, removeItem: k => { delete mem[k]; } };
+  const old = JSON.stringify({ v: 1, name: 'Mark', xp: 1234, srs: { 'w|a1-01|0': { d: 1, i: 3, e: 2.5, r: 1, l: 0 } }, settings: { goal: 30, aiKey: 'sk-geheim' }, placement: { done: true, level: 'A2' } });
+  mem['spt.v1'] = old; mem['spt.sync'] = JSON.stringify({ token: 'ghp_x', gistId: 'abc', login: 'mark' });
+  const mk = () => {
+    const c = vm.createContext({ console, setTimeout, clearTimeout, localStorage: ls, sessionStorage: ls, TextEncoder, crypto: globalThis.crypto, fetch: async () => { throw new Error('geen netwerk in test'); } });
+    c.window = c; c.globalThis = c;
+    for (const f of ['js/core.js', 'js/sync.js']) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), c, { filename: f });
+    return c.SPT;
+  };
+  let P1 = mk();
+  ok(P1.Profiles.activeId() === 'main' && !P1.Profiles.many(), 'profielen: zonder register is er één profiel (main)');
+  ok(!('spt.profiles' in mem), 'profielen: register wordt niet geschreven zolang er niets verandert');
+  P1.Store.load();
+  ok(P1.Store.state.xp === 1234 && P1.Store.state.name === 'Mark', 'profielen: main laadt de bestaande voortgang uit spt.v1');
+  ok(mem['spt.v1'] === old, 'profielen: spt.v1 is na laden nog exact hetzelfde');
+  ok(P1.Sync.status().file === 'espanol-latino-voortgang.json' && P1.Sync.status().gistId === 'abc', 'profielen: bestaande sync houdt het oude gist-bestand');
+  const id = P1.Profiles.add('Ana María', '🌺');
+  ok(P1.Profiles.many() && mem['spt.p.' + id] && JSON.parse(mem['spt.p.' + id]).name === 'Ana María', 'profielen: nieuw profiel met eigen lege voortgang');
+  ok(mem['spt.v1'] === old && mem['spt.sync'].includes('ghp_x'), 'profielen: nieuw profiel laat main ongemoeid');
+  // overschakelen (zonder herladen in de test): nieuwe context leest het actieve profiel
+  P1.Profiles.reg.active = id; P1.Profiles.write();
+  const P2 = mk(); P2.Store.load();
+  ok(P2.Store.state.name === 'Ana María' && P2.Store.state.xp === 0 && !P2.Store.state.settings.aiKey, 'profielen: tweede profiel laadt eigen voortgang, zonder AI-sleutel');
+  ok(!P2.Sync.enabled(), 'profielen: tweede profiel heeft geen token van main');
+  P2.Store.state.xp = 50; P2.Store.save();
+  ok(JSON.parse(mem['spt.p.' + id]).xp === 50 && mem['spt.v1'] === old, 'profielen: opslaan in profiel 2 raakt spt.v1 niet');
+  const ff = P2.Sync.freshFile('Ana María');
+  ok(/^espanol-latino-voortgang-ana-maria-[a-z0-9]{1,4}\.json$/.test(ff) && ff !== 'espanol-latino-voortgang.json', 'profielen: nieuw gist-bestand per profiel (' + ff + ')');
+  await P2.Profiles.setPin('2580');
+  ok(P2.Profiles.hasPin() && !JSON.parse(mem['spt.profiles']).pin.includes('2580'), 'pincode: opgeslagen als hash, niet als tekst');
+  const P3 = mk();
+  ok(P3.Profiles.locked() && !(await P3.Profiles.unlock('1111')) && P3.Profiles.locked(), 'pincode: verkeerde code ontgrendelt niet');
+  ok((await P3.Profiles.unlock('2580')) && !P3.Profiles.locked(), 'pincode: juiste code ontgrendelt');
+  let bad = false; try { await P3.Profiles.setPin('12'); } catch (e) { bad = true; }
+  ok(bad, 'pincode: te kort wordt geweigerd');
+  ok(!P3.Profiles.remove('main') && P3.Profiles.remove(id) && !('spt.p.' + id in mem) && P3.Profiles.activeId() === 'main' && mem['spt.v1'] === old, 'profielen: main kan niet weg; ander profiel wel, en dan terug naar main');
+}
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);
