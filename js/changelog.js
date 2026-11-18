@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.30.2', date: '2026-11-18',
+    nl: ['Lupe heeft een klein schattig mondje (geen \'snor\' meer) en grotere glanzende ogen.'],
+    es: [] },
   { v: '1.30.1', date: '2026-11-18',
     nl: ['Lupe lijkt nu echt een axolotl: bredere platte kop met grote glimlach, lange staart met vin, slanke vingertjes en teentjes en spikkeltjes.'],
     es: [] },
