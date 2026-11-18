@@ -83,7 +83,7 @@ main { max-width: 760px; margin: 0 auto; padding: 16px 16px calc(var(--tab-h) + 
 .btn:disabled { opacity: .45; cursor: not-allowed; }
 .btn.primary { background: var(--accent); color: var(--accent-ink); box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 70%, #000); }
 .btn.ghost { background: transparent; border-color: var(--line); }
-.btn.ok { background: var(--ok); color: #fff; }
+.btn.ok { background: var(--ok); color: var(--accent-ink); }
 .btn.danger { background: var(--bad-soft); color: var(--bad); }
 .btn.link { background: none; border: none; color: var(--accent); padding: .4rem .2rem; min-height: 0; font-weight: 600; }
 .btn.small { padding: .4rem .7rem; min-height: 0; font-size: .85rem; }
@@ -655,7 +655,7 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 
 /* Offline luisteren (Instellingen) */
 .offline-rows { display: flex; flex-direction: column; gap: 4px; }
-.offline-row { padding: 10px 0; border-top: 1px solid var(--line, rgba(0,0,0,.08)); align-items: center; }
+.offline-row { padding: 10px 0; border-top: 1px solid var(--line); align-items: center; }
 .offline-row:first-child { border-top: 0; }
 
 /* Dialoog: eerst luisteren + rollenspel */
@@ -873,7 +873,7 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .dl-btns { display: flex; flex-direction: column; align-items: center; gap: .3rem; flex: none; }
 .dl-btns .icon-btn { margin: 0; }
 .xi-btn { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--teal); background: var(--card); color: var(--teal); font: italic 700 .95rem/1 var(--serif); display: inline-flex; align-items: center; justify-content: center; flex: none; padding: 0; }
-.xi-btn.on { background: var(--teal); color: #fff; }
+.xi-btn.on { background: var(--teal); color: var(--accent-ink); }
 .xi-btn:active { transform: scale(.94); }
 .xi-box { margin-top: .45rem; background: var(--teal-soft); border-radius: 10px; padding: .5rem .7rem; font-size: .9rem; line-height: 1.45; color: var(--ink); cursor: auto; text-align: left; }
 .xi-box.hidden { display: none; }
@@ -901,7 +901,7 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .dp-item.done:not(:last-child)::before { background: var(--ok); }
 .dp-node { position: relative; z-index: 1; align-self: center; flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: .95rem; background: var(--card); color: var(--muted); border: 3px solid var(--line); }
 .dp-item.next .dp-node { border-color: var(--accent); color: var(--accent); animation: dp-pulse 2s ease-in-out infinite; }
-.dp-item.done .dp-node { background: var(--ok); border-color: var(--ok); color: #fff; }
+.dp-item.done .dp-node { background: var(--ok); border-color: var(--ok); color: var(--accent-ink); }
 .dp-chest .dp-node { font-size: 1rem; border-color: var(--gold); background: var(--gold-soft); }
 .dp-chest.locked .dp-node { filter: grayscale(.7); opacity: .75; }
 .dp-chest.ready .dp-node { animation: dp-wiggle 1.6s ease-in-out infinite; }
@@ -980,7 +980,7 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .dp-pill { display: inline-flex; align-items: center; gap: .3rem; padding: .25rem .6rem .25rem .3rem; border-radius: 999px; background: var(--bg2); color: var(--ink2); font-size: .82rem; font-weight: 700; }
 .dp-pill i { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: .7rem; background: var(--card); border: 2px solid var(--line); }
 .dp-pill.on { background: var(--ok-soft); color: var(--ok); }
-.dp-pill.on i { background: var(--ok); border-color: var(--ok); color: #fff; }
+.dp-pill.on i { background: var(--ok); border-color: var(--ok); color: var(--accent-ink); }
 .dp-pill.pop { animation: dp-pop .7s cubic-bezier(.3, 1.6, .5, 1) .6s both; }
 
 /* de dagbeloning */
@@ -1135,3 +1135,24 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .fb-fix { margin-top: .35rem; }
 .pl-act .btn.wide { margin-top: 0; }
 @media (max-width: 520px) { .mundo-entry { gap: .6rem; } .me-flags { display: none; } .me-icon { font-size: 1.7rem; } }
+
+/* ---------- Wat is er nieuw (tik op het versienummer) ---------- */
+.tb-ver { cursor: pointer; position: relative; }
+.tb-ver.has-new::after { content: ''; position: absolute; top: -2px; right: -8px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--bg); }
+.modal.whatsnew { max-width: 520px; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+.modal.whatsnew h3 { margin: 0; font-family: var(--serif); font-size: 1.35rem; }
+.modal.whatsnew .wn-top { align-items: center; }
+.modal.whatsnew .update-x { color: var(--muted); font-size: 1.15rem; }
+.wn-check { display: flex; flex-direction: column; align-items: flex-start; gap: .6rem; padding: .8rem; margin: .6rem 0 1rem; background: var(--bg); border-radius: 14px; }
+.wn-out:empty { display: none; }
+.wn-out p { margin: 0 0 .5rem; font-weight: 600; }
+.wn-out .wn-list { margin-bottom: .6rem; }
+.wn-sub { margin: 0 0 .4rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.wn-list { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1rem; }
+.wn-item { border: 1px solid var(--line); border-radius: 14px; padding: .65rem .8rem; background: var(--card); }
+.wn-item.current { border-color: var(--accent); }
+.wn-head { display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
+.wn-head b { font-variant-numeric: tabular-nums; }
+.wn-tag { margin-left: auto; font-size: .72rem; font-weight: 700; padding: .1rem .5rem; border-radius: 99px; background: var(--accent); color: var(--accent-ink); }
+.wn-item ul { margin: .35rem 0 0; padding-left: 1.15rem; }
+.wn-item li { margin: .15rem 0; line-height: 1.4; }
