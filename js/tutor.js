@@ -42,8 +42,8 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
       <g fill="#ffd6e5"><circle cx="-12" cy="13" r="1.3"/><circle cx="-10.5" cy="17" r="1.3"/><circle cx="-6.5" cy="18.5" r="1.3"/><circle cx="-2" cy="18" r="1.3"/><circle cx="1" cy="15.5" r="1.3"/></g></g>`;
     const body = full ? `
   <g class="lupe-tail">
-    <path d="M74 111C90 113 102 122 113 130C120 135 126 133 130 125C133 133 132 145 123 151C112 157 96 154 85 148C79 145 75 141 72 134Z" fill="${u('t')}" opacity=".55"/>
-    <g stroke="#fff" stroke-width=".8" opacity=".6" fill="none"><path d="M85 117 83 127"/><path d="M97 123 93 133"/><path d="M108 129 102 138"/><path d="M121 133 114 141"/><path d="M127 141 119 145"/><path d="M96 151 97 144"/><path d="M110 153 108 146"/></g>
+    <path d="M74 111C90 113 102 122 113 130C120 135 126 133 130 125C133 133 132 145 123 151C112 157 96 154 85 148C79 145 75 141 72 134Z" fill="${u('t')}"/>
+    <g stroke="#ee97b9" stroke-width=".8" opacity=".7" fill="none"><path d="M85 117 83 127"/><path d="M97 123 93 133"/><path d="M108 129 102 138"/><path d="M121 133 114 141"/><path d="M127 141 119 145"/><path d="M96 151 97 144"/><path d="M110 153 108 146"/></g>
     <path d="M74 120C89 126 101 135 112 140C119 143 125 141 129 135C126 145 117 150 107 149C94 147 83 142 74 136Z" fill="${u('s')}"/>
     <g fill="${SPOT}" opacity=".45"><circle cx="90" cy="133" r="1.3"/><circle cx="102" cy="139" r="1.1"/><circle cx="114" cy="144" r="1"/><circle cx="84" cy="128" r="1"/></g>
   </g>
@@ -60,7 +60,7 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     <radialGradient id="${id}s" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#ffd6e5"/><stop offset=".55" stop-color="#f8aecb"/><stop offset="1" stop-color="#ec88b0"/></radialGradient>
     <linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="-33" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#c8396f"/><stop offset="1" stop-color="#f07ea8"/></linearGradient>
     <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22ae9e"/><stop offset="1" stop-color="#147c70"/></linearGradient>
-    <linearGradient id="${id}t" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f07ea8"/><stop offset="1" stop-color="#ffc4da"/></linearGradient>
+    <linearGradient id="${id}t" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f9b9d3"/><stop offset="1" stop-color="#ffe3ee"/></linearGradient>
   </defs>
   ${body}
   <g class="gills-l">${fronds(-1)}</g><g class="gills-r">${fronds(1)}</g>
