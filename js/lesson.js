@@ -446,6 +446,9 @@
     return wrap;
   };
 
+  /** Mag de AI dit typantwoord herbeoordelen? Vrije vertalingen en woorden (Typ in het Spaans), niet vervoegen of invullen. */
+  function canRegrade(it) { return !!(it && it.kind === 'type' && it.prompt && (it.translate || (it.word && !it.conj && !it.sentence))); }
+
   R.type = (it, ctx) => {
     const qKey = Q_MAP[it.q];
     const wrap = h('div', { class: 'type' });
@@ -453,7 +456,7 @@
     let sent = null;
     if (it.conj) { const c = conjCard(it, ctx); sent = c.frame; wrap.append(c.el); }
     else if (it.prompt) wrap.append(h('div', { class: 'prompt' }, it.prompt));
-    if (it.mainOnly) wrap.append(h('div', { class: 'p-note' }, '🔁 Je eigen zin was ook goed. Typ nu de zin zoals hij in de les staat.'));
+    if (it.mainOnly) wrap.append(h('div', { class: 'p-note' }, it.translate ? '🔁 Je eigen zin was ook goed. Typ nu de zin zoals hij in de les staat.' : '🔁 Je eigen antwoord was ook goed. Typ nu het woord zoals het in de les staat.'));
     if (it.sentence) { sent = sentenceEl(it.sentence); wrap.append(sent); }
     if (it.h) wrap.append(h('div', { class: 'hint' }, '(' + it.h + ')'));
     if (it.nl && it.sentence) wrap.append(h('div', { class: 'nl-hint' }, it.nl));
@@ -487,7 +490,7 @@
       let r = S.Gen.checkType(user, it);
       // eerder door Lupe goedgekeurd (herbeoordeling): nu meteen goed
       // maar de zin uit de les moet je óók leren: dan komt hij straks terug (alleen de lesversie telt dan)
-      const lupeOk = !r.ok && it.translate && !it.mainOnly && S.Mistakes && S.Mistakes.accepted(it.prompt, user);
+      const lupeOk = !r.ok && canRegrade(it) && !it.mainOnly && S.Mistakes && S.Mistakes.accepted(it.prompt, user);
       if (lupeOk) r = { ok: true, warn: 'lupe', best: user, alt: true };
       field().disabled = true;
       if (part) { part.mark(user, it.answers); const w = wrap.querySelector('.p-whole'); if (w) w.remove(); }
@@ -940,7 +943,7 @@
       if (r.ok && r.warn === 'typo') fb.append(h('div', null, '🔤 Kleine typfout — precies: ', h('b', { lang: 'es' }, r.expected)));
       if (r.ok && r.warn === 'article') fb.append(h('div', null, '📌 Vergeet het lidwoord niet: ', h('b', { lang: 'es' }, r.expected)));
       if (r.ok && r.warn === 'lupe') fb.append(h('div', null, '🤖 Lupe keurde dit antwoord eerder goed. In de les staat: ', h('b', { lang: 'es' }, (r.alts || it.answers)[0]), speakBtn((r.alts || it.answers)[0])),
-        h('div', { class: 'small' }, '🔁 Leer ook de zin uit de les: je krijgt hem straks nog een keer.'));
+        h('div', { class: 'small' }, it.translate ? '🔁 Leer ook de zin uit de les: je krijgt hem straks nog een keer.' : '🔁 Leer ook het woord uit de les: je krijgt het straks nog een keer.'));
       if (r.ok && r.warn === 'synonym') fb.append(h('div', null, '👍 Ook goed! In de les staat: ', h('b', { lang: 'es' }, r.main)));
       if (!r.ok && r.expected && r.matchMistakes == null) {
         fb.append(h('div', { class: 'fb-exp' }, T('correct') + ': ', h('b', { lang: 'es' }, r.expected), (it.speakAnswer || it.kind === 'listen' || it.sentence) ? speakBtn(it.sentence ? it.sentence.replace('___', r.expected) : r.expected) : null));
@@ -973,9 +976,17 @@
       if (!r.ok && it.mainOnly && S.Mistakes && S.Mistakes.accepted(it.prompt, r.user)) {
         fb.querySelectorAll('.fb-wrong').forEach(x => x.remove());
         fb.append(h('div', { class: 'small' }, '🤖 Dit antwoord keurde Lupe al goed. Nu oefen je de zin zoals hij in de les staat.'));
-      } else if (!r.ok && it.translate && S.AI.enabled() && r.user) {
-        const b = h('button', { class: 'btn small ghost', type: 'button' }, '🤖 Toch goed? Laat de AI het beoordelen');
+      } else if (!r.ok && canRegrade(it) && r.user) {
+        const b = h('button', { class: 'btn small ghost fb-regrade', type: 'button' }, '🤖 Toch goed? Laat de AI het beoordelen');
         b.onclick = async () => {
+          // zonder API-sleutel op dit apparaat (de sleutel wordt niet gesynchroniseerd): eerst de sleutel invullen
+          if (!S.AI.enabled()) {
+            if (!fb.querySelector('.fb-nokey')) fb.insertBefore(h('div', { class: 'small muted fb-nokey' },
+              '🔑 Op dit apparaat staat nog geen API-sleutel (die wordt niet mee-gesynchroniseerd). Plak hem in het venster van Lupe en tik daarna nog een keer op deze knop.'), b);
+            if (S.Ask) S.Ask.open(); else location.hash = '#/ajustes';
+            return;
+          }
+          const nk = fb.querySelector('.fb-nokey'); if (nk) nk.remove();
           b.disabled = true; b.textContent = 'AI beoordeelt…';
           try {
             const j = await S.AI.checkTranslation(it.prompt, r.user, r.alts || it.answers);
@@ -994,7 +1005,7 @@
               graded.set(it.orig || it, true);
               // de herkansing blijft: dan oefen je de zin zoals hij in de les staat
               const rq = queue.find((q, i) => i > idx && q.orig === (it.orig || it) && q.retry);
-              if (rq) { mainOnlyCopy(rq); fb.append(h('div', { class: 'small' }, '🔁 Leer ook de zin uit de les: je krijgt hem straks nog een keer.')); }
+              if (rq) { mainOnlyCopy(rq); fb.append(h('div', { class: 'small' }, it.translate ? '🔁 Leer ook de zin uit de les: je krijgt hem straks nog een keer.' : '🔁 Leer ook het woord uit de les: je krijgt het straks nog een keer.')); }
               const mi = mistakes.findIndex(m => m.it === it); if (mi >= 0) mistakes.splice(mi, 1);
               hooks.onItem && hooks.onItem(it, true, { ...r, ok: true, override: true, alt: true });
               xp += 5; progress(); if (idx < queue.length && queue[idx] === it) persist(idx + 1);
@@ -1006,7 +1017,7 @@
     }
 
     /* Herkansing na een goedgekeurd alternatief: nu telt alleen de zin uit de les. */
-    function mainOnlyCopy(q) { q.mainOnly = true; q.q = 'Vertaal zoals in de les'; q.keep = null; }
+    function mainOnlyCopy(q) { q.mainOnly = true; q.keep = null; if (q.translate) q.q = 'Vertaal zoals in de les'; else q.syn = []; }
 
     /* Wat Lupe ziet als je haar iets vraagt tijdens de les. */
     let lastR = null;
