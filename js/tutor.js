@@ -77,13 +77,14 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     ${petals}<circle r="5" fill="#f7b733"/><circle r="2.3" fill="#e2603a"/>
   </g>
   <g class="lupe-eyes">
-    <circle cx="42" cy="63" r="6.6" fill="#2a1a22"/><circle cx="78" cy="63" r="6.6" fill="#2a1a22"/>
-    <circle cx="44.4" cy="60.6" r="2.4" fill="#fff"/><circle cx="80.4" cy="60.6" r="2.4" fill="#fff"/>
-    <circle cx="40" cy="65.6" r="1.1" fill="#fff" opacity=".75"/><circle cx="76" cy="65.6" r="1.1" fill="#fff" opacity=".75"/>
+    <ellipse cx="42" cy="64" rx="7.4" ry="7.8" fill="#2a1a22"/><ellipse cx="78" cy="64" rx="7.4" ry="7.8" fill="#2a1a22"/>
+    <ellipse cx="42" cy="67.2" rx="4.6" ry="3" fill="#5a2c42" opacity=".7"/><ellipse cx="78" cy="67.2" rx="4.6" ry="3" fill="#5a2c42" opacity=".7"/>
+    <circle cx="44.6" cy="61" r="2.8" fill="#fff"/><circle cx="80.6" cy="61" r="2.8" fill="#fff"/>
+    <circle cx="39.6" cy="67" r="1.2" fill="#fff" opacity=".8"/><circle cx="75.6" cy="67" r="1.2" fill="#fff" opacity=".8"/>
   </g>
   <ellipse cx="30.5" cy="76" rx="7" ry="4.2" fill="#f0789f" opacity=".55"/><ellipse cx="89.5" cy="76" rx="7" ry="4.2" fill="#f0789f" opacity=".55"/>
-  <path class="m-closed" d="M43 79.5Q60 91 77 79.5" fill="none" stroke="#7a2944" stroke-width="2.9" stroke-linecap="round"/>
-  <g class="m-open"><path d="M49 79Q60 98 71 79Q60 83 49 79Z" fill="#7a2944"/><ellipse cx="60" cy="88.5" rx="5" ry="2.6" fill="#f0789f"/></g>
+  <g class="m-closed" fill="none" stroke="#a3415f" stroke-linecap="round"><path d="M52.5 80.5Q60 87 67.5 80.5" stroke-width="2.3"/><path d="M50.8 79.4Q51.6 81.2 53.2 81.1M69.2 79.4Q68.4 81.2 66.8 81.1" stroke-width="1.3"/></g>
+  <g class="m-open"><path d="M52.5 80Q60 81.3 67.5 80Q66.8 90.5 60 90.5Q53.2 90.5 52.5 80Z" fill="#8e3253"/><path d="M55.5 88.2Q60 84.6 64.5 88.2Q62.8 90.4 60 90.4Q57.2 90.4 55.5 88.2Z" fill="#f37fa6"/></g>
 </svg>`;
   }
 
