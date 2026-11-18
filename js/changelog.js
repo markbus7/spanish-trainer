@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.29.2', date: '2026-11-18',
+    nl: ['Op reis: per land veel meer slang en uitdrukkingen (ongeveer 160 nieuwe woorden), bijvoorbeeld «frin» in Panama.', 'Leenwoorden laten zien waar ze vandaan komen, bijvoorbeeld «uit het Engels: friend».'],
+    es: ['De viaje: mucha más jerga y expresiones por país (unas 160 palabras nuevas), por ejemplo «frin» en Panamá.', 'Los préstamos muestran de dónde vienen, por ejemplo «del inglés: friend».'] },
   { v: '1.29.1', date: '2026-11-18',
     nl: ['Op reis: de vlaggen op de kaart, in het paspoort en in de lijst zijn nu afbeeldingen, zodat je ze op elk apparaat ziet.'],
     es: ['De viaje: las banderas del mapa, del pasaporte y de la lista ahora son imágenes, así se ven en cualquier dispositivo.'] },
