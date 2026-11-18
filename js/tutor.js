@@ -10,32 +10,49 @@ Personality: warm, patient, playful and encouraging; you love tacos al pastor, m
 Speak as Lupe in the first person. Do not mention being an AI or a language model unless the learner asks.`
   };
 
-  /* Het figuur. Mond: .m-closed en .m-open; CSS wisselt ze af tijdens het praten. */
-  function svg(size) {
+  /* Het figuur. Mond: .m-closed en .m-open; CSS wisselt ze af tijdens het praten.
+     Elke tekening krijgt eigen id's voor de kleurverlopen (anders verdwijnen ze als de eerste Lupe op de pagina verborgen is).
+     opt.face: alleen het hoofd, ingezoomd (voor het logo en het app-icoon). */
+  let uid = 0;
+  function svg(size, opt) {
+    opt = opt || {};
+    const id = 'lp' + (++uid), u = k => `url(#${id}${k})`;
     const fronds = side => {
-      const x = side < 0 ? 24 : 96;
-      return [-38, -78, -118].map(a => {
-        const r = a * -side;
-        return `<g transform="translate(${x} 58) rotate(${r})"><g class="gill"><ellipse cx="0" cy="-17" rx="6.5" ry="15" fill="#e0568a"/><path d="M0 -4 L0 -29" stroke="#f9b9cf" stroke-width="2" stroke-linecap="round"/><path d="M0 -11 l-4 -3 M0 -17 l-4 -3 M0 -23 l-3.5 -3 M0 -11 l4 -3 M0 -17 l4 -3 M0 -23 l3.5 -3" stroke="#f9b9cf" stroke-width="1.4" stroke-linecap="round"/></g></g>`;
+      const x = side < 0 ? 25 : 95;
+      return [-38, -78, -118].map((a, i) => {
+        const r = a * -side, len = i === 1 ? 1 : .92;
+        return `<g transform="translate(${x} 57) rotate(${r}) scale(${len})"><g class="gill"><path d="M0 0C-9.5-5-11-23 0-33C11-23 9.5-5 0 0Z" fill="${u('g')}"/><path d="M0-3V-28" stroke="#ffd3e2" stroke-width="1.6" stroke-linecap="round" opacity=".9"/><path d="M-1-9l-5.5-3.5M-1-15.5-6.8-19M-1-22l-4.6-3.4M1-9l5.5-3.5M1-15.5 6.8-19M1-22l4.6-3.4" stroke="#ffd3e2" stroke-width="1.2" stroke-linecap="round" opacity=".6"/></g></g>`;
       }).join('');
     };
-    return `<svg class="lupe-svg" viewBox="0 0 120 120" width="${size}" height="${size}" role="img" aria-label="Lupe, de docente" xmlns="http://www.w3.org/2000/svg">
+    const petals = [0, 45, 90, 135, 180, 225, 270, 315].map(d => `<circle cx="${(5.2 * Math.cos(d * Math.PI / 180)).toFixed(2)}" cy="${(5.2 * Math.sin(d * Math.PI / 180)).toFixed(2)}" r="3.7" fill="#f28c1b"/>`).join('');
+    const vb = opt.face ? '-6 12 132 92' : '0 0 120 120', w = opt.face ? Math.round(size * 132 / 92) : size;
+    return `<svg class="lupe-svg" viewBox="${vb}" width="${w}" height="${size}" role="img" aria-label="Lupe, de docente" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="${id}s" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#ffd6e5"/><stop offset=".55" stop-color="#f8aecb"/><stop offset="1" stop-color="#ec88b0"/></radialGradient>
+    <linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="-33" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#c8396f"/><stop offset="1" stop-color="#f07ea8"/></linearGradient>
+    <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22ae9e"/><stop offset="1" stop-color="#147c70"/></linearGradient>
+  </defs>
   <g class="gills-l">${fronds(-1)}</g><g class="gills-r">${fronds(1)}</g>
-  <path d="M30 98 Q60 122 90 98 L94 120 L26 120 Z" fill="#1b998b"/>
-  <path d="M34 104 Q60 120 86 104" fill="none" stroke="#f2b134" stroke-width="3" stroke-dasharray="4 3"/>
-  <ellipse cx="60" cy="68" rx="42" ry="35" fill="#f7a9c6"/>
-  <ellipse cx="60" cy="80" rx="27" ry="18" fill="#fbc8da"/>
-  <g class="lupe-flower" transform="translate(84 37)">
-    <circle r="9" fill="#f59a1b"/><circle r="6.5" fill="#f7b733"/><circle r="3.4" fill="#e2603a"/>
-    <path d="M-7 7 Q-12 12 -15 10" stroke="#3a8f4a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  ${opt.face ? '' : `<path d="M20 121C22 101 36 91 60 91S98 101 100 121Z" fill="${u('h')}"/>
+  <path d="M31 95.5Q60 113 89 95.5" fill="none" stroke="#fff4e6" stroke-width="3.6" stroke-linecap="round"/>
+  <path d="M30 103Q60 120 90 103" fill="none" stroke="#f2b134" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/>
+  <g><circle cx="42" cy="113" r="3.1" fill="#f0789f"/><circle cx="60" cy="116" r="3.1" fill="#f2b134"/><circle cx="78" cy="113" r="3.1" fill="#f0789f"/><circle cx="42" cy="113" r="1.1" fill="#fff4e6"/><circle cx="60" cy="116" r="1.1" fill="#fff4e6"/><circle cx="78" cy="113" r="1.1" fill="#fff4e6"/></g>`}
+  <ellipse cx="60" cy="67" rx="43" ry="34.5" fill="${u('s')}"/>
+  <ellipse cx="60" cy="82" rx="28" ry="16.5" fill="#ffdce8" opacity=".85"/>
+  <ellipse cx="43" cy="45" rx="11" ry="5" transform="rotate(-22 43 45)" fill="#fff" opacity=".4"/>
+  <g fill="#e483aa" opacity=".55"><circle cx="58" cy="39" r="1.9"/><circle cx="66" cy="41.5" r="1.4"/><circle cx="51" cy="42.5" r="1.3"/><circle cx="31" cy="58" r="1.5"/><circle cx="91" cy="60" r="1.5"/></g>
+  <g class="lupe-flower" transform="translate(85 38)">
+    <ellipse cx="-8" cy="6" rx="5" ry="2.4" transform="rotate(35 -8 6)" fill="#3a9d5d"/><ellipse cx="6" cy="8.5" rx="4.4" ry="2.1" transform="rotate(-30 6 8.5)" fill="#2f8a50"/>
+    ${petals}<circle r="5" fill="#f7b733"/><circle r="2.3" fill="#e2603a"/>
   </g>
   <g class="lupe-eyes">
-    <circle cx="42" cy="63" r="6" fill="#2a1a22"/><circle cx="78" cy="63" r="6" fill="#2a1a22"/>
-    <circle cx="44" cy="61" r="2.1" fill="#fff"/><circle cx="80" cy="61" r="2.1" fill="#fff"/>
+    <circle cx="42" cy="63" r="6.6" fill="#2a1a22"/><circle cx="78" cy="63" r="6.6" fill="#2a1a22"/>
+    <circle cx="44.4" cy="60.6" r="2.4" fill="#fff"/><circle cx="80.4" cy="60.6" r="2.4" fill="#fff"/>
+    <circle cx="40" cy="65.6" r="1.1" fill="#fff" opacity=".75"/><circle cx="76" cy="65.6" r="1.1" fill="#fff" opacity=".75"/>
   </g>
-  <ellipse cx="31" cy="76" rx="6.5" ry="4" fill="#f0789f" opacity=".65"/><ellipse cx="89" cy="76" rx="6.5" ry="4" fill="#f0789f" opacity=".65"/>
-  <path class="m-closed" d="M49 80 Q60 90 71 80" fill="none" stroke="#7a2944" stroke-width="3" stroke-linecap="round"/>
-  <g class="m-open"><path d="M49 79 Q60 98 71 79 Q60 83 49 79 Z" fill="#7a2944"/><ellipse cx="60" cy="88.5" rx="5" ry="2.6" fill="#f0789f"/></g>
+  <ellipse cx="30.5" cy="76" rx="7" ry="4.2" fill="#f0789f" opacity=".55"/><ellipse cx="89.5" cy="76" rx="7" ry="4.2" fill="#f0789f" opacity=".55"/>
+  <path class="m-closed" d="M50 80.5Q60 89.5 70 80.5" fill="none" stroke="#7a2944" stroke-width="2.9" stroke-linecap="round"/>
+  <g class="m-open"><path d="M49 79Q60 98 71 79Q60 83 49 79Z" fill="#7a2944"/><ellipse cx="60" cy="88.5" rx="5" ry="2.6" fill="#f0789f"/></g>
 </svg>`;
   }
 

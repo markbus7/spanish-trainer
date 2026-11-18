@@ -1051,3 +1051,32 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .admin-stat { background: var(--bg2); border-radius: 10px; padding: .5rem .6rem; display: flex; flex-direction: column; gap: .15rem; }
 .admin-stat small { line-height: 1.25; }
 @media (max-width: 560px) { .admin-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---------- eigen iconen en illustraties (js/icons.js) ---------- */
+.ic { display: inline-grid; place-items: center; line-height: 0; }
+.ic .ic-art { width: 100%; height: 100%; display: block; }
+.ic-art { overflow: visible; }
+.plan-card .pc-icon .ic { width: 40px; height: 40px; }
+.quick-btn .qi .ic { width: 38px; height: 38px; margin: 0 0 .25rem -2px; }
+.quick-btn .qi .ic .ic-art { transition: transform .2s; }
+.quick-btn:hover .qi .ic-art, .quick-btn:active .qi .ic-art { transform: rotate(-6deg) scale(1.06); }
+.step .st-icon .ic { width: 42px; height: 42px; }
+.gm-icon .ic { width: 2.8rem; height: 2.8rem; }
+/* tabbalk en bovenbalk: lijn-iconen met een zachte vulling */
+.ic-line { display: block; }
+.ic-line .fill { fill: currentColor; fill-opacity: .12; stroke: none; }
+.ic-line .dot { fill: currentColor; stroke: none; }
+.tabbar a span.tab-ic { filter: none; opacity: 1; line-height: 0; transition: transform .2s; }
+.tabbar a span.tab-ic .ic-line { width: 26px; height: 26px; }
+.tabbar a.active span.tab-ic .fill { fill-opacity: .22; }
+.tabbar a.active span.tab-ic { transform: translateY(-1px) scale(1.06); }
+.tabbar a.active::after { content: ''; width: 18px; height: 3px; border-radius: 2px; background: var(--accent); margin-top: 1px; }
+.tabbar a { position: relative; }
+.tb-gear { color: var(--ink2); line-height: 0; display: grid; place-items: center; }
+.tb-gear .ic-line { width: 24px; height: 24px; transition: transform .4s; }
+.tb-gear:hover .ic-line { transform: rotate(45deg); }
+/* logo: Lupe in een warm rondje */
+.logo-mark { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; background: linear-gradient(145deg, #f8a07a, var(--accent)); box-shadow: inset 0 -2px 0 rgba(0,0,0,.08); flex: none; overflow: hidden; margin-right: .2rem; }
+.logo-mark svg { width: 32px; height: auto; margin-top: 3px; }
+.quick-btn .qi:has(.ic) { width: 48px; height: 48px; border-radius: 14px; background: var(--bg2); display: grid; place-items: center; margin-bottom: .35rem; }
+.quick-btn .qi .ic { width: 40px; height: 40px; margin: 0; }

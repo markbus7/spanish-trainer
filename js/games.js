@@ -659,7 +659,7 @@
     wrap.append(h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, 'Woorden uit'), h('div', { class: 'card' }, chips, unitSel, info)));
     wrap.append(h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, 'Kies een spel'), h('div', { class: 'gm-cards' },
       GAMES.map(gm => h('button', { class: 'gm-card', type: 'button', onclick: () => start(gm.id, src) },
-        h('span', { class: 'gm-icon' }, gm.icon),
+        h('span', { class: 'gm-icon' }, S.Icons ? S.Icons.el(gm.id) : gm.icon),
         h('div', { class: 'grow' }, h('b', null, gm.es), h('small', { class: 'gm-nl' }, gm.nl + ' · ±' + gm.min + ' min'), h('span', { class: 'gm-desc' }, gm.desc)),
         h('span', { class: 'gm-go', 'aria-hidden': 'true' }, '›'))))));
     return wrap;

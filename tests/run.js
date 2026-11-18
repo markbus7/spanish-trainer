@@ -559,6 +559,17 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   ok(html.indexOf('js/ask.js') > html.indexOf('js/lesson.js') && html.indexOf('js/ask.js') < html.indexOf('js/app.js'), 'vraag-het-Lupe: script geladen tussen lesson.js en app.js');
   ok(sw.includes("'js/ask.js'"), 'vraag-het-Lupe: script zit in de offline-cache');
 }
+{ // eigen iconen en illustraties (js/icons.js)
+  const c = vm.createContext({ console }); c.window = c; c.SPT = {};
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/icons.js'), 'utf8'), c, { filename: 'js/icons.js' });
+  const I = c.SPT.Icons, html = fs.readFileSync(path.join(root, 'index.html'), 'utf8'), sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  ['hoy', 'ruta', 'practica', 'docente', 'perfil'].forEach(t => ok(I.line(t).startsWith('<svg') && html.includes('data-tab="' + t + '"'), 'iconen: tabbalk heeft een eigen icoon voor ' + t));
+  ['sopa', 'cruci', 'revoltijo', 'volcan', 'parejas', 'review', 'vocab', 'grammar', 'dialogue', 'read', 'speak', 'test', 'gift', 'trophy', 'exam', 'pause'].forEach(n => ok(I.has(n) && /<svg[^>]*viewBox="0 0 48 48"/.test(I.art(n)), 'iconen: illustratie ' + n));
+  ['🃏', '🧩', '💬', '📖', '🎙️', '🏁', '🔁', '🎁', '⚡', '🎧'].forEach(e => ok(I.has(e), 'iconen: emoji ' + e + ' heeft een illustratie'));
+  ok(I.art('onbekend') === '' && !I.has('🐢'), 'iconen: onbekende naam geeft niets (emoji blijft staan)');
+  ok(html.indexOf('js/icons.js') > html.indexOf('js/tutor.js') && html.indexOf('js/icons.js') < html.indexOf('js/app.js') && sw.includes("'js/icons.js'"), 'iconen: script geladen na tutor.js en in de offline-cache');
+  ok(sw.includes("'icons/apple-touch-icon.png'") && fs.existsSync(path.join(root, 'icons/apple-touch-icon.png')), 'iconen: app-icoon voor het beginscherm');
+}
 
 /* ---------- Profe Lupe als begeleider: elke situatie heeft een Spaanse zin, Latijns-Amerikaans ---------- */
 {

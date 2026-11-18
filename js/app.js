@@ -188,7 +188,7 @@
     const at = Math.min(p.idx + 1, p.n), ago = Date.now() - (st().paused.t || 0);
     const when = ago < 36e5 ? 'zojuist' : ago < 864e5 ? 'vandaag' : 'op ' + new Date(st().paused.t).toLocaleDateString(S.LOC, { day: 'numeric', month: 'long' });
     return h('div', { class: 'plan-card paused' },
-      h('div', { class: 'pc-icon' }, '⏸️'),
+      h('div', { class: 'pc-icon' }, S.Icons.el('pause')),
       h('div', { class: 'pc-body' }, h('b', null, 'Verder waar je was'), h('span', null, `${p.title} · vraag ${at} van ${p.n}`),
         h('div', { class: 'pbar' }, h('i', { style: { width: Math.round(p.idx / Math.max(1, p.n) * 100) + '%' } })),
         h('small', null, 'Onderbroken ' + when + '. Je antwoorden en score zijn bewaard.')),
@@ -428,7 +428,7 @@
     return wrap;
   };
   /* Oefentegel: titel, één zin wat je er doet (x) en daaronder kort hoe lang/hoeveel (s). */
-  function quick(icon, t, s, fn, done, x) { return h('button', { class: 'quick-btn' + (done ? ' did' : ''), type: 'button', onclick: fn }, h('span', { class: 'qi' }, icon), done ? h('span', { class: 'qd', title: 'Vandaag gedaan' }, '✓') : null, h('b', null, t), x ? h('span', { class: 'qx' }, x) : null, h('small', null, s)); }
+  function quick(icon, t, s, fn, done, x) { return h('button', { class: 'quick-btn' + (done ? ' did' : ''), type: 'button', onclick: fn }, h('span', { class: 'qi' }, S.Icons && S.Icons.has(icon) ? S.Icons.el(icon) : icon), done ? h('span', { class: 'qd', title: 'Vandaag gedaan' }, '✓') : null, h('b', null, t), x ? h('span', { class: 'qx' }, x) : null, h('small', null, s)); }
 
   /* ================= Dagplan (Hoy) ================= */
   let wantChest = false; // na 'Naar mijn beloning' op het eindscherm: Hoy opent de beloning meteen
@@ -465,7 +465,7 @@
     function task(id, icon, title, sub, act, desc) {
       const done = T[id].done, next = ds.next === id;
       const card = h('div', { class: 'plan-card dp-card' + (done ? ' is-done' : next ? ' is-next' : '') },
-        h('div', { class: 'pc-icon' }, icon),
+        h('div', { class: 'pc-icon' }, S.Icons.el(icon)),
         h('div', { class: 'pc-body' },
           next ? h('em', { class: 'dp-tag' }, 'Volgende') : done ? h('em', { class: 'dp-tag ok' }, '✓ Klaar') : null,
           h('b', null, title), h('span', null, sub), desc ? h('small', null, desc) : null),
@@ -478,7 +478,7 @@
     const chest = h('div', { class: 'dp-item dp-chest' + (ds.chest ? ' done opened' : ds.all ? ' ready' : ' locked') },
       h('div', { class: 'dp-node' }, ds.chest ? '⭐' : '🎁'),
       h('div', { class: 'plan-card dp-card' },
-        h('div', { class: 'pc-icon chest-ic' }, ds.chest ? '🏆' : '🎁'),
+        h('div', { class: 'pc-icon chest-ic' }, S.Icons.el(ds.chest ? 'trophy' : 'gift')),
         h('div', { class: 'pc-body' },
           h('b', null, ds.chest ? 'Dagbeloning ontvangen' : 'Dagbeloning'),
           h('span', null, ds.chest ? `+${S.Dagplan.CHEST_XP} XP · tot morgen!` : ds.all ? 'Alles af! Open je beloning.' : `Nog ${left} ${left === 1 ? 'taak' : 'taken'} · +${S.Dagplan.CHEST_XP} XP`),
@@ -641,7 +641,7 @@
     Gen.STEPS.forEach(x => {
       const done = (s.steps || {})[x.id] || (x.id === 'test' && s.done);
       steps.append(h('button', { class: 'step' + (done ? ' done' : '') + (nxt && nxt.id === x.id ? ' next' : ''), type: 'button', onclick: () => startStep(u, x.id) },
-        h('span', { class: 'st-icon' }, done ? '✓' : x.icon), h('b', null, x.nl), h('small', null, '±' + x.min + ' min')));
+        h('span', { class: 'st-icon' }, done ? '✓' : S.Icons.el(x.id === 'vocab1' || x.id === 'vocab2' ? 'vocab' : x.id === 'apply' ? 'speak' : x.id)), h('b', null, x.nl), h('small', null, '±' + x.min + ' min')));
     });
     const pd = Paused.get();
     if (pd && pd.desc && pd.desc.unit === u.id) wrap.append(h('div', { class: 'plan' }, pausedCard()));
@@ -729,14 +729,14 @@
       h('button', { class: 'btn primary wide', type: 'button', onclick: () => { const ses = Gen.weakTraining(weak.map(w => w[0])); if (!ses.items.length) { S.toast('Nog geen oefeningen voor deze onderwerpen'); return; } runSession(ses); } }, 'Oefen deze onderwerpen'))
       : h('p', { class: 'muted' }, 'Nog geen zwakke punten gevonden. Blijf oefenen, dan zie je hier waar je extra aandacht aan kunt geven.')));
     wrap.append(section('🎲 Woordspellen', h('div', { class: 'quick' },
-      S.Games.GAMES.map(g => quick(g.icon, g.es, g.nl + ' · ±' + g.min + ' min', () => S.Games.start(g.id), null, g.tip)),
+      S.Games.GAMES.map(g => quick(g.id, g.es, g.nl + ' · ±' + g.min + ' min', () => S.Games.start(g.id), null, g.tip)),
       quick('🗂️', 'Alle spellen', 'kies je woorden', () => { location.hash = '#/juegos'; }, null, 'Kies eerst uit welke unit de woorden komen'))));
     wrap.append(section('Meer', h('div', { class: 'quick' },
       quick('📚', 'Woordenboek', 'zoeken + eigen woorden', () => { location.hash = '#/woorden'; }, null, 'Zoek een woord op of voeg je eigen woorden toe'),
       quick('⚡', 'Woordensprint', '2 min of zelf kiezen', () => { location.hash = '#/woordtoets'; }, null, 'Zoveel mogelijk woorden op tijd, of test nieuwe woorden'),
       quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10)), null, 'Luister naar een zin en typ wat je hoort'),
       quick('🎙️', 'Uitspraak', '8 zinnen', () => startSpeak(), null, 'Zeg zinnen hardop, de app luistert mee'),
-      quick('🔀', 'Extra herhaling', '20 items', () => { const ids = U.sample(Object.keys(st().srs), 20); if (!ids.length) { S.toast('Nog niets geleerd'); return; } runSession(Gen.reviewSession(20, ids)); }, null, 'Herhaal geleerde woorden, ook als ze nog niet aan de beurt zijn'))));
+      quick('review', 'Extra herhaling', '20 items', () => { const ids = U.sample(Object.keys(st().srs), 20); if (!ids.length) { S.toast('Nog niets geleerd'); return; } runSession(Gen.reviewSession(20, ids)); }, null, 'Herhaal geleerde woorden, ook als ze nog niet aan de beurt zijn'))));
     return wrap;
   };
   function weakTags() {
@@ -1839,7 +1839,10 @@
     if (S.course.id !== 'es-nl') {
       const logo = document.querySelector('.logo'); if (logo) logo.innerHTML = S.course.flag + ' ' + S.course.brand;
       document.title = S.course.title;
+    } else {
+      const logo = document.querySelector('.logo'); if (logo) logo.innerHTML = S.Icons.logo() + ' Español <em>latino</em>';
     }
+    S.Icons.decorate();
     Store.load(); migrateTests();
     applyTheme(); Speech.init(); S.Tutor.hookSpeech();
     const ver = document.getElementById('tb-ver'); if (ver) ver.textContent = appVersion();
