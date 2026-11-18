@@ -29,19 +29,30 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     const full = !!opt.full && !opt.face;
     const vb = opt.face ? '-6 12 132 92' : full ? '-8 14 140 150' : '0 0 120 120',
       w = opt.face ? Math.round(size * 132 / 92) : full ? Math.round(size * 140 / 150) : size;
-    // handje met vier vingertjes; a = draaihoek van de arm (0 = langs het lijf)
-    const arm = (x, y, a, side) => `<g class="lupe-arm${side > 0 ? ' arm-r' : ' arm-l'}" transform="translate(${x} ${y}) rotate(${a})"><g class="arm-in"><path d="M-5.5 0C-6.5 9-5 17-3.5 21H3.5C5 17 6.5 9 5.5 0Z" fill="${u('s')}"/>
-      <g fill="#f8aecb"><circle cx="-4.2" cy="22.5" r="2.5"/><circle cx="-1.4" cy="24.6" r="2.5"/><circle cx="1.6" cy="24.6" r="2.5"/><circle cx="4.3" cy="22.4" r="2.5"/></g><ellipse cx="0" cy="20" rx="5" ry="3.6" fill="#f8aecb"/></g></g>`;
+    // armpje met vier slanke vingertjes zoals een echte axolotl; a = draaihoek (0 = langs het lijf)
+    const SK = '#f4a6c4', SPOT = '#d9668f';
+    const arm = (x, y, a, side) => `<g class="lupe-arm${side > 0 ? ' arm-r' : ' arm-l'}" transform="translate(${x} ${y}) rotate(${a})"><g class="arm-in">
+      <path d="M0 0C-1 7-1 13 0 18" fill="none" stroke="${SK}" stroke-width="8.5" stroke-linecap="round"/>
+      <g stroke="${SK}" stroke-width="2.6" stroke-linecap="round" fill="none"><path d="M-1 18-6.5 23.5"/><path d="M-.5 19-3.2 26"/><path d="M.5 19 1.8 26.5"/><path d="M1 18 6 24"/></g>
+      <g fill="#ffd6e5"><circle cx="-6.5" cy="23.5" r="1.3"/><circle cx="-3.2" cy="26" r="1.3"/><circle cx="1.8" cy="26.5" r="1.3"/><circle cx="6" cy="24" r="1.3"/></g>
+      <g fill="${SPOT}" opacity=".5"><circle cx="-1.6" cy="6" r="1"/><circle cx="1.4" cy="11" r=".9"/></g></g></g>`;
+    // achterpootje met vijf teentjes
+    const leg = (x, s) => `<g transform="translate(${x} 142) scale(${s} 1)"><path d="M0 0C-1 5-3 9-5 12" fill="none" stroke="${SK}" stroke-width="9" stroke-linecap="round"/>
+      <g stroke="${SK}" stroke-width="2.6" stroke-linecap="round" fill="none"><path d="M-5 12-12 13"/><path d="M-5 12.5-10.5 17"/><path d="M-5 13-6.5 18.5"/><path d="M-4.5 13-2 18"/><path d="M-4 12.5 1 15.5"/></g>
+      <g fill="#ffd6e5"><circle cx="-12" cy="13" r="1.3"/><circle cx="-10.5" cy="17" r="1.3"/><circle cx="-6.5" cy="18.5" r="1.3"/><circle cx="-2" cy="18" r="1.3"/><circle cx="1" cy="15.5" r="1.3"/></g></g>`;
     const body = full ? `
-  <g class="lupe-tail"><path d="M80 128C94 140 112 144 122 122C125 115 124 108 121 104C119 118 110 128 96 126C89 125 84 122 81 118Z" fill="${u('t')}" opacity=".7"/>
-    <path d="M78 130C92 138 106 140 116 124C119 119 120 114 119 110C114 122 104 128 94 127C87 126 82 123 79 120Z" fill="${u('s')}"/></g>
-  <g class="lupe-legs"><ellipse cx="46" cy="149" rx="8" ry="7" fill="${u('s')}"/><ellipse cx="74" cy="149" rx="8" ry="7" fill="${u('s')}"/>
-    <g fill="#f8aecb"><circle cx="40" cy="154.5" r="2.7"/><circle cx="44" cy="156" r="2.7"/><circle cx="48.4" cy="156" r="2.7"/><circle cx="52" cy="154.4" r="2.6"/><circle cx="68" cy="154.4" r="2.6"/><circle cx="71.6" cy="156" r="2.7"/><circle cx="76" cy="156" r="2.7"/><circle cx="80" cy="154.5" r="2.7"/></g></g>
+  <g class="lupe-tail">
+    <path d="M74 111C90 113 102 122 113 130C120 135 126 133 130 125C133 133 132 145 123 151C112 157 96 154 85 148C79 145 75 141 72 134Z" fill="${u('t')}" opacity=".55"/>
+    <g stroke="#fff" stroke-width=".8" opacity=".6" fill="none"><path d="M85 117 83 127"/><path d="M97 123 93 133"/><path d="M108 129 102 138"/><path d="M121 133 114 141"/><path d="M127 141 119 145"/><path d="M96 151 97 144"/><path d="M110 153 108 146"/></g>
+    <path d="M74 120C89 126 101 135 112 140C119 143 125 141 129 135C126 145 117 150 107 149C94 147 83 142 74 136Z" fill="${u('s')}"/>
+    <g fill="${SPOT}" opacity=".45"><circle cx="90" cy="133" r="1.3"/><circle cx="102" cy="139" r="1.1"/><circle cx="114" cy="144" r="1"/><circle cx="84" cy="128" r="1"/></g>
+  </g>
+  <g class="lupe-legs">${leg(47, 1)}${leg(73, -1)}</g>
   ${arm(30, 101, opt.wave ? 14 : 22, -1)}
   ${opt.wave ? arm(91, 103, -128, 1) : arm(90, 101, -22, 1)}
-  <path d="M40 93C33 108 28 126 26 144Q60 156 94 144C92 126 87 108 80 93Z" fill="${u('h')}"/>
-  <path d="M29 131Q60 143 91 131" fill="none" stroke="#fff4e6" stroke-width="3.4" stroke-linecap="round"/>
-  <path d="M28 138Q60 150 92 138" fill="none" stroke="#f2b134" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/>
+  <path d="M41 93C35 108 31 124 29 141Q60 151 91 141C89 124 85 108 79 93Z" fill="${u('h')}"/>
+  <path d="M31 129Q60 140 89 129" fill="none" stroke="#fff4e6" stroke-width="3.4" stroke-linecap="round"/>
+  <path d="M30 135.5Q60 146 90 135.5" fill="none" stroke="#f2b134" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/>
   <g><circle cx="42" cy="122" r="3.1" fill="#f0789f"/><circle cx="60" cy="125" r="3.4" fill="#f2b134"/><circle cx="78" cy="122" r="3.1" fill="#f0789f"/><circle cx="42" cy="122" r="1.1" fill="#fff4e6"/><circle cx="60" cy="125" r="1.2" fill="#fff4e6"/><circle cx="78" cy="122" r="1.1" fill="#fff4e6"/></g>
   <path d="M49 106l3 4 3-4 3 4 3-4 3 4 3-4 3 4" fill="none" stroke="#fff4e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>` : '';
     return `<svg class="lupe-svg${full ? ' lupe-full' + (opt.wave ? ' waving' : '') : ''}" viewBox="${vb}" width="${w}" height="${size}" role="img" aria-label="Lupe, de docente" xmlns="http://www.w3.org/2000/svg">
@@ -57,8 +68,8 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   <path d="M31 95.5Q60 113 89 95.5" fill="none" stroke="#fff4e6" stroke-width="3.6" stroke-linecap="round"/>
   <path d="M30 103Q60 120 90 103" fill="none" stroke="#f2b134" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/>
   <g><circle cx="42" cy="113" r="3.1" fill="#f0789f"/><circle cx="60" cy="116" r="3.1" fill="#f2b134"/><circle cx="78" cy="113" r="3.1" fill="#f0789f"/><circle cx="42" cy="113" r="1.1" fill="#fff4e6"/><circle cx="60" cy="116" r="1.1" fill="#fff4e6"/><circle cx="78" cy="113" r="1.1" fill="#fff4e6"/></g>`}
-  <ellipse cx="60" cy="67" rx="43" ry="34.5" fill="${u('s')}"/>
-  <ellipse cx="60" cy="82" rx="28" ry="16.5" fill="#ffdce8" opacity=".85"/>
+  <path d="M60 34C88 34 105 47 105 66C105 87 87 99 60 99C33 99 15 87 15 66C15 47 32 34 60 34Z" fill="${u('s')}"/>
+  <path d="M24 80C34 92 46 96 60 96S86 92 96 80C88 86 76 89 60 89S32 86 24 80Z" fill="#ffdce8" opacity=".7"/>
   <ellipse cx="43" cy="45" rx="11" ry="5" transform="rotate(-22 43 45)" fill="#fff" opacity=".4"/>
   <g fill="#e483aa" opacity=".55"><circle cx="58" cy="39" r="1.9"/><circle cx="66" cy="41.5" r="1.4"/><circle cx="51" cy="42.5" r="1.3"/><circle cx="31" cy="58" r="1.5"/><circle cx="91" cy="60" r="1.5"/></g>
   <g class="lupe-flower" transform="translate(85 38)">
@@ -71,7 +82,7 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     <circle cx="40" cy="65.6" r="1.1" fill="#fff" opacity=".75"/><circle cx="76" cy="65.6" r="1.1" fill="#fff" opacity=".75"/>
   </g>
   <ellipse cx="30.5" cy="76" rx="7" ry="4.2" fill="#f0789f" opacity=".55"/><ellipse cx="89.5" cy="76" rx="7" ry="4.2" fill="#f0789f" opacity=".55"/>
-  <path class="m-closed" d="M50 80.5Q60 89.5 70 80.5" fill="none" stroke="#7a2944" stroke-width="2.9" stroke-linecap="round"/>
+  <path class="m-closed" d="M43 79.5Q60 91 77 79.5" fill="none" stroke="#7a2944" stroke-width="2.9" stroke-linecap="round"/>
   <g class="m-open"><path d="M49 79Q60 98 71 79Q60 83 49 79Z" fill="#7a2944"/><ellipse cx="60" cy="88.5" rx="5" ry="2.6" fill="#f0789f"/></g>
 </svg>`;
   }
