@@ -17,14 +17,14 @@
   }
   const T_ = {
     check: ['Controleer', 'Comprobar'], next: ['Verder', 'Continuar'], skip: ['Overslaan', 'Saltar'], gotit: ['Begrepen', 'Entendido'],
-    choose: ['Kies het juiste antwoord', 'Elige la respuesta correcta'], fill: ['Vul in', 'Completa'], translate: ['Vertaal naar het Spaans', 'Traduce al español'],
+    choose: ['Kies het juiste antwoord', 'Elige la respuesta correcta'], fill: ['Vul in', 'Completa'], translate: ['Vertaal naar het Spaans', 'Traduce al español'], aslesson: ['Vertaal zoals in de les', 'Traduce como en la lección'],
     order: ['Zet de zin in de juiste volgorde', 'Ordena la frase'], match: ['Koppel de paren', 'Une las parejas'], listen: ['Luister en typ wat je hoort', 'Escucha y escribe'],
     speak: ['Zeg het hardop', 'Dilo en voz alta'], conj: ['Vervoeg het werkwoord', 'Conjuga el verbo'], type: ['Typ in het Spaans', 'Escribe en español'],
     meaning: ['Wat betekent dit?', '¿Qué significa?'], howsay: ['Hoe zeg je dit in het Spaans?', '¿Cómo se dice en español?'], hear: ['Wat hoor je?', '¿Qué escuchas?'],
     newword: ['Nieuw woord', 'Palabra nueva'], correct: ['Juiste antwoord', 'Respuesta correcta'], write: ['Schrijfopdracht', 'Tarea de escritura']
   };
   function T(k) { const v = T_[k]; return v ? v[esMode() ? 1 : 0] : k; }
-  const Q_MAP = { 'Wat betekent dit?': 'meaning', 'Hoe zeg je dit in het Spaans?': 'howsay', 'Wat hoor je?': 'hear', 'Typ in het Spaans': 'type', 'Vertaal naar het Spaans': 'translate', 'Vervoeg': 'conj' };
+  const Q_MAP = { 'Wat betekent dit?': 'meaning', 'Hoe zeg je dit in het Spaans?': 'howsay', 'Wat hoor je?': 'hear', 'Typ in het Spaans': 'type', 'Vertaal naar het Spaans': 'translate', 'Vertaal zoals in de les': 'aslesson', 'Vervoeg': 'conj' };
 
   /* 🔊 normaal, 🐢 langzaam. Tik je nog eens op de 🐢, dan wordt het een 🐌: heel langzaam (en dat blijft hij bij deze vraag). */
   function speakBtn(text, opt = {}) {
@@ -453,6 +453,7 @@
     let sent = null;
     if (it.conj) { const c = conjCard(it, ctx); sent = c.frame; wrap.append(c.el); }
     else if (it.prompt) wrap.append(h('div', { class: 'prompt' }, it.prompt));
+    if (it.mainOnly) wrap.append(h('div', { class: 'p-note' }, '🔁 Je eigen zin was ook goed. Typ nu de zin zoals hij in de les staat.'));
     if (it.sentence) { sent = sentenceEl(it.sentence); wrap.append(sent); }
     if (it.h) wrap.append(h('div', { class: 'hint' }, '(' + it.h + ')'));
     if (it.nl && it.sentence) wrap.append(h('div', { class: 'nl-hint' }, it.nl));
@@ -485,13 +486,14 @@
       const user = part ? part.value().trim() : inp.value.trim();
       let r = S.Gen.checkType(user, it);
       // eerder door Lupe goedgekeurd (herbeoordeling): nu meteen goed
-      const lupeOk = !r.ok && it.translate && S.Mistakes && S.Mistakes.accepted(it.prompt, user);
-      if (lupeOk) r = { ok: true, warn: 'lupe', best: user };
+      // maar de zin uit de les moet je óók leren: dan komt hij straks terug (alleen de lesversie telt dan)
+      const lupeOk = !r.ok && it.translate && !it.mainOnly && S.Mistakes && S.Mistakes.accepted(it.prompt, user);
+      if (lupeOk) r = { ok: true, warn: 'lupe', best: user, alt: true };
       field().disabled = true;
       if (part) { part.mark(user, it.answers); const w = wrap.querySelector('.p-whole'); if (w) w.remove(); }
       if (sent) { const bl = sent.querySelector('.blank'); if (bl) { bl.textContent = r.ok ? user : (r.best || it.answers[0]); bl.classList.add('filled'); } }
       const parts = it.translate && !r.ok ? S.check.parts(user, it.answers) : null;
-      return { ok: r.ok, user, expected: r.best || it.answers[0], warn: r.warn, gender: r.gender, synonym: r.synonym, main: it.word ? it.word.es : it.answers[0], x: it.x, alts: it.answers, hinted: help.hints(), parts };
+      return { ok: r.ok, user, expected: r.best || it.answers[0], warn: r.warn, gender: r.gender, synonym: r.synonym, main: it.word ? it.word.es : it.answers[0], x: it.x, alts: it.answers, hinted: help.hints(), alt: r.alt, parts };
     };
     return wrap;
   };
@@ -878,18 +880,19 @@
       skipBtn.hidden = true; backBtn.hidden = true; peekBtn.hidden = true; closePeek();
       const first = !graded.has(it.orig || it);
       if (first) graded.set(it.orig || it, r.ok);
-      if (r.ok) { streak++; bestStreak = Math.max(bestStreak, streak); xp += it.retry || r.hinted ? 5 : 10; } else streak = 0;
+      if (r.ok) { streak++; bestStreak = Math.max(bestStreak, streak); xp += it.retry || r.hinted || r.alt ? 5 : 10; } else streak = 0;
       // twee keer achter elkaar fout? Dan eerst een makkelijkere vraag, zodat je niet in een reeks pittige vastloopt
       if (r.ok) misses = 0; else if (++misses >= 2 && session.mode !== 'exam' && !session.timer && S.Gen.easeNext(queue, idx + 1)) misses = 0;
       if (!r.ok && !r.self && r.expected) mistakes.push({ it, r });
       // item direct verwerken (SRS + statistiek) — alleen eerste poging
       if (first && hooks.onItem) hooks.onItem(it, r.ok, r);
       if (session.mode === 'exam') { idx++; setTimeout(show, 120); return; }
-      const retryLater = (!r.ok || r.hinted) && !it.retry && (session.mode === 'learn' || session.mode === 'review') && !['match', 'speak'].includes(it.kind);
+      const retryLater = (!r.ok || r.hinted || r.alt) && !it.retry && (session.mode === 'learn' || session.mode === 'review') && !['match', 'speak'].includes(it.kind);
       (r.ok ? Sound.good : Sound.bad)();
       // opnieuw aanbieden in leer-/herhaalmodus
       if (retryLater) {
         const copy = { ...it, retry: true, orig: it.orig || it };
+        if (r.alt) mainOnlyCopy(copy);
         // zin half goed: straks alleen de foute woorden opnieuw invullen
         if (S.check.partsUsable(r.parts)) { copy.keep = { a: r.parts.a, k: r.parts.k }; r.keepLater = true; }
         if (copy.options) copy.options = U.shuffle(copy.options);
@@ -936,7 +939,8 @@
       if (r.ok && r.warn === 'enye') fb.append(h('div', null, '✍️ Let op de ñ: ', h('b', { lang: 'es' }, r.expected)));
       if (r.ok && r.warn === 'typo') fb.append(h('div', null, '🔤 Kleine typfout — precies: ', h('b', { lang: 'es' }, r.expected)));
       if (r.ok && r.warn === 'article') fb.append(h('div', null, '📌 Vergeet het lidwoord niet: ', h('b', { lang: 'es' }, r.expected)));
-      if (r.ok && r.warn === 'lupe') fb.append(h('div', null, '🤖 Lupe keurde dit antwoord eerder goed. In de les staat: ', h('b', { lang: 'es' }, (r.alts || it.answers)[0])));
+      if (r.ok && r.warn === 'lupe') fb.append(h('div', null, '🤖 Lupe keurde dit antwoord eerder goed. In de les staat: ', h('b', { lang: 'es' }, (r.alts || it.answers)[0]), speakBtn((r.alts || it.answers)[0])),
+        h('div', { class: 'small' }, '🔁 Leer ook de zin uit de les: je krijgt hem straks nog een keer.'));
       if (r.ok && r.warn === 'synonym') fb.append(h('div', null, '👍 Ook goed! In de les staat: ', h('b', { lang: 'es' }, r.main)));
       if (!r.ok && r.expected && r.matchMistakes == null) {
         fb.append(h('div', { class: 'fb-exp' }, T('correct') + ': ', h('b', { lang: 'es' }, r.expected), (it.speakAnswer || it.kind === 'listen' || it.sentence) ? speakBtn(it.sentence ? it.sentence.replace('___', r.expected) : r.expected) : null));
@@ -966,7 +970,10 @@
         fb.append(h('div', { class: 'xi-fb' }, r.ok ? nt.btn : null, nt.box));
       }
       // AI-beoordeling bij vrije vertaling
-      if (!r.ok && it.translate && S.AI.enabled() && r.user) {
+      if (!r.ok && it.mainOnly && S.Mistakes && S.Mistakes.accepted(it.prompt, r.user)) {
+        fb.querySelectorAll('.fb-wrong').forEach(x => x.remove());
+        fb.append(h('div', { class: 'small' }, '🤖 Dit antwoord keurde Lupe al goed. Nu oefen je de zin zoals hij in de les staat.'));
+      } else if (!r.ok && it.translate && S.AI.enabled() && r.user) {
         const b = h('button', { class: 'btn small ghost', type: 'button' }, '🤖 Toch goed? Laat de AI het beoordelen');
         b.onclick = async () => {
           b.disabled = true; b.textContent = 'AI beoordeelt…';
@@ -985,17 +992,21 @@
               fb.querySelectorAll('.fb-wrong').forEach(x => x.remove());
               const fe = fb.querySelector('.fb-exp'); if (fe && fe.firstChild) fe.firstChild.textContent = esMode() ? 'En la lección dice: ' : 'In de les staat: ';
               graded.set(it.orig || it, true);
-              const qi = queue.lastIndexOf(queue.find(q => q.orig === (it.orig || it) && q.retry));
-              if (qi > idx) queue.splice(qi, 1);
+              // de herkansing blijft: dan oefen je de zin zoals hij in de les staat
+              const rq = queue.find((q, i) => i > idx && q.orig === (it.orig || it) && q.retry);
+              if (rq) { mainOnlyCopy(rq); fb.append(h('div', { class: 'small' }, '🔁 Leer ook de zin uit de les: je krijgt hem straks nog een keer.')); }
               const mi = mistakes.findIndex(m => m.it === it); if (mi >= 0) mistakes.splice(mi, 1);
-              hooks.onItem && hooks.onItem(it, true, { ...r, ok: true, override: true });
-              xp += 10; progress(); if (idx < queue.length && queue[idx] === it) persist(idx + 1);
+              hooks.onItem && hooks.onItem(it, true, { ...r, ok: true, override: true, alt: true });
+              xp += 5; progress(); if (idx < queue.length && queue[idx] === it) persist(idx + 1);
             }
           } catch (e) { b.disabled = false; b.textContent = '⚠️ ' + e.message; }
         };
         fb.append(b);
       }
     }
+
+    /* Herkansing na een goedgekeurd alternatief: nu telt alleen de zin uit de les. */
+    function mainOnlyCopy(q) { q.mainOnly = true; q.q = 'Vertaal zoals in de les'; q.keep = null; }
 
     /* Wat Lupe ziet als je haar iets vraagt tijdens de les. */
     let lastR = null;
