@@ -51,6 +51,17 @@
     }
     return { title: p.name + ' · Paspoortstempel', items: U.shuffle(items), mode: 'test', pass: PASS };
   }
+  /* Zoeken in de woorden van een land: zonder accenten en hoofdletters, in het Spaans én het Nederlands.
+     f = 'all' | 'ok' (netjes, zonder label) | 'i' (informeel) | 'g' (grof). Geeft de indexen in p.words. */
+  const fold = t => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[¡!¿?«»'’.,]/g, ' ').replace(/\s+/g, ' ').trim();
+  function search(p, q, f = 'all') {
+    const k = fold(q);
+    return p.words.map((w, i) => i).filter(i => {
+      const [es, nl, lab] = p.words[i];
+      if (f === 'ok' ? lab : f !== 'all' && lab !== f) return false;
+      return !k || fold(es).includes(k) || fold(nl).includes(k);
+    });
+  }
   function finish(p, kind, sum) {
     const g = progOf(p.id); g.v = g.v || Date.now(); g.n = (g.n || 0) + 1;
     const score = sum.total ? sum.ok / sum.total : 0;
@@ -143,12 +154,34 @@
         h('div', { class: 'pl-ex' }, h('div', { class: 'grow' }, h('div', { class: 'es', lang: 'es' }, es), h('div', { class: 'small muted' }, nl))),
         h('div', { class: 'row gap wrap' }, hereBtn(p, es), neutral ? h('button', { class: 'btn small ghost', type: 'button', onclick: () => S.Speech.say(es, { clipNs: null }) }, '🔊 Neutraal') : null)))));
     const ws = words(p);
+    const row = (pl, i) => { const [es, nl, lab] = pl.words[i]; return h('div', { class: 'word-row' },
+      h('button', { class: 'icon-btn speak', type: 'button', 'aria-label': 'Beluister', onclick: e => { e.stopPropagation(); say(pl, pl.words[i][0]); } }, '🔊'),
+      h('div', { class: 'grow' }, h('b', { lang: 'es' }, es), h('span', null, nl)),
+      lab && LABEL[lab] ? h('span', { class: 'lab ' + LABEL[lab][1] }, LABEL[lab][1]) : null); };
+    const box = h('div', { class: 'card word-list' }), info = h('p', { class: 'small muted pl-count' });
+    let q = '', f = 'all';
+    const input = h('input', { class: 'pl-search', type: 'search', placeholder: '🔎 Zoek in het Spaans of Nederlands…', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', spellcheck: 'false', enterkeyhint: 'search', 'aria-label': 'Zoek woorden van ' + p.name });
+    const FILTERS = [['all', 'Alles'], ['ok', 'Netjes'], ['i', 'Informeel'], ['g', 'Grof']];
+    const chips = FILTERS.map(([k, t]) => h('button', { class: 'chip toggle' + (k === f ? ' on' : ''), type: 'button', 'aria-pressed': String(k === f), onclick: () => { f = k; chips.forEach((c, j) => { const on = FILTERS[j][0] === k; c.classList.toggle('on', on); c.setAttribute('aria-pressed', String(on)); }); draw(); } }, t));
+    function draw() {
+      const hits = search(p, q, f);
+      box.innerHTML = ''; hits.forEach(i => box.append(row(p, i)));
+      box.hidden = !hits.length;
+      const all = !q && f === 'all';
+      info.textContent = all ? p.words.length + ' woorden en uitdrukkingen' : hits.length ? hits.length + ' van ' + p.words.length + ' woorden' : 'Niets gevonden in ' + p.name + '.';
+      other.innerHTML = '';
+      if (q.trim().length >= 2) {
+        const elsewhere = list().filter(x => x.id !== p.id).map(x => [x, search(x, q, f)]).filter(([, r]) => r.length).slice(0, 6);
+        if (elsewhere.length) other.append(h('p', { class: 'small muted' }, 'Ook in andere landen:'),
+          h('div', { class: 'card word-list' }, elsewhere.flatMap(([x, r]) => r.slice(0, 3).map(i => { const el = row(x, i); el.prepend(h('a', { class: 'pl-other', href: '#/pais/' + x.id, title: x.name, 'aria-label': x.name }, flagImg(x))); return el; }))));
+      }
+    }
+    const other = h('div', { class: 'pl-elsewhere' });
+    input.addEventListener('input', () => { q = input.value; draw(); });
     wrap.append(h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, '💬 Woorden en slang'),
       h('p', { class: 'small muted' }, h('span', { class: 'lab inf' }, 'inf'), ' = informeel, onder vrienden. ', h('span', { class: 'lab grof' }, 'grof'), ' = alleen om te herkennen, niet zelf zeggen.'),
-      h('div', { class: 'card word-list' }, p.words.map(([es, nl, lab], i) => h('div', { class: 'word-row' },
-        h('button', { class: 'icon-btn speak', type: 'button', 'aria-label': 'Beluister', onclick: e => { e.stopPropagation(); say(p, ws[i].es); } }, '🔊'),
-        h('div', { class: 'grow' }, h('b', { lang: 'es' }, es), h('span', null, nl)),
-        lab && LABEL[lab] ? h('span', { class: 'lab ' + LABEL[lab][1] }, LABEL[lab][1]) : null)))));
+      h('div', { class: 'pl-tools' }, input, h('div', { class: 'row gap wrap' }, chips)), info, box, other));
+    draw();
     if (p.fact) wrap.append(h('div', { class: 'card pl-fact' }, h('b', null, '💡 Wist je dat?'), h('p', null, p.fact)));
     const unit = p.unit && S.C.get(p.unit);
     wrap.append(h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, '🎯 Oefenen'),
@@ -179,5 +212,5 @@
   /* Onderbroken oefening van een land hervatten (vanuit «Verder waar je was»). */
   function resume(session, d) { const p = get(d.id); if (p) run(p, d.what, session); else S.runSession(session, { desc: d }); }
 
-  S.Mundo = { flagImg, list, get, status, stamps, words, practice, quiz, finish, page, placePage, resume, PASS };
+  S.Mundo = { flagImg, search, list, get, status, stamps, words, practice, quiz, finish, page, placePage, resume, PASS };
 })(window.SPT);
