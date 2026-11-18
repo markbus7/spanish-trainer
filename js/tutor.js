@@ -25,15 +25,35 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
       }).join('');
     };
     const petals = [0, 45, 90, 135, 180, 225, 270, 315].map(d => `<circle cx="${(5.2 * Math.cos(d * Math.PI / 180)).toFixed(2)}" cy="${(5.2 * Math.sin(d * Math.PI / 180)).toFixed(2)}" r="3.7" fill="#f28c1b"/>`).join('');
-    const vb = opt.face ? '-6 12 132 92' : '0 0 120 120', w = opt.face ? Math.round(size * 132 / 92) : size;
-    return `<svg class="lupe-svg" viewBox="${vb}" width="${w}" height="${size}" role="img" aria-label="Lupe, de docente" xmlns="http://www.w3.org/2000/svg">
+    // opt.full: Lupe met haar hele lijf (huipil-jurkje, armpjes, pootjes en staart). size = hoogte.
+    const full = !!opt.full && !opt.face;
+    const vb = opt.face ? '-6 12 132 92' : full ? '-8 14 140 150' : '0 0 120 120',
+      w = opt.face ? Math.round(size * 132 / 92) : full ? Math.round(size * 140 / 150) : size;
+    // handje met vier vingertjes; a = draaihoek van de arm (0 = langs het lijf)
+    const arm = (x, y, a, side) => `<g class="lupe-arm${side > 0 ? ' arm-r' : ' arm-l'}" transform="translate(${x} ${y}) rotate(${a})"><g class="arm-in"><path d="M-5.5 0C-6.5 9-5 17-3.5 21H3.5C5 17 6.5 9 5.5 0Z" fill="${u('s')}"/>
+      <g fill="#f8aecb"><circle cx="-4.2" cy="22.5" r="2.5"/><circle cx="-1.4" cy="24.6" r="2.5"/><circle cx="1.6" cy="24.6" r="2.5"/><circle cx="4.3" cy="22.4" r="2.5"/></g><ellipse cx="0" cy="20" rx="5" ry="3.6" fill="#f8aecb"/></g></g>`;
+    const body = full ? `
+  <g class="lupe-tail"><path d="M80 128C94 140 112 144 122 122C125 115 124 108 121 104C119 118 110 128 96 126C89 125 84 122 81 118Z" fill="${u('t')}" opacity=".7"/>
+    <path d="M78 130C92 138 106 140 116 124C119 119 120 114 119 110C114 122 104 128 94 127C87 126 82 123 79 120Z" fill="${u('s')}"/></g>
+  <g class="lupe-legs"><ellipse cx="46" cy="149" rx="8" ry="7" fill="${u('s')}"/><ellipse cx="74" cy="149" rx="8" ry="7" fill="${u('s')}"/>
+    <g fill="#f8aecb"><circle cx="40" cy="154.5" r="2.7"/><circle cx="44" cy="156" r="2.7"/><circle cx="48.4" cy="156" r="2.7"/><circle cx="52" cy="154.4" r="2.6"/><circle cx="68" cy="154.4" r="2.6"/><circle cx="71.6" cy="156" r="2.7"/><circle cx="76" cy="156" r="2.7"/><circle cx="80" cy="154.5" r="2.7"/></g></g>
+  ${arm(30, 101, opt.wave ? 14 : 22, -1)}
+  ${opt.wave ? arm(91, 103, -128, 1) : arm(90, 101, -22, 1)}
+  <path d="M40 93C33 108 28 126 26 144Q60 156 94 144C92 126 87 108 80 93Z" fill="${u('h')}"/>
+  <path d="M29 131Q60 143 91 131" fill="none" stroke="#fff4e6" stroke-width="3.4" stroke-linecap="round"/>
+  <path d="M28 138Q60 150 92 138" fill="none" stroke="#f2b134" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/>
+  <g><circle cx="42" cy="122" r="3.1" fill="#f0789f"/><circle cx="60" cy="125" r="3.4" fill="#f2b134"/><circle cx="78" cy="122" r="3.1" fill="#f0789f"/><circle cx="42" cy="122" r="1.1" fill="#fff4e6"/><circle cx="60" cy="125" r="1.2" fill="#fff4e6"/><circle cx="78" cy="122" r="1.1" fill="#fff4e6"/></g>
+  <path d="M49 106l3 4 3-4 3 4 3-4 3 4 3-4 3 4" fill="none" stroke="#fff4e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>` : '';
+    return `<svg class="lupe-svg${full ? ' lupe-full' + (opt.wave ? ' waving' : '') : ''}" viewBox="${vb}" width="${w}" height="${size}" role="img" aria-label="Lupe, de docente" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <radialGradient id="${id}s" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#ffd6e5"/><stop offset=".55" stop-color="#f8aecb"/><stop offset="1" stop-color="#ec88b0"/></radialGradient>
     <linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="-33" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#c8396f"/><stop offset="1" stop-color="#f07ea8"/></linearGradient>
     <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22ae9e"/><stop offset="1" stop-color="#147c70"/></linearGradient>
+    <linearGradient id="${id}t" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f07ea8"/><stop offset="1" stop-color="#ffc4da"/></linearGradient>
   </defs>
+  ${body}
   <g class="gills-l">${fronds(-1)}</g><g class="gills-r">${fronds(1)}</g>
-  ${opt.face ? '' : `<path d="M20 121C22 101 36 91 60 91S98 101 100 121Z" fill="${u('h')}"/>
+  ${opt.face || full ? '' : `<path d="M20 121C22 101 36 91 60 91S98 101 100 121Z" fill="${u('h')}"/>
   <path d="M31 95.5Q60 113 89 95.5" fill="none" stroke="#fff4e6" stroke-width="3.6" stroke-linecap="round"/>
   <path d="M30 103Q60 120 90 103" fill="none" stroke="#f2b134" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/>
   <g><circle cx="42" cy="113" r="3.1" fill="#f0789f"/><circle cx="60" cy="116" r="3.1" fill="#f2b134"/><circle cx="78" cy="113" r="3.1" fill="#f0789f"/><circle cx="42" cy="113" r="1.1" fill="#fff4e6"/><circle cx="60" cy="116" r="1.1" fill="#fff4e6"/><circle cx="78" cy="113" r="1.1" fill="#fff4e6"/></g>`}
@@ -57,10 +77,11 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   }
 
   /* Een avatar-element. Alle avatars op de pagina gaan "praten" zolang Speech iets voorleest dat van Lupe komt. */
-  function avatar(size = 56, cls = '') {
+  /* opt: { full: hele lijf, wave: zwaait } */
+  function avatar(size = 64, cls = '', opt) {
     const el = document.createElement('div');
-    el.className = 'lupe ' + cls;
-    el.innerHTML = svg(size);
+    el.className = 'lupe ' + cls + (opt && opt.full ? ' full' : '');
+    el.innerHTML = svg(size, opt);
     return el;
   }
   /* Lupe klinkt standaard als een meisje: een vrouwenstem met een veel hogere toon. In Instellingen kan het ook als een volwassen vrouw. */
@@ -118,7 +139,7 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     const canTalk = S.Speech.canSpeak();
     const el = h('div', { class: 'lupe-coach' + (opt.cls ? ' ' + opt.cls : '') + (canTalk ? ' can-talk' : ''), role: canTalk ? 'button' : null, tabindex: canTalk ? 0 : null,
       title: canTalk ? 'Tik om Lupe te horen' : null, 'aria-label': canTalk ? 'Profe Lupe: ' + line.es + '. Tik om te horen.' : null },
-      avatar(opt.size || 52, 'coach-av'),
+      avatar(opt.size || (opt.full ? 128 : 64), 'coach-av', { full: opt.full, wave: opt.wave }),
       h('div', { class: 'lc-bubble' },
         opt.label !== false ? h('div', { class: 'lc-who' }, opt.label || 'Profe Lupe') : null,
         h('div', { class: 'lc-es', lang: line.lang || 'es' }, line.es),
@@ -133,9 +154,9 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     return el;
   }
 
-  /* Lupe groot in het midden, met een emoji-badge (eindscherm van een les of spel). */
+  /* Lupe groot in het midden met haar hele lijf, met een emoji-badge (welkom, eindscherm van een les of spel). */
   function hero(line, emoji, opt = {}) {
-    const el = coach(line, Object.assign({ size: 92, cls: 'lc-hero' }, opt));
+    const el = coach(line, Object.assign({ size: 176, full: true, cls: 'lc-hero' }, opt));
     if (el && emoji) el.querySelector('.coach-av').append(S.U.h('span', { class: 'lc-badge', 'aria-hidden': 'true' }, emoji));
     return el;
   }

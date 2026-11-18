@@ -243,7 +243,7 @@
     const wrap = h('div', { class: 'grammar' },
       h('div', { class: 'eyebrow' }, '🧩 ' + (g.es || 'Gramática')),
       h('h2', null, g.t));
-    const sumEl = () => S.Tutor.coach({ es: g.sum, lang: S.course.target, nl: es ? '' : 'Kort samengevat, in het Spaans. Tik om het te horen.' }, { size: 44, label: 'Profe Lupe vat samen', cls: 'lc-sum' }) || h('div', { class: 'sum', lang: S.course.target }, (S.course.target === 'es' ? '🇪🇸 ' : S.course.flag + ' ') + g.sum);
+    const sumEl = () => S.Tutor.coach({ es: g.sum, lang: S.course.target, nl: es ? '' : 'Kort samengevat, in het Spaans. Tik om het te horen.' }, { size: 54, label: 'Profe Lupe vat samen', cls: 'lc-sum' }) || h('div', { class: 'sum', lang: S.course.target }, (S.course.target === 'es' ? '🇪🇸 ' : S.course.flag + ' ') + g.sum);
     if (g.sum && es) wrap.append(sumEl());
     const body = h('div', { class: 'prose', html: g.html });
     if (es) { const d = h('details', null, h('summary', null, 'Uitleg in het Nederlands'), body); wrap.append(d); } else wrap.append(body);
@@ -931,7 +931,7 @@
       fb.className = 'ls-fb show';
       // Profe Lupe reageert op je antwoord (klein, naast de titel)
       const streakLine = r.ok && session.mode !== 'exam' ? S.Tutor.lines.streak(streak) : null;
-      const fbTitle = t => S.Tutor.coachOn() ? h('div', { class: 'fb-head' }, S.Tutor.avatar(34, 'fb-lupe' + (r.ok ? '' : ' sad')), h('div', { class: 'fb-title' }, streakLine || t)) : h('div', { class: 'fb-title' }, streakLine || t);
+      const fbTitle = t => S.Tutor.coachOn() ? h('div', { class: 'fb-head' }, S.Tutor.avatar(44, 'fb-lupe' + (r.ok ? '' : ' sad')), h('div', { class: 'fb-title' }, streakLine || t)) : h('div', { class: 'fb-title' }, streakLine || t);
       if (r.silent && r.ok) { fb.append(fbTitle(U.pick(PRAISE))); return; }
       fb.append(fbTitle(r.dontKnow ? 'Geen probleem!' : r.ok ? U.pick(PRAISE) : U.pick(OOPS)));
       if (r.dontKnow) fb.append(h('div', { class: 'small' }, '🔁 Dit komt later terug in je herhaling.'));

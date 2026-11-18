@@ -367,7 +367,7 @@
     });
     return h('div', { class: 'welcome' },
       h('div', { class: 'hero' }, S.Tutor.coachOn() ? null : h('div', { class: 'hero-emoji' }, '🌎'), h('h1', null, '¡Bienvenido!'), h('p', null, 'Leer Latijns-Amerikaans Spaans stap voor stap: van A1 naar B1 en verder, tot C2.')),
-      S.Tutor.hero(S.Tutor.lines.welcome, '🌎'),
+      S.Tutor.hero(S.Tutor.lines.welcome, '🌎', { wave: true }),
       section('Hoe heet je?', name),
       section('Waar begin je?',
         h('button', { class: 'choice primary', type: 'button', onclick: () => go(() => { location.hash = '#/toets'; }) }, h('b', null, '🧭 Niveautest (aanbevolen)'), h('span', null, '±8 minuten. Ik bepaal je niveau en zet je op de juiste plek. Je kunt de test later altijd opnieuw doen via je profiel.')),
@@ -395,7 +395,7 @@
     const anyDays = Object.values(s.days).some(x => x.min > 0 || x.items > 0);
     wrap.append(S.Tutor.coach(S.Tutor.lines.hello({ paused: !!Paused.get(), goalDone: min >= goal, streak: Store.liveStreak(), lapsed: anyDays && !Store.liveStreak() && !d.items,
       due, step: step && step.id, unit: u.title, unitNl: u.nl, min,
-      chestReady: ds.all && !ds.chest, planDone: ds.chest, planLeft: ds.total - ds.n, planN: ds.n }), { cls: 'hoy-lupe' }));
+      chestReady: ds.all && !ds.chest, planDone: ds.chest, planLeft: ds.total - ds.n, planN: ds.n }), { cls: 'hoy-lupe', full: true, wave: true }));
 
     const plan = h('div', { class: 'plan' });
     // 0. onderbroken oefening
@@ -539,7 +539,7 @@
         stage,
         h('h3', null, '¡Plan del día completado!'),
         h('p', { class: 'center muted' }, 'Herhaling, nieuwe stof en spreken: alles af voor vandaag.'),
-        S.Tutor.coach(S.Tutor.lines.planDone({ streak }), { speak: true, delay: 1300, size: 46 }),
+        S.Tutor.coach(S.Tutor.lines.planDone({ streak }), { speak: true, delay: 1300, size: 60 }),
         h('div', { class: 'stats-row' },
           h('div', { class: 'stat' }, h('b', null, '+' + S.Dagplan.CHEST_XP), h('span', null, 'XP')),
           h('div', { class: 'stat' }, h('b', null, '🔥 ' + streak), h('span', null, streak === 1 ? 'dag op rij' : 'dagen op rij')),
@@ -792,7 +792,7 @@
     if (!S.AI.enabled()) {
       wrap.append(h('h1', null, 'Docente'));
       wrap.append(h('div', { class: 'card tutor-intro' },
-        h('div', { class: 'row gap' }, lupeAv(84), h('div', null, h('h3', null, '¡Hola! Soy Lupe 👋'), h('p', { class: 'small muted' }, S.Tutor.tagline))),
+        h('div', { class: 'row gap' }, S.Tutor.avatar(150, 'big', { full: true, wave: true }), h('div', null, h('h3', null, '¡Hola! Soy Lupe 👋'), h('p', { class: 'small muted' }, S.Tutor.tagline))),
         h('p', null, 'Ik ben een ajolote uit de kanalen van Xochimilco (Mexico-Stad) en ik wil graag je persoonlijke docente zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.'),
         h('p', null, 'Voer echte gesprekken (rollenspellen in Mexico, Colombia, Argentinië…). Je krijgt direct correcties in het Nederlands, kunt alles over grammatica vragen en krijgt feedback op je teksten.'),
         h('p', { class: 'small muted' }, 'Hiervoor heb je een eigen API-sleutel van Anthropic (Claude) nodig. Die maak je aan op platform.claude.com (uitleg in Instellingen). Je betaalt per gebruik, meestal een paar cent per gesprek. De sleutel wordt alleen op dit apparaat bewaard.'),
@@ -900,7 +900,7 @@
     const voiceHint = h('a', { class: 'small voice-hint', href: '#/ajustes' }, '🎙️ Klinkt Lupe robotachtig? Zo krijgt ze een natuurlijke stem ›');
     const checkVoice = () => { voiceHint.hidden = !Speech.voices.length || Speech.hasGoodVoice(); };
     checkVoice(); setTimeout(checkVoice, 800);
-    const av = lupeAv(72, 'big');
+    const av = lupeAv(96, 'big');
     av.title = 'Tik om haar te laten stoppen met praten';
     av.onclick = () => { Speech.stop(); S.Tutor.setTalking(false); };
     return h('div', { class: 'tutor-head' }, av,
@@ -908,7 +908,7 @@
       h('button', { class: 'btn ghost small t-stop', type: 'button', onclick: () => { Speech.stop(); S.Tutor.setTalking(false); } }, '■ Stop'));
   }
   function bubble(m, pending) {
-    const b = h('div', { class: 'msg ' + m.role }, m.role === 'assistant' ? lupeAv(34, 'mini') : null, h('div', { class: 'bubble-body' }, pending ? h('span', { class: 'typing' }, '…') : null));
+    const b = h('div', { class: 'msg ' + m.role }, m.role === 'assistant' ? lupeAv(40, 'mini') : null, h('div', { class: 'bubble-body' }, pending ? h('span', { class: 'typing' }, '…') : null));
     if (!pending) fillBubble(b, m);
     return b;
   }
@@ -946,7 +946,7 @@
     const f = M().focus(7, 2); if (!f.length) return null;
     const top = f[0], ex = top.ex[0];
     return h('div', { class: 'card lupe-focus' },
-      h('div', { class: 'row gap' }, S.Tutor.avatar(44, 'coach-av'),
+      h('div', { class: 'row gap' }, S.Tutor.avatar(72, 'coach-av'),
         h('div', { class: 'grow' }, h('b', null, '🎯 ' + top.label + ' ging deze week ' + top.n + '× mis'),
           ex ? h('div', { class: 'small lf-ex' }, h('s', { lang: 'es' }, ex.w), ' → ', h('b', { lang: 'es' }, ex.c)) : null,
           f.length > 1 ? h('small', { class: 'muted' }, 'Ook: ' + f.slice(1).map(t => t.label + ' (' + t.n + '×)').join(', ')) : null)),
@@ -994,7 +994,7 @@
     const trend = r.prev ? (r.total < r.prev ? '📉 minder dan de ' + r.days + ' dagen ervoor (' + r.prev + ')' : r.total > r.prev ? 'meer dan de ' + r.days + ' dagen ervoor (' + r.prev + ')' : 'evenveel als ervoor') : null;
     wrap.append(S.Tutor.coach(!r.total ? { es: '¡Platiquemos! Así veo en qué te puedo ayudar.', nl: 'Laten we kletsen! Dan zie ik waarmee ik je kan helpen.' }
       : r.prev && r.total < r.prev ? { es: '¡Vas mejorando! Cometes menos errores que antes.', nl: 'Je wordt beter! Je maakt minder fouten dan eerst.' }
-        : { es: 'Mira, esto es lo que más practicaría yo.', nl: 'Kijk, dit zou ik het meest oefenen.' }));
+        : { es: 'Mira, esto es lo que más practicaría yo.', nl: 'Kijk, dit zou ik het meest oefenen.' }, { full: true }));
     wrap.append(h('div', { class: 'stat-grid' },
       statCard('📝', r.total, 'fouten genoteerd', trend || 'laatste ' + r.days + ' dagen'),
       statCard('🧩', r.topics.length, 'onderwerpen'),
@@ -1118,7 +1118,7 @@
         h('h1', null, s.name || 'Mijn profiel'),
         h('p', { class: 'muted small' }, 'Leert Spaans sinds ' + fmtDate(s.created) + ' · ' + U.plural(activeDays, 'dag', 'dagen') + ' geoefend'),
         h('div', { class: 'chips' }, h('span', { class: 'chip' }, '📈 ' + est.label), h('span', { class: 'chip' }, '🔥 ' + U.plural(Store.liveStreak(), 'dag', 'dagen')), h('span', { class: 'chip' }, '⭐ ' + s.xp + ' XP')))));
-    wrap.append(S.Tutor.coach(S.Tutor.lines.profile({ words: wordStats(C.all()).seen, days: activeDays, streak: Store.liveStreak() })));
+    wrap.append(S.Tutor.coach(S.Tutor.lines.profile({ words: wordStats(C.all()).seen, days: activeDays, streak: Store.liveStreak() }), { full: true }));
 
     // ---- niveau ----
     const les = lessonLevel(); const cur = P.current();
@@ -1436,7 +1436,7 @@
     const t = r.rec; const res = Gen.levelTestResult(t.bands, TEST_ORDER);
     const prev = testsOf().filter(x => x.d < t.d).pop();
     const wrap = h('div', { class: 'page' }, h('h1', null, 'Uitslag niveautest'));
-    wrap.append(S.Tutor.coach(S.Tutor.lines.result({ level: t.level, first: !prev, up: prev && lvIdx(t.level) > lvIdx(prev.level), down: prev && lvIdx(t.level) < lvIdx(prev.level) }), { speak: true }));
+    wrap.append(S.Tutor.coach(S.Tutor.lines.result({ level: t.level, first: !prev, up: prev && lvIdx(t.level) > lvIdx(prev.level), down: prev && lvIdx(t.level) < lvIdx(prev.level) }), { speak: true, full: true, wave: !prev || lvIdx(t.level) > lvIdx(prev.level) }));
     const trend = prev ? (lvIdx(t.level) > lvIdx(prev.level) ? '📈 Hoger dan je vorige test (' + (prev.level || 'beginner') + ')' : lvIdx(t.level) < lvIdx(prev.level) ? '📉 Lager dan je vorige test (' + (prev.level || 'beginner') + '). Dat kan gebeuren: doe hem later nog eens.' : '➡️ Gelijk aan je vorige test') : null;
     wrap.append(h('div', { class: 'card level-est' },
       h('div', { class: 'muted small' }, 'Je beheerst'),

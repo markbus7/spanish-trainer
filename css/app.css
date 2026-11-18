@@ -698,6 +698,12 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .lupe.talking .gills-l, .lupe.talking .gills-r { animation: lupe-wiggle .5s infinite alternate ease-in-out; transform-box: fill-box; }
 .lupe.talking .gills-l { transform-origin: right center; } .lupe.talking .gills-r { transform-origin: left center; animation-delay: -.25s; }
 .lupe.big { animation: lupe-bob 3.2s infinite ease-in-out; cursor: pointer; }
+/* Lupe met haar hele lijf: zwaaien, staart die meebeweegt */
+.lupe-full .lupe-tail { transform-box: fill-box; transform-origin: 0% 60%; animation: lupe-tail 2.8s infinite ease-in-out; }
+.lupe-full.waving .arm-r .arm-in { transform-origin: 0 0; animation: lupe-wave 1.1s 4 ease-in-out; }
+.lupe.talking .lupe-full .arm-in { transform-origin: 0 0; animation: lupe-wave 1.1s infinite ease-in-out; }
+@keyframes lupe-tail { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-6deg); } }
+@keyframes lupe-wave { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-16deg); } }
 .lupe.talking.big { animation-duration: .9s; }
 @keyframes lupe-talk { from { opacity: 0; } to { opacity: 1; } }
 @keyframes lupe-blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
@@ -779,6 +785,11 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .lupe-coach.lc-hero .coach-av { animation: pop .5s, lupe-bob 3.2s .5s infinite ease-in-out; }
 .lc-badge { position: absolute; right: -10px; bottom: -4px; font-size: 2rem; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,.15)); }
 .lupe-coach.lc-sum { margin: .8rem 0 .2rem; }
+/* hele Lupe naast het tekstballonnetje (Hoy, profiel, rapport, niveautest) */
+.lupe-coach:not(.lc-hero) .coach-av.full { margin-bottom: -.2rem; }
+.lupe-coach:not(.lc-hero):has(.coach-av.full) .lc-bubble { margin-bottom: 2.2rem; }
+@media (max-width: 520px) { .lupe-coach:not(.lc-hero) .coach-av.full svg { width: 96px; height: 103px; } .lupe-coach:not(.lc-hero):has(.coach-av.full) .lc-bubble { margin-bottom: 1.6rem; } }
+@media (max-width: 520px) { .lupe-coach.lc-hero .coach-av.full svg { width: 140px; height: 150px; } }
 .lupe-coach.lc-sum .lc-es { font-size: .98rem; }
 /* klein naast de feedback na een antwoord */
 .fb-head { display: flex; align-items: center; gap: .5rem; }
@@ -828,8 +839,8 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 
 /* ---------- «Vraag het Lupe»: knop rechts + chatpaneel (js/ask.js) ---------- */
 :root { --ask-w: min(400px, 42vw); }
-.ask-fab { position: fixed; right: 0; top: 46%; z-index: 70; display: flex; align-items: center; justify-content: center; width: 54px; height: 58px; padding: 0 0 0 4px; border: 1px solid var(--line); border-right: none; border-radius: 18px 0 0 18px; background: var(--lupe-bub); box-shadow: var(--shadow); cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; transition: width .15s; }
-.ask-fab:hover { width: 60px; }
+.ask-fab { position: fixed; right: 0; top: 46%; z-index: 70; display: flex; align-items: center; justify-content: center; width: 62px; height: 66px; padding: 0 0 0 4px; border: 1px solid var(--line); border-right: none; border-radius: 18px 0 0 18px; background: var(--lupe-bub); box-shadow: var(--shadow); cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; transition: width .15s; }
+.ask-fab:hover { width: 68px; }
 .ask-fab[hidden] { display: none; }
 .ask-fab .lupe { pointer-events: none; }
 .ask-fab-q { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 99px; background: var(--accent); color: var(--accent-ink); font: 800 .7rem/18px var(--font); text-align: center; }
@@ -866,12 +877,13 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 @media (prefers-reduced-motion: reduce) { .ask-panel { animation: none; } }
 /* smal scherm: knop iets kleiner, en in een les ruimte vrijhouden zodat hij niets bedekt */
 @media (max-width: 759px) {
-  .ask-fab { width: 44px; height: 50px; }
-  .ask-fab:hover { width: 44px; }
-  .ask-fab .lupe svg { width: 32px; height: 32px; }
+  .ask-fab { width: 50px; height: 56px; }
+  .ask-fab:hover { width: 50px; }
+  .ask-fab .lupe svg { width: 38px; height: 38px; }
   .ask-fab-q { width: 16px; height: 16px; line-height: 16px; font-size: .62rem; }
-  body.ask-fab-on #lesson .ls-body { padding-right: 50px; }
-  body.ask-fab-on #lesson .ls-fb { padding-right: 40px; }
+  body.ask-fab-on #lesson .ls-body { padding-right: 56px; }
+  body.ask-fab-on #lesson .ls-fb { padding-right: 46px; }
+  body.ask-fab-on .page .lupe-coach:not(.lc-hero) .lc-bubble { margin-right: 44px; }
 }
 /* ---- ⓘ Uitleg zonder AI (content/uitleg.js) ---- */
 .dl-btns { display: flex; flex-direction: column; align-items: center; gap: .3rem; flex: none; }
