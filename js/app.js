@@ -573,7 +573,7 @@
       wrap.append(section('Uitbreiding (los van je cursus)', h('a', { class: 'card mundo-entry', href: '#/mundo' },
         h('span', { class: 'me-icon' }, '🗺️'),
         h('div', { class: 'grow' }, h('b', null, 'Op reis: Spaans per land'), h('small', null, 'Los van je cursus. Kies zelf een land en leer het accent, de woorden en de slang van daar.'),
-          h('span', { class: 'me-flags' }, S.Mundo.list().map(p => p.flag).join(' '))),
+          h('span', { class: 'me-flags' }, S.Mundo.list().map(p => S.Mundo.flagImg(p)))),
         h('span', { class: 'chip' }, '🛂 ' + got + '/' + n))));
     }
     const cur = P.current();
