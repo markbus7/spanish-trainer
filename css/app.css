@@ -871,6 +871,7 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
   .ask-fab .lupe svg { width: 32px; height: 32px; }
   .ask-fab-q { width: 16px; height: 16px; line-height: 16px; font-size: .62rem; }
   body.ask-fab-on #lesson .ls-body { padding-right: 50px; }
+  body.ask-fab-on #lesson .ls-fb { padding-right: 40px; }
 }
 /* ---- ⓘ Uitleg zonder AI (content/uitleg.js) ---- */
 .dl-btns { display: flex; flex-direction: column; align-items: center; gap: .3rem; flex: none; }

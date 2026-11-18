@@ -18,6 +18,8 @@
     'perdón': ['disculpa', 'disculpe', 'lo siento'],
     'disculpe': ['perdón', 'perdone'],
     'de nada': ['no hay de qué'],
+    'el profesor / la profesora': ['el maestro', 'la maestra'],
+    'el / la maestro/a': ['el profesor', 'la profesora'],
     'el médico / la médica': ['el doctor', 'la doctora'],
     'el mesero / la mesera': ['el mozo', 'la moza'],
     'holandés / holandesa': ['neerlandés', 'neerlandesa'],

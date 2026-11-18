@@ -202,7 +202,7 @@ ${logRule()}`;
   async function checkTranslation(nl, user, accepted) {
     const p = learnerProfile();
     const sys = `${baseRules(p)}\nYou grade translations strictly but fairly. Reply ONLY with a JSON object.`;
-    const prompt = `${NL()} sentence: "${nl}"
+    const prompt = `${NL()} sentence or word: "${nl}"
 Learner's ${TL()} translation: "${user}"
 Model answers: ${JSON.stringify(accepted)}
 Is the learner's translation grammatically correct, natural${CO().target === 'es' ? ' for Latin America' : ' ' + CO().ai.target}, and does it mean the same as the ${NL()}? Missing accents alone still count as correct (mention them in the feedback).
