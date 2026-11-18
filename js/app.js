@@ -104,7 +104,7 @@
     if (it.tag) Store.mark(it.tag, ok);
     if (it.srsId && it.wt && (!SRS.has(it.srsId) || (r && r.override && (st().srs[it.srsId].s || 0) >= Date.now() - 864e5 && st().srs[it.srsId].i === 0))) {
       // woordtoets: nieuw woord goed = meteen bekend (interval it.wt), fout of met hint = vandaag in de herhaling
-      const known = ok && !(r && r.hinted);
+      const known = ok && !(r && (r.hinted || r.alt));
       if (!SRS.has(it.srsId)) SRS.add(it.srsId, known ? it.wt : 0);
       else if (known) { const c = st().srs[it.srsId]; c.i = it.wt; c.d = U.dayIndex() + it.wt; c.l = Math.max(0, c.l - 1); }
       const c = st().srs[it.srsId]; c.t = Date.now(); if (known) c.g = (c.g || 0) + 1; else c.f = (c.f || 0) + 1;
@@ -112,9 +112,9 @@
       // zin half goed: bij de herhaling staan de goede woorden er al (zoals bij gewone lessen)
       if (it.translate && !ok && r && S.check.partsUsable(r.parts)) (st().partial || (st().partial = {}))[it.srsId] = { a: r.parts.a, k: r.parts.k, t: Date.now() };
     } else if (it.srsId) {
-      if (SRS.has(it.srsId) && ok && r && r.hinted && !r.override) { const c = st().srs[it.srsId]; c.t = Date.now(); c.r = 0; c.i = 1; c.d = Math.min(c.d, U.dayIndex() + 1); }
+      if (SRS.has(it.srsId) && ok && r && (r.hinted || r.alt) && !r.override) { const c = st().srs[it.srsId]; c.t = Date.now(); c.r = 0; c.i = 1; c.d = Math.min(c.d, U.dayIndex() + 1); }
       else if (SRS.has(it.srsId)) { if (!r || !r.override) SRS.grade(it.srsId, ok); else { const c = st().srs[it.srsId]; if (c) { c.l = Math.max(0, c.l - 1); if (c.f) { c.f--; c.g = (c.g || 0) + 1; } } } }
-      else if (!ok) stepWrong.add(it.srsId); else if (r && r.override) stepWrong.delete(it.srsId);
+      else if (!ok) stepWrong.add(it.srsId); else if (r && r.override && !r.alt) stepWrong.delete(it.srsId);
       // zin half goed: bij de volgende herhaling staan de goede woorden er al
       if (it.translate) {
         const P = st().partial || (st().partial = {});
