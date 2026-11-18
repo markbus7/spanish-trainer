@@ -402,7 +402,7 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 /* Op reis (js/mundo.js): kaart, paspoort en landpagina's */
 .mundo-entry { display: flex; align-items: center; gap: .9rem; text-decoration: none; color: var(--ink); border: 1px solid var(--line); }
 .mundo-entry .grow { display: flex; flex-direction: column; gap: .2rem; } .mundo-entry small { color: var(--ink2); font-size: .88rem; }
-.me-icon { font-size: 2.2rem; } .me-flags { font-size: .95rem; letter-spacing: .05em; line-height: 1.5; }
+.me-icon { font-size: 2.2rem; } .me-flags { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .2rem; } .me-flags .flag-img { width: 1.35em; height: 1em; }
 .mundo-card { padding: .6rem; }
 .mundo-map { display: block; width: 100%; max-width: 620px; height: auto; max-height: 78vh; margin: 0 auto; touch-action: manipulation; }
 .mundo-map .sea { fill: var(--sea); }
@@ -416,19 +416,21 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .mundo-map .pin circle { fill: var(--pin); stroke: var(--line); stroke-width: 1.2; filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.25)); }
 .mundo-map .pin.seen circle { stroke: var(--cty-seen); stroke-width: 2; } .mundo-map .pin.stamp > circle:first-child { stroke: var(--cty-stamp); stroke-width: 2.5; }
 .mundo-map .pin:focus-visible circle { stroke: var(--accent); stroke-width: 3; }
-.mundo-map .pin-flag { font-size: 17px; pointer-events: none; }
+.mundo-map .pin-flag { pointer-events: none; }
+.mundo-map .pin-edge { fill: none; stroke: rgba(0,0,0,.18); stroke-width: .6; pointer-events: none; }
+.flag-img { display: inline-block; width: 1.6em; height: 1.2em; object-fit: cover; border-radius: 3px; box-shadow: 0 0 0 1px rgba(0,0,0,.12); vertical-align: middle; }
 .mundo-map .pin-okbg { fill: var(--ok) !important; stroke: var(--card) !important; stroke-width: 1.2 !important; } .mundo-map .pin-ok { fill: #fff; font-size: 9px; font-weight: 800; pointer-events: none; }
 .passport { display: flex; flex-direction: column; gap: .55rem; }
 .pp-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
 .pp-flags { display: flex; flex-wrap: wrap; gap: .3rem; }
-.pp-flag { font-size: 1.35rem; text-decoration: none; padding: .15rem .3rem; border-radius: 8px; border: 1.5px dashed var(--line); filter: grayscale(.85); opacity: .55; line-height: 1.2; }
+.pp-flag { display: inline-flex; font-size: 1.35rem; text-decoration: none; padding: .15rem .3rem; border-radius: 8px; border: 1.5px dashed var(--line); filter: grayscale(.85); opacity: .55; line-height: 1.2; }
 .pp-flag.seen { filter: none; opacity: .9; border-style: solid; }
 .pp-flag.stamp { filter: none; opacity: 1; border: 2px solid var(--cty-stamp); background: var(--accent-soft); }
 .pl-list .unit-row { background: var(--card); border-color: var(--line); }
-.pl-icon { font-size: 1.6rem; }
+.pl-icon { font-size: 1.6rem; display: inline-flex; }
 .pl-hero { display: flex; gap: 1rem; align-items: flex-start; }
 .pl-hero h1 { margin: 0 0 .15rem; } .pl-hero p { margin: .35rem 0; }
-.pl-flag { font-size: 3.4rem; line-height: 1; }
+.pl-flag { font-size: 3.4rem; line-height: 1; } .pl-flag .flag-img { width: 1.33em; height: 1em; border-radius: 6px; }
 .pl-hello { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; margin-top: .6rem; padding: .6rem .7rem; border-radius: 12px; background: var(--bg2); }
 .pl-hello span { display: flex; flex-direction: column; }
 .pl-sound { display: flex; flex-direction: column; gap: .35rem; }

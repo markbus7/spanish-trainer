@@ -36,7 +36,7 @@
       U.shuffle(chunk).forEach((w, j) => items.push(mcItem(w, ws, w.note.startsWith('grof') ? 'es' : ['es', 'nl', 'listen'][j % 3])));
       if (chunk.length >= 3) items.push({ kind: 'match', pairs: chunk.map(w => [w.es, w.nl]), tag: null, skill: 'vocab' });
     }
-    return { title: p.flag + ' ' + p.name + ' · Woorden en slang', items, mode: 'learn' };
+    return { title: p.name + ' · Woorden en slang', items, mode: 'learn' };
   }
   function quiz(p) {
     const ws = words(p);
@@ -48,7 +48,7 @@
       const zinnen = U.shuffle(list().flatMap(x => (x.sounds || []).map(y => y[2])).filter(z => z !== s[2])).slice(0, 3);
       items[items.length - 1] = { kind: 'mc', audio: s[2], q: 'Welke zin hoor je?', options: U.shuffle([s[2], ...zinnen]), answer: s[2], skill: 'listen', tag: null };
     }
-    return { title: p.flag + ' ' + p.name + ' · Paspoortstempel', items: U.shuffle(items), mode: 'test', pass: PASS };
+    return { title: p.name + ' · Paspoortstempel', items: U.shuffle(items), mode: 'test', pass: PASS };
   }
   function finish(p, kind, sum) {
     const g = progOf(p.id); g.v = g.v || Date.now(); g.n = (g.n || 0) + 1;
@@ -61,6 +61,9 @@
   }
 
   /* ---------- weergave ---------- */
+  /* Vlaggen als afbeelding (icons/vlaggen, uit flag-icons, MIT): vlag-emoji's ziet niet elk apparaat (bijv. Windows). */
+  const flagSrc = p => 'icons/vlaggen/' + (p.flagImg || p.id) + '.png';
+  const flagImg = (p, cls) => h('img', { class: 'flag-img' + (cls ? ' ' + cls : ''), src: flagSrc(p), alt: '', width: 40, height: 30, loading: 'lazy', decoding: 'async' });
   const say = (p, text) => S.Speech.say(text, { clipNs: ns(p) });
   function hereBtn(p, text, label) {
     return h('button', { class: 'btn small pl-say', type: 'button', onclick: e => { e.stopPropagation(); say(p, text); } }, '🔊 ' + (label || p.name));
@@ -80,8 +83,9 @@
       if (c) { const sh = el('path', { d: c.d, class: 'cty ' + s }); sh.addEventListener('click', () => go(p.id)); shapes.append(sh); }
       const [x, y] = p.pin || (c ? c.p : [0, 0]);
       if (p.line && c) lines.append(el('line', { x1: x, y1: y, x2: c.p[0], y2: c.p[1], class: 'lead' }));
-      const t = el('text', { x, y: y + 1, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'pin-flag' }); t.textContent = p.flag;
-      const g = el('g', { class: 'pin ' + s, tabindex: 0, role: 'link', 'aria-label': p.name }, [el('circle', { cx: x, cy: y, r: 15 }), t]);
+      const im = el('image', { x: x - 10, y: y - 7.5, width: 20, height: 15, href: flagSrc(p), preserveAspectRatio: 'xMidYMid slice', class: 'pin-flag' });
+      im.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', flagSrc(p));
+      const g = el('g', { class: 'pin ' + s, tabindex: 0, role: 'link', 'aria-label': p.name }, [el('circle', { cx: x, cy: y, r: 15 }), im, el('rect', { x: x - 10, y: y - 7.5, width: 20, height: 15, rx: 2, class: 'pin-edge' })]);
       if (s === 'stamp') { const ok = el('text', { x: x + 11, y: y - 10, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'pin-ok' }); ok.textContent = '✓'; g.append(el('circle', { cx: x + 11, cy: y - 10, r: 7, class: 'pin-okbg' }), ok); }
       g.addEventListener('click', () => go(p.id));
       g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(p.id); } });
@@ -104,14 +108,14 @@
     wrap.append(h('div', { class: 'card passport' },
       h('div', { class: 'pp-head' }, h('b', null, '🛂 Mijn paspoort'), h('span', { class: 'muted small' }, got + ' van ' + n + ' stempels')),
       h('div', { class: 'pbar' }, h('i', { style: { width: Math.round(got / Math.max(1, n) * 100) + '%' } })),
-      h('div', { class: 'pp-flags' }, list().map(p => h('a', { class: 'pp-flag ' + status(p.id), href: '#/pais/' + p.id, title: p.name }, p.flag)))));
+      h('div', { class: 'pp-flags' }, list().map(p => h('a', { class: 'pp-flag ' + status(p.id), href: '#/pais/' + p.id, title: p.name, 'aria-label': p.name }, flagImg(p))))));
     const map = svgMap();
     if (map) wrap.append(h('div', { class: 'card mundo-card' }, map, h('p', { class: 'small muted center' }, 'Tik op een vlag of een land.')));
     (S.placeGroups || [{ id: null, name: 'Landen' }]).forEach(g => {
       const ps = list().filter(p => !g.id || p.group === g.id); if (!ps.length) return;
       wrap.append(h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, g.name),
         h('div', { class: 'unit-list pl-list' }, ps.map(p => h('a', { class: 'unit-row', href: '#/pais/' + p.id },
-          h('span', { class: 'u-icon pl-icon' }, p.flag),
+          h('span', { class: 'u-icon pl-icon' }, flagImg(p)),
           h('div', { class: 'grow' }, h('b', null, p.name), h('small', null, p.city + ' · ' + p.speakers)),
           stampChip(p.id))))));
     });
@@ -124,7 +128,7 @@
     const neutral = p.voice !== 'MX';
     wrap.append(h('a', { class: 'back', href: '#/mundo' }, '← Kaart'),
       h('div', { class: 'pl-hero card' },
-        h('div', { class: 'pl-flag' }, p.flag),
+        h('div', { class: 'pl-flag' }, flagImg(p)),
         h('div', { class: 'grow' },
           h('div', { class: 'eyebrow' }, 'Op reis · ' + p.city),
           h('h1', null, p.name),
@@ -165,8 +169,8 @@
       onFinish: sum => {
         const r = finish(p, kind, sum); off();
         S.Store.save();
-        if (kind !== 'quiz') return { emoji: p.flag, title: '¡Bien hecho!', text: 'Je hebt de woorden van ' + p.name + ' geoefend. Klaar voor je stempel?', nextLabel: '🛂 Naar de stempeltoets', next: () => run(p, 'quiz'), alt: { label: 'Terug naar ' + p.name, fn: () => { location.hash = '#/pais/' + p.id; } } };
-        if (r.score >= PASS) return { passed: true, emoji: '🛂', title: r.first ? '¡Sello! Stempel gehaald' : '¡Muy bien!', text: (r.first ? 'Je paspoort heeft een nieuwe stempel: ' + p.flag + ' ' + p.name + '. ' : '') + 'Score: ' + Math.round(r.score * 100) + '%.', nextLabel: '🗺️ Naar de kaart', next: () => { location.hash = '#/mundo'; } };
+        if (kind !== 'quiz') return { emoji: '🎉', title: '¡Bien hecho!', text: 'Je hebt de woorden van ' + p.name + ' geoefend. Klaar voor je stempel?', nextLabel: '🛂 Naar de stempeltoets', next: () => run(p, 'quiz'), alt: { label: 'Terug naar ' + p.name, fn: () => { location.hash = '#/pais/' + p.id; } } };
+        if (r.score >= PASS) return { passed: true, emoji: '🛂', title: r.first ? '¡Sello! Stempel gehaald' : '¡Muy bien!', text: (r.first ? 'Je paspoort heeft een nieuwe stempel: ' + p.name + '. ' : '') + 'Score: ' + Math.round(r.score * 100) + '%.', nextLabel: '🗺️ Naar de kaart', next: () => { location.hash = '#/mundo'; } };
         return { passed: false, emoji: '💪', title: 'Bijna!', text: 'Je had ' + Math.round(r.score * 100) + '%. Voor een stempel heb je ' + Math.round(PASS * 100) + '% nodig. Oefen de woorden nog eens en probeer het opnieuw.', nextLabel: 'Woorden oefenen', next: () => run(p, 'practice'), alt: { label: 'Terug naar ' + p.name, fn: () => { location.hash = '#/pais/' + p.id; } } };
       }
     });
@@ -174,5 +178,5 @@
   /* Onderbroken oefening van een land hervatten (vanuit «Verder waar je was»). */
   function resume(session, d) { const p = get(d.id); if (p) run(p, d.what, session); else S.runSession(session, { desc: d }); }
 
-  S.Mundo = { list, get, status, stamps, words, practice, quiz, finish, page, placePage, resume, PASS };
+  S.Mundo = { flagImg, list, get, status, stamps, words, practice, quiz, finish, page, placePage, resume, PASS };
 })(window.SPT);

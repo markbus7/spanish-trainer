@@ -1,0 +1,2 @@
+Vlaggen voor «Op reis» (js/mundo.js), 120×90 px.
+Gemaakt uit flag-icons (https://github.com/lipis/flag-icons), MIT-licentie, Copyright (c) 2013 Panayiotis Lipiridis.
