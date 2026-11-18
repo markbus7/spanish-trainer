@@ -22,7 +22,8 @@
   function words(p) { return p.words.map(([es, nl, lab], i) => ({ id: 'pl|' + p.id + '|' + i, es, nl, note: lab && LABEL[lab] ? LABEL[lab][0] : '' })); }
   /* Woorden voor de oefeningen: de grove alleen als je ze herkent (Spaans → Nederlands), niet om zelf te kiezen. */
   function mcItem(w, all, dir) {
-    const others = U.shuffle(all.filter(x => x.id !== w.id && x.nl !== w.nl && x.es !== w.es)).slice(0, 3);
+    const seenNl = new Set([w.nl]), seenEs = new Set([w.es]);
+    const others = U.shuffle(all).filter(x => { if (x.id === w.id || seenNl.has(x.nl) || seenEs.has(x.es)) return false; seenNl.add(x.nl); seenEs.add(x.es); return true; }).slice(0, 3);
     const base = { tag: null, skill: 'vocab', word: w };
     if (dir === 'listen') return { ...base, kind: 'mc', audio: w.es, q: 'Wat hoor je?', options: U.shuffle([w.es, ...others.map(o => o.es)]), answer: w.es, skill: 'listen' };
     if (dir === 'nl') return { ...base, kind: 'mc', prompt: w.nl, q: 'Hoe zeg je dit in het Spaans?', options: U.shuffle([w.es, ...others.map(o => o.es)]), answer: w.es, speakAnswer: true };
@@ -34,7 +35,7 @@
       const chunk = ws.slice(i, i + 5);
       chunk.forEach(w => items.push({ kind: 'card', word: w }));
       U.shuffle(chunk).forEach((w, j) => items.push(mcItem(w, ws, w.note.startsWith('grof') ? 'es' : ['es', 'nl', 'listen'][j % 3])));
-      if (chunk.length >= 3) items.push({ kind: 'match', pairs: chunk.map(w => [w.es, w.nl]), tag: null, skill: 'vocab' });
+      if (chunk.length >= 3) { const nl = new Set(); items.push({ kind: 'match', pairs: chunk.filter(w => !nl.has(w.nl) && nl.add(w.nl)).map(w => [w.es, w.nl]), tag: null, skill: 'vocab' }); }
     }
     return { title: p.name + ' · Woorden en slang', items, mode: 'learn' };
   }

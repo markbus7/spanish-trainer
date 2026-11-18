@@ -234,7 +234,7 @@
       ],
       words: [['che', 'hé, joh', 'i'], ['dale', 'oké, doe maar', 'i'], ['el laburo', 'het werk', 'i'], ['el bondi / el colectivo', 'de bus', 'i'], ['re-', 'heel (re lindo = heel mooi)', 'i'],
         ['¡qué copado!', 'wat tof!', 'i'], ['el pibe / la piba', 'de jongen / het meisje', 'i'], ['la mina', 'de vrouw, het meisje', 'i'], ['el quilombo', 'de chaos, de puinhoop', 'i'],
-        ['¡qué bajón!', 'wat balen!', 'i'], ['la guita', 'het geld', 'i'], ['la birra', 'het bier', 'i'], ['el mate', 'de mate (kruidenthee)'], ['boludo', 'gast (onder vrienden), maar ook: sukkel!', 'g'], ['¡bárbaro!', 'geweldig!'], ['la fiaca', 'de luiheid, geen zin', 'i'], ['¡qué garrón!', 'wat balen!', 'i'], ['el chorro', 'de dief', 'i'], ['el boliche', 'de disco, de bar', 'i'], ['la posta', 'de waarheid, echt waar', 'i'], ['el bardo', 'de chaos, de herrie', 'i'], ['al pedo', 'voor niks, nutteloos', 'g'], ['¡ni en pedo!', 'echt niet!', 'g']],
+        ['¡qué bajón!', 'wat balen!', 'i'], ['la guita', 'het geld', 'i'], ['la birra', 'het bier', 'i'], ['el mate', 'de mate (kruidenthee)'], ['boludo', 'gast (onder vrienden), maar ook: sukkel!', 'g'], ['¡bárbaro!', 'geweldig!'], ['la fiaca', 'de luiheid, geen zin', 'i'], ['¡qué garrón!', 'wat een pech!', 'i'], ['el chorro', 'de dief', 'i'], ['el boliche', 'de disco, de bar', 'i'], ['la posta', 'de waarheid, echt waar', 'i'], ['el bardo', 'de chaos, de herrie', 'i'], ['al pedo', 'voor niks, nutteloos', 'g'], ['¡ni en pedo!', 'echt niet!', 'g']],
       fact: 'Mate drink je samen uit één beker met een metalen rietje. Hij gaat het hele rondje rond.' },
 
     { id: 'uy', flag: '🇺🇾', name: 'Uruguay', city: 'Montevideo', speakers: '±3,4 mln', group: 'zuid', voice: 'UY', listen: 'es-UY', pin: [452, 590], line: true,
