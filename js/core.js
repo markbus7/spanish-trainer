@@ -720,7 +720,11 @@
     listen(opt = {}) {
       const R = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!R) return Promise.reject(this.micError('unsupported'));
+      // Hangt er nog een oude herkenning (op iPad komt 'klaar' soms nooit)? Rond die nu echt af en ruim hem op.
+      if (this._kill) this._kill();
       if (this._rec) { try { this._rec.abort(); } catch (e) { /* */ } this._rec = null; }
+      // Een knipperend AudioContext (tikgeluidjes) kan op iPad het geluidskanaal vasthouden: even pauzeren.
+      try { S.Sound && S.Sound.pause && S.Sound.pause(); } catch (e) { /* */ }
       // Lupe of een opname mag niet meer praten: op iPad deelt de microfoon het geluidskanaal met het voorlezen.
       this.stop(); this._talk(false);
       const state = s => { try { opt.onState && opt.onState(s); } catch (e) { /* */ } };
@@ -730,15 +734,32 @@
         r.lang = S.course.target !== 'es' ? S.course.listen
           : v && /^es-(mx|us|419|co|ar|cl|pe|ve|uy|cr|ec|gt|pa|pr|do|bo|py|sv|hn|ni|cu)$/i.test(v.lang.replace('_', '-')) ? v.lang.replace('_', '-') : 'es-MX';
         r.interimResults = true; r.maxAlternatives = 3; r.continuous = false;
-        let done = false, started = false, finalAlts = null, interim = '', silenceT = null;
+        let done = false, started = false, stopping = false, finalAlts = null, interim = '', silenceT = null;
         const timers = [];
         const finish = (ok, val) => {
           if (done) return; done = true;
           timers.forEach(clearTimeout); clearTimeout(silenceT);
+          const noop = () => {}; r.onstart = r.onsoundstart = r.onspeechstart = r.onresult = r.onerror = r.onend = noop;
           if (this._rec === r) this._rec = null;
+          if (this._kill === kill) this._kill = null;
+          if (this._soft === softStop) this._soft = null;
+          this._lastEnd = Date.now();
           ok ? resolve(val) : reject(val);
         };
         const heardSoFar = () => finalAlts || (interim ? [interim] : null);
+        // Afronden met wat er al gehoord is (of 'niets gehoord').
+        const settle = () => { const got = heardSoFar(); got && got.length ? finish(true, got) : finish(false, this.micError('no-speech')); };
+        // Hard opruimen: abort() laat de microfoon op iPad meteen los; daarna de belofte zelf afronden.
+        const kill = () => { if (done) return; try { r.abort(); } catch (e) { /* */ } settle(); };
+        /* Netjes stoppen. Safari op iPad stuurt na stop() soms nooit 'onend': dan bleef de knop op opnemen staan,
+           hield Safari de microfoon vast en deed een tweede keer niets meer (tot je naar een andere app ging).
+           Daarom: na stop() even wachten, dan abort(), en daarna zelf afronden. */
+        const softStop = () => {
+          if (done || stopping) return; stopping = true;
+          try { r.stop(); } catch (e) { /* */ }
+          timers.push(setTimeout(() => { if (!done) { try { r.abort(); } catch (e) { /* */ } } }, 1200));
+          timers.push(setTimeout(() => { if (!done) settle(); }, 2000));
+        };
         r.onstart = () => { started = true; state('listening'); };
         r.onsoundstart = () => state('sound');
         r.onspeechstart = () => state('speech');
@@ -756,23 +777,25 @@
           try { opt.onInterim && opt.onInterim(interim); } catch (err) { /* */ }
           // Safari op iPad stopt soms niet vanzelf: na een korte stilte ronden we zelf af.
           clearTimeout(silenceT);
-          silenceT = setTimeout(() => { try { r.stop(); } catch (err) { /* */ } }, finalAlts ? 300 : 1600);
+          silenceT = setTimeout(softStop, finalAlts ? 300 : 1600);
         };
         r.onerror = e => {
           const got = heardSoFar();
           if (got && got.length && (e.error === 'no-speech' || e.error === 'aborted')) return finish(true, got);
           finish(false, this.micError(e.error));
         };
-        r.onend = () => { const got = heardSoFar(); got && got.length ? finish(true, got) : finish(false, this.micError('no-speech')); };
+        r.onend = settle;
         // Start de microfoon niet binnen een paar seconden, dan blijft hij anders stil 'hangen' (zo leek het alsof er niets gebeurde).
         timers.push(setTimeout(() => { if (!started && !done) { try { r.abort(); } catch (e) { /* */ } finish(false, this.micError('start-timeout')); } }, 6000));
-        timers.push(setTimeout(() => { try { r.stop(); } catch (e) { /* */ } }, opt.max || 20000));
-        this._rec = r;
+        timers.push(setTimeout(softStop, opt.max || 20000));
+        this._rec = r; this._kill = kill; this._soft = softStop;
         state('starting');
         try { r.start(); } catch (e) { finish(false, this.micError(e && e.name === 'NotAllowedError' ? 'not-allowed' : 'start-failed', e && e.message)); }
       });
     },
-    stopListening() { try { if (this._rec) { this._rec.stop(); } } catch (e) { /* */ } },
+    stopListening() { if (this._soft) this._soft(); else { try { if (this._rec) this._rec.stop(); } catch (e) { /* */ } } },
+    /* Meteen loslaten (bijv. als de app naar de achtergrond gaat of je de les verlaat). */
+    abortListening() { if (this._kill) this._kill(); },
     isListening() { return !!this._rec; },
     /* iPad/iPhone (iPadOS doet zich voor als Mac, maar heeft een touchscreen) en 'op beginscherm gezet' */
     isIOS() { const n = window.navigator || {}, ua = n.userAgent || ''; return /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && n.maxTouchPoints > 1); },
@@ -810,6 +833,7 @@
     if (!Store.state.settings.sound) return;
     try {
       actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended' && actx.resume) actx.resume();
       let t = actx.currentTime;
       freqs.forEach(f => {
         const o = actx.createOscillator(), g = actx.createGain();
@@ -822,6 +846,12 @@
     good: () => tone([660, 880], 0.08, 'sine'),
     bad: () => tone([220, 180], 0.11, 'triangle', 0.05),
     win: () => tone([523, 659, 784, 1047], 0.1, 'sine', 0.06),
-    tap: () => tone([440], 0.03, 'sine', 0.025)
+    tap: () => tone([440], 0.03, 'sine', 0.025),
+    pause: () => { try { if (actx && actx.state === 'running' && actx.suspend) actx.suspend(); } catch (e) { /* */ } }
   };
+  // Gaat de app naar de achtergrond, laat de microfoon dan echt los (anders hangt hij als je terugkomt).
+  try {
+    document.addEventListener('visibilitychange', () => { if (document.hidden) Speech.abortListening(); });
+    window.addEventListener('pagehide', () => Speech.abortListening());
+  } catch (e) { /* */ }
 })(window.SPT = window.SPT || {});
