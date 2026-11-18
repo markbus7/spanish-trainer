@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.29.5', date: '2026-11-18',
+    nl: ['Microfoon werkt weer als je hem stopt en opnieuw start (iPad hield hem soms vast)'],
+    es: [] },
   { v: '1.29.4', date: '2026-11-18',
     nl: ['Op reis: de knop «Neutraal» laat nu echt de neutrale zin horen (bijv. «Voy para la playa con los niños» bij Panama), en die zin staat er ook bij.'],
     es: ['De viaje: el botón «Neutral» ahora reproduce de verdad la frase neutral (p. ej. «Voy para la playa con los niños» en Panamá), y la frase también aparece escrita.'] },

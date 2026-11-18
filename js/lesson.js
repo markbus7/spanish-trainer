@@ -322,7 +322,7 @@
       lines.forEach(l => { l.classList.remove('mine', 'active', 'said'); l._extra.innerHTML = ''; l._esEl.classList.remove('hide-es'); });
     }
     function stopRole() {
-      role.active = false; Speech.stop(); Speech.stopListening(); resetLines();
+      role.active = false; Speech.stop(); Speech.abortListening(); resetLines();
       roleBtn.textContent = '🎭 Speel een rol'; rolePanel.classList.add('hidden');
       if (role.resolve) { role.resolve(null); role.resolve = null; }
     }
@@ -1087,7 +1087,7 @@
     }
     function close(silent) {
       touch(); if (tick) clearInterval(tick);
-      closePeek(); leaveFns.forEach(f => f()); Speech.stop(); Speech.stopListening();
+      closePeek(); leaveFns.forEach(f => f()); Speech.stop(); Speech.abortListening();
       document.removeEventListener('keydown', onKey);
       root.hidden = true; root.innerHTML = ''; document.body.classList.remove('in-lesson');
       if (S.Ask) S.Ask.setSource(null);

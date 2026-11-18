@@ -674,6 +674,33 @@ async function micTests() {
   script = r => { r.onstart(); r.onresult(ev([res('quiero un café', false)])); setTimeout(() => Sp.stopListening(), 5); };
   got = await Sp.listen();
   ok(got[0] === 'quiero un café', 'mic: tik nog eens = klaar met wat er gehoord is');
+  // iPad-gedrag: na stop() komt er nooit 'onend'. Vroeger bleef hij dan hangen en deed een tweede keer niets meer.
+  class HangRec { start() { Sp._fake = this; this.aborted = 0; setTimeout(() => script && script(this), 0); } stop() { } abort() { this.aborted++; } }
+  ctx.webkitSpeechRecognition = HangRec;
+  script = r => { r.onstart(); r.onresult(ev([res('hola', false)])); setTimeout(() => Sp.stopListening(), 5); };
+  let t0 = Date.now();
+  got = await Sp.listen();
+  const hung = Sp._fake;
+  ok(got[0] === 'hola' && Date.now() - t0 < 3000 && hung.aborted >= 1, 'mic: stop zonder onend rondt toch af en laat de microfoon los');
+  ok(!Sp.isListening(), 'mic: na hangende stop luistert hij niet meer');
+  // tweede keer starten werkt meteen weer
+  script = r => { r.onstart(); r.onresult(ev([res('otra vez', true)])); r.onend(); };
+  got = await Sp.listen();
+  ok(got[0] === 'otra vez', 'mic: tweede keer starten werkt weer: ' + got);
+  // een oude herkenning die nog loopt wordt opgeruimd als je opnieuw start
+  script = r => { r.onstart(); };
+  const first = Sp.listen().then(v => ['ok', v], e => ['err', e.code]);
+  await new Promise(r => setTimeout(r, 10));
+  const old = Sp._fake;
+  script = r => { r.onstart(); r.onresult(ev([res('nuevo', true)])); r.onend(); };
+  got = await Sp.listen();
+  const f = await first;
+  ok(got[0] === 'nuevo' && old.aborted >= 1 && f[0] === 'err', 'mic: oude herkenning wordt afgebroken bij opnieuw starten: ' + f);
+  // naar de achtergrond: meteen loslaten
+  script = r => { r.onstart(); r.onresult(ev([res('adiós', false)])); setTimeout(() => Sp.abortListening(), 5); };
+  got = await Sp.listen();
+  ok(got[0] === 'adiós' && !Sp.isListening(), 'mic: abortListening laat meteen los');
+  ctx.webkitSpeechRecognition = FakeRec;
   // geen browserondersteuning
   delete ctx.webkitSpeechRecognition;
   err = null; try { await Sp.listen(); } catch (e) { err = e; }

@@ -76,7 +76,7 @@
     const levelBtn = h('button', { class: 'btn ghost', type: 'button' }, '1️⃣ Hoort de microfoon mij?');
     levelBtn.onclick = async () => {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { levelOut.textContent = '❓ Deze browser laat geen geluidsmeting toe. Ga door naar stap 2.'; return; }
-      Speech.stop(); Speech.stopListening();
+      Speech.stop(); Speech.abortListening();
       levelBtn.disabled = true; levelOut.textContent = 'Microfoon openen… (sta de microfoon toe als erom gevraagd wordt)';
       let stream = null, ctx = null;
       try {
