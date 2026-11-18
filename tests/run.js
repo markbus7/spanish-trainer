@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js']) {
+for (const f of ['js/core.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -182,6 +182,40 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
   ok(JSON.stringify(M(m, b)) === JSON.stringify(M(m, M(m, b))) && M(m, a).xp === 300, 'merge: idempotent');
   const r = base(); r.epoch = 999; r.updated = 1;
   ok(Object.keys(M(r, b).units).length === 0 && Object.keys(M(b, r).units).length === 0, 'merge: wissen (epoch) wint');
+}
+
+/* ---------- Op reis (uitbreiding Spaans per land) ---------- */
+{
+  const Mu = S.Mundo, M = S.MAPS.es, ps = Mu.list();
+  ok(ps.length >= 21 && ['mx', 'co', 'ar', 'pa', 'es', 'gq'].every(id => Mu.get(id)), 'op reis: alle Spaanstalige landen, ook Spanje');
+  ok(new Set(ps.map(p => p.id)).size === ps.length, 'op reis: unieke landcodes');
+  ps.forEach(p => {
+    ok(p.noShape || (M.c[p.id] && M.c[p.id].d.length > 20), 'op reis: ' + p.id + ' staat op de kaart');
+    ok(p.pin && p.pin[0] >= 15 && p.pin[0] <= M.w - 15 && p.pin[1] >= 15 && p.pin[1] <= M.h - 15, 'op reis: ' + p.id + ' vlagknop binnen de kaart');
+    ok(S.placeGroups.some(g => g.id === p.group), 'op reis: ' + p.id + ' heeft een groep');
+    ok(p.hello && p.hello.length >= 2 && p.intro && p.sounds.length >= 2 && p.sounds.every(x => x.length === 4 && x.every(Boolean)), 'op reis: ' + p.id + ' begroeting, intro en klanken');
+    ok(p.words.length >= 8 && p.words.every(w => w[0] && w[1] && (!w[2] || ['i', 'g'].includes(w[2]))), 'op reis: ' + p.id + ' woorden en labels');
+    ok(new Set(p.words.map(w => w[0])).size === p.words.length, 'op reis: ' + p.id + ' geen dubbele woorden');
+    ok(!p.unit || S.C.get(p.unit), 'op reis: ' + p.id + ' link naar unit bestaat');
+    const pr = Mu.practice(p), qz = Mu.quiz(p);
+    ok(pr.items.length >= p.words.length * 2 && qz.items.length === Math.min(10, p.words.length), 'op reis: ' + p.id + ' oefening en toets');
+    ok([...pr.items, ...qz.items].every(it => it.kind !== 'mc' || (it.options.includes(it.answer) && new Set(it.options).size === it.options.length)), 'op reis: ' + p.id + ' meerkeuze heeft het antwoord, zonder dubbele opties');
+    ok([...pr.items, ...qz.items].every(it => !it.srsId), 'op reis: ' + p.id + ' niets in de gewone herhaling');
+    ok(qz.items.every(it => !it.word || !it.word.note.startsWith('grof') || it.q === 'Wat betekent dit?'), 'op reis: ' + p.id + ' grove woorden alleen herkennen');
+  });
+  const keep = S.Store.state; S.Store.state = JSON.parse(JSON.stringify(keep)); S.Store.state.places = {};
+  const ar = Mu.get('ar');
+  ok(Mu.status('ar') === 'new', 'op reis: nieuw land');
+  ok(!Mu.finish(ar, 'quiz', { ok: 7, total: 10 }).first && Mu.status('ar') === 'seen' && S.Store.state.places.ar.best === 0.7, 'op reis: 70% = geen stempel');
+  ok(Mu.finish(ar, 'quiz', { ok: 8, total: 10 }).first && Mu.status('ar') === 'stamp' && Mu.stamps() === 1, 'op reis: 80% = stempel');
+  ok(!Mu.finish(ar, 'quiz', { ok: 10, total: 10 }).first && S.Store.state.places.ar.best === 1, 'op reis: tweede keer geen nieuwe stempel');
+  S.Store.state = keep;
+  const Mg = (a, b) => S.Store.mergeStates(a, b);
+  if (Mg) {
+    const a = { updated: 2, places: { ar: { v: 5, n: 1, best: 0.5 } } }, b = { updated: 1, places: { ar: { v: 3, n: 4, best: 0.9, stamp: 7 }, mx: { v: 9 } } };
+    const m = Mg(a, b);
+    ok(m.places.ar.v === 3 && m.places.ar.n === 4 && m.places.ar.best === 0.9 && m.places.ar.stamp === 7 && m.places.mx.v === 9, 'op reis: voortgang samenvoegen bij synchroniseren');
+  }
 }
 
 /* ---------- opnames: alles wat een les voorleest, moet in de inspreeklijst staan ---------- */

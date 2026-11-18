@@ -90,30 +90,7 @@
     { id: 'libre', icon: '☕', lv: 'A1', title: 'Vrij gesprek', place: 'Latinoamérica 🌎', role: 'Eres un amigo latinoamericano simpático (elige un país al empezar y dilo). Conversas de forma natural sobre la vida diaria, intereses y planes del estudiante.', goal: 'Praat vrijuit over wat je wilt.' }
   ];
 
-  /* Regio’s: kenmerken en typische woorden (herkenning, vooral vanaf B1/B2). */
-  S.regions = [
-    { id: 'mx', flag: '🇲🇽', name: 'Mexico', speakers: '±130 mln',
-      traits: ['Duidelijke uitspraak, vaak gezien als «neutraal» (veel dubbing komt uit Mexico)', 'Veel verkleinwoorden: ahorita, cafecito, tantito', 'Beleefd: «¿mande?» = pardon?'],
-      words: [['¿qué onda?', 'hoe is ’t?'], ['chido / padre', 'tof'], ['güey', 'gast (informeel)'], ['la lana', 'geld'], ['la chamba', 'werk'], ['¡órale! / ¡sale!', 'oké! / komt goed!'], ['el camión', 'de bus'], ['¿mande?', 'pardon? (beleefd)']] },
-    { id: 'co', flag: '🇨🇴', name: 'Colombia', speakers: '±52 mln',
-      traits: ['Bogotá: heel duidelijke uitspraak, veel «usted», ook onder vrienden (ustedeo)', 'Kust (Cartagena, Barranquilla): s aan het eind valt weg, Caribisch ritme', 'Heel beleefd: «¿me regala…?», «qué pena con usted»'],
-      words: [['parce / parcero', 'maat, vriend'], ['chévere / bacano', 'tof'], ['¿quiubo?', 'hoe is ’t?'], ['un tinto', 'zwarte koffie'], ['la plata', 'geld'], ['¡qué pena!', 'sorry / wat gênant'], ['¡listo!', 'oké!'], ['el camello', 'werk (informeel)']] },
-    { id: 'ar', flag: '🇦🇷', name: 'Argentinië & Uruguay (Río de la Plata)', speakers: '±50 mln',
-      traits: ['VOSEO: «vos» in plaats van tú: vos sos, vos tenés, vos querés, vení', 'll en y klinken als «sj» (sheísmo): «calle» ≈ «kasje»', 'Italiaanse melodie en handgebaren'],
-      words: [['che', 'hé / joh'], ['boludo', 'gast (vriendschappelijk, maar ook scheldwoord!)'], ['el laburo', 'werk'], ['el bondi / el colectivo', 'de bus'], ['re-', 'heel (re lindo)'], ['dale', 'oké'], ['la birra', 'het bier'], ['¿todo bien?', 'alles goed?']] },
-    { id: 'cl', flag: '🇨🇱', name: 'Chili', speakers: '±19 mln',
-      traits: ['Snel gesproken, eindletters vallen weg', 'Veel eigen slang, «po» (= pues) achter zinnen: «sí po», «ya po»', 'Soms voseo in de werkwoordsvorm: «¿cómo estái?»'],
-      words: [['¿cachai?', 'snap je?'], ['bacán', 'tof'], ['fome', 'saai'], ['el pololo / la polola', 'vriend / vriendin (relatie)'], ['la pega', 'werk'], ['al tiro', 'meteen'], ['una luca', 'duizend peso'], ['la once', 'lichte avondmaaltijd']] },
-    { id: 'pe', flag: '🇵🇪', name: 'Peru & Andes (Bolivia, Ecuador)', speakers: '±60 mln',
-      traits: ['Rustig en duidelijk, goed te verstaan', 'Invloed van Quechua: «guagua» (baby), «cancha» (geroosterde mais / veld)', 'Ecuador: «ya mismo» = straks; veel «usted»'],
-      words: [['el pata / el causa', 'maat, vriend (PE)'], ['chévere / bacán', 'tof'], ['la chamba', 'werk'], ['el jato', 'het huis (PE, slang)'], ['¡ya!', 'oké!'], ['la palta', 'de avocado'], ['el soroche', 'hoogteziekte'], ['la guagua', 'de baby (Andes)']] },
-    { id: 'car', flag: '🇨🇺🇵🇷🇩🇴🇻🇪', name: 'Caribisch gebied (Cuba, Puerto Rico, Dominicaanse Rep., Venezuela)', speakers: '±50 mln',
-      traits: ['Snel en melodieus; s valt weg («¿cómo etá?»)', 'Puerto Rico: r aan het eind kan als l klinken («puelta»)', 'Onderwerp vóór werkwoord in vragen: «¿Qué tú quieres?»'],
-      words: [['la guagua', 'de bus'], ['chévere', 'tof'], ['el / la pana', 'maat, vriend'], ['la vaina', 'het ding / gedoe'], ['¡wepa!', 'joepie! (PR)'], ['el chamo', 'de jongen (VE)'], ['¿qué lo que?', 'hoe is ’t? (DR)'], ['jevo / jeva', 'vriend(in) (relatie)']] },
-    { id: 'ca', flag: '🇬🇹🇸🇻🇭🇳🇳🇮🇨🇷', name: 'Midden-Amerika', speakers: '±45 mln',
-      traits: ['Veel voseo (Guatemala, El Salvador, Honduras, Nicaragua, Costa Rica)', 'Costa Rica: veel «usted», ook tegen kinderen; «pura vida»', 'Verkleinwoord op -ico: «momentico», «chiquitico»'],
-      words: [['pura vida', 'top! / alles goed (CR)'], ['mae', 'gast (CR)'], ['tuanis', 'tof (CR)'], ['el chunche', 'het ding (CR, NI)'], ['el cipote', 'het kind (HN, SV)'], ['chapín', 'Guatemalteek'], ['el pisto', 'geld (GT, HN, SV)'], ['¡qué chilero!', 'wat tof! (GT)']] }
-  ];
+  /* De oude «Regio’s» staan nu, uitgebreid per land, in content/landen.js (uitbreiding «Op reis»). */
 
   /* Uitdrukkingen voor «la frase del día». */
   S.phrases = [

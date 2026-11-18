@@ -1,6 +1,7 @@
 /* Español Latino — ontwerp */
 :root {
   --bg: #fbf7f1; --bg2: #f3ece2; --card: #ffffff; --ink: #24201b; --ink2: #5d554b; --muted: #8a8075; --line: #e7ddd0;
+  --sea: #d7ecf3; --land0: #e9e2d6; --cty: #f6c9a8; --cty-seen: #f0a374; --cty-stamp: #e2603a; --pin: #ffffff;
   --accent: #e2603a; --accent-ink: #ffffff; --accent-soft: #fde7de; --teal: #1b998b; --teal-soft: #dcf3ef; --gold: #f2b134; --gold-soft: #fdf1d6;
   --ok: #1f9d55; --ok-soft: #e3f6ea; --bad: #d64545; --bad-soft: #fbe5e5; --blue: #2f80ed;
   /* statuskleuren passen bij het symbool: 🌱 lichtgroen → 🌳 donkergroen → ⭐ goud/oranje (-ink = voor tekst) */
@@ -12,6 +13,7 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    --sea: #13242b; --land0: #2a251f; --cty: #5b3a2a; --cty-seen: #8a4a2d; --cty-stamp: #e2603a; --pin: #2b241e;
     --bg: #15120f; --bg2: #1e1a16; --card: #221d18; --ink: #f3ece3; --ink2: #cfc5b8; --muted: #9a8f82; --line: #352e27;
     --accent: #f07a55; --accent-soft: #3a241b; --teal: #3cc2b1; --teal-soft: #17302c; --gold: #f2b134; --gold-soft: #3a2f17;
     --ok: #46c37b; --ok-soft: #17301f; --bad: #f06a6a; --bad-soft: #3a1c1c; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
@@ -20,6 +22,7 @@
   }
 }
 :root[data-theme="dark"] {
+  --sea: #13242b; --land0: #2a251f; --cty: #5b3a2a; --cty-seen: #8a4a2d; --cty-stamp: #e2603a; --pin: #2b241e;
   --bg: #15120f; --bg2: #1e1a16; --card: #221d18; --ink: #f3ece3; --ink2: #cfc5b8; --muted: #9a8f82; --line: #352e27;
   --accent: #f07a55; --accent-soft: #3a241b; --teal: #3cc2b1; --teal-soft: #17302c; --gold: #f2b134; --gold-soft: #3a2f17;
   --ok: #46c37b; --ok-soft: #17301f; --bad: #f06a6a; --bad-soft: #3a1c1c; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
@@ -396,9 +399,48 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .badge { text-align: center; padding: .7rem .3rem; border-radius: 14px; background: var(--card); border: 1px solid var(--line); opacity: .35; filter: grayscale(1); }
 .badge.on { opacity: 1; filter: none; box-shadow: var(--shadow); }
 .badge span { font-size: 1.8rem; display: block; } .badge small { font-size: .72rem; font-weight: 600; }
-.region summary { display: flex; align-items: center; gap: .6rem; list-style: none; color: var(--ink); }
-.region summary::-webkit-details-marker { display: none; }
-.region .flag { font-size: 1.4rem; } .region ul { color: var(--ink2); font-size: .92rem; }
+/* Op reis (js/mundo.js): kaart, paspoort en landpagina's */
+.mundo-entry { display: flex; align-items: center; gap: .9rem; text-decoration: none; color: var(--ink); border: 1px solid var(--line); }
+.mundo-entry .grow { display: flex; flex-direction: column; gap: .2rem; } .mundo-entry small { color: var(--ink2); font-size: .88rem; }
+.me-icon { font-size: 2.2rem; } .me-flags { font-size: .95rem; letter-spacing: .05em; line-height: 1.5; }
+.mundo-card { padding: .6rem; }
+.mundo-map { display: block; width: 100%; max-width: 620px; height: auto; max-height: 78vh; margin: 0 auto; touch-action: manipulation; }
+.mundo-map .sea { fill: var(--sea); }
+.mundo-map .land { fill: var(--land0); stroke: var(--card); stroke-width: .6; }
+.mundo-map .inset { fill: var(--sea); stroke: var(--line); stroke-width: 1.2; }
+.mundo-map .cty { fill: var(--cty); stroke: var(--card); stroke-width: .7; cursor: pointer; transition: fill .15s; }
+.mundo-map .cty.seen { fill: var(--cty-seen); } .mundo-map .cty.stamp { fill: var(--cty-stamp); }
+.mundo-map .cty:hover { fill: var(--cty-seen); }
+.mundo-map .lead { stroke: var(--ink2); stroke-width: .9; stroke-dasharray: 2 2; opacity: .7; }
+.mundo-map .pin { cursor: pointer; outline: none; }
+.mundo-map .pin circle { fill: var(--pin); stroke: var(--line); stroke-width: 1.2; filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.25)); }
+.mundo-map .pin.seen circle { stroke: var(--cty-seen); stroke-width: 2; } .mundo-map .pin.stamp > circle:first-child { stroke: var(--cty-stamp); stroke-width: 2.5; }
+.mundo-map .pin:focus-visible circle { stroke: var(--accent); stroke-width: 3; }
+.mundo-map .pin-flag { font-size: 17px; pointer-events: none; }
+.mundo-map .pin-okbg { fill: var(--ok) !important; stroke: var(--card) !important; stroke-width: 1.2 !important; } .mundo-map .pin-ok { fill: #fff; font-size: 9px; font-weight: 800; pointer-events: none; }
+.passport { display: flex; flex-direction: column; gap: .55rem; }
+.pp-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.pp-flags { display: flex; flex-wrap: wrap; gap: .3rem; }
+.pp-flag { font-size: 1.35rem; text-decoration: none; padding: .15rem .3rem; border-radius: 8px; border: 1.5px dashed var(--line); filter: grayscale(.85); opacity: .55; line-height: 1.2; }
+.pp-flag.seen { filter: none; opacity: .9; border-style: solid; }
+.pp-flag.stamp { filter: none; opacity: 1; border: 2px solid var(--cty-stamp); background: var(--accent-soft); }
+.pl-list .unit-row { background: var(--card); border-color: var(--line); }
+.pl-icon { font-size: 1.6rem; }
+.pl-hero { display: flex; gap: 1rem; align-items: flex-start; }
+.pl-hero h1 { margin: 0 0 .15rem; } .pl-hero p { margin: .35rem 0; }
+.pl-flag { font-size: 3.4rem; line-height: 1; }
+.pl-hello { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; margin-top: .6rem; padding: .6rem .7rem; border-radius: 12px; background: var(--bg2); }
+.pl-hello span { display: flex; flex-direction: column; }
+.pl-sound { display: flex; flex-direction: column; gap: .35rem; }
+.pl-sound p { margin: 0; color: var(--ink2); }
+.pl-ex { padding: .5rem .7rem; border-left: 3px solid var(--accent); background: var(--bg2); border-radius: 0 10px 10px 0; }
+.pl-ex .es { font-weight: 600; }
+.pl-say { white-space: nowrap; }
+.lab { display: inline-block; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: .12rem .45rem; border-radius: 6px; background: var(--bg2); color: var(--ink2); white-space: nowrap; }
+.lab.grof { background: var(--bad-soft); color: var(--bad); }
+.pl-fact p { margin: .3rem 0 0; color: var(--ink2); }
+.pl-act { display: flex; flex-direction: column; gap: .55rem; } .pl-act p { margin: 0; }
+@media (max-width: 520px) { .pl-hero { flex-direction: column; gap: .4rem; } .pl-flag { font-size: 2.6rem; } }
 
 /* ---------- formulieren ---------- */
 .form { display: flex; flex-direction: column; gap: .9rem; }
@@ -1091,3 +1133,5 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .rep-proposal ul { margin: .3rem 0; padding-left: 1.2rem; }
 .rep-update > .row { margin-top: .7rem; }
 .fb-fix { margin-top: .35rem; }
+.pl-act .btn.wide { margin-top: 0; }
+@media (max-width: 520px) { .mundo-entry { gap: .6rem; } .me-flags { display: none; } .me-icon { font-size: 1.7rem; } }

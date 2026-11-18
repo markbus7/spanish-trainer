@@ -1,6 +1,6 @@
 /* Verzamelt alle vaste Spaanse teksten die de app voorleest, met een passende stem per regio.
    Gebruik: node tools/tts-texts.js > texts.json   (de GitHub-actie "Stemmen maken" doet dit automatisch)
-   Uitvoer: [{ k: sleutel, text, voice, (ns, pitch, rate) }]; het bestand heet audio/<k>.mp3. */
+   Uitvoer: [{ k: sleutel, text, voice, (ns, pitch, rate, say = uitspraak als die afwijkt van text) }]; het bestand heet audio/<k>.mp3. */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
@@ -24,7 +24,8 @@ const VOICES = {
   DO: ['es-DO-RamonaNeural', 'es-DO-EmilioNeural'], CU: ['es-CU-BelkysNeural', 'es-CU-ManuelNeural'], VE: ['es-VE-PaolaNeural', 'es-VE-SebastianNeural'],
   UY: ['es-UY-ValentinaNeural', 'es-UY-MateoNeural'], BO: ['es-BO-SofiaNeural', 'es-BO-MarceloNeural'], PY: ['es-PY-TaniaNeural', 'es-PY-MarioNeural'],
   SV: ['es-SV-LorenaNeural', 'es-SV-RodrigoNeural'], HN: ['es-HN-KarlaNeural', 'es-HN-CarlosNeural'], NI: ['es-NI-YolandaNeural', 'es-NI-FedericoNeural'],
-  PR: ['es-PR-KarinaNeural', 'es-PR-VictorNeural'], US: ['es-US-PalomaNeural', 'es-US-AlonsoNeural']
+  PR: ['es-PR-KarinaNeural', 'es-PR-VictorNeural'], US: ['es-US-PalomaNeural', 'es-US-AlonsoNeural'],
+  ES: ['es-ES-ElviraNeural', 'es-ES-AlvaroNeural'], GQ: ['es-GQ-TeresaNeural', 'es-GQ-JavierNeural']
 };
 const DEF = VOICES.MX[0];
 function country(place) {
@@ -92,7 +93,20 @@ for (const v of Object.keys(S.conj.VERBS)) for (const t of Object.keys(S.conj.TE
 }
 LV = 'X';
 (S.phrases || []).forEach(p => add(p[0]));
-(S.regions || []).forEach(r => { const v = VOICES[r.id.toUpperCase()]; (r.words || []).forEach(([es]) => add(es, v ? v[0] : DEF)); });
+/* Op reis (content/landen.js): alles van een land met de stem van dat land, in naamruimte 'pl-<land>'.
+   Woorden met een uitspraakhint (4e veld) houden hun sleutel, maar de stem leest de hint. De klankzinnen
+   komen ook zonder naamruimte (Mexicaanse stem) voor de knop «Neutraal». */
+for (const p of S.places || []) {
+  const [vf, vm_] = VOICES[p.voice] || VOICES.MX, ns = 'pl-' + p.id;
+  const put = (text, voice, said) => {
+    if (!text) return;
+    const k = S.Speech.clipKey(text, ns);
+    if (!out.has(k)) out.set(k, Object.assign({ k, ns, text: S.Speech.clean(text), voice, lv: [ns + ':X'] }, said ? { say: S.Speech.clean(said) } : {}));
+  };
+  put(p.hello[0], vm_, p.hello[2]);
+  (p.sounds || []).forEach(([, , es], i) => { put(es, i % 2 ? vm_ : vf); add(es); });
+  p.words.forEach(([es, , , said]) => put(es, vf, said));
+}
 add('¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.');
 
 /* Profe Lupe: al haar vaste zinnen (begroeting, feedback, eindschermen, grammaticasamenvatting), in twee varianten
