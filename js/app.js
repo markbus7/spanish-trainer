@@ -1802,26 +1802,79 @@
       h('span', null, '🆕 Versie ' + L.number + ' staat klaar'), btn,
       h('button', { class: 'update-x', type: 'button', 'aria-label': 'Later', onclick: () => document.getElementById('update-bar').remove() }, '✕')));
   }
-  function versionCard() {
-    const out = h('p', { class: 'small', role: 'status' });
-    const btn = h('button', { class: 'btn ghost', type: 'button', onclick: async () => {
-      btn.disabled = true; out.className = 'small'; out.textContent = 'Controleren…';
+  /* Wat is er nieuw (js/changelog.js). Bij een Spaanstalige cursus de Spaanse tekst, anders de Nederlandse. */
+  const LOG = self.SPT_CHANGELOG || [];
+  const logText = e => (S.i18n && S.i18n.on && e.es && e.es.length ? e.es : e.nl) || [];
+  function logList(entries, cur) {
+    return h('div', { class: 'wn-list', 'data-notr': S.i18n && S.i18n.on ? '' : null },
+      entries.map(e => h('section', { class: 'wn-item' + (e.v === cur ? ' current' : '') },
+        h('div', { class: 'wn-head' }, h('b', null, 'v' + e.v), h('small', { class: 'muted' }, versionDate(e.date)),
+          e.v === cur ? h('span', { class: 'wn-tag' }, S.t('jouw versie')) : null),
+        h('ul', null, logText(e).map(x => h('li', null, x))))));
+  }
+  // de changelog van de live-versie ophalen, om te laten zien wat een update brengt
+  async function latestLog() {
+    try {
+      const r = await fetch('js/changelog.js?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return [];
+      const box = {}; new Function('self', await r.text())(box); return Array.isArray(box.SPT_CHANGELOG) ? box.SPT_CHANGELOG : [];
+    } catch (e) { return []; }
+  }
+  /* Knop «Controleren op updates» met de uitkomst eronder; gebruikt in Instellingen en in «Wat is er nieuw». */
+  function updateCheck(opts = {}) {
+    const out = h('div', { class: 'small wn-out', role: 'status' });
+    const btn = h('button', { class: 'btn ' + (opts.primary ? 'primary' : 'ghost'), type: 'button', onclick: async () => {
+      btn.disabled = true; out.className = 'small wn-out'; out.textContent = 'Controleren…';
       try {
         const L = await latestVersion();
         if (!newer(L.number, V.number)) out.textContent = '✅ Je hebt de nieuwste versie.';
         else {
+          const coming = opts.log ? (await latestLog()).filter(e => newer(e.v, V.number)) : [];
           out.textContent = '';
-          out.append('🆕 Versie ' + L.number + (L.date ? ' (' + versionDate(L.date) + ')' : '') + ' staat klaar. ',
-            h('button', { class: 'btn primary', type: 'button', onclick: updateNow }, 'Nu bijwerken'));
+          out.append(h('p', null, '🆕 Versie ' + L.number + (L.date ? ' (' + versionDate(L.date) + ')' : '') + ' staat klaar. '),
+            coming.length ? logList(coming) : null,
+            h('button', { class: 'btn primary', type: 'button', onclick: e => { e.target.disabled = true; e.target.textContent = 'Bijwerken…'; updateNow(); } }, 'Nu bijwerken'));
         }
-      } catch (e) { out.className = 'small warn'; out.textContent = '⚠️ ' + (navigator.onLine === false ? 'Je bent offline. Probeer het later opnieuw.' : e.message); }
+      } catch (e) { out.className = 'small wn-out warn'; out.textContent = '⚠️ ' + (navigator.onLine === false ? 'Je bent offline. Probeer het later opnieuw.' : e.message); }
       btn.disabled = false;
     } }, '🔄 Controleren op updates');
+    return { btn, out };
+  }
+  const SEEN_KEY = 'spt.seenVersion';
+  function markSeen() { try { localStorage.setItem(SEEN_KEY, V.number); } catch (e) { /* negeer */ } const b = document.getElementById('tb-ver'); if (b) b.classList.remove('has-new'); }
+  /* Na een update: een stipje bij het versienummer tot je «Wat is er nieuw» hebt geopend. De allereerste keer niet. */
+  function flagNew() {
+    let seen = null; try { seen = localStorage.getItem(SEEN_KEY); } catch (e) { return; }
+    if (!seen) { markSeen(); return; }
+    if (newer(V.number, seen)) { const b = document.getElementById('tb-ver'); if (b) { b.classList.add('has-new'); b.title = 'Nieuwe versie: tik om te zien wat er nieuw is'; } }
+  }
+  function whatsNew() {
+    markSeen();
+    const root = document.getElementById('modal-root'); root.innerHTML = '';
+    const close = () => { root.innerHTML = ''; document.removeEventListener('keydown', esc); };
+    const esc = e => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', esc);
+    const u = updateCheck({ primary: true, log: true });
+    const list = LOG.length ? logList(LOG, V.number) : h('p', { class: 'muted' }, 'Nog geen overzicht van updates.');
+    root.append(h('div', { class: 'modal-bg', onclick: e => { if (e.target.classList.contains('modal-bg')) close(); } },
+      h('div', { class: 'modal whatsnew', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'wn-title' },
+        h('div', { class: 'row between wn-top' }, h('h3', { id: 'wn-title' }, '🆕 Wat is er nieuw'),
+          h('button', { class: 'update-x', type: 'button', 'aria-label': 'Sluiten', onclick: close }, '✕')),
+        h('p', { class: 'small muted' }, 'Je gebruikt versie ' + V.number + (V.date ? ' van ' + versionDate(V.date) : '') + '.'),
+        h('div', { class: 'wn-check' }, u.btn, u.out),
+        h('h4', { class: 'wn-sub' }, 'Recente updates'),
+        list,
+        h('div', { class: 'row end' }, h('button', { class: 'btn ghost', type: 'button', onclick: close }, 'Sluiten')))));
+    u.btn.focus();
+  }
+  S.whatsNew = whatsNew;
+  function versionCard() {
+    const u = updateCheck();
     return h('div', { class: 'card form' },
       h('div', { class: 'row gap between wrap' },
         h('div', null, h('b', null, 'Versie ' + V.number), h('small', { class: 'muted', style: { display: 'block' } }, versionDate(V.date))),
-        btn),
-      out,
+        u.btn),
+      u.out,
+      h('button', { class: 'btn link', type: 'button', onclick: whatsNew }, '📋 Wat is er nieuw in de laatste updates'),
       h('p', { class: 'small muted' }, 'Na een update zie je hier een hoger versienummer. Staat er nog het oude nummer? Tik dan op «Controleren op updates».'));
   }
   /* Opnames per niveau downloaden, zodat ze ook zonder internet werken (sw.js bewaart ze in een vaste cache). */
@@ -1899,7 +1952,8 @@
     S.Icons.decorate();
     Store.load(); migrateTests();
     applyTheme(); Speech.init(); S.Tutor.hookSpeech();
-    const ver = document.getElementById('tb-ver'); if (ver) ver.textContent = appVersion();
+    const ver = document.getElementById('tb-ver');
+    if (ver) { ver.textContent = appVersion(); ver.addEventListener('click', e => { e.preventDefault(); whatsNew(); }); flagNew(); }
     window.addEventListener('hashchange', render);
     render();
     if (S.Ask) S.Ask.init();

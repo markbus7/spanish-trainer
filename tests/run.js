@@ -468,6 +468,18 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
     ok(q === 'v=' + V.number, 'index.html laadt ' + file + ' met ?v=' + V.number + ' (gebruik node tools/versie.js)');
   }
   ok(html.includes('href="css/app.css?v=' + V.number + '"'), 'index.html laadt css/app.css met ?v=' + V.number);
+  // Wat is er nieuw: bovenste blok = huidige versie, nieuwste eerst, elk blok met tekst
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/changelog.js'), 'utf8'), vctx);
+  const LOG = vctx.SPT_CHANGELOG || [];
+  ok(LOG.length && LOG[0].v === V.number, 'changelog: bovenste versie is ' + V.number + ' (node tools/versie.js ' + V.number + ' "wat er nieuw is")');
+  ok(LOG[0] && LOG[0].date === V.date, 'changelog: datum bovenste versie gelijk aan js/version.js');
+  const num = v => v.split('.').reduce((a, x) => a * 1000 + +x, 0);
+  LOG.forEach((e, i) => {
+    ok(/^\d+\.\d+\.\d+$/.test(e.v) && /^\d{4}-\d{2}-\d{2}$/.test(e.date), 'changelog: versie en datum geldig bij ' + e.v);
+    ok(Array.isArray(e.nl) && e.nl.length && e.nl.every(x => typeof x === 'string' && x.trim() && !/TODO/.test(x)), 'changelog: Nederlandse tekst bij ' + e.v);
+    ok(!e.es || (Array.isArray(e.es) && e.es.every(x => typeof x === 'string')), 'changelog: es is een lijst bij ' + e.v);
+    if (i) ok(num(LOG[i - 1].v) > num(e.v), 'changelog: nieuwste eerst (' + LOG[i - 1].v + ' vóór ' + e.v + ')');
+  });
   ok(/updateViaCache:\s*'none'/.test(fs.readFileSync(path.join(root, 'js/app.js'), 'utf8')), 'service worker wordt zonder HTTP-cache bijgewerkt');
 }
 
