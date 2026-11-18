@@ -40,6 +40,34 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     const leg = (x, s) => `<g transform="translate(${x} 142) scale(${s} 1)"><path d="M0 0C-1 5-3 9-5 12" fill="none" stroke="${SK}" stroke-width="9" stroke-linecap="round"/>
       <g stroke="${SK}" stroke-width="2.6" stroke-linecap="round" fill="none"><path d="M-5 12-12 13"/><path d="M-5 12.5-10.5 17"/><path d="M-5 13-6.5 18.5"/><path d="M-4.5 13-2 18"/><path d="M-4 12.5 1 15.5"/></g>
       <g fill="#ffd6e5"><circle cx="-12" cy="13" r="1.3"/><circle cx="-10.5" cy="17" r="1.3"/><circle cx="-6.5" cy="18.5" r="1.3"/><circle cx="-2" cy="18" r="1.3"/><circle cx="1" cy="15.5" r="1.3"/></g></g>`;
+    // het huipil-jurkje: geborduurde bloemenrand, sierkraag, pofmouwtjes, plooien en een kanten zoom
+    const qb = (a, c, b, t) => [(1 - t) * (1 - t) * a[0] + 2 * t * (1 - t) * c[0] + t * t * b[0], (1 - t) * (1 - t) * a[1] + 2 * t * (1 - t) * c[1] + t * t * b[1]].map(v => +v.toFixed(2));
+    const flower = (x, y, col, r = 1.55) => `<g transform="translate(${x} ${y})">${[0, 72, 144, 216, 288].map(d => `<circle cx="${(r * 1.15 * Math.cos((d - 90) * Math.PI / 180)).toFixed(2)}" cy="${(r * 1.15 * Math.sin((d - 90) * Math.PI / 180)).toFixed(2)}" r="${r}" fill="${col}"/>`).join('')}<circle r="${(r * .75).toFixed(2)}" fill="#ffe08a"/></g>`;
+    const leafP = (x, y, a) => `<ellipse cx="${x}" cy="${y}" rx="2.3" ry="1.05" transform="rotate(${a} ${x} ${y})" fill="#7fd18b"/>`;
+    const FL = ['#f0789f', '#f7a531', '#ffffff', '#c28be8', '#f0789f'];
+    const band = [.12, .31, .5, .69, .88].map((t, i) => { const [x, y] = qb([32, 124], [60, 134], [88, 124], t); return flower(x, y, FL[i]); }).join('')
+      + [.215, .405, .595, .785].map((t, i) => { const [x, y] = qb([32, 124], [60, 134], [88, 124], t); return leafP(x, y - 1.6, i % 2 ? 25 : -25) + leafP(x, y + 1.6, i % 2 ? -25 : 25); }).join('');
+    const lace = Array.from({ length: 11 }, (_, i) => { const [x, y] = qb([29.5, 141], [60, 151], [90.5, 141], i / 10); return `<circle cx="${x}" cy="${y}" r="2.7"/>`; }).join('');
+    const laceDots = Array.from({ length: 11 }, (_, i) => { const [x, y] = qb([29.5, 142.6], [60, 152.6], [90.5, 142.6], i / 10); return `<circle cx="${x}" cy="${y}" r=".7"/>`; }).join('');
+    const sleeve = (x, flip) => `<g transform="translate(${x} 100) scale(${flip} 1)"><path d="M-6.5 3.5C-8 -2-4.5-6 .5-6S8-2 6.5 3.5C3.5 6-3.5 6-6.5 3.5Z" fill="#1e9f90"/><path d="M-6.3 3.4C-3.3 5.8 3.3 5.8 6.3 3.4" fill="none" stroke="#fff4e6" stroke-width="1.6" stroke-linecap="round"/><path d="M-6.3 3.4C-3.3 5.8 3.3 5.8 6.3 3.4" fill="none" stroke="#f0789f" stroke-width=".9" stroke-dasharray="1 1.6" stroke-linecap="round" transform="translate(0 1.6)"/><path d="M-3-3.5Q0-4.8 3-3.5" stroke="#fff" stroke-width=".9" opacity=".35" fill="none" stroke-linecap="round"/></g>`;
+    const dress = full ? `
+  <g class="lupe-dress">
+    <g fill="#ffeef4" stroke="#e98bb0" stroke-width=".7">${lace}</g><g fill="#f0789f">${laceDots}</g>
+    <path d="M41 93C35 108 31 124 29 141Q60 151 91 141C89 124 85 108 79 93Z" fill="${u('h')}"/>
+    <path d="M41 93C36 106 33 120 31 135Q36 137 40 138C40 124 42 108 46 94Z" fill="#fff" opacity=".1"/>
+    <g fill="none" stroke="#0b5f55" stroke-linecap="round" opacity=".35" stroke-width="1.1"><path d="M48 113Q45.5 127 44 141"/><path d="M60 114V144.5"/><path d="M72 113Q74.5 127 76 141"/></g>
+    <path d="M32.2 118.5Q60 128.5 87.8 118.5" fill="none" stroke="#fff4e6" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M31.4 129.5Q60 139.5 88.6 129.5" fill="none" stroke="#fff4e6" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M32.6 120.6Q60 130.6 87.4 120.6M31.6 127.4Q60 137.4 88.4 127.4" fill="none" stroke="#f2b134" stroke-width=".8" stroke-dasharray="1.2 1.4"/>
+    ${band}
+    <path d="M30.2 137Q60 147.5 89.8 137" fill="none" stroke="#f2b134" stroke-width="1.8" stroke-dasharray="2.6 2" stroke-linecap="round"/>
+    <path d="M46.5 94.5H73.5L70.5 109Q60 113 49.5 109Z" fill="#0f7064"/>
+    <path d="M46.5 94.5H73.5L70.5 109Q60 113 49.5 109Z" fill="none" stroke="#f2b134" stroke-width="1.2" stroke-linejoin="round" stroke-dasharray="1.6 1.2"/>
+    <path d="M51 104l2 2.4 2-2.4 2 2.4 2-2.4 2 2.4 2-2.4 2 2.4 2-2.4" fill="none" stroke="#fff4e6" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+    ${flower(60, 100.6, '#f0789f', 1.35)}${leafP(55, 101, -15)}${leafP(65, 101, 15)}
+    <circle cx="52" cy="98.6" r=".9" fill="#f7a531"/><circle cx="68" cy="98.6" r=".9" fill="#f7a531"/>
+  </g>
+  ${sleeve(35.5, -1)}${sleeve(84.5, 1)}` : '';
     const body = full ? `
   <g class="lupe-tail">
     <path d="M74 111C90 113 102 122 113 130C120 135 126 133 130 125C133 133 132 145 123 151C112 157 96 154 85 148C79 145 75 141 72 134Z" fill="${u('t')}"/>
@@ -50,11 +78,7 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   <g class="lupe-legs">${leg(47, 1)}${leg(73, -1)}</g>
   ${arm(30, 101, opt.wave ? 14 : 22, -1)}
   ${opt.wave ? arm(91, 103, -128, 1) : arm(90, 101, -22, 1)}
-  <path d="M41 93C35 108 31 124 29 141Q60 151 91 141C89 124 85 108 79 93Z" fill="${u('h')}"/>
-  <path d="M31 129Q60 140 89 129" fill="none" stroke="#fff4e6" stroke-width="3.4" stroke-linecap="round"/>
-  <path d="M30 135.5Q60 146 90 135.5" fill="none" stroke="#f2b134" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/>
-  <g><circle cx="42" cy="122" r="3.1" fill="#f0789f"/><circle cx="60" cy="125" r="3.4" fill="#f2b134"/><circle cx="78" cy="122" r="3.1" fill="#f0789f"/><circle cx="42" cy="122" r="1.1" fill="#fff4e6"/><circle cx="60" cy="125" r="1.2" fill="#fff4e6"/><circle cx="78" cy="122" r="1.1" fill="#fff4e6"/></g>
-  <path d="M49 106l3 4 3-4 3 4 3-4 3 4 3-4 3 4" fill="none" stroke="#fff4e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>` : '';
+  ${dress}` : '';
     return `<svg class="lupe-svg${full ? ' lupe-full' + (opt.wave ? ' waving' : '') : ''}" viewBox="${vb}" width="${w}" height="${size}" role="img" aria-label="Lupe, de docente" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <radialGradient id="${id}s" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#ffd6e5"/><stop offset=".55" stop-color="#f8aecb"/><stop offset="1" stop-color="#ec88b0"/></radialGradient>
@@ -69,7 +93,6 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   <path d="M30 103Q60 120 90 103" fill="none" stroke="#f2b134" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/>
   <g><circle cx="42" cy="113" r="3.1" fill="#f0789f"/><circle cx="60" cy="116" r="3.1" fill="#f2b134"/><circle cx="78" cy="113" r="3.1" fill="#f0789f"/><circle cx="42" cy="113" r="1.1" fill="#fff4e6"/><circle cx="60" cy="116" r="1.1" fill="#fff4e6"/><circle cx="78" cy="113" r="1.1" fill="#fff4e6"/></g>`}
   <path d="M60 34C88 34 105 47 105 66C105 87 87 99 60 99C33 99 15 87 15 66C15 47 32 34 60 34Z" fill="${u('s')}"/>
-  <path d="M24 80C34 92 46 96 60 96S86 92 96 80C88 86 76 89 60 89S32 86 24 80Z" fill="#ffdce8" opacity=".7"/>
   <ellipse cx="43" cy="45" rx="11" ry="5" transform="rotate(-22 43 45)" fill="#fff" opacity=".4"/>
   <g fill="#e483aa" opacity=".55"><circle cx="58" cy="39" r="1.9"/><circle cx="66" cy="41.5" r="1.4"/><circle cx="51" cy="42.5" r="1.3"/><circle cx="31" cy="58" r="1.5"/><circle cx="91" cy="60" r="1.5"/></g>
   <g class="lupe-flower" transform="translate(85 38)">
