@@ -994,10 +994,10 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .lupe-focus .lf-ex s, .rep-ex s, .rep-recent s { color: #c0392b; text-decoration-thickness: 1.5px; }
 .lupe-focus .btn { margin-top: .7rem; }
 .rep-period { margin: .2rem 0 .8rem; }
-.rep-topic, .rep-recent { border-bottom: 1px solid var(--line); padding: .55rem 0; }
+.rep-topic, .rep-recent, .rep-fix { border-bottom: 1px solid var(--line); padding: .55rem 0; }
 .rep-topic:last-of-type, .rep-recent:last-child { border-bottom: 0; }
-.rep-topic summary, .rep-recent summary { display: flex; align-items: center; gap: .6rem; cursor: pointer; list-style: none; min-height: 40px; }
-.rep-topic summary::-webkit-details-marker, .rep-recent summary::-webkit-details-marker { display: none; }
+.rep-topic summary, .rep-recent summary, .rep-fix summary { display: flex; align-items: center; gap: .6rem; cursor: pointer; list-style: none; min-height: 40px; }
+.rep-topic summary::-webkit-details-marker, .rep-recent summary::-webkit-details-marker, .rep-fix summary::-webkit-details-marker { display: none; }
 .rep-topic summary .pbar { width: 28%; max-width: 160px; flex: none; }
 .rep-ex { padding: .4rem 0 .1rem .4rem; display: flex; flex-direction: column; gap: .1rem; }
 .rep-topic .btn.link { margin-top: .3rem; padding-left: .4rem; text-align: left; }
@@ -1080,3 +1080,14 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .logo-mark svg { width: 32px; height: auto; margin-top: 3px; }
 .quick-btn .qi:has(.ic) { width: 48px; height: 48px; border-radius: 14px; background: var(--bg2); display: grid; place-items: center; margin-bottom: .35rem; }
 .quick-btn .qi .ic { width: 40px; height: 40px; margin: 0; }
+
+/* Voor de volgende update (herbeoordelingen + voorstellen van Lupe) */
+.rep-update .rep-h { font-size: 1rem; margin: .8rem 0 .2rem; }
+.rep-fix > div, .rep-fix > a { margin-top: .3rem; }
+.rep-fix summary small { word-break: break-word; }
+.rep-proposal { margin-top: .8rem; }
+.rep-fix summary b { color: var(--ink); }
+.rep-fix + .rep-proposal, .rep-update > p + .rep-proposal { border-top: 0; }
+.rep-proposal ul { margin: .3rem 0; padding-left: 1.2rem; }
+.rep-update > .row { margin-top: .7rem; }
+.fb-fix { margin-top: .35rem; }

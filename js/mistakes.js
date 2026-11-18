@@ -82,6 +82,32 @@
     return out;
   }
 
+  /* ---------- herbeoordeling: Lupe keurde een fout gerekend antwoord toch goed ---------- */
+  // Bewaard in state.lupe.fix, zodat het in het rapport staat en in de volgende update van de app kan
+  // (ontbrekend goed antwoord, of een modelantwoord dat niet klopt). Daarna rekent de app dit antwoord ook goed.
+  const MAXFIX = 100;
+  function fixes() { const L = db(); if (!Array.isArray(L.fix)) L.fix = []; return L.fix; }
+  function regrade(it, user, j) {
+    if (!it || !j || !j.correct || !user) return null;
+    const s = (x, n) => String(x == null ? '' : x).trim().slice(0, n);
+    const id = it.srsId || (it.orig && it.orig.srsId) || '';
+    const unit = /^x\|/.test(id) ? id.split('|')[1] : '';
+    const list = fixes(), k = S.check.bare(user);
+    const e = { t: Date.now(), q: s(it.prompt, 200), u: s(user, 200), a: (it.answers || []).slice(0, 4).map(x => s(x, 200)),
+      fb: s(j.feedback, 300), b: s(j.better, 200), why: s(j.app, 300), id: s(id, 80), unit };
+    const old = list.findIndex(x => x.q === e.q && S.check.bare(x.u) === k);
+    if (old >= 0) list.splice(old, 1);
+    list.push(e);
+    db().fix = list.slice(-MAXFIX);
+    return e;
+  }
+  /** Keurde Lupe dit antwoord op deze vraag eerder goed? */
+  function accepted(q, user) {
+    const L = st().lupe; if (!L || !Array.isArray(L.fix) || !q || !user) return null;
+    const k = S.check.bare(user);
+    return L.fix.find(x => x.q === q && S.check.bare(x.u) === k) || null;
+  }
+
   /* ---------- samenvoegen bij synchroniseren (idempotent) ---------- */
   function merge(a, b) {
     const A = (a && a.log) || [], B = (b && b.log) || [];
@@ -90,6 +116,14 @@
     const adv = [a && a.advice, b && b.advice].filter(Boolean).sort((x, y) => (y.t || 0) - (x.t || 0))[0];
     const out = { log: log.slice(-MAX), n: Math.max((a && a.n) || 0, (b && b.n) || 0) };
     if (adv) out.advice = JSON.parse(JSON.stringify(adv));
+    const upd = [a && a.update, b && b.update].filter(Boolean).sort((x, y) => (y.t || 0) - (x.t || 0))[0];
+    if (upd) out.update = JSON.parse(JSON.stringify(upd));
+    const F = ((a && a.fix) || []).concat((b && b.fix) || []);
+    if (F.length) {
+      const byK = new Map();
+      F.filter(e => e && e.t && e.q).sort((x, y) => x.t - y.t).forEach(e => { const k = e.q + '|' + S.check.bare(e.u); byK.delete(k); byK.set(k, JSON.parse(JSON.stringify(e))); });
+      out.fix = [...byK.values()].slice(-MAXFIX);
+    }
     return out;
   }
 
@@ -114,7 +148,8 @@
     log.filter(e => e.tag === 'vocab').reverse().forEach(e => { const k = S.check.bare(e.es || e.c); if (!seenW.has(k)) { seenW.add(k); words.push(e); } });
     // vergelijken met de periode ervoor: gaat het beter?
     const prev = L.log.filter(e => e.t >= from - days * DAY && e.t < from).length;
-    return { days, total: log.length, msgs: L.n || 0, topics, words, recent: log.slice(-12).reverse(), prev, advice: L.advice || null };
+    const fix = (L.fix || []).filter(e => e.t >= from).slice().reverse();
+    return { days, total: log.length, msgs: L.n || 0, topics, words, recent: log.slice(-12).reverse(), prev, advice: L.advice || null, fix, update: L.update || null };
   }
   function label(tag) { return tag === 'other' ? 'overig' : C.tag(tag); }
 
@@ -163,7 +198,38 @@
       weak.forEach(([k, v]) => lines.push(`- ${C.tag(k)}: ${Math.round(v.ok / (v.ok + v.no) * 100)}% goed (${v.ok + v.no} antwoorden)`));
     }
     if (r.advice && r.advice.text && opt.advice !== false) lines.push('', 'Advies van Lupe (' + fmtD(r.advice.t) + '):', r.advice.text.replace(/\*\*/g, ''));
+    if (opt.update !== false) { const u = updateText(r, opt); if (u) lines.push('', u); }
     return lines.join('\n');
+  }
+  /** Het deel voor de volgende update van de app: herbeoordelingen + voorstellen van Lupe. */
+  function updateText(r = report(30), opt = {}) {
+    const lines = [];
+    if (r.fix && r.fix.length) {
+      lines.push('Voor de volgende update — antwoorden die fout gerekend werden maar volgens Lupe goed zijn:');
+      r.fix.slice(0, 30).forEach(e => {
+        const u = e.unit ? C.get(e.unit) : null;
+        lines.push(`- ${e.q ? '«' + e.q + '»' : '(vraag)'}${u ? ' [' + u.level + ' ' + u.title + (e.id ? ', ' + e.id : '') + ']' : e.id ? ' [' + e.id + ']' : ''}`);
+        lines.push(`    mijn antwoord: «${e.u}»${e.a && e.a.length ? ' · in de app: «' + e.a.join('» / «') + '»' : ''}`);
+        if (e.why) lines.push(`    Lupe: ${e.why}`);
+        else if (e.fb) lines.push(`    Lupe: ${e.fb}`);
+      });
+    }
+    if (r.update && r.update.text && opt.proposal !== false) {
+      if (lines.length) lines.push('');
+      lines.push('Voorstellen van Lupe voor de volgende update (' + fmtD(r.update.t) + '):', r.update.text.replace(/\*\*/g, ''));
+    }
+    return lines.join('\n');
+  }
+
+  /* ---------- Lupe stelt voor wat er in de volgende update moet komen (met AI-sleutel) ---------- */
+  async function proposeUpdate() {
+    const r = report(90);
+    const sys = `You are Profe Lupe, the Latin American Spanish teacher inside a language-learning web app${S.course.target === 'es' ? ' for a Dutch speaker' : ''}. The app maker asks you what should go into the NEXT UPDATE of the app, so the course fits this learner better.
+Write in Dutch, as a short list of 3–7 concrete proposals (one line each, starting with "- "), most important first. No headings, no tables, no intro or outro.
+Each proposal must be something the app maker can build or change: e.g. add an accepted answer or synonym to a specific exercise, fix a wrong model answer, add exercises or a short explanation for a grammar topic the learner keeps getting wrong, add vocabulary, or a new feature that would help. Refer to the exact exercise or lesson when the report names one. Always Latin American Spanish norms (ustedes, never vosotros; regional vocabulary like carro, celular, computadora). Do not invent problems that are not supported by the report; if the report is thin, propose fewer items.`;
+    const text = await S.AI.ask({ system: sys, prompt: asText(r, { advice: true, proposal: false }), maxTokens: 900 });
+    db().update = { t: Date.now(), text: text.trim() };
+    return db().update;
   }
 
   /* ---------- advies van Lupe (met AI-sleutel) ---------- */
@@ -180,5 +246,5 @@ Write in Dutch, max ~120 words, no headings, no tables. Based on the learner's m
     return db().advice;
   }
 
-  S.Mistakes = { promptRule, strip, parse, record, merge, report, focus, practice, asText, advise, findWord, unitsFor, MAX };
+  S.Mistakes = { promptRule, strip, parse, record, merge, report, focus, practice, asText, updateText, advise, proposeUpdate, regrade, accepted, findWord, unitsFor, MAX };
 })(window.SPT);

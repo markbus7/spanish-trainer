@@ -483,7 +483,10 @@
     ctx.evaluate = () => {
       help.done();
       const user = part ? part.value().trim() : inp.value.trim();
-      const r = S.Gen.checkType(user, it);
+      let r = S.Gen.checkType(user, it);
+      // eerder door Lupe goedgekeurd (herbeoordeling): nu meteen goed
+      const lupeOk = !r.ok && it.translate && S.Mistakes && S.Mistakes.accepted(it.prompt, user);
+      if (lupeOk) r = { ok: true, warn: 'lupe', best: user };
       field().disabled = true;
       if (part) { part.mark(user, it.answers); const w = wrap.querySelector('.p-whole'); if (w) w.remove(); }
       if (sent) { const bl = sent.querySelector('.blank'); if (bl) { bl.textContent = r.ok ? user : (r.best || it.answers[0]); bl.classList.add('filled'); } }
@@ -933,13 +936,14 @@
       if (r.ok && r.warn === 'enye') fb.append(h('div', null, '✍️ Let op de ñ: ', h('b', { lang: 'es' }, r.expected)));
       if (r.ok && r.warn === 'typo') fb.append(h('div', null, '🔤 Kleine typfout — precies: ', h('b', { lang: 'es' }, r.expected)));
       if (r.ok && r.warn === 'article') fb.append(h('div', null, '📌 Vergeet het lidwoord niet: ', h('b', { lang: 'es' }, r.expected)));
+      if (r.ok && r.warn === 'lupe') fb.append(h('div', null, '🤖 Lupe keurde dit antwoord eerder goed. In de les staat: ', h('b', { lang: 'es' }, (r.alts || it.answers)[0])));
       if (r.ok && r.warn === 'synonym') fb.append(h('div', null, '👍 Ook goed! In de les staat: ', h('b', { lang: 'es' }, r.main)));
       if (!r.ok && r.expected && r.matchMistakes == null) {
-        fb.append(h('div', null, T('correct') + ': ', h('b', { lang: 'es' }, r.expected), (it.speakAnswer || it.kind === 'listen' || it.sentence) ? speakBtn(it.sentence ? it.sentence.replace('___', r.expected) : r.expected) : null));
+        fb.append(h('div', { class: 'fb-exp' }, T('correct') + ': ', h('b', { lang: 'es' }, r.expected), (it.speakAnswer || it.kind === 'listen' || it.sentence) ? speakBtn(it.sentence ? it.sentence.replace('___', r.expected) : r.expected) : null));
         if (r.user && it.kind !== 'mc') fb.append(h('div', { class: 'small muted' }, 'Jouw antwoord: ' + r.user));
         if (r.parts && r.parts.k.length) {
-          fb.append(h('div', { class: 'small' }, 'Per woord: ', wordDiff(r.parts), h('span', { class: 'muted' }, ' (groen goed' + (r.parts.st.includes('accent') ? ' · geel: let op het accent' : '') + ' · rood fout)')));
-          if (r.keepLater) fb.append(h('div', { class: 'small' }, '🔁 Straks staan de groene woorden er al en vul je alleen de rode opnieuw in.'));
+          fb.append(h('div', { class: 'small fb-wrong' }, 'Per woord: ', wordDiff(r.parts), h('span', { class: 'muted' }, ' (groen goed' + (r.parts.st.includes('accent') ? ' · geel: let op het accent' : '') + ' · rood fout)')));
+          if (r.keepLater) fb.append(h('div', { class: 'small fb-wrong' }, '🔁 Straks staan de groene woorden er al en vul je alleen de rode opnieuw in.'));
         }
         if (r.warn === 'article-wrong') {
           const noun = r.expected.replace(S.Gen.ART, '');
@@ -967,11 +971,19 @@
         b.onclick = async () => {
           b.disabled = true; b.textContent = 'AI beoordeelt…';
           try {
-            const j = await S.AI.checkTranslation(it.prompt, r.user, it.alts);
+            const j = await S.AI.checkTranslation(it.prompt, r.user, r.alts || it.answers);
             b.remove();
-            fb.append(h('div', { class: 'fb-ai' }, (j.correct ? '✅ ' : '❌ ') + j.feedback, j.better ? h('div', { class: 'small', lang: 'es' }, '→ ' + j.better) : null));
+            // goedgekeurd: in het rapport voor de volgende update (ontbrekend antwoord of fout modelantwoord)
+            const fix = j.correct && S.Mistakes ? S.Mistakes.regrade(it.orig || it, r.user, j) : null;
+            if (fix) S.Store.save();
+            fb.append(h('div', { class: 'fb-ai' }, (j.correct ? '✅ ' : '❌ ') + j.feedback, j.better ? h('div', { class: 'small', lang: 'es' }, '→ ' + j.better) : null,
+              fix ? h('div', { class: 'small muted fb-fix' }, '📋 Genoteerd in je rapport voor de volgende update. Dit antwoord telt voortaan als goed.') : null));
             if (j.correct) {
               foot.classList.remove('bad'); foot.classList.add('ok');
+              const ft = fb.querySelector('.fb-title'); if (ft) ft.textContent = esMode() ? '¡Sí estaba bien!' : 'Toch goed!';
+              const fa = fb.querySelector('.fb-lupe'); if (fa) fa.classList.remove('sad');
+              fb.querySelectorAll('.fb-wrong').forEach(x => x.remove());
+              const fe = fb.querySelector('.fb-exp'); if (fe && fe.firstChild) fe.firstChild.textContent = esMode() ? 'En la lección dice: ' : 'In de les staat: ';
               graded.set(it.orig || it, true);
               const qi = queue.lastIndexOf(queue.find(q => q.orig === (it.orig || it) && q.retry));
               if (qi > idx) queue.splice(qi, 1);

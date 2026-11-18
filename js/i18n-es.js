@@ -560,6 +560,8 @@
     "In de les staat: ": "En la lección dice: ",
     "Ook goed: ": "También vale: ",
     "🤖 Toch goed? Laat de AI het beoordelen": "🤖 ¿Está bien de todos modos? Que lo evalúe la IA",
+    "📋 Genoteerd in je rapport voor de volgende update. Dit antwoord telt voortaan als goed.": "📋 Anotado en tu informe para la próxima actualización. A partir de ahora esta respuesta cuenta como correcta.",
+    "🤖 Lupe keurde dit antwoord eerder goed. In de les staat: ": "🤖 Lupe ya aprobó esta respuesta antes. En la lección dice: ",
     "Vraag en jouw antwoord": "Pregunta y tu respuesta",
     "Vraag": "Pregunta",
     "op rij": "seguidas",
