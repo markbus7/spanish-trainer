@@ -3,7 +3,8 @@
    Per land:
      voice  = landcode van de opnamestem (tools/tts-texts.js), listen = taalcode voor de microfoon
      hello  = [begroeting, vertaling]
-     sounds = [titel, uitleg, voorbeeldzin, vertaling]: wat je hoort; de zin klinkt «hier» (lokale stem) en «neutraal»
+     sounds = [titel, uitleg, voorbeeldzin, vertaling, neutraal]: wat je hoort; de zin klinkt «hier» (lokale stem).
+              neutraal = dezelfde zin zoals in de basiscursus (alleen als de woorden anders zijn; anders dezelfde zin, neutrale stem)
      words  = [Spaans, Nederlands, label, uitspraak]: label i = informeel, g = grof (alleen herkennen);
               leenwoorden krijgen hun herkomst in de vertaling, bijv. «(uit het Engels: friend)»;
               uitspraak (optioneel) = hoe de stem het moet lezen als de spelling dat niet laat zien
@@ -38,7 +39,7 @@
       hello: ['¡Qué onda, vos! Bienvenido a Guatemala.', 'Hoe is het, jij? Welkom in Guatemala.'],
       intro: 'Het land van de Maya’s. Naast Spaans spreken veel mensen een Mayataal, zoals K’iche’.',
       sounds: [
-        ['Voseo', 'Onder vrienden zeggen ze «vos» in plaats van «tú», met een eigen werkwoordsvorm: vos sabés, vos tenés.', '¿Vos querés ir al mercado conmigo?', 'Wil jij met mij naar de markt?'],
+        ['Voseo', 'Onder vrienden zeggen ze «vos» in plaats van «tú», met een eigen werkwoordsvorm: vos sabés, vos tenés.', '¿Vos querés ir al mercado conmigo?', 'Wil jij met mij naar de markt?', '¿Tú quieres ir al mercado conmigo?'],
         ['Zachte rr', 'De rr klinkt vaak zacht, bijna als de «zj» in «garage». De s blijft wel goed hoorbaar.', 'El carro rojo está en la calle.', 'De rode auto staat op straat.']
       ],
       words: [['chapín / chapina', 'Guatemalteek / Guatemalteekse', 'i'], ['¡qué chilero!', 'wat tof!', 'i'], ['el pisto', 'het geld', 'i'], ['la chamba', 'het werk', 'i'], ['el patojo / la patoja', 'het kind, de jongere', 'i'],
@@ -49,7 +50,7 @@
       hello: ['¡Hola, vos! Bienvenido a El Salvador.', 'Hoi, jij! Welkom in El Salvador.'],
       intro: 'Het kleinste land van het Midden-Amerikaanse vasteland. Bekend om de pupusa, een gevulde maïspannenkoek.',
       sounds: [
-        ['Voseo', '«Vos» onder vrienden: vos sos, vos podés.', '¿Vos de dónde sos?', 'Waar kom jij vandaan?'],
+        ['Voseo', '«Vos» onder vrienden: vos sos, vos podés.', '¿Vos de dónde sos?', 'Waar kom jij vandaan?', '¿Tú de dónde eres?'],
         ['Zachte s', 'Aan het eind van een lettergreep klinkt de s vaak als een h: «los pájaros» wordt «loh pájaroh».', 'Los pájaros están en el árbol.', 'De vogels zitten in de boom.']
       ],
       words: [['guanaco / guanaca', 'Salvadoraan / Salvadoraanse', 'i'], ['¡qué chivo!', 'wat tof!', 'i'], ['el cipote / la cipota', 'het kind', 'i'], ['el chero / la chera', 'de maat, de vriend(in)', 'i'],
@@ -60,7 +61,7 @@
       hello: ['¡Hola, vos! Bienvenido a Honduras.', 'Hoi, jij! Welkom in Honduras.'],
       intro: 'Hondurezen noemen zichzelf «catrachos». Aan de kust en op de eilanden hoor je ook Engels en Garifuna.',
       sounds: [
-        ['Voseo', 'Onder vrienden «vos»: vos querés, vos tenés.', '¿Y vos qué querés comer?', 'En wat wil jij eten?'],
+        ['Voseo', 'Onder vrienden «vos»: vos querés, vos tenés.', '¿Y vos qué querés comer?', 'En wat wil jij eten?', '¿Y tú qué quieres comer?'],
         ['De s valt weg', 'De s aan het eind wordt een zachte h of verdwijnt: «¿cómo estás?» klinkt als «¿cómo ehtá?».', '¿Cómo estás, mi amigo?', 'Hoe gaat het, vriend?']
       ],
       words: [['catracho / catracha', 'Hondurees / Hondurese', 'i'], ['tuani', 'tof', 'i'], ['cheque', 'oké, prima', 'i'], ['el pisto', 'het geld', 'i'], ['el cipote / la cipota', 'het kind', 'i'],
@@ -71,7 +72,7 @@
       hello: ['¡Hola, vos! Bienvenido a Nicaragua.', 'Hoi, jij! Welkom in Nicaragua.'],
       intro: 'Land van meren en vulkanen. Nicaraguanen noemen zichzelf «nicas». Voseo hoor je hier overal, zelfs in reclames.',
       sounds: [
-        ['Voseo', '«Vos» is hier de gewone jij-vorm: vos sabés, vos vivís.', '¿Vos sabés dónde queda el lago?', 'Weet jij waar het meer is?'],
+        ['Voseo', '«Vos» is hier de gewone jij-vorm: vos sabés, vos vivís.', '¿Vos sabés dónde queda el lago?', 'Weet jij waar het meer is?', '¿Tú sabes dónde queda el lago?'],
         ['De s valt weg', 'Net als in Honduras klinkt de s aan het eind als een h of verdwijnt.', 'Vamos a la playa mañana.', 'We gaan morgen naar het strand.']
       ],
       words: [['nica', 'Nicaraguaan(se)', 'i'], ['tuani', 'tof', 'i'], ['el chunche', 'het ding', 'i'], ['el chavalo / la chavala', 'de jongen / het meisje', 'i'], ['los reales', 'het geld', 'i'],
@@ -82,9 +83,9 @@
       hello: ['¡Pura vida! Bienvenido a Costa Rica.', 'Pura vida! Welkom in Costa Rica.'],
       intro: '«Ticos» staan bekend om «pura vida» en om hun beleefdheid. Veel mensen zeggen «usted», zelfs tegen vrienden en kinderen.',
       sounds: [
-        ['Usted voor iedereen', 'Waar jij «tú» zou zeggen, zegt een Costa Ricaan vaak «usted».', '¿Usted quiere un cafecito?', 'Wil je een koffietje?'],
+        ['Usted voor iedereen', 'Waar jij «tú» zou zeggen, zegt een Costa Ricaan vaak «usted».', '¿Usted quiere un cafecito?', 'Wil je een koffietje?', '¿Tú quieres un cafecito?'],
         ['Zachte r', 'De rr en de r aan het begin van een woord klinken bijna als de Franse j: «carro» klinkt als «cazjo».', 'El carro de Rodrigo es rojo.', 'De auto van Rodrigo is rood.'],
-        ['Verkleinwoord op -tico', 'Niet «momentito» maar «momentico», niet «chiquitito» maar «chiquitico».', 'Espere un momentico, por favor.', 'Wacht heel even, alstublieft.']
+        ['Verkleinwoord op -tico', 'Niet «momentito» maar «momentico», niet «chiquitito» maar «chiquitico».', 'Espere un momentico, por favor.', 'Wacht heel even, alstublieft.', 'Espere un momentito, por favor.']
       ],
       words: [['pura vida', 'top! / alles goed / dag!'], ['mae', 'gast', 'i'], ['tuanis', 'tof', 'i'], ['¡qué chiva!', 'wat tof!', 'i'], ['el brete', 'het werk', 'i'], ['la birra', 'het bier', 'i'],
         ['el chunche', 'het ding', 'i'], ['¡upe!', 'hallo? (als je bij iemand binnenstapt)'], ['diay', 'tja, nou', 'i'], ['el tico / la tica', 'Costa Ricaan / Costa Ricaanse'], ['la soda', 'het eenvoudige eettentje'], ['jalar', 'verkering hebben', 'i'], ['el carajillo', 'het kind', 'i'], ['¡qué pereza!', 'geen zin in!', 'i'], ['la jupa', 'het hoofd', 'i'], ['¡qué sal!', 'balen! / pech!', 'i'], ['al chile', 'echt waar', 'i'], ['la harina', 'het geld', 'i'], ['la choza', 'het huis', 'i'], ['buenas', 'hallo (bij binnenkomst)']],
@@ -95,8 +96,8 @@
       intro: 'Het land van het kanaal, tussen twee oceanen. Panamees Spaans is snel en Caribisch, met veel Engelse woorden.',
       sounds: [
         ['Snel, de s valt weg', 'Panamezen praten snel. De s aan het eind en de d tussen klinkers verdwijnen: «pelado» wordt «pelao».', '¿Para dónde vas, mi hermano?', 'Waar ga je heen, broer?'],
-        ['Pa’ in plaats van para', '«Para» wordt bijna altijd «pa’».', 'Voy pa’ la playa con los pelaos.', 'Ik ga met de kids naar het strand.'],
-        ['Engelse leenwoorden', 'Door het kanaal en de Amerikanen: «parquear», «bróder», «el man».', 'Voy a parquear el carro aquí.', 'Ik ga de auto hier parkeren.']
+        ['Pa’ in plaats van para', '«Para» wordt bijna altijd «pa’».', 'Voy pa’ la playa con los pelaos.', 'Ik ga met de kids naar het strand.', 'Voy para la playa con los niños.'],
+        ['Engelse leenwoorden', 'Door het kanaal en de Amerikanen: «parquear», «bróder», «el man».', 'Voy a parquear el carro aquí.', 'Ik ga de auto hier parkeren.', 'Voy a estacionar el carro aquí.']
       ],
       words: [['¿qué xopá?', 'hoe is het? (spreek uit: ke sjopá)', 'i', 'qué chopá'], ['ofi', 'oké! / tuurlijk! (uit het Engels: official)', 'i'], ['el pelao / la pelaa', 'het kind', 'i'], ['¡chuleta!', 'jeetje! / verdorie!', 'i'],
         ['¡juega vivo!', 'wees slim, let op!', 'i'], ['el chantin', 'het huis', 'i'], ['la fría', 'het koude biertje', 'i'], ['el man', 'de vent, de gast', 'i'], ['la vaina', 'het ding, het gedoe', 'i'],
@@ -108,7 +109,7 @@
       intro: 'Snel, muzikaal en vol eigen woorden. De s en de d aan het eind vallen vaak weg.',
       sounds: [
         ['De s valt weg', '«¿Cómo estás?» klinkt als «¿cómo etá?» en «los amigos» als «lo amigo».', '¿Cómo estás? Estamos bien.', 'Hoe gaat het? Met ons gaat het goed.'],
-        ['Tú vóór het werkwoord', 'In vragen zetten Cubanen «tú» vóór het werkwoord.', '¿Qué tú quieres comer?', 'Wat wil jij eten?'],
+        ['Tú vóór het werkwoord', 'In vragen zetten Cubanen «tú» vóór het werkwoord.', '¿Qué tú quieres comer?', 'Wat wil jij eten?', '¿Qué quieres comer?'],
         ['Dubbele medeklinker', 'In het westen wordt een r of l voor een medeklinker vaak een dubbele klank: «puerta» klinkt als «puetta».', 'Abre la puerta, por favor.', 'Doe de deur open, alsjeblieft.']
       ],
       words: [['asere', 'maat', 'i'], ['¿qué bolá?', 'hoe is het?', 'i'], ['la guagua', 'de bus'], ['la pincha', 'het werk', 'i'], ['el yuma', 'de buitenlander, vooral Amerikaan (van «Yuma», de VS)', 'i'],
@@ -122,7 +123,7 @@
       sounds: [
         ['De s valt weg', 'De s aan het eind hoor je bijna nooit: «los muchachos» wordt «lo muchacho».', 'Los muchachos están en la casa.', 'De jongens zijn thuis.'],
         ['r en l worden i', 'In het noorden (Cibao) wordt een r of l aan het eind van een lettergreep een i: «por favor» klinkt als «poi favoi».', 'Por favor, ¿me da un café?', 'Mag ik een koffie, alstublieft?'],
-        ['Tú vóór het werkwoord', 'Net als in Cuba: «¿Qué tú dices?»', '¿Qué tú dices?', 'Wat zeg jij?']
+        ['Tú vóór het werkwoord', 'Net als in Cuba: «¿Qué tú dices?»', '¿Qué tú dices?', 'Wat zeg jij?', '¿Qué dices?']
       ],
       words: [['¿qué lo que?', 'hoe is het?', 'i'], ['el tíguere', 'de slimme gast, het boefje', 'i'], ['¡qué chévere!', 'wat tof!'], ['la vaina', 'het ding, het gedoe', 'i'], ['un chin', 'een beetje', 'i'],
         ['el colmado', 'de buurtwinkel'], ['el concho', 'de gedeelde taxi', 'i'], ['el motoconcho', 'de mototaxi'], ['jevo / jeva', 'vriendje / vriendinnetje', 'i'], ['dique', 'zogenaamd', 'i'],
@@ -135,7 +136,7 @@
       sounds: [
         ['r wordt l', 'Een r aan het eind van een lettergreep klinkt als een l: «comer» wordt «comel», «parque» wordt «palque».', 'Voy a comer en el parque.', 'Ik ga in het park eten.'],
         ['rr achter in de keel', 'Sommige Puerto Ricanen spreken de rr achter in de keel uit, bijna als een Nederlandse g of r.', 'El carro de Ramón corre rápido.', 'De auto van Ramón rijdt snel.'],
-        ['Tú vóór het werkwoord', 'Net als in Cuba en de Dominicaanse Republiek.', '¿Qué tú vas a hacer hoy?', 'Wat ga jij vandaag doen?']
+        ['Tú vóór het werkwoord', 'Net als in Cuba en de Dominicaanse Republiek.', '¿Qué tú vas a hacer hoy?', 'Wat ga jij vandaag doen?', '¿Qué vas a hacer hoy?']
       ],
       words: [['¡wepa!', 'joepie!', 'i'], ['boricua', 'Puerto Ricaan(se)'], ['el corillo', 'de vriendengroep', 'i'], ['janguear', 'uitgaan, rondhangen (uit het Engels: to hang out)', 'i'], ['la guagua', 'de bus'],
         ['el pana', 'de maat', 'i'], ['¡ay bendito!', 'ach gut! / oh jee!'], ['brutal', 'geweldig', 'i'], ['el zafacón', 'de vuilnisbak'], ['los chavos', 'het geld', 'i'], ['¡acho!', 'jeetje! / hé!', 'i'], ['estar al garete', 'stuurloos zijn', 'i'], ['la china', 'de sinaasappel'], ['el mahón', 'de spijkerbroek'], ['el bizcocho', 'de taart'], ['la nena', 'het meisje', 'i'], ['bregar', 'ergens mee dealen', 'i'], ['¡ea rayos!', 'jeetje!', 'i'], ['¡qué jevi!', 'wat tof!', 'i']],
@@ -157,9 +158,9 @@
       hello: ['¡Quiubo, parce! Bienvenido a Colombia.', 'Hoe is het, maat? Welkom in Colombia.'],
       intro: 'Heel verschillende accenten: helder en beleefd in Bogotá, zangerig in Medellín, Caribisch aan de kust.',
       sounds: [
-        ['Bogotá: helder en beleefd', 'Duidelijke uitspraak en veel «usted», ook onder vrienden en in relaties.', '¿Usted qué quiere tomar, parcero?', 'Wat wil jij drinken, maat?'],
-        ['Kust: Caribisch', 'In Cartagena en Barranquilla valt de s aan het eind weg en «para» wordt «pa’».', 'Vamos pa’ la playa, que está bacano.', 'Kom, naar het strand, het is top.'],
-        ['Medellín: voseo', '«Paisas» gebruiken «vos» met een zangerige toon en vaak «pues» aan het eind.', '¿Vos qué hacés, pues?', 'Wat doe jij nou?']
+        ['Bogotá: helder en beleefd', 'Duidelijke uitspraak en veel «usted», ook onder vrienden en in relaties.', '¿Usted qué quiere tomar, parcero?', 'Wat wil jij drinken, maat?', '¿Tú qué quieres tomar, amigo?'],
+        ['Kust: Caribisch', 'In Cartagena en Barranquilla valt de s aan het eind weg en «para» wordt «pa’».', 'Vamos pa’ la playa, que está bacano.', 'Kom, naar het strand, het is top.', 'Vamos a la playa, que está muy bonito.'],
+        ['Medellín: voseo', '«Paisas» gebruiken «vos» met een zangerige toon en vaak «pues» aan het eind.', '¿Vos qué hacés, pues?', 'Wat doe jij nou?', '¿Tú qué haces?']
       ],
       words: [['parce / parcero', 'maat, vriend', 'i'], ['¡qué chévere! / ¡qué bacano!', 'wat tof!', 'i'], ['¿quiubo?', 'hoe is het?', 'i'], ['un tinto', 'een zwarte koffie'], ['la plata', 'het geld'],
         ['¡qué pena!', 'sorry / wat gênant'], ['¡listo!', 'oké!'], ['el camello', 'het werk', 'i'], ['¿me regala…?', 'mag ik … ? (bij bestellen)'], ['la rumba', 'het feest', 'i'],
@@ -170,9 +171,9 @@
       hello: ['¡Qué más, ñaño! Bienvenido a Ecuador.', 'Hoe is het, broer? Welkom in Ecuador.'],
       intro: 'Van de Andes tot de Galápagos. In Quito praten ze rustig en duidelijk, aan de kust (Guayaquil) sneller en Caribischer.',
       sounds: [
-        ['Andes: rustig en duidelijk', 'Medeklinkers blijven goed hoorbaar en klinkers zijn kort.', 'Ya mismo llegamos a Quito.', 'We zijn zo in Quito.'],
-        ['Kust: de s valt weg', 'In Guayaquil klinkt de s aan het eind als een h.', 'Los manes están en la playa.', 'De gasten zijn op het strand.'],
-        ['«Dame pasando»', 'Een beleefd verzoek: «dame pasando la sal» = geef me even het zout.', 'Dame pasando la sal, por favor.', 'Geef me even het zout, alsjeblieft.']
+        ['Andes: rustig en duidelijk', 'Medeklinkers blijven goed hoorbaar en klinkers zijn kort.', 'Ya mismo llegamos a Quito.', 'We zijn zo in Quito.', 'Pronto llegamos a Quito.'],
+        ['Kust: de s valt weg', 'In Guayaquil klinkt de s aan het eind als een h.', 'Los manes están en la playa.', 'De gasten zijn op het strand.', 'Los chicos están en la playa.'],
+        ['«Dame pasando»', 'Een beleefd verzoek: «dame pasando la sal» = geef me even het zout.', 'Dame pasando la sal, por favor.', 'Geef me even het zout, alsjeblieft.', '¿Me pasas la sal, por favor?']
       ],
       words: [['ya mismo', 'zo meteen (kan nog even duren!)'], ['ñaño / ñaña', 'broer / zus, maat', 'i'], ['¡chévere!', 'tof!'], ['la guagua', 'de baby (Andes)'], ['el man', 'de gast', 'i'],
         ['¡achachay!', 'brr, koud!'], ['¡arrarray!', 'au, heet!'], ['el chuchaqui', 'de kater', 'i'], ['¡de ley!', 'zeker weten!', 'i'], ['el pana', 'de maat', 'i'], ['la buseta', 'het busje'], ['¿qué fue?', 'hoe is het? (kust)', 'i'], ['bacán', 'tof', 'i'], ['¡qué bestia!', 'wauw!', 'i'], ['la jama', 'het eten', 'i'], ['la farra', 'het feest', 'i'], ['chulla vida', 'je leeft maar één keer']],
@@ -194,7 +195,7 @@
       intro: 'Hoog in de Andes. Veel mensen spreken ook Quechua of Aymara, en het Spaans is rustig en helder.',
       sounds: [
         ['Heldere s, rustige toon', 'In La Paz praten mensen rustig en spreken ze elke s duidelijk uit.', 'Mañana vamos al lago Titicaca.', 'Morgen gaan we naar het Titicacameer.'],
-        ['Verkleinwoorden en «ya»', 'Overal verkleinwoorden (un ratito, cerquita) en vaak «¿ya?» aan het eind van een zin.', 'Espérame un ratito, ¿ya?', 'Wacht even op me, oké?']
+        ['Verkleinwoorden en «ya»', 'Overal verkleinwoorden (un ratito, cerquita) en vaak «¿ya?» aan het eind van een zin.', 'Espérame un ratito, ¿ya?', 'Wacht even op me, oké?', 'Espérame un momento, ¿sí?']
       ],
       words: [['el cumpa', 'de maat', 'i'], ['¡ya!', 'oké!'], ['la wawa', 'de baby'], ['el chango / la changa', 'de jongen / het meisje', 'i'], ['la salteña', 'het gevulde deegpasteitje'],
         ['el api', 'warme maïsdrank (paars)'], ['el micro', 'de bus'], ['¡jallalla!', 'proost! / leve! (Aymara)'], ['el soroche', 'de hoogteziekte'], ['la farra', 'het feest', 'i'], ['¡ya, pues!', 'oké, goed dan!', 'i'], ['la chela', 'het biertje', 'i'], ['¡qué macana!', 'wat jammer!', 'i'], ['el cuate', 'de vriend', 'i'], ['el llokalla', 'de jongen', 'i', 'el yocalla'], ['jailón / jailona', 'kakker', 'i'], ['el pucho', 'de sigaret', 'i']],
@@ -204,8 +205,8 @@
       hello: ['¡Hola! Bienvenido a Paraguay.', 'Hoi! Welkom in Paraguay.'],
       intro: 'Een tweetalig land: bijna iedereen spreekt ook Guaraní. Veel mensen mengen de twee talen (dat heet «jopara»).',
       sounds: [
-        ['Voseo', 'Onder vrienden «vos»: vos sabés, vos tenés.', '¿Vos sabés hablar guaraní?', 'Kun jij Guaraní spreken?'],
-        ['Guaraní-woordjes', 'Kleine woordjes uit het Guaraní maken een zin zachter, zoals «na» (toe, alsjeblieft).', 'Vení un ratito, na.', 'Kom even hier, toe.']
+        ['Voseo', 'Onder vrienden «vos»: vos sabés, vos tenés.', '¿Vos sabés hablar guaraní?', 'Kun jij Guaraní spreken?', '¿Tú sabes hablar guaraní?'],
+        ['Guaraní-woordjes', 'Kleine woordjes uit het Guaraní maken een zin zachter, zoals «na» (toe, alsjeblieft).', 'Vení un ratito, na.', 'Kom even hier, toe.', 'Ven un momento, por favor.']
       ],
       words: [['¿mba’éichapa?', 'hoe gaat het? (Guaraní)', '', 'mbaeíchapa'], ['¡nde!', 'hé! / zeg!', 'i'], ['la chipa', 'het kaasbroodje'], ['el tereré', 'de koude mate'], ['¡jaha!', 'kom, we gaan! (Guaraní)', 'i', 'jajá'],
         ['la guaina', 'het meisje', 'i'], ['el karaku', 'de kracht, de energie', 'i'], ['luego', 'toch, gewoon (opvulwoord)', 'i'], ['la plata', 'het geld'], ['¡nderakore!', 'jeetje! (Guaraní)', 'i', 'nderakoré'], ['¡ha upéi!', 'en toen? (Guaraní)', 'i'], ['vyrorei', 'onzin (Guaraní)', 'i', 'virorei'], ['¡chake!', 'pas op! (Guaraní)', 'i'], ['el mitã', 'het kind (Guaraní)', '', 'el mitá'], ['chuchi', 'chic, kakkerig', 'i'], ['la sopa paraguaya', 'maïscake (geen soep!)'], ['el reviro', 'gebakken deeggerecht']],
@@ -216,8 +217,8 @@
       intro: 'Chilenen praten snel, slikken eindletters in en hebben heel veel eigen slang. Een uitdaging, ook voor andere Latijns-Amerikanen.',
       sounds: [
         ['Snel, eindletters vallen weg', 'De s en de d aan het eind verdwijnen: «cansado» wordt «cansao».', 'Estoy cansado, vamos a la casa.', 'Ik ben moe, laten we naar huis gaan.'],
-        ['«po» achter de zin', '«Po» (van «pues») komt overal achter: «sí po», «ya po».', 'Sí po, vamos al tiro.', 'Ja joh, we gaan meteen.'],
-        ['Chileense jij-vorm', 'Onder vrienden: «¿cómo estái?», «¿querí?», «¿cachai?».', '¿Querí ir a la playa?', 'Wil je naar het strand?']
+        ['«po» achter de zin', '«Po» (van «pues») komt overal achter: «sí po», «ya po».', 'Sí po, vamos al tiro.', 'Ja joh, we gaan meteen.', 'Sí, vamos ahora mismo.'],
+        ['Chileense jij-vorm', 'Onder vrienden: «¿cómo estái?», «¿querí?», «¿cachai?».', '¿Querí ir a la playa?', 'Wil je naar het strand?', '¿Quieres ir a la playa?']
       ],
       words: [['¿cachai?', 'snap je?', 'i'], ['bacán', 'tof', 'i'], ['fome', 'saai', 'i'], ['el pololo / la polola', 'het vriendje / het vriendinnetje', 'i'], ['la pega', 'het werk', 'i'], ['al tiro', 'meteen', 'i'],
         ['una luca', 'duizend peso', 'i'], ['la once', 'de lichte avondmaaltijd'], ['¡qué lata!', 'wat vervelend!', 'i'], ['la micro', 'de bus'], ['el carrete', 'het feestje', 'i'], ['harto', 'veel', 'i'],
@@ -228,9 +229,9 @@
       hello: ['¡Hola, che! ¿Todo bien? Bienvenido a la Argentina.', 'Hoi! Alles goed? Welkom in Argentinië.'],
       intro: 'Het Spaans van Buenos Aires klinkt het meest anders: «vos» in plaats van «tú», een «sj»-klank en een Italiaanse melodie.',
       sounds: [
-        ['Voseo', '«Vos» in plaats van «tú», met eigen vormen: vos sos, vos tenés, vos querés. Gebiedende wijs: vení, decime.', 'Vos sos de Holanda, ¿no?', 'Jij komt uit Nederland, toch?'],
+        ['Voseo', '«Vos» in plaats van «tú», met eigen vormen: vos sos, vos tenés, vos querés. Gebiedende wijs: vení, decime.', 'Vos sos de Holanda, ¿no?', 'Jij komt uit Nederland, toch?', 'Tú eres de Holanda, ¿no?'],
         ['ll en y als «sj»', '«Calle» klinkt als «kasje», «yo» als «sjo».', 'Yo me llamo Lucía y vivo en esta calle.', 'Ik heet Lucía en ik woon in deze straat.'],
-        ['Italiaanse melodie', 'Door de vele Italiaanse immigranten klinkt het Argentijnse Spaans zangerig, met lange klinkers.', '¡Pero no, che! ¿Qué decís?', 'Ach nee, joh! Wat zeg je nou?']
+        ['Italiaanse melodie', 'Door de vele Italiaanse immigranten klinkt het Argentijnse Spaans zangerig, met lange klinkers.', '¡Pero no, che! ¿Qué decís?', 'Ach nee, joh! Wat zeg je nou?', '¡Pero no, oye! ¿Qué dices?']
       ],
       words: [['che', 'hé, joh', 'i'], ['dale', 'oké, doe maar', 'i'], ['el laburo', 'het werk', 'i'], ['el bondi / el colectivo', 'de bus', 'i'], ['re-', 'heel (re lindo = heel mooi)', 'i'],
         ['¡qué copado!', 'wat tof!', 'i'], ['el pibe / la piba', 'de jongen / het meisje', 'i'], ['la mina', 'de vrouw, het meisje', 'i'], ['el quilombo', 'de chaos, de puinhoop', 'i'],
@@ -241,7 +242,7 @@
       hello: ['¡Hola, bo! ¿Todo bien? Bienvenido a Uruguay.', 'Hoi joh! Alles goed? Welkom in Uruguay.'],
       intro: 'Klinkt veel als Buenos Aires (voseo, de sj-klank), maar Uruguayanen hebben hun eigen woorden. En ze drinken nog meer mate.',
       sounds: [
-        ['Tú met vos-vorm', 'In Montevideo hoor je vaak een mengvorm: «tú» met de werkwoordsvorm van «vos».', '¿Tú querés un mate?', 'Wil jij een mate?'],
+        ['Tú met vos-vorm', 'In Montevideo hoor je vaak een mengvorm: «tú» met de werkwoordsvorm van «vos».', '¿Tú querés un mate?', 'Wil jij een mate?', '¿Tú quieres un mate?'],
         ['ll en y als «sj»', 'Net als in Buenos Aires.', 'Llueve mucho en Montevideo.', 'Het regent veel in Montevideo.']
       ],
       words: [['bo', 'hé jij, joh', 'i'], ['¡ta!', 'oké!', 'i'], ['¡qué bárbaro!', 'geweldig!'], ['el gurí / la gurisa', 'het kind', 'i'], ['el mate', 'de mate'], ['la guita', 'het geld', 'i'],
@@ -253,8 +254,8 @@
       intro: 'Hier begon het Spaans. Het klinkt anders dan in Latijns-Amerika: «vosotros» voor jullie en in het grootste deel van het land een «th»-klank. Je hoeft het niet zelf te gebruiken, maar herkennen is handig.',
       sounds: [
         ['z en ce/ci als «th»', 'De z en de c voor e en i klinken als het Engelse «th» in «think»: «gracias» klinkt als «grathias».', 'Gracias, voy a cenar en la plaza.', 'Bedankt, ik ga op het plein eten.'],
-        ['Vosotros', 'Tegen een groep vrienden zeg je «vosotros», met eigen vormen: queréis, tenéis, sois.', '¿Vosotros queréis venir esta noche?', 'Willen jullie vanavond komen?'],
-        ['Voltooide tijd voor vandaag', 'Over vandaag zegt een Spanjaard «he comido», waar Latijns-Amerikanen «comí» zeggen.', 'Hoy he comido paella.', 'Ik heb vandaag paella gegeten.']
+        ['Vosotros', 'Tegen een groep vrienden zeg je «vosotros», met eigen vormen: queréis, tenéis, sois.', '¿Vosotros queréis venir esta noche?', 'Willen jullie vanavond komen?', '¿Ustedes quieren venir esta noche?'],
+        ['Voltooide tijd voor vandaag', 'Over vandaag zegt een Spanjaard «he comido», waar Latijns-Amerikanen «comí» zeggen.', 'Hoy he comido paella.', 'Ik heb vandaag paella gegeten.', 'Hoy comí paella.']
       ],
       words: [['¡vale!', 'oké!'], ['¡guay!', 'tof!', 'i'], ['¡mola!', 'dat is tof!', 'i'], ['el tío / la tía', 'de gast / de meid', 'i'], ['el curro', 'het werk', 'i'], ['la pasta', 'het geld', 'i'],
         ['el coche', 'de auto (Latijns-Amerika: el carro)'], ['el móvil', 'de mobiel (Latijns-Amerika: el celular)'], ['el ordenador', 'de computer'], ['el zumo', 'het sap (Latijns-Amerika: el jugo)'],
@@ -266,7 +267,7 @@
       intro: 'Het enige Spaanstalige land in Afrika. Mensen spreken thuis vaak Fang, Bubi of Pichi. Het Spaans volgt de regels van Spanje, met een eigen melodie.',
       sounds: [
         ['Elke lettergreep even sterk', 'Het Spaans klinkt rustig en duidelijk, met minder verschil tussen beklemtoonde en onbeklemtoonde lettergrepen.', 'Vamos a Malabo mañana por la mañana.', 'We gaan morgenochtend naar Malabo.'],
-        ['Vosotros, zoals in Spanje', 'Voor «jullie» gebruiken ze «vosotros», net als in Spanje.', '¿Vosotros sois de Bata?', 'Komen jullie uit Bata?']
+        ['Vosotros, zoals in Spanje', 'Voor «jullie» gebruiken ze «vosotros», net als in Spanje.', '¿Vosotros sois de Bata?', 'Komen jullie uit Bata?', '¿Ustedes son de Bata?']
       ],
       words: [['ecuatoguineano / ecuatoguineana', 'Equatoriaal-Guinees / -Guinese'], ['Malabo', 'hoofdstad, op het eiland Bioko'], ['Bata', 'grootste stad, op het vasteland'], ['¡vale!', 'oké!'],
         ['el coche', 'de auto'], ['el móvil', 'de mobiel'], ['vosotros', 'jullie (informeel)'], ['el pichi', 'het Pichi (Engelse creooltaal op Bioko)'], ['¡mbolo!', 'hallo! (Fang)'], ['el fang', 'het Fang (grootste taal)'], ['el bubi', 'het Bubi (taal van Bioko)'], ['¿cómo amaneciste?', 'goedemorgen, hoe heb je geslapen?']],
@@ -276,8 +277,8 @@
       hello: ['¡Hola! Bienvenido a los Estados Unidos.', 'Hoi! Welkom in de Verenigde Staten.'],
       intro: 'Meer Spaanssprekers dan in Spanje! Veel mensen wisselen midden in een zin tussen Spaans en Engels: Spanglish.',
       sounds: [
-        ['Spanglish', 'Engelse woorden krijgen een Spaans jasje: «parquear», «la troca» (truck), «el lonche» (lunch).', 'Voy a parquear la troca.', 'Ik ga de pick-up parkeren.'],
-        ['Letterlijk uit het Engels', 'Engelse uitdrukkingen woord voor woord vertaald: «te llamo para atrás» = I’ll call you back.', 'Te llamo para atrás más tarde.', 'Ik bel je straks terug.']
+        ['Spanglish', 'Engelse woorden krijgen een Spaans jasje: «parquear», «la troca» (truck), «el lonche» (lunch).', 'Voy a parquear la troca.', 'Ik ga de pick-up parkeren.', 'Voy a estacionar la camioneta.'],
+        ['Letterlijk uit het Engels', 'Engelse uitdrukkingen woord voor woord vertaald: «te llamo para atrás» = I’ll call you back.', 'Te llamo para atrás más tarde.', 'Ik bel je straks terug.', 'Te devuelvo la llamada más tarde.']
       ],
       words: [['la troca', 'de pick-up (uit het Engels: truck)', 'i'], ['parquear', 'parkeren (uit het Engels: to park)', 'i'], ['el lonche', 'de lunch (uit het Engels: lunch)', 'i'], ['los biles', 'de rekeningen (uit het Engels: bills)', 'i'], ['la marqueta', 'de supermarkt (uit het Engels: market)', 'i'],
         ['te llamo para atrás', 'ik bel je terug', 'i'], ['vacunar la carpeta', 'de vloerbedekking stofzuigen', 'i'], ['el bróder', 'de broer, maat (uit het Engels: brother)', 'i'], ['¿qué es lo que es?', 'wat is er? (New York)', 'i'], ['la yarda', 'de tuin (uit het Engels: yard)', 'i'], ['el rufo', 'het dak (uit het Engels: roof)', 'i'], ['textear', 'appen, sms’en', 'i'], ['aplicar', 'solliciteren (uit het Engels: to apply)', 'i'], ['el raite', 'de lift, meerijden (uit het Engels: ride)', 'i'], ['el parqueo', 'de parkeerplaats', 'i']],

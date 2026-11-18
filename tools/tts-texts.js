@@ -104,7 +104,7 @@ for (const p of S.places || []) {
     if (!out.has(k)) out.set(k, Object.assign({ k, ns, text: S.Speech.clean(text), voice, lv: [ns + ':X'] }, said ? { say: S.Speech.clean(said) } : {}));
   };
   put(p.hello[0], vm_, p.hello[2]);
-  (p.sounds || []).forEach(([, , es], i) => { put(es, i % 2 ? vm_ : vf); add(es); });
+  (p.sounds || []).forEach(([, , es, , neu], i) => { put(es, i % 2 ? vm_ : vf); add(neu || es); });
   p.words.forEach(([es, , , said]) => put(es, vf, said));
 }
 add('¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.');

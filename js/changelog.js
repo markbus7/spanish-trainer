@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.29.4', date: '2026-11-18',
+    nl: ['Op reis: de knop «Neutraal» laat nu echt de neutrale zin horen (bijv. «Voy para la playa con los niños» bij Panama), en die zin staat er ook bij.'],
+    es: ['De viaje: el botón «Neutral» ahora reproduce de verdad la frase neutral (p. ej. «Voy para la playa con los niños» en Panamá), y la frase también aparece escrita.'] },
   { v: '1.29.3', date: '2026-11-18',
     nl: ['Op reis: zoek op elke landpagina in de woorden en slang, in het Spaans of Nederlands, met filters voor netjes, informeel en grof.', 'Vind je iets niet in dat land, dan zie je meteen of het in een ander land voorkomt.'],
     es: ['De viaje: busca en cada país entre las palabras y la jerga, en español o en neerlandés, con filtros para formal, informal y vulgar.', 'Si no lo encuentras en ese país, ves enseguida si aparece en otro.'] },
