@@ -149,10 +149,11 @@
           h('div', { class: 'pl-hello' }, hereBtn(p, p.hello[0], 'Luister'), h('span', null, h('b', { lang: 'es' }, p.hello[0]), h('small', { class: 'muted' }, p.hello[1]))))));
     wrap.append(h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, '👂 Hoe klinkt het?'),
       neutral ? h('p', { class: 'small muted' }, 'Vergelijk: ', h('b', null, '🔊 ' + p.name), ' is een stem van hier, ', h('b', null, '🔊 Neutraal'), ' is de stem van je basiscursus.') : null,
-      (p.sounds || []).map(([t, x, es, nl]) => h('div', { class: 'card pl-sound' },
+      (p.sounds || []).map(([t, x, es, nl, neu]) => h('div', { class: 'card pl-sound' },
         h('b', null, t), h('p', { class: 'small' }, x),
         h('div', { class: 'pl-ex' }, h('div', { class: 'grow' }, h('div', { class: 'es', lang: 'es' }, es), h('div', { class: 'small muted' }, nl))),
-        h('div', { class: 'row gap wrap' }, hereBtn(p, es), neutral ? h('button', { class: 'btn small ghost', type: 'button', onclick: () => S.Speech.say(es, { clipNs: null }) }, '🔊 Neutraal') : null)))));
+        neutral && neu && neu !== es ? h('div', { class: 'pl-ex neutral' }, h('div', { class: 'grow' }, h('div', { class: 'small muted' }, 'Neutraal, zoals in je basiscursus:'), h('div', { class: 'es', lang: 'es' }, neu))) : null,
+        h('div', { class: 'row gap wrap' }, hereBtn(p, es), neutral ? h('button', { class: 'btn small ghost', type: 'button', onclick: () => S.Speech.say(neu || es, { clipNs: null }) }, '🔊 Neutraal') : null)))));
     const ws = words(p);
     const row = (pl, i) => { const [es, nl, lab] = pl.words[i]; return h('div', { class: 'word-row' },
       h('button', { class: 'icon-btn speak', type: 'button', 'aria-label': 'Beluister', onclick: e => { e.stopPropagation(); say(pl, pl.words[i][0]); } }, '🔊'),
