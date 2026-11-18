@@ -40,7 +40,7 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     const leg = (x, s) => `<g transform="translate(${x} 142) scale(${s} 1)"><path d="M0 0C-1 5-3 9-5 12" fill="none" stroke="${SK}" stroke-width="9" stroke-linecap="round"/>
       <g stroke="${SK}" stroke-width="2.6" stroke-linecap="round" fill="none"><path d="M-5 12-12 13"/><path d="M-5 12.5-10.5 17"/><path d="M-5 13-6.5 18.5"/><path d="M-4.5 13-2 18"/><path d="M-4 12.5 1 15.5"/></g>
       <g fill="#ffd6e5"><circle cx="-12" cy="13" r="1.3"/><circle cx="-10.5" cy="17" r="1.3"/><circle cx="-6.5" cy="18.5" r="1.3"/><circle cx="-2" cy="18" r="1.3"/><circle cx="1" cy="15.5" r="1.3"/></g></g>`;
-    // het huipil-jurkje: geborduurde bloemenrand, sierkraag, pofmouwtjes, plooien en een kanten zoom
+    // het huipil-jurkje (Talavera-blauw): geborduurde bloemenrand, sierkraag, pofmouwtjes, plooien en een kanten zoom
     const qb = (a, c, b, t) => [(1 - t) * (1 - t) * a[0] + 2 * t * (1 - t) * c[0] + t * t * b[0], (1 - t) * (1 - t) * a[1] + 2 * t * (1 - t) * c[1] + t * t * b[1]].map(v => +v.toFixed(2));
     const flower = (x, y, col, r = 1.55) => `<g transform="translate(${x} ${y})">${[0, 72, 144, 216, 288].map(d => `<circle cx="${(r * 1.15 * Math.cos((d - 90) * Math.PI / 180)).toFixed(2)}" cy="${(r * 1.15 * Math.sin((d - 90) * Math.PI / 180)).toFixed(2)}" r="${r}" fill="${col}"/>`).join('')}<circle r="${(r * .75).toFixed(2)}" fill="#ffe08a"/></g>`;
     const leafP = (x, y, a) => `<ellipse cx="${x}" cy="${y}" rx="2.3" ry="1.05" transform="rotate(${a} ${x} ${y})" fill="#7fd18b"/>`;
@@ -49,19 +49,19 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
       + [.215, .405, .595, .785].map((t, i) => { const [x, y] = qb([32, 124], [60, 134], [88, 124], t); return leafP(x, y - 1.6, i % 2 ? 25 : -25) + leafP(x, y + 1.6, i % 2 ? -25 : 25); }).join('');
     const lace = Array.from({ length: 11 }, (_, i) => { const [x, y] = qb([29.5, 141], [60, 151], [90.5, 141], i / 10); return `<circle cx="${x}" cy="${y}" r="2.7"/>`; }).join('');
     const laceDots = Array.from({ length: 11 }, (_, i) => { const [x, y] = qb([29.5, 142.6], [60, 152.6], [90.5, 142.6], i / 10); return `<circle cx="${x}" cy="${y}" r=".7"/>`; }).join('');
-    const sleeve = (x, flip) => `<g transform="translate(${x} 100) scale(${flip} 1)"><path d="M-6.5 3.5C-8 -2-4.5-6 .5-6S8-2 6.5 3.5C3.5 6-3.5 6-6.5 3.5Z" fill="#1e9f90"/><path d="M-6.3 3.4C-3.3 5.8 3.3 5.8 6.3 3.4" fill="none" stroke="#fff4e6" stroke-width="1.6" stroke-linecap="round"/><path d="M-6.3 3.4C-3.3 5.8 3.3 5.8 6.3 3.4" fill="none" stroke="#f0789f" stroke-width=".9" stroke-dasharray="1 1.6" stroke-linecap="round" transform="translate(0 1.6)"/><path d="M-3-3.5Q0-4.8 3-3.5" stroke="#fff" stroke-width=".9" opacity=".35" fill="none" stroke-linecap="round"/></g>`;
+    const sleeve = (x, flip) => `<g transform="translate(${x} 100) scale(${flip} 1)"><path d="M-6.5 3.5C-8 -2-4.5-6 .5-6S8-2 6.5 3.5C3.5 6-3.5 6-6.5 3.5Z" fill="#3a78d6"/><path d="M-6.3 3.4C-3.3 5.8 3.3 5.8 6.3 3.4" fill="none" stroke="#fff4e6" stroke-width="1.6" stroke-linecap="round"/><path d="M-6.3 3.4C-3.3 5.8 3.3 5.8 6.3 3.4" fill="none" stroke="#f0789f" stroke-width=".9" stroke-dasharray="1 1.6" stroke-linecap="round" transform="translate(0 1.6)"/><path d="M-3-3.5Q0-4.8 3-3.5" stroke="#fff" stroke-width=".9" opacity=".35" fill="none" stroke-linecap="round"/></g>`;
     const dress = full ? `
   <g class="lupe-dress">
     <g fill="#ffeef4" stroke="#e98bb0" stroke-width=".7">${lace}</g><g fill="#f0789f">${laceDots}</g>
     <path d="M41 93C35 108 31 124 29 141Q60 151 91 141C89 124 85 108 79 93Z" fill="${u('h')}"/>
     <path d="M41 93C36 106 33 120 31 135Q36 137 40 138C40 124 42 108 46 94Z" fill="#fff" opacity=".1"/>
-    <g fill="none" stroke="#0b5f55" stroke-linecap="round" opacity=".35" stroke-width="1.1"><path d="M48 113Q45.5 127 44 141"/><path d="M60 114V144.5"/><path d="M72 113Q74.5 127 76 141"/></g>
+    <g fill="none" stroke="#173a78" stroke-linecap="round" opacity=".35" stroke-width="1.1"><path d="M48 113Q45.5 127 44 141"/><path d="M60 114V144.5"/><path d="M72 113Q74.5 127 76 141"/></g>
     <path d="M32.2 118.5Q60 128.5 87.8 118.5" fill="none" stroke="#fff4e6" stroke-width="1.6" stroke-linecap="round"/>
     <path d="M31.4 129.5Q60 139.5 88.6 129.5" fill="none" stroke="#fff4e6" stroke-width="1.6" stroke-linecap="round"/>
     <path d="M32.6 120.6Q60 130.6 87.4 120.6M31.6 127.4Q60 137.4 88.4 127.4" fill="none" stroke="#f2b134" stroke-width=".8" stroke-dasharray="1.2 1.4"/>
     ${band}
     <path d="M30.2 137Q60 147.5 89.8 137" fill="none" stroke="#f2b134" stroke-width="1.8" stroke-dasharray="2.6 2" stroke-linecap="round"/>
-    <path d="M46.5 94.5H73.5L70.5 109Q60 113 49.5 109Z" fill="#0f7064"/>
+    <path d="M46.5 94.5H73.5L70.5 109Q60 113 49.5 109Z" fill="#173a78"/>
     <path d="M46.5 94.5H73.5L70.5 109Q60 113 49.5 109Z" fill="none" stroke="#f2b134" stroke-width="1.2" stroke-linejoin="round" stroke-dasharray="1.6 1.2"/>
     <path d="M51 104l2 2.4 2-2.4 2 2.4 2-2.4 2 2.4 2-2.4 2 2.4 2-2.4" fill="none" stroke="#fff4e6" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
     ${flower(60, 100.6, '#f0789f', 1.35)}${leafP(55, 101, -15)}${leafP(65, 101, 15)}
@@ -83,7 +83,7 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   <defs>
     <radialGradient id="${id}s" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#ffd6e5"/><stop offset=".55" stop-color="#f8aecb"/><stop offset="1" stop-color="#ec88b0"/></radialGradient>
     <linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="-33" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#c8396f"/><stop offset="1" stop-color="#f07ea8"/></linearGradient>
-    <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22ae9e"/><stop offset="1" stop-color="#147c70"/></linearGradient>
+    <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a78d6"/><stop offset="1" stop-color="#1f4f9e"/></linearGradient>
     <linearGradient id="${id}t" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f9b9d3"/><stop offset="1" stop-color="#ffe3ee"/></linearGradient>
   </defs>
   ${body}
