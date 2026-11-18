@@ -954,7 +954,9 @@
   function reportSummary() {
     const r = M().report(30);
     const card = h('div', { class: 'card rep-sum' });
+    const fixLine = r.fix.length ? h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, '✅ toch goed volgens Lupe'), h('small', { class: 'muted' }, U.plural(r.fix.length, 'antwoord', 'antwoorden'))) : null;
     if (!r.total) {
+      if (fixLine) card.append(fixLine);
       card.append(h('p', { class: 'small' }, '📋 Lupe houdt hier bij waar je de mist in gaat in je gesprekken (🎭 rollenspel en ✍️ correctie). Nog niets genoteerd in de laatste 30 dagen.'));
       card.append(h('a', { class: 'btn ghost wide', href: '#/rapport' }, '📋 Naar het rapport'));
       return card;
@@ -962,6 +964,7 @@
     card.append(h('p', { class: 'small' }, h('b', null, U.plural(r.total, 'fout', 'fouten')), ' in je gesprekken met Lupe (laatste 30 dagen).'));
     r.topics.slice(0, 3).forEach(t => card.append(h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, t.label), h('small', { class: 'muted' }, t.n + '×'))));
     if (r.words.length) card.append(h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, 'woordenschat'), h('small', { class: 'muted' }, r.words.length + ' woorden')));
+    if (fixLine) card.append(fixLine);
     card.append(h('a', { class: 'btn primary wide', href: '#/rapport' }, '📋 Bekijk het hele rapport'));
     return card;
   }
@@ -1028,13 +1031,15 @@
     };
     drawAdv(r.advice);
     wrap.append(section('Advies van Lupe', adv));
+    // voor de volgende update: herbeoordelingen + voorstellen van Lupe
+    wrap.append(section('Voor de volgende update', updateCard(r)));
     // terugkoppelen aan je coach
     const text = M().asText(r);
     wrap.append(section('Delen met je coach', h('div', { class: 'card' },
       h('p', { class: 'small muted' }, 'Kopieer het rapport als tekst en plak het in je chat met je coach. Dan kunnen de lessen daarop worden aangepast.'),
       h('div', { class: 'row gap wrap' },
-        h('button', { class: 'btn primary grow', type: 'button', onclick: () => shareReport(text, 'copy') }, '📋 Kopieer rapport'),
-        navigator.share ? h('button', { class: 'btn ghost grow', type: 'button', onclick: () => shareReport(text, 'share') }, '📤 Delen') : null),
+        h('button', { class: 'btn primary grow', type: 'button', onclick: () => shareReport(M().asText(M().report(repDays)), 'copy') }, '📋 Kopieer rapport'),
+        navigator.share ? h('button', { class: 'btn ghost grow', type: 'button', onclick: () => shareReport(M().asText(M().report(repDays)), 'share') }, '📤 Delen') : null),
       h('details', { class: 'rep-text' }, h('summary', { class: 'small' }, 'Tekst bekijken'), h('pre', { class: 'small' }, text)))));
     // laatste fouten
     if (r.recent.length) {
@@ -1047,6 +1052,51 @@
     return wrap;
   };
   routes.rapport.tab = 'perfil';
+
+  /* Antwoorden die Lupe toch goed keurde (🤖 Toch goed?) en haar eigen voorstellen voor de volgende update. */
+  function updateCard(r) {
+    const card = h('div', { class: 'card rep-update' });
+    card.append(h('p', { class: 'small muted' }, 'Werd een vertaling fout gerekend en keurde Lupe hem toch goed (🤖 Toch goed?), dan staat hij hier. Ook Lupe zelf kan voorstellen wat er in de volgende update moet komen. Deel dit met je coach, dan kan de app verbeterd worden.'));
+    if (r.fix.length) {
+      card.append(h('h3', { class: 'rep-h' }, '✅ Toch goed volgens Lupe (' + r.fix.length + ')'));
+      r.fix.slice(0, 12).forEach(e => {
+        const u = e.unit ? C.get(e.unit) : null;
+        card.append(h('details', { class: 'rep-fix' },
+          h('summary', null, h('span', { class: 'grow' }, h('b', { lang: 'es' }, e.u), h('small', { class: 'muted' }, ' · ' + e.q)), h('small', { class: 'muted' }, fmtDate(e.t, { day: 'numeric', month: 'short' }))),
+          e.a && e.a.length ? h('div', { class: 'small' }, 'In de app: ', h('span', { lang: 'es' }, e.a.join(' / '))) : null,
+          e.why ? h('div', { class: 'small' }, '🔧 ', e.why) : null,
+          e.fb ? h('div', { class: 'small muted' }, '🤖 ', e.fb) : null,
+          u ? h('a', { class: 'btn link small', href: '#/unit/' + u.id }, '📘 ' + u.level + ' · ' + u.icon + ' ' + u.title) : null));
+      });
+      if (r.fix.length > 12) card.append(h('small', { class: 'muted' }, '… en nog ' + (r.fix.length - 12) + ' (staan allemaal in de tekst om te delen).'));
+    } else card.append(h('p', { class: 'small' }, 'Nog geen antwoorden die Lupe toch goed keurde in deze periode.'));
+    const box = h('div', { class: 'rep-proposal' });
+    const draw = u => {
+      box.innerHTML = '';
+      box.append(h('h3', { class: 'rep-h' }, '💡 Voorstellen van Lupe'));
+      if (u && u.text) box.append(h('div', { class: 'small', html: S.md(u.text) }), h('small', { class: 'muted' }, 'Voorgesteld op ' + fmtDate(u.t, { day: 'numeric', month: 'long' })));
+      else box.append(h('p', { class: 'small muted' }, S.AI.enabled() ? 'Laat Lupe je fouten, zwakke punten en goedgekeurde antwoorden bekijken en voorstellen wat er in de volgende update moet komen.' : 'Met een AI-sleutel (Instellingen) kan Lupe hier voorstellen wat er in de volgende update moet komen.'));
+      if (S.AI.enabled()) {
+        const btn = h('button', { class: 'btn ghost wide', type: 'button' }, u && u.text ? '✨ Nieuwe voorstellen' : '✨ Wat moet er in de volgende update?');
+        btn.onclick = async () => {
+          btn.disabled = true; btn.textContent = 'Lupe denkt na…';
+          try { const x = await M().proposeUpdate(); save(); draw(x); refreshTxt(); }
+          catch (e) { btn.disabled = false; btn.textContent = '✨ Probeer opnieuw'; S.toast('⚠️ ' + e.message, 4000); }
+        };
+        box.append(btn);
+      }
+    };
+    const pre = h('pre', { class: 'small' });
+    const refreshTxt = () => { pre.textContent = M().updateText(M().report(repDays)) || 'Nog niets om te delen.'; };
+    draw(r.update); refreshTxt();
+    const share = how => { const t = M().updateText(M().report(repDays)); if (!t) { S.toast('Nog niets om te delen.'); return; } shareReport(t, how); };
+    card.append(box,
+      h('div', { class: 'row gap wrap' },
+        h('button', { class: 'btn primary grow', type: 'button', onclick: () => share('copy') }, '📋 Kopieer voor de update'),
+        navigator.share ? h('button', { class: 'btn ghost grow', type: 'button', onclick: () => share('share') }, '📤 Delen') : null),
+      h('details', { class: 'rep-text' }, h('summary', { class: 'small' }, 'Tekst bekijken'), pre));
+    return card;
+  }
 
   routes.perfil = function () {
     const s = st(); const wrap = h('div', { class: 'page profile' });

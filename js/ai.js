@@ -206,7 +206,7 @@ ${logRule()}`;
 Learner's ${TL()} translation: "${user}"
 Model answers: ${JSON.stringify(accepted)}
 Is the learner's translation grammatically correct, natural${CO().target === 'es' ? ' for Latin America' : ' ' + CO().ai.target}, and does it mean the same as the ${NL()}? Missing accents alone still count as correct (mention them in the feedback).
-Reply with JSON: {"correct": true|false, "feedback": "max 2 short sentences in ${NL() === 'Spanish' ? 'Latin American Spanish' : NL()}", "better": "the corrected or more natural ${TL()} version"}`;
+Reply with JSON: {"correct": true|false, "feedback": "max 2 short sentences in ${NL() === 'Spanish' ? 'Latin American Spanish' : NL()}", "better": "the corrected or more natural ${TL()} version", "app": "only if correct: ONE short sentence in Dutch for the app maker on what to change in the next update, e.g. 'Voeg «…» toe als goed antwoord' or 'Het modelantwoord «…» klopt niet, moet zijn «…»'; empty string if incorrect"}`;
     const text = await ask({ system: sys, prompt, maxTokens: 600 });
     const j = parseJSON(text);
     if (!j || typeof j.correct !== 'boolean') throw new Error('Onverwacht antwoord van de AI.');

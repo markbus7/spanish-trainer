@@ -666,6 +666,21 @@ await micTests();
   const m = St.mergeStates(A, B);
   ok(m.lupe.log.length === 7 && JSON.stringify(St.mergeStates(m, m).lupe) === JSON.stringify(m.lupe) && St.mergeStates(B, A).lupe.log.length === 7, 'lupe-log: sync voegt samen, idempotent');
   ok(!/vosotros/i.test(S.AI.roleplaySystem({ role: 'x', goal: 'y' }).replace(/never "vosotros"/g, '')) && S.AI.roleplaySystem({ role: 'x', goal: 'y' }).includes('<log>') && S.AI.writingSystem().includes('<log>'), 'lupe-log: prompts vragen om het blok');
+  // herbeoordeling: Lupe keurt een fout gerekend antwoord toch goed → rapport + voortaan goed
+  const tr = S.C.all().flatMap(u => u.ex.map((e, i) => S.Gen.normEx(e, u, i))).find(x => x && x.translate);
+  ok(Mi.regrade(tr, 'mi respuesta', { correct: false }) === null && !Mi.accepted(tr.prompt, 'mi respuesta'), 'herbeoordeling: afgekeurd wordt niet bewaard');
+  const fx = Mi.regrade(tr, 'Mi respuesta', { correct: true, feedback: 'Está bien.', better: 'x', app: 'Voeg «mi respuesta» toe als goed antwoord.' });
+  ok(fx && fx.unit && S.C.get(fx.unit) && fx.a.length && Mi.accepted(tr.prompt, 'mi respuésta ') && !Mi.accepted(tr.prompt, 'otra'), 'herbeoordeling: bewaard en voortaan goed');
+  Mi.regrade(tr, 'mi respuesta', { correct: true, app: 'nog eens' });
+  ok(St.state.lupe.fix.length === 1 && Mi.report(30).fix.length === 1, 'herbeoordeling: dubbel antwoord één keer');
+  const ut = Mi.updateText(Mi.report(30));
+  ok(ut.includes('«mi respuesta»') && ut.includes('nog eens') && ut.includes(tr.prompt) && Mi.asText(Mi.report(30)).includes('Voor de volgende update'), 'herbeoordeling: in het rapport om te delen');
+  St.state.lupe.update = { t: Date.now(), text: '- Voeg meer oefeningen toe' };
+  ok(Mi.updateText(Mi.report(30)).includes('Voorstellen van Lupe') && !Mi.updateText(Mi.report(30), { proposal: false }).includes('Voorstellen van Lupe'), 'herbeoordeling: voorstellen van Lupe');
+  const F1 = JSON.parse(JSON.stringify(St.state)), F2 = JSON.parse(JSON.stringify(St.state));
+  F2.lupe.fix.push({ t: Date.now() + 5, q: 'otra', u: 'algo', a: [] });
+  const fm = St.mergeStates(F1, F2);
+  ok(fm.lupe.fix.length === 2 && fm.lupe.update && JSON.stringify(St.mergeStates(fm, fm).lupe.fix) === JSON.stringify(fm.lupe.fix), 'herbeoordeling: sync voegt samen');
   St.state = JSON.parse(saved);
 }
 
