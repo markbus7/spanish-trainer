@@ -169,7 +169,7 @@
         return extra;
       },
       onAbort: sum => { Store.addXP(sum.newXp); addTime(sum.newMinutes); if (sum.total) Store.touchStreak(); Store.save(); render(); },
-      onClose: () => render()
+      onClose: () => { if (opts.onClose) opts.onClose(); render(); }
     });
   }
   S.runSession = runSession;
@@ -181,6 +181,7 @@
     else if (d.kind === 'review') startReview(d.limit, session);
     else if (d.kind === 'exam') startLevelExam(d.lvl, session);
     else if (d.kind === 'woordtoets') S.WordTest.resume(session, d);
+    else if (d.kind === 'place' && S.Mundo) S.Mundo.resume(session, d);
     else runSession(session, { desc: d });
   }
   function pausedCard() {
@@ -567,6 +568,14 @@
   routes.ruta = function () {
     const wrap = h('div', { class: 'page' });
     wrap.append(h('h1', null, 'Tu ruta'), h('p', { class: 'muted' }, 'Van beginner tot meesterschap. Elke unit: woorden → grammatica → dialoog → lezen → toepassen → toets.'));
+    if (S.Mundo && S.Mundo.list().length) {
+      const n = S.Mundo.list().length, got = S.Mundo.stamps();
+      wrap.append(section('Uitbreiding (los van je cursus)', h('a', { class: 'card mundo-entry', href: '#/mundo' },
+        h('span', { class: 'me-icon' }, '🗺️'),
+        h('div', { class: 'grow' }, h('b', null, 'Op reis: Spaans per land'), h('small', null, 'Los van je cursus. Kies zelf een land en leer het accent, de woorden en de slang van daar.'),
+          h('span', { class: 'me-flags' }, S.Mundo.list().map(p => p.flag).join(' '))),
+        h('span', { class: 'chip' }, '🛂 ' + got + '/' + n))));
+    }
     const cur = P.current();
     // andere cursussen: alleen de niveaus met lesstof, plus het eerstvolgende als 'komt later'
     const lvls = S.course.target === 'es' ? C.LEVELS : C.LEVELS.filter((L, i) => C.available(L.id) || (i > 0 && C.available(C.LEVELS[i - 1].id)));
@@ -598,7 +607,6 @@
       wrap.append(card);
     });
     wrap.append(section('Extra', h('div', { class: 'quick' },
-      !S.regions || !S.regions.length ? null : quick('🌎', 'Regio’s', 'Mexico tot Argentinië', () => { location.hash = '#/regios'; }, null, 'Lees hoe het Spaans per land verschilt'),
       quick('🧭', 'Niveautest', '±8 min', () => { location.hash = '#/toets'; }, null, 'Korte toets die laat zien op welk niveau je zit'))));
     return wrap;
   };
@@ -1302,16 +1310,12 @@
   }
 
   /* ================= REGIO’S ================= */
-  routes.regios = function () {
-    const wrap = h('div', { class: 'page' });
-    wrap.append(h('a', { class: 'back', href: '#/ruta' }, '← Ruta'), h('h1', null, '🌎 Regio’s'),
-      h('p', { class: 'muted' }, 'Je praat met mensen uit verschillende landen, dus het helpt om de grootste verschillen te herkennen. In de lessen leer je een neutraal Latijns-Amerikaans Spaans dat overal wordt begrepen. Hier vind je per regio de typische kenmerken.'));
-    S.regions.forEach(r => wrap.append(h('details', { class: 'card region' },
-      h('summary', null, h('span', { class: 'flag' }, r.flag), h('b', null, r.name), h('small', { class: 'muted' }, r.speakers)),
-      h('ul', null, r.traits.map(t => h('li', null, t))),
-      h('div', { class: 'word-list' }, r.words.map(([es, nl]) => h('div', { class: 'word-row' }, S.Lesson.speakBtn(es), h('div', { class: 'grow' }, h('b', { lang: 'es' }, es), h('span', null, nl))))))));
-    return wrap;
-  };
+  /* Uitbreiding «Op reis» (js/mundo.js). De oude pagina Regio’s is opgegaan in de kaart. */
+  routes.mundo = () => S.Mundo.page();
+  routes.mundo.tab = 'ruta';
+  routes.pais = id => S.Mundo.placePage(id);
+  routes.pais.tab = 'ruta';
+  routes.regios = () => S.Mundo.page();
   routes.regios.tab = 'ruta';
 
   /* ================= NIVEAUTEST (herhaalbaar) ================= */

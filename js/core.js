@@ -168,6 +168,7 @@
       days: {}, xp: 0, streak: { cur: 0, best: 0, last: null }, current: null, badges: [], done: {},
       tests: [], games: {}, fast: 0, myWords: {},
       lupe: { log: [], n: 0 }, // fouten uit gesprekken met Lupe (js/mistakes.js)
+      places: {}, // uitbreiding «Op reis»: voortgang per land (js/mundo.js)
       partial: {}, // zinnen met fouten: welke woorden al goed waren (sleutel = srsId)
       paused: { t: 0, data: null } // onderbroken oefening, om later verder te gaan
     };
@@ -291,6 +292,15 @@
       const o = O.tags[id], n = out.tags[id];
       if (!n) { out.tags[id] = clone(o); continue; }
       n.ok = max(n.ok, o.ok); n.no = max(n.no, o.no); n.last = max(n.last, o.last);
+    }
+    // Op reis: per land het eerste bezoek, het meeste oefenen, de beste score en de eerste stempel
+    out.places = out.places || {};
+    for (const id in O.places || {}) {
+      const o = O.places[id], n = out.places[id];
+      if (!n) { out.places[id] = clone(o); continue; }
+      const first = (x, y) => x && y ? Math.min(x, y) : x || y || undefined;
+      n.v = first(n.v, o.v); n.stamp = first(n.stamp, o.stamp); n.n = max(n.n, o.n); n.best = max(n.best, o.best);
+      if (!n.stamp) delete n.stamp;
     }
     for (const k in O.skills) {
       const o = O.skills[k], n = out.skills[k] || (out.skills[k] = { ok: 0, no: 0 });
@@ -652,6 +662,8 @@
       // de bestandsnaam volgt uit de tekst. Bestaat hij niet, dan valt het vanzelf terug op de apparaatstem.
       const pending = !this.clips && this.clipsLoaded && Store.state.settings.clips !== false && !opt.noClip;
       // Lupe: eerst haar eigen opname; is die er niet, dan de gewone opname van de lesstof (zonder naamruimte).
+      // tijdens een oefening van «Op reis» klinkt alles met de stem van dat land (als die opname er is)
+      if (opt.clipNs === undefined && this.placeNs) opt = Object.assign({}, opt, { clipNs: this.placeNs });
       if (opt.clipNs && !pending && !this.hasClip(text, opt.clipNs)) opt = Object.assign({}, opt, { clipNs: undefined });
       const p = this.hasClip(text, opt.clipNs) || pending
         ? (this.stop(), this.playClip(text, opt).then(() => { this.last = { src: 'clip' }; }, () => { if (!pending) this.clipFailed(); else this.last = { src: 'device' }; return this.speak(text, opt, true); }))
