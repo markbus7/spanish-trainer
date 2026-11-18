@@ -90,7 +90,7 @@ If the course text itself contains a real mistake, say so honestly.`;
       catch (e) { out.textContent = '⚠️ ' + e.message; }
     };
     return h('div', { class: 'ask-nokey' },
-      h('div', { class: 'row gap' }, S.Tutor.avatar(64), h('div', null, h('b', null, '¡Hola! Soy Lupe.'), h('p', { class: 'small muted' }, 'Ik leg alles uit wat je in de app tegenkomt.'))),
+      h('div', { class: 'row gap' }, S.Tutor.avatar(80), h('div', null, h('b', null, '¡Hola! Soy Lupe.'), h('p', { class: 'small muted' }, 'Ik leg alles uit wat je in de app tegenkomt.'))),
       h('p', null, 'Om mij vragen te stellen heb je een eigen API-sleutel van Anthropic nodig. Je betaalt per gebruik; een vraag kost meestal minder dan een cent.'),
       h('ol', { class: 'small steps-list' },
         h('li', null, 'Open ', h('a', { href: 'https://platform.claude.com/settings/keys', target: '_blank', rel: 'noopener' }, 'deze link naar Anthropic'), ' en log in.'),
@@ -137,14 +137,14 @@ If the course text itself contains a real mistake, say so honestly.`;
     bodyEl = h('div', { class: 'ask-body' });
     panel = h('aside', { class: 'ask-panel', role: 'dialog', 'aria-label': 'Vraag het Profe Lupe', hidden: true },
       h('div', { class: 'ask-grab', 'aria-hidden': 'true' }),
-      h('div', { class: 'ask-head' }, S.Tutor.avatar(40, 'ask-av'),
+      h('div', { class: 'ask-head' }, S.Tutor.avatar(48, 'ask-av'),
         h('div', { class: 'grow' }, h('b', null, 'Vraag het Lupe'), whereEl),
         h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Sluiten', onclick: close }, '✕')),
       bodyEl);
     // Esc sluit het paneel; toetsen in het paneel gaan niet naar de les (Enter = «Verder»)
     panel.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); close(); } e.stopPropagation(); });
     backdrop = h('div', { class: 'ask-backdrop', hidden: true, onclick: close });
-    fab = h('button', { class: 'ask-fab', type: 'button', 'aria-label': 'Vraag het Profe Lupe', title: 'Vraag het Lupe' }, S.Tutor.avatar(38, 'ask-fab-av'), h('span', { class: 'ask-fab-q', 'aria-hidden': 'true' }, '?'));
+    fab = h('button', { class: 'ask-fab', type: 'button', 'aria-label': 'Vraag het Profe Lupe', title: 'Vraag het Lupe' }, S.Tutor.avatar(46, 'ask-fab-av'), h('span', { class: 'ask-fab-q', 'aria-hidden': 'true' }, '?'));
     dragFab();
     document.body.append(backdrop, panel, fab);
   }
