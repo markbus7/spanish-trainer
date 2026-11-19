@@ -268,13 +268,22 @@
     const speakers = [...new Set(d.lines.map(l => l[0]))];
     let showAll = false;
     const seen = new Set();
+    /* Personages: elke spreker is een getekend dier uit de vaste cast (js/cast.js). Mark (de leerling) staat altijd rechts. */
+    const Cast = S.Cast, me = speakers.includes('Mark') ? 'Mark' : null;
+    const charOf = who => Cast && Cast.forSpeaker(who, d.place);
+    const side = who => me ? (who === me ? 'right' : 'left') : (speakers.indexOf(who) % 2 ? 'right' : 'left');
+    const face = (who, size, cls) => {
+      const c = charOf(who);
+      if (c) { const el = Cast.avatar(c.id, size, cls); el.dataset.who = who; el.title = who + ' · ' + c.animal; return el; }
+      return h('div', { class: 'avatar' + (who === me ? ' me' : ''), title: who, 'data-who': who }, who === me ? 'Jij' : who[0]);
+    };
     const lines = d.lines.map(([who, es, nl, x]) => {
       const tr = h('div', { class: 'nl hidden' }, nl);
       const esEl = h('div', { class: 'es', lang: 'es' }, es);
       const extra = h('div', { class: 'rp-turn' });
       const nt = noteToggle(findNotes(es, { extra: x, seen }));
-      const line = h('div', { class: 'dl ' + (speakers.indexOf(who) % 2 ? 'right' : 'left') },
-        h('div', { class: 'avatar', title: who }, who[0]),
+      const line = h('div', { class: 'dl ' + side(who) + (charOf(who) ? ' has-cast' : '') },
+        face(who, 46),
         h('div', { class: 'bubble', onclick: () => { if (line.classList.contains('mine')) return; tr.classList.toggle('hidden'); } },
           h('div', { class: 'who' }, who), esEl, tr, nt && nt.box, extra),
         h('div', { class: 'dl-btns' }, speakBtn(es), nt && nt.btn));
@@ -282,6 +291,36 @@
       return line;
     });
     const list = h('div', { class: 'dl-list' }, lines);
+
+    /* Het toneel: de personages van deze dialoog groot bovenaan. Wie praat, beweegt zijn mond. Tik = wie is dit? */
+    const cast = speakers.filter(w => w !== me && charOf(w));
+    const info = h('div', { class: 'cast-info hidden' });
+    const sceneBubble = h('div', { class: 'scene-bubble hidden', 'aria-live': 'polite' });
+    const stage = cast.length ? h('div', { class: 'dl-stage' + (cast.length > 2 ? ' many' : '') }, cast.map(w => {
+      const c = charOf(w);
+      return h('button', { class: 'cast-pick', type: 'button', onclick: () => {
+        const open = info.dataset.who === w && !info.classList.contains('hidden');
+        info.classList.toggle('hidden', open); info.dataset.who = w; info.innerHTML = '';
+        if (!open) info.append(h('b', null, c.name), ' · ', c.animal + ' (' + c.nl + ') · ' + c.city + ' · ' + c.age + ' jaar', h('div', { class: 'small' }, c.trait));
+      } }, face(w, cast.length > 2 ? 78 : 96, 'on-stage'), h('span', { class: 'cast-name' }, c.name));
+    })) : null;
+    if (Cast && stage) {
+      const els = () => [...(stage ? stage.querySelectorAll('[data-who]') : []), ...list.querySelectorAll('[data-who]')];
+      const whoSays = new Map(d.lines.map(([w, es]) => [es, w]));
+      ctx.onLeave(Cast.onTalk((on, text) => {
+        const w = on ? whoSays.get(text) : null;
+        els().forEach(el => el.classList.toggle('talking', !!w && el.dataset.who === w));
+        stage.classList.toggle('speaking', !!w);
+        // tekstballon op het toneel: wat het personage nu zegt (niet als de tekst verborgen is of jij aan de beurt bent)
+        const show = !!w && w !== me && !list.classList.contains('masked');
+        sceneBubble.classList.toggle('hidden', !show);
+        if (show) {
+          const i = cast.indexOf(w);
+          sceneBubble.style.setProperty('--tail', ((i + .5) / cast.length * 100).toFixed(1) + '%');
+          sceneBubble.innerHTML = ''; sceneBubble.append(h('div', { class: 'who' }, w), h('div', { class: 'es', lang: 'es' }, text));
+        }
+      }));
+    }
 
     /* Eerst luisteren: de Spaanse tekst is wazig tot je hem zelf zichtbaar maakt. */
     const listenFirst = Speech.canSpeak() && set.listenFirst !== false;
@@ -382,7 +421,7 @@
     ctx.onLeave(() => { playing = false; if (role.active) stopRole(); Speech.stop(); });
     return h('div', { class: 'dialogue' },
       h('div', { class: 'eyebrow' }, '💬 ' + (d.place || '')), h('h2', null, d.t),
-      intro,
+      stage, stage && sceneBubble, stage && info, intro,
       h('div', { class: 'row gap wrap' }, Speech.canSpeak() ? playBtn : null, Speech.canSpeak() ? maskBtn : null, trBtn, Speech.canSpeak() && Speech.canListen() ? roleBtn : null),
       rolePanel, list);
   };
