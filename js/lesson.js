@@ -266,6 +266,8 @@
     const d = it.dialogue; ctx.free();
     const set = S.Store.state.settings;
     const speakers = [...new Set(d.lines.map(l => l[0]))];
+    // dialoogzinnen hebben eigen opnames met de stem die bij de spreker past (naamruimte 'dlg', tools/tts-texts.js)
+    const say = { clipNs: S.course.ns ? undefined : 'dlg' };
     let showAll = false;
     const seen = new Set();
     /* Personages: elke spreker is een getekend dier uit de vaste cast (js/cast.js). Mark (de leerling) staat altijd rechts. */
@@ -286,7 +288,7 @@
         face(who, 46),
         h('div', { class: 'bubble', onclick: () => { if (line.classList.contains('mine')) return; tr.classList.toggle('hidden'); } },
           h('div', { class: 'who' }, who), esEl, tr, nt && nt.box, extra),
-        h('div', { class: 'dl-btns' }, speakBtn(es), nt && nt.btn));
+        h('div', { class: 'dl-btns' }, speakBtn(es, say), nt && nt.btn));
       Object.assign(line, { _tr: tr, _es: es, _nl: nl, _who: who, _esEl: esEl, _extra: extra, _note: !!nt });
       return line;
     });
@@ -336,7 +338,7 @@
     let playing = false;
     async function playAll() {
       playing = true; playBtn.textContent = '⏸ Stop';
-      for (const l of lines) { if (!playing) break; l.classList.add('active'); l.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); await Speech.say(l._es); l.classList.remove('active'); }
+      for (const l of lines) { if (!playing) break; l.classList.add('active'); l.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); await Speech.say(l._es, say); l.classList.remove('active'); }
       playing = false; playBtn.textContent = '▶ Alles afspelen';
     }
     const playBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => {
@@ -380,7 +382,7 @@
           if (!role.active) return;
           if (score !== null) role.scores.push(score);
           l._esEl.classList.remove('hide-es'); l.classList.add('said');
-        } else await Speech.say(l._es);
+        } else await Speech.say(l._es, say);
         l.classList.remove('active');
       }
       role.active = false; roleBtn.textContent = '🎭 Nog een keer';
@@ -412,7 +414,7 @@
           } catch (err) { mic.classList.remove('rec'); live.fail(err); }
         } }, '🎙️');
         const live = S.Mic.live();
-        const hint = h('button', { class: 'btn ghost small', type: 'button', onclick: e => { e.stopPropagation(); l._esEl.classList.remove('hide-es'); Speech.say(l._es); } }, '💡 Voorzeggen');
+        const hint = h('button', { class: 'btn ghost small', type: 'button', onclick: e => { e.stopPropagation(); l._esEl.classList.remove('hide-es'); Speech.say(l._es, say); } }, '💡 Voorzeggen');
         const skip = h('button', { class: 'btn ghost small', type: 'button', onclick: e => { e.stopPropagation(); finish(null); } }, 'Overslaan');
         l._extra.append(h('div', { class: 'row gap wrap rp-ctrl' }, mic, hint, skip), live.el, status);
       });
