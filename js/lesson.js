@@ -266,13 +266,14 @@
     const d = it.dialogue; ctx.free();
     const set = S.Store.state.settings;
     const speakers = [...new Set(d.lines.map(l => l[0]))];
-    // dialoogzinnen hebben eigen opnames met de stem die bij de spreker past (naamruimte 'dlg', tools/tts-texts.js)
-    const say = { clipNs: S.course.ns ? undefined : 'dlg' };
+    // dialoogzinnen hebben eigen opnames met de stem die bij de spreker past (naamruimte 'ch' = vaste stem per personage uit js/cast.js, tools/tts-texts.js)
+    const say = { clipNs: S.course.ns ? undefined : 'ch' };
     let showAll = false;
     const seen = new Set();
     /* Personages: elke spreker is een getekend dier uit de vaste cast (js/cast.js). Mark (de leerling) staat altijd rechts. */
     const Cast = S.Cast, me = speakers.includes('Mark') ? 'Mark' : null;
-    const charOf = who => Cast && Cast.forSpeaker(who, d.place);
+    const mine = Cast && S.Store.state.me && Cast.get(S.Store.state.me); // jouw eigen personage (Perfil)
+    const charOf = who => Cast && (who === me ? mine : Cast.forSpeaker(who, d.place));
     const side = who => me ? (who === me ? 'right' : 'left') : (speakers.indexOf(who) % 2 ? 'right' : 'left');
     const face = (who, size, cls) => {
       const c = charOf(who);
@@ -295,7 +296,7 @@
     const list = h('div', { class: 'dl-list' }, lines);
 
     /* Het toneel: de personages van deze dialoog groot bovenaan. Wie praat, beweegt zijn mond. Tik = wie is dit? */
-    const cast = speakers.filter(w => w !== me && charOf(w));
+    const cast = speakers.filter(w => w !== me && charOf(w)).concat(mine ? [me] : []);
     const info = h('div', { class: 'cast-info hidden' });
     const sceneBubble = h('div', { class: 'scene-bubble hidden', 'aria-live': 'polite' });
     const stage = cast.length ? h('div', { class: 'dl-stage' + (cast.length > 2 ? ' many' : '') }, cast.map(w => {
@@ -303,8 +304,9 @@
       return h('button', { class: 'cast-pick', type: 'button', onclick: () => {
         const open = info.dataset.who === w && !info.classList.contains('hidden');
         info.classList.toggle('hidden', open); info.dataset.who = w; info.innerHTML = '';
-        if (!open) info.append(h('b', null, c.name), ' · ', c.animal + ' (' + c.nl + ') · ' + c.city + ' · ' + c.age + ' jaar', h('div', { class: 'small' }, c.trait));
-      } }, face(w, cast.length > 2 ? 78 : 96, 'on-stage'), h('span', { class: 'cast-name' }, c.name));
+        if (!open) info.append(...(c.player ? [h('b', null, 'Dit ben jij'), ' · ' + c.nl, h('div', { class: 'small' }, 'Een ander personage kiezen kan in Perfil.')]
+          : [h('b', null, c.name), ' · ', c.animal + ' (' + c.nl + ') · ' + c.city + ' · ' + c.age + ' jaar', h('div', { class: 'small' }, c.trait)]));
+      } }, face(w, cast.length > 2 ? 78 : 96, 'on-stage'), h('span', { class: 'cast-name' }, c.player ? 'Jij' : c.name));
     })) : null;
     if (Cast && stage) {
       const els = () => [...(stage ? stage.querySelectorAll('[data-who]') : []), ...list.querySelectorAll('[data-who]')];

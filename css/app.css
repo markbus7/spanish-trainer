@@ -1203,3 +1203,16 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .pl-count { margin: .2rem 0 .4rem; }
 .pl-other { display: inline-flex; text-decoration: none; }
 @media (min-width: 700px) { .dl-stage .cast svg { width: 124px; height: 124px; } .dl-stage.many .cast svg { width: 100px; height: 100px; } }
+/* Eigen personage kiezen (Perfil) */
+.prof-av { position: relative; background: none; border: 0; padding: 0; cursor: pointer; flex: none; line-height: 0; display: block; min-width: max-content; }
+.prof-av .avatar { margin: 0; }
+.prof-av .cast { width: 76px; height: 76px; border-radius: 50%; background: var(--bg2); overflow: hidden; box-shadow: var(--shadow); }
+.prof-av-edit { position: absolute; right: -2px; bottom: -2px; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff; font-size: .8rem; line-height: 24px; text-align: center; box-shadow: var(--shadow); }
+.me-picker.hidden { display: none; }
+.me-picker { margin: .6rem 0 1rem; }
+.me-picker p { margin: .2rem 0 .6rem; }
+.me-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: .5rem; margin-bottom: .5rem; }
+.me-opt { display: flex; flex-direction: column; align-items: center; gap: .2rem; background: var(--bg2); border: 2px solid transparent; border-radius: 16px; padding: .5rem .3rem .4rem; cursor: pointer; color: inherit; font: inherit; font-size: .8rem; font-weight: 600; }
+.me-opt.on { border-color: var(--accent); background: var(--accent-soft); }
+.me-opt:hover .cast { transform: translateY(-2px); }
+@media (max-width: 520px) { .dl-stage.many { gap: .35rem; flex-wrap: wrap; } .dl-stage.many .cast svg { width: 64px; height: 64px; } .dl-stage.many .cast-name { font-size: .68rem; max-width: 76px; text-align: center; } }

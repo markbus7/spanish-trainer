@@ -32,9 +32,9 @@ function country(place) {
   const cps = [...String(place || '')].map(c => c.codePointAt(0)).filter(c => c >= 0x1F1E6 && c <= 0x1F1FF);
   return cps.length >= 2 ? String.fromCharCode(cps[0] - 0x1F1E6 + 65, cps[1] - 0x1F1E6 + 65) : null;
 }
-/* Dialogen (naamruimte 'dlg'): elke spreker een eigen stem die past bij man/vrouw.
+/* Dialogen (naamruimte 'ch'): elke spreker een eigen stem die past bij man/vrouw.
    Mannen herkennen we aan de naam (eerste woord niet op -a), met een paar uitzonderingen. */
-const FEMALE = new Set(['Yarisel', 'Coralis', 'Fer', 'Abuela Lupe', 'Señora Elena', 'Beatriz', 'Isabel', 'Carmen', 'Raquel', 'Inés', 'Pilar', 'Mercedes', 'Luz', 'Sol', 'Belén', 'Abigail', 'Ruth', 'Esther', 'Maribel', 'Soledad', 'Rocío', 'Consuelo', 'Nicole', 'Doña Rosa']);
+const FEMALE = new Set(['Yarisel', 'Coralis', 'Abuela Lupe', 'Señora Elena', 'Beatriz', 'Isabel', 'Carmen', 'Raquel', 'Inés', 'Pilar', 'Mercedes', 'Luz', 'Sol', 'Belén', 'Abigail', 'Ruth', 'Esther', 'Maribel', 'Soledad', 'Rocío', 'Consuelo', 'Nicole', 'Doña Rosa']);
 const MALE = new Set(['Turista', 'Guía Mauricio', 'Mark', 'Luca', 'Nicola', 'Joshua', 'Elías']);
 const isMale = w => MALE.has(w) || (!FEMALE.has(w) && !/(a|ora)$/i.test(String(w).split(/\s+/)[0].replace(/[.,]/g, '')) && !/^(Sra|Señorita|Doña|Tía|Abuela|Doctora|Profa)\b/i.test(w));
 // eerst de stem van het land; doen er twee mannen of twee vrouwen mee (of Mark naast een man uit het land), dan een andere stem
@@ -73,8 +73,12 @@ for (const u of S.C.all()) {
     u.dialogue.lines.forEach(([w, es]) => add(es, w === 'Mark' ? vm_ : (who.filter(x => x !== 'Mark').indexOf(w) % 2 ? vm_ : vf))); // oude opnames (andere plekken)
     const cast = castVoices(who, c);
     u.dialogue.lines.forEach(([w, es]) => {
-      const k = S.Speech.clipKey(es, 'dlg');
-      if (!out.has(k)) out.set(k, Object.assign({ k, ns: 'dlg', text: S.Speech.clean(es), voice: cast[w], lv: [LV] }, mood(es)));
+      const k = S.Speech.clipKey(es, 'ch');
+      // personage uit de vaste cast (js/cast.js): altijd dezelfde stem, met zijn eigen toonhoogte en tempo
+      const ch = S.Cast && S.Cast.forSpeaker(w, u.dialogue.place), cv = ch && ch.voice;
+      const m = mood(es), num = x => parseInt(x || 0, 10);
+      const spec = cv ? { voice: cv.v, pitch: (num(m.pitch) + cv.pitch >= 0 ? '+' : '') + (num(m.pitch) + cv.pitch) + 'Hz', rate: (num(m.rate) + cv.rate >= 0 ? '+' : '') + (num(m.rate) + cv.rate) + '%' } : Object.assign({ voice: cast[w] }, m);
+      if (!out.has(k)) out.set(k, Object.assign({ k, ns: 'ch', text: S.Speech.clean(es), lv: [LV] }, spec));
       else if (!out.get(k).lv.includes(LV)) out.get(k).lv.push(LV);
     });
   }

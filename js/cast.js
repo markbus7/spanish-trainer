@@ -359,13 +359,245 @@
   ${mouth(85.5, { w: 6.5, line: '#3a3946' })}`
     }
   ];
-  const BY = Object.fromEntries(CAST.map(c => [c.id, c]));
+
+  /* ---------- bijrollen: zelfde stijl, opgebouwd uit vaste onderdelen ----------
+     beast(o): zoogdier/reptiel; bird(o): vogel; frog(o): kikker. o.fur = [licht, midden, donker], o.wear = kleding, o.hat/o.acc = accessoires. */
+  const HEAD = 'M60 30C88 30 102 47 102 67C102 88 85 100 60 100C35 100 18 88 18 67C18 47 32 30 60 30Z';
+  const EARS = {
+    round: (f, i) => `<circle cx="29" cy="36" r="11" fill="${f}"/><circle cx="91" cy="36" r="11" fill="${f}"/><circle cx="29.5" cy="37" r="6" fill="${i}"/><circle cx="90.5" cy="37" r="6" fill="${i}"/>`,
+    big: (f, i) => `<path d="M27 46C24 30 25 16 30 8C38 14 46 24 52 34Z" fill="${f}"/><path d="M93 46C96 30 95 16 90 8C82 14 74 24 68 34Z" fill="${f}"/><path d="M30 42C28 31 29 21 32 15C37 20 42 27 46 34Z" fill="${i}"/><path d="M90 42C92 31 91 21 88 15C83 20 78 27 74 34Z" fill="${i}"/>`,
+    point: (f, i) => `<path d="M27 50C22 36 22 22 29 14C38 17 47 26 51 34Z" fill="${f}"/><path d="M93 50C98 36 98 22 91 14C82 17 73 26 69 34Z" fill="${f}"/><path d="M30 44C27 34 27 25 31 20C37 23 42 28 45 34Z" fill="${i}"/><path d="M90 44C93 34 93 25 89 20C83 23 78 28 75 34Z" fill="${i}"/>`,
+    huge: (f, i) => `<path d="M30 52C14 44 4 28 4 12C20 14 38 26 48 38Z" fill="${f}"/><path d="M90 52C106 44 116 28 116 12C100 14 82 26 72 38Z" fill="${f}"/><path d="M30 46C19 40 12 29 11 19C23 22 35 30 42 38Z" fill="${i}"/><path d="M90 46C101 40 108 29 109 19C97 22 85 30 78 38Z" fill="${i}"/>`,
+    long: (f, i) => `<ellipse cx="42" cy="22" rx="8" ry="22" transform="rotate(-12 42 22)" fill="${f}"/><ellipse cx="78" cy="22" rx="8" ry="22" transform="rotate(12 78 22)" fill="${f}"/><ellipse cx="42" cy="22" rx="4" ry="16" transform="rotate(-12 42 22)" fill="${i}"/><ellipse cx="78" cy="22" rx="4" ry="16" transform="rotate(12 78 22)" fill="${i}"/>`,
+    side: (f, i) => `<path d="M33 62C18 62 6 54 4 44C14 42 28 46 38 54Z" fill="${f}"/><path d="M87 62C102 62 114 54 116 44C106 42 92 46 82 54Z" fill="${f}"/><path d="M30 57C20 56 12 51 10 46C18 46 27 49 33 54Z" fill="${i}"/><path d="M90 57C100 56 108 51 110 46C102 46 93 49 87 54Z" fill="${i}"/>`,
+    disc: (f, i) => `<circle cx="26" cy="34" r="16" fill="${f}"/><circle cx="94" cy="34" r="16" fill="${f}"/><circle cx="27" cy="35" r="10.5" fill="${i}"/><circle cx="93" cy="35" r="10.5" fill="${i}"/>`,
+    tiny: (f, i) => `<circle cx="32" cy="40" r="6" fill="${f}"/><circle cx="88" cy="40" r="6" fill="${f}"/><circle cx="32" cy="41" r="3" fill="${i}"/><circle cx="88" cy="41" r="3" fill="${i}"/>`,
+    none: () => ''
+  };
+  const NOSE = {
+    bear: (c, y) => `<path d="M${54} ${y}Q60 ${y - 2.5} 66 ${y}Q65.5 ${y + 5} 60 ${y + 6}Q54.5 ${y + 5} 54 ${y}Z" fill="${c}"/><ellipse cx="57.8" cy="${y + .4}" rx="1.8" ry=".9" fill="#fff" opacity=".45"/><path d="M60 ${y + 6}V${y + 8.5}" stroke="${c}" stroke-width="1.3" stroke-linecap="round" opacity=".7"/>`,
+    cat: (c, y) => `<path d="M55.5 ${y}Q60 ${y - 1.5} 64.5 ${y}Q63 ${y + 4} 60 ${y + 4.5}Q57 ${y + 4} 55.5 ${y}Z" fill="${c}"/><path d="M60 ${y + 4.5}V${y + 6.5}" stroke="#8a4a3a" stroke-width="1.2" stroke-linecap="round"/>`,
+    dots: (c, y) => `<ellipse cx="56" cy="${y + 2}" rx="1.5" ry="1" fill="${c}"/><ellipse cx="64" cy="${y + 2}" rx="1.5" ry="1" fill="${c}"/>`,
+    rabbit: (c, y) => `<path d="M57 ${y}Q60 ${y - 1} 63 ${y}L60 ${y + 3}Z" fill="${c}"/><path d="M60 ${y + 3}V${y + 5.5}" stroke="#8a4a3a" stroke-width="1.2" stroke-linecap="round"/>`
+  };
+  // kleding: a/b = kleurverloop, stijl
+  const WEAR = {
+    tee: w => `<path d="M42 93Q60 106 78 93" fill="none" stroke="${w.trim || '#fff4e6'}" stroke-width="3" stroke-linecap="round"/>`,
+    shirt: w => `<path d="M46 93L60 107L74 93Z" fill="${w.inner || '#fff'}"/><path d="M44 93L52 106 60 99Z" fill="${w.trim || '#fff'}"/><path d="M76 93L68 106 60 99Z" fill="${w.trim || '#fff'}"/><g fill="${w.btn || '#fff'}" opacity=".9"><circle cx="60" cy="110" r="1.4"/><circle cx="60" cy="117" r="1.4"/></g>`,
+    blazer: w => `<path d="M46 93L60 121L74 93Z" fill="${w.inner || '#fff'}"/><path d="M44 93L54 112 60 121 48 121Z" fill="${w.trim}"/><path d="M76 93L66 112 60 121 72 121Z" fill="${w.trim}"/>${w.pin ? `<circle cx="72" cy="104" r="2.2" fill="${w.pin}"/>` : ''}`,
+    coat: () => `<path d="M46 93L60 121L74 93Z" fill="#8fd0e8"/><path d="M44 93L54 112 60 121 46 121Z" fill="#fff"/><path d="M76 93L66 112 60 121 74 121Z" fill="#fff"/><path d="M48 96C44 110 50 118 60 118" fill="none" stroke="#3a3a46" stroke-width="2.2" stroke-linecap="round"/><path d="M72 96C76 106 74 112 70 114" fill="none" stroke="#3a3a46" stroke-width="2.2" stroke-linecap="round"/><circle cx="70" cy="115.5" r="3" fill="#b9c2cc" stroke="#3a3a46" stroke-width="1.4"/><rect x="77" y="104" width="10" height="7" rx="1.5" fill="#e6f2fb" stroke="#9bb" stroke-width=".6"/><path d="M80 105.5V109.5M78 107.5H82" stroke="#e8344e" stroke-width="1.4"/>`,
+    waiter: () => `<path d="M44 93L60 121L76 93Z" fill="#fff"/><path d="M44 93L56 121H32Z" fill="#2a2a33"/><path d="M76 93L64 121H88Z" fill="#2a2a33"/><path d="M52 98L60 101 68 98 68 106 60 103 52 106Z" fill="#c9283b"/><circle cx="60" cy="102" r="2" fill="#a81f30"/><g fill="#2a2a33"><circle cx="60" cy="111" r="1.2"/><circle cx="60" cy="117" r="1.2"/></g>`,
+    stripes: w => `<g fill="none" stroke="${w.trim}" stroke-width="2.6" opacity=".9"><path d="M22 106Q60 120 98 106"/><path d="M19 114Q60 128 101 114"/></g><path d="M42 93Q60 104 78 93" fill="none" stroke="${w.trim2 || '#fff4e6'}" stroke-width="3" stroke-linecap="round"/>`,
+    poncho: w => `<path d="M17 121C19 103 34 94 46 93L60 108 74 93C86 94 101 103 103 121Z" fill="${w.a}"/><g fill="none" stroke-width="2.4"><path d="M24 108Q60 122 96 108" stroke="${w.trim}"/><path d="M21 115Q60 129 99 115" stroke="${w.trim2}"/></g><g fill="${w.trim2}">${[30, 44, 76, 90].map(x => `<path d="M${x} 104l2.4 2.4-2.4 2.4-2.4-2.4Z"/>`).join('')}</g>`,
+    flowers: w => `<path d="M42 93Q60 106 78 93" fill="none" stroke="#fff4e6" stroke-width="3" stroke-linecap="round"/>${flower(30, 108, w.f1 || '#fff', 1.8)}${flower(46, 113, w.f2 || '#ffd23f', 1.8)}${flower(74, 113, w.f1 || '#fff', 1.8)}${flower(90, 108, w.f2 || '#ffd23f', 1.8)}`,
+    vest: w => `<path d="M42 93Q60 106 78 93" fill="none" stroke="#fff4e6" stroke-width="3" stroke-linecap="round"/><path d="M30 99L44 95 50 121H28Z" fill="${w.trim}"/><path d="M90 99L76 95 70 121H92Z" fill="${w.trim}"/><g fill="#f2b134"><circle cx="38" cy="106" r="1.4"/><circle cx="82" cy="106" r="1.4"/></g>`
+  };
+  const HAT = {
+    chullo: (a, b) => `<path d="M26 50C24 26 42 14 60 14C78 14 96 26 94 50C84 42 72 39 60 39C48 39 36 42 26 50Z" fill="${a}"/><path d="M26 50L22 74 31 72 32 46Z" fill="${a}"/><path d="M94 50L98 74 89 72 88 46Z" fill="${a}"/><path d="M22 74V82M98 74V82" stroke="${b}" stroke-width="1.6"/><circle cx="22" cy="84" r="2.6" fill="${b}"/><circle cx="98" cy="84" r="2.6" fill="${b}"/>
+      <path d="M30 40Q60 28 90 40" fill="none" stroke="${b}" stroke-width="3"/><path d="M33 34l4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4" fill="none" stroke="#fff" stroke-width="1.4" transform="translate(-1 -6)"/><circle cx="60" cy="12" r="5" fill="${b}"/>`,
+    safari: () => `<path d="M14 46Q60 32 106 46Q100 52 60 46Q20 52 14 46Z" fill="#a8844e"/><path d="M30 44C30 24 44 16 60 16S90 24 90 44Q60 38 30 44Z" fill="#c9a66b"/><path d="M30 40Q60 34 90 40V44Q60 38 30 44Z" fill="#6e5230"/>`,
+    sun: () => `<path d="M16 42Q60 28 104 42Q98 50 60 44Q22 50 16 42Z" fill="#f2e2b0"/><path d="M32 40C32 22 46 16 60 16S88 22 88 40Q60 34 32 40Z" fill="#fff1c9"/><path d="M32 37Q60 31 88 37V41Q60 35 32 41Z" fill="#e8344e"/>`,
+    cap: c => `<path d="M30 42C30 24 44 18 60 18S90 24 90 42Q60 36 30 42Z" fill="${c}"/><path d="M28 42Q60 34 92 42Q90 50 60 46Q30 50 28 42Z" fill="${c}" opacity=".85"/><path d="M40 42Q60 38 80 42" fill="none" stroke="#fff" stroke-width="1" opacity=".5"/><circle cx="60" cy="18" r="2.2" fill="${c}"/><path d="M50 30h20" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>`,
+    sombrero: () => `<ellipse cx="60" cy="38" rx="50" ry="9" fill="#d9b25a"/><path d="M38 38C38 20 48 12 60 12S82 20 82 38Z" fill="#e8c56e"/><path d="M38 33Q60 28 82 33V38H38Z" fill="#c9283b"/><path d="M12 38Q60 50 108 38" fill="none" stroke="#b08a3a" stroke-width="1.4"/>`,
+    fruits: () => `<ellipse cx="60" cy="30" rx="26" ry="6" fill="#d9a441"/><path d="M34 30Q60 44 86 30L82 34Q60 46 38 34Z" fill="#b8832a"/><circle cx="48" cy="24" r="7" fill="#f7941d"/><circle cx="62" cy="21" r="7.5" fill="#e8344e"/><circle cx="74" cy="25" r="6.5" fill="#ffd23f"/><path d="M38 26C42 16 54 14 56 22" fill="#3a9d5d"/><path d="M80 22C84 14 94 16 90 26" fill="#3a9d5d"/><circle cx="55" cy="28" r="5" fill="#8a3a8e"/>`,
+    bun: c => `<circle cx="60" cy="24" r="9" fill="${c}"/>`
+  };
+  const ACC = {
+    glasses: (c = '#3b2a20') => `<g fill="none" stroke="${c}" stroke-width="2"><circle cx="42" cy="64" r="11"/><circle cx="78" cy="64" r="11"/><path d="M53 63Q60 60 67 63"/></g>`,
+    mustache: (c = '#3a2414') => `<path d="M60 83C54 79 44 80 40 86C46 85 52 87 60 85C68 87 74 85 80 86C76 80 66 79 60 83Z" fill="${c}"/>`,
+    earrings: (c = '#f2b134') => `<circle cx="20" cy="74" r="2.6" fill="${c}"/><circle cx="100" cy="74" r="2.6" fill="${c}"/><circle cx="20" cy="79" r="3.2" fill="none" stroke="${c}" stroke-width="1.4"/><circle cx="100" cy="79" r="3.2" fill="none" stroke="${c}" stroke-width="1.4"/>`,
+    camera: () => `<path d="M40 98L60 112 80 98" fill="none" stroke="#2a2a33" stroke-width="1.6"/><rect x="50" y="108" width="20" height="13" rx="3" fill="#2a2a33"/><circle cx="60" cy="114.5" r="4.4" fill="#5ec2e8" stroke="#888" stroke-width="1.2"/><rect x="64" y="109.5" width="4" height="2" rx=".8" fill="#e8344e"/>`,
+    mic: () => `<path d="M88 121V106" stroke="#2a2a33" stroke-width="3" stroke-linecap="round"/><rect x="83" y="96" width="10" height="13" rx="5" fill="#444"/><path d="M84.5 100h7M84.5 103h7" stroke="#888" stroke-width=".8"/>`,
+    badge: (c = '#fff') => `<rect x="70" y="104" width="13" height="9" rx="1.6" fill="${c}" stroke="#999" stroke-width=".6"/><path d="M72.5 107h8M72.5 110h5" stroke="#999" stroke-width=".9"/>`,
+    phone: () => `<rect x="80" y="100" width="10" height="17" rx="2.2" fill="#2a2a33"/><rect x="81.5" y="102" width="7" height="12" rx="1" fill="#5ec2e8"/>`,
+    whisk: (c = '#7a5a40') => whisk(83, c),
+    bow: (c = '#e8344e') => `<path d="M66 30L76 24 76 36Z M66 30L56 24 56 36Z" fill="${c}"/><circle cx="66" cy="30" r="2.4" fill="${c}"/>`
+  };
+  function beast(o) {
+    const [a, b, c] = o.fur;
+    const w = o.wear || { kind: 'tee', a: '#5aa0d8', b: '#3f7fb8' };
+    return {
+      defs: fur(a, b, c) + lin('o', w.a, w.b),
+      draw: u => `
+  <path d="${SH}" fill="${u('o')}"/>${(WEAR[w.kind] || WEAR.tee)(w)}${o.under || ''}
+  ${(EARS[o.ears || 'round'])(u('f'), o.earIn || '#e9b7c4')}${o.back || ''}
+  <path d="${o.head || HEAD}" fill="${u('f')}"/>
+  ${shine(42, 41)}
+  ${o.marks || ''}
+  ${o.muzzle ? `<ellipse cx="60" cy="${o.my || 84}" rx="${o.mrx || 15}" ry="${o.mry || 11.5}" fill="${o.muzzle}"/>` : ''}
+  ${o.cheeks ? `<ellipse cx="52.5" cy="84" rx="9.5" ry="7.4" fill="${o.cheeks}"/><ellipse cx="67.5" cy="84" rx="9.5" ry="7.4" fill="${o.cheeks}"/>` : ''}
+  ${o.hat ? o.hat : ''}
+  ${eyes(Object.assign({ dx: 18, y: 64, r: 7, col: '#24160f', iris: '#5c3a26' }, o.eyes || {}))}
+  ${o.front || ''}
+  ${blush(o.by || 78, o.bdx || 30, '#f0789f', .45)}
+  ${(NOSE[o.nose || 'bear'])(o.noseCol || '#2a1a12', o.ny || 75)}
+  ${mouth(o.mouthY || 85, { w: o.mw || 6, line: o.line || '#6e4b2e' })}
+  ${o.top || ''}`
+    };
+  }
+  function bird(o) {
+    const [a, b, c] = o.fur, w = o.wear || { kind: 'tee', a: '#5aa0d8', b: '#3f7fb8' }, k = o.beak || '#ffd23f', k2 = o.beak2 || '#e8a21a';
+    const beak = o.hook
+      ? { closed: `<path d="M50 72Q60 64 70 72Q72 82 64 90Q62 84 56 82Q50 79 50 72Z" fill="${k}"/><path d="M53 82Q60 80 64 84Q62 88 58 88Q54 86 53 82Z" fill="${k2}"/><ellipse cx="56" cy="71" rx="2" ry="1" fill="#fff" opacity=".6"/>`, open: `<path d="M50 70Q60 62 70 70Q72 79 65 85Q62 80 56 79Q50 76 50 70Z" fill="${k}"/><path d="M53 84Q60 82 64 86Q62 92 58 92Q54 89 53 84Z" fill="${k2}"/><path d="M54 80Q60 79 64 84Q60 84 54 83Z" fill="#7a2e3c"/>` }
+      : { closed: `<path d="M53 74Q60 71 67 74L60 84Z" fill="${k}"/><path d="M56 79.5H64" stroke="${k2}" stroke-width="1" stroke-linecap="round"/>`, open: `<path d="M53 73Q60 70 67 73L60 79Z" fill="${k}"/><path d="M55 80.5H65L60 87Z" fill="${k2}"/><path d="M56.5 79.2H63.5L60 82Z" fill="#7a2e3c"/>` };
+    return {
+      defs: fur(a, b, c) + lin('o', w.a, w.b),
+      draw: u => `
+  <path d="${SH}" fill="${u('o')}"/>${(WEAR[w.kind] || WEAR.tee)(w)}
+  ${o.back || ''}
+  <path d="${HEAD}" fill="${u('f')}"/>
+  ${shine(42, 41)}
+  ${o.marks || ''}${o.hat || ''}
+  ${eyes(Object.assign({ dx: 18, y: 63, r: 7.2, col: '#1a1018', iris: '#40243a' }, o.eyes || {}))}
+  ${blush(78, 30, '#f0789f', .4)}
+  <g class="m-closed">${beak.closed}</g><g class="m-open">${beak.open}</g>
+  ${o.front || ''}`
+    };
+  }
+  function frog(o) {
+    const [a, b, c] = o.fur, w = o.wear;
+    return {
+      defs: fur(a, b, c) + lin('o', w.a, w.b),
+      draw: u => `
+  <path d="${SH}" fill="${u('o')}"/>${(WEAR[w.kind] || WEAR.tee)(w)}
+  <circle cx="40" cy="46" r="16" fill="${u('f')}"/><circle cx="80" cy="46" r="16" fill="${u('f')}"/>
+  <path d="M60 44C88 44 104 56 104 73C104 91 86 101 60 101C34 101 16 91 16 73C16 56 32 44 60 44Z" fill="${u('f')}"/>
+  ${shine(36, 36, 7, 3.4, -30)}${o.marks || ''}
+  <path d="M30 80C40 96 80 96 90 80C86 94 74 100 60 100C46 100 34 94 30 80Z" fill="${o.belly || '#fff3c4'}" opacity=".9"/>
+  ${o.hat || ''}
+  ${eyes({ dx: 20, y: 46, r: 9.4, col: '#1a0e08', iris: o.iris || '#a0522d', lash: !!o.lash, ring: o.ring })}
+  ${blush(77, 32, '#ff6a8a', .5)}
+  <g fill="${c}"><ellipse cx="56" cy="67" rx="1.3" ry=".9"/><ellipse cx="64" cy="67" rx="1.3" ry=".9"/></g>
+  <g class="m-closed" fill="none" stroke="${o.line || '#5a3a1a'}" stroke-linecap="round"><path d="M40 77Q60 90 80 77" stroke-width="2.4"/></g>
+  <g class="m-open"><path d="M41 76.5Q60 81 79 76.5Q75 93 60 93Q45 93 41 76.5Z" fill="#7a2e3c"/><path d="M48 88Q60 81 72 88Q67 93 60 93Q53 93 48 88Z" fill="#f37fa6"/></g>
+  ${o.front || ''}`
+    };
+  }
+  const extra = (meta, art) => Object.assign({ extra: true }, meta, art);
+  const SPOTS = (col, pts) => `<g fill="${col}" opacity=".75">${pts.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r || 1.6}"/>`).join('')}</g>`;
+  CAST.push(
+    extra({ id: 'andres', name: 'Andrés', animal: 'zorro andino', nl: 'Andesvos', city: 'Lima', cc: 'PE', age: 29, female: false, trait: 'Ingenieur en vriend van Lucía. Rustig, precies en altijd netjes in het overhemd.', color: '#c9733a' },
+      beast({ fur: ['#f2c49a', '#d98e55', '#a8602e'], ears: 'point', earIn: '#5a3a28', muzzle: '#fbeedd', mrx: 16, mry: 13, wear: { kind: 'shirt', a: '#8fb8e8', b: '#5f8fc8', trim: '#dfeaf8', inner: '#c9283b' }, marks: '<path d="M33 52Q42 48 48 52M87 52Q78 48 72 52" fill="none" stroke="#7a4a28" stroke-width="2" stroke-linecap="round"/>' })),
+    extra({ id: 'valentina-ar', name: 'Valentina', animal: 'vizcacha', nl: 'viscacha', city: 'Buenos Aires (woont in Lima)', cc: 'AR', age: 31, female: true, trait: 'Argentijnse journaliste. Stelt vragen alsof het een interview is, en lacht om je antwoorden.', color: '#75aadb' },
+      beast({ fur: ['#e6e2dc', '#bdb6ac', '#8f877c'], ears: 'long', earIn: '#d9b6b8', muzzle: '#fbf8f2', mrx: 15, mry: 12, wear: { kind: 'stripes', a: '#75aadb', b: '#4f86bd', trim: '#fff', trim2: '#f2b134' }, marks: '<path d="M60 31C56 44 56 56 60 70C64 56 64 44 60 31Z" fill="#fff" opacity=".7"/><path d="M28 82Q38 79 45 82M92 82Q82 79 75 82" stroke="#3a3530" stroke-width="2.4" stroke-linecap="round" fill="none"/>', nose: 'rabbit', noseCol: '#3a3530', front: ACC.earrings() + ACC.whisk('#5a534a') })),
+    extra({ id: 'camila', name: 'Camila', animal: 'chinchilla', nl: 'chinchilla', city: 'Santiago de Chile', cc: 'CL', age: 33, female: true, trait: 'Werkt bij een bank en leeft op de minuut. Toch altijd tijd voor once met vrienden.', color: '#6a7a9a' },
+      beast({ fur: ['#eef0f4', '#c4c8d2', '#9298a8'], ears: 'disc', earIn: '#f2c2cc', muzzle: '#fbfbfd', mrx: 15, mry: 12, wear: { kind: 'blazer', a: '#3a4a6a', b: '#26324a', trim: '#4a5c80', inner: '#fff', pin: '#f2b134' }, nose: 'rabbit', noseCol: '#d9768f', front: ACC.whisk('#7a7f8c') })),
+    extra({ id: 'senora-cartagena', name: 'Señora', animal: 'iguana', nl: 'leguaan', city: 'Cartagena', cc: 'CO', age: 60, female: true, trait: 'Fruitverkoopster in de oude stad, met een schaal fruit op haar hoofd. Wijst je graag de weg.', color: '#3a9d5d' },
+      beast({ fur: ['#c7ec9a', '#7cc46a', '#3f8f48'], ears: 'none', wear: { kind: 'flowers', a: '#ffd23f', b: '#f2a81d', f1: '#c9283b', f2: '#1f4f9e' },
+        back: '<g fill="#3f8f48">' + [36, 46, 56, 66, 76].map((x, i) => `<path d="M${x} ${34 - (i === 2 ? 4 : 0)}l4 -10 4 10Z"/>`).join('') + '</g>',
+        marks: SPOTS('#4f9f50', [[30, 60, 2.2], [90, 60, 2.2], [36, 52, 1.6], [84, 52, 1.6], [26, 72, 1.6], [94, 72, 1.6]]) + '<path d="M50 96Q60 112 70 96" fill="#9fd67a"/>', nose: 'dots', noseCol: '#2f6f38', hat: HAT.fruits(), front: ACC.earrings('#e8344e'), line: '#2f6f38', eyes: { lash: true, iris: '#7a6a1a' } })),
+    extra({ id: 'ana', name: 'Ana', animal: 'teporingo', nl: 'vulkaankonijn', city: 'Ciudad de México', cc: 'MX', age: 24, female: true, trait: 'Vriendin uit Mexico-Stad. Bestelt altijd «con todo» en eet de pittigste salsa zonder te knipperen.', color: '#a0704a' },
+      beast({ fur: ['#d9b896', '#a87f58', '#7a5534'], ears: 'tiny', earIn: '#e9b7c4', muzzle: '#f2e2cc', mrx: 14, mry: 11, nose: 'rabbit', noseCol: '#d9768f', wear: { kind: 'tee', a: '#f0789f', b: '#d14f8a' }, front: ACC.whisk('#6a4a30') + flower(84, 40, '#ffd23f', 2.6, '#e2452f'), eyes: { lash: true } })),
+    extra({ id: 'mesero', name: 'Mesero', animal: 'chihuahua', nl: 'chihuahua', city: 'Ciudad de México', cc: 'MX', age: 45, female: false, trait: 'Ober in de taquería. Snel, vriendelijk en eerlijk over hoe pittig de groene salsa is.', color: '#2a2a33' },
+      beast({ fur: ['#f6dcb4', '#e2b47a', '#c08848'], ears: 'huge', earIn: '#f2b6b8', muzzle: '#fbeedc', mrx: 13, mry: 10.5, wear: { kind: 'waiter', a: '#fff', b: '#ececec' }, eyes: { r: 8 }, line: '#6e4b2e' })),
+    extra({ id: 'vendedora', name: 'Vendedora', animal: 'tití cabeciblanco', nl: 'pinchéaapje', city: 'Bogotá', cc: 'CO', age: 27, female: true, trait: 'Verkoopster in een kledingwinkel. Zegt «sumercé» en vindt alles je «divino» staan.', color: '#8a3a8e' },
+      beast({ fur: ['#c99a6a', '#9a6a3e', '#6a4424'], ears: 'tiny', earIn: '#3a2a20', wear: { kind: 'blazer', a: '#8a3a8e', b: '#6a2a70', trim: '#a24ea8', inner: '#fff' },
+        marks: '<path d="M36 50C46 46 74 46 84 50C92 64 86 92 60 96C34 92 28 64 36 50Z" fill="#3a2a22"/>',
+        top: '<path d="M30 48C24 36 22 28 26 18C30 26 34 28 36 26C34 16 36 8 42 2C44 12 48 16 52 16C52 8 56 2 60 -2C64 2 68 8 68 16C72 16 76 12 78 2C84 8 86 16 84 26C86 28 90 26 94 18C98 28 96 36 90 48C82 38 72 34 60 34C48 34 38 38 30 48Z" fill="#fdfbf6" stroke="#cfc6b8" stroke-width="1.2" stroke-linejoin="round"/>', nose: 'dots', noseCol: '#151010', front: ACC.badge(), eyes: { lash: true, iris: '#7a4a1a' }, line: '#c9a08a' })),
+    extra({ id: 'andrea', name: 'Andrea', animal: 'mapache', nl: 'wasbeer', city: 'San José', cc: 'CR', age: 26, female: true, trait: 'Tica die elk weekend een vulkaan of strand opzoekt. Alles is «tuanis» en «pura vida».', color: '#2fa79a' },
+      beast({ fur: ['#c9c6c2', '#9a958e', '#6e6a64'], ears: 'point', earIn: '#3a3632', muzzle: '#f6f4f0', mrx: 15, mry: 12, wear: { kind: 'tee', a: '#2fa79a', b: '#1d7a70' },
+        marks: '<path d="M24 62C30 54 50 54 60 62C70 54 90 54 96 62C92 72 76 74 66 68L60 66 54 68C44 74 28 72 24 62Z" fill="#2e2a26"/><path d="M38 50Q60 44 82 50" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".7" fill="none"/>', eyes: { iris: '#7a5a3a', lash: true }, front: hib(86, 40, .8, '#ff7ab0') })),
+    extra({ id: 'carlos', name: 'Carlos', animal: 'jaguar', nl: 'jaguar', city: 'Antigua', cc: 'GT', age: 38, female: false, trait: 'Groeide op op een koffiefinca bij Antigua. Vertelt graag over vroeger, toen ze nog op straat voetbalden.', color: '#d9a020' },
+      beast({ fur: ['#ffe2a0', '#f2b94a', '#cf8a22'], ears: 'round', earIn: '#3a2a1a', cheeks: '#fff8ec', nose: 'cat', noseCol: '#c9576a', wear: { kind: 'poncho', a: '#c9283b', b: '#a01f30', trim: '#1f4f9e', trim2: '#ffd23f' },
+        marks: '<g fill="none" stroke="#4a2e14" stroke-width="2" opacity=".8"><circle cx="34" cy="48" r="3.4"/><circle cx="86" cy="48" r="3.4"/><circle cx="26" cy="64" r="3"/><circle cx="94" cy="64" r="3"/><circle cx="46" cy="38" r="2.8"/><circle cx="74" cy="38" r="2.8"/></g>' + SPOTS('#4a2e14', [[60, 40], [53, 45, 1.3], [67, 45, 1.3], [24, 76, 1.3], [96, 76, 1.3]]), front: ACC.whisk('#7a5a30') })),
+    extra({ id: 'doctora', name: 'Doctora', animal: 'búho', nl: 'uil', city: 'Guadalajara', cc: 'MX', age: 50, female: true, trait: 'Huisarts. Luistert geduldig, stelt precies de goede vragen en schrijft altijd veel water drinken voor.', color: '#5ec2e8' },
+      bird({ fur: ['#e8d2b4', '#b98f62', '#8a6440'], hook: true, beak: '#f2c75a', beak2: '#c99a2a', wear: { kind: 'coat', a: '#ffffff', b: '#e6eef2' },
+        back: '<path d="M26 44L22 22 40 34Z" fill="#8a6440"/><path d="M94 44L98 22 80 34Z" fill="#8a6440"/>',
+        marks: '<circle cx="42" cy="63" r="14" fill="#f6ead8"/><circle cx="78" cy="63" r="14" fill="#f6ead8"/>' + SPOTS('#8a6440', [[50, 90, 1.3], [60, 93, 1.3], [70, 90, 1.3]]), eyes: { ring: '#f2b134', iris: '#5a3a1a' }, front: ACC.glasses('#5a6a7a') })),
+    extra({ id: 'entrevistadora', name: 'Entrevistadora', animal: 'venado cola blanca', nl: 'witstaarthert', city: 'Ciudad de México', cc: 'MX', age: 42, female: true, trait: 'HR-manager. Vriendelijk maar zakelijk, gebruikt altijd «usted».', color: '#3a4a6a' },
+      beast({ fur: ['#e8c098', '#c48c5a', '#94603a'], ears: 'side', earIn: '#f2d0c0', muzzle: '#fbf2e8', mrx: 13, mry: 13, my: 86, wear: { kind: 'blazer', a: '#2a3a5a', b: '#1a2640', trim: '#3a4e74', inner: '#f2e8f8', pin: '#e8344e' }, eyes: { lash: true, r: 7.4 }, front: ACC.earrings('#e6e6ee'), top: HAT.bun('#94603a') })),
+    extra({ id: 'yarisel', name: 'Yarisel', animal: 'rana dorada', nl: 'Panamese gouden kikker', city: 'Ciudad de Panamá', cc: 'PA', age: 30, female: true, trait: 'Werkt bij de balie voor verloren voorwerpen. Vindt alles terug, als je het goed beschrijft.', color: '#f2b134' },
+      frog({ fur: ['#ffe680', '#ffc93a', '#d99a10'], iris: '#3a2a10', lash: true, belly: '#fff6c8', wear: { kind: 'shirt', a: '#1f4f9e', b: '#173a78', trim: '#3a6ac0' }, marks: SPOTS('#2a1e10', [[34, 70, 2.6], [86, 70, 2.4], [60, 58, 2.2], [46, 62, 1.6], [74, 62, 1.6]]), front: ACC.badge('#fff8e0') })),
+    extra({ id: 'yokasta', name: 'Yokasta', animal: 'manatí', nl: 'zeekoe', city: 'Santo Domingo', cc: 'DO', age: 35, female: true, trait: 'Dominicaanse die je de Zona Colonial laat zien. Hartelijk, praat met iedereen op straat.', color: '#1f4f9e' },
+      beast({ fur: ['#c9d2dc', '#97a4b4', '#6a7888'], ears: 'none', muzzle: '#b8c2ce', mrx: 20, mry: 13, my: 82, nose: 'dots', noseCol: '#4a5868', wear: { kind: 'flowers', a: '#e8344e', b: '#b8233a', f1: '#fff', f2: '#ffd23f' }, eyes: { lash: true, r: 6.4, dx: 19 }, mouthY: 88, front: ACC.whisk('#6a7888') + ACC.earrings() + hib(84, 40, 1, '#f7941d') })),
+    extra({ id: 'paola', name: 'Paola', animal: 'ardilla', nl: 'eekhoorn', city: 'Ciudad de México', cc: 'MX', age: 30, female: true, trait: 'Vrolijk en hartelijk. Viert oud en nieuw met haar hele familie, met twaalf druiven en veel wensen.', color: '#e2452f' },
+      beast({ fur: ['#f6b884', '#e2793e', '#b8521e'], ears: 'point', earIn: '#f6c0a0', muzzle: '#fff1e2', mrx: 14, mry: 11.5, nose: 'cat', noseCol: '#8a3a2a', wear: { kind: 'tee', a: '#c9283b', b: '#a01f30', trim: '#ffd23f' }, eyes: { lash: true },
+        back: '<path d="M88 120C112 110 118 80 104 64C100 80 96 96 86 104Z" fill="#c9622a"/>', front: ACC.earrings() + ACC.bow('#ffd23f') })),
+    extra({ id: 'tio-beto', name: 'Tío Beto', animal: 'tejón (coatí)', nl: 'neusbeer', city: 'Ciudad de México', cc: 'MX', age: 58, female: false, trait: 'De oom met de grote snor. Telt hardop af, roept «¡aguas!» en vertelt elk jaar dezelfde grap.', color: '#8a5a2c' },
+      beast({ fur: ['#c9a27a', '#9a7048', '#6a4a2c'], ears: 'tiny', earIn: '#3a2a1a', muzzle: '#f2e2cc', mrx: 11, mry: 14, my: 85, wear: { kind: 'shirt', a: '#f2f2f2', b: '#d8d8d8', trim: '#fff', inner: '#e8344e', btn: '#999' },
+        marks: '<path d="M30 58C36 52 46 54 50 60M90 58C84 52 74 54 70 60" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none" opacity=".7"/>', front: ACC.mustache('#4a3020'), mouthY: 89, line: '#4a3020', top: HAT.sombrero() })),
+    extra({ id: 'lupita', name: 'Lupita', animal: 'guacamaya', nl: 'ara (papegaai)', city: 'Oaxaca', cc: 'MX', age: 28, female: true, trait: 'Oaxaqueña die van roddels houdt. Wil altijd het hele verhaal weten, met alle details.', color: '#e8344e' },
+      bird({ fur: ['#ff8a7a', '#e8344e', '#b51d3a'], hook: true, beak: '#f6efe0', beak2: '#2a2a33', wear: { kind: 'flowers', a: '#1f1f2a', b: '#101018', f1: '#e8344e', f2: '#ffd23f' },
+        marks: '<path d="M30 56C34 50 50 50 52 60C50 70 34 72 30 64Z" fill="#fff"/><path d="M90 56C86 50 70 50 68 60C70 70 86 72 90 64Z" fill="#fff"/><path d="M34 60h6M33 64h7M86 60h-6M87 64h-7" stroke="#e8344e" stroke-width=".8"/>', front: ACC.earrings() + flower(32, 38, '#ffd23f', 3, '#f7941d') + flower(42, 33, '#5ec2e8', 2.4) })),
+    extra({ id: 'mauricio', name: 'Guía Mauricio', animal: 'rana de ojos rojos', nl: 'roodoogmakikikker', city: 'Monteverde', cc: 'CR', age: 40, female: false, trait: 'Natuurgids in het nevelwoud. Ziet elk diertje in de bomen en fluistert zodat je ze niet wegjaagt.', color: '#3a9d5d' },
+      frog({ fur: ['#b8f08a', '#5cc44a', '#2f8a32'], iris: '#e8344e', ring: '#ff4a3a', belly: '#e8f8c8', wear: { kind: 'vest', a: '#6e8a4a', b: '#4e6a34', trim: '#a8844e' }, hat: '<g transform="translate(0 -14)">' + HAT.safari() + '</g>' })),
+    extra({ id: 'turista', name: 'Turista', animal: 'oveja', nl: 'schaap', city: 'op vakantie', cc: 'CR', age: 45, female: false, trait: 'Toerist met een grote zonnehoed en een camera. Stelt dezelfde vragen als jij.', color: '#f2b134' },
+      beast({ fur: ['#4a4450', '#2e2a34', '#1c1a22'], ears: 'side', earIn: '#5a5262', muzzle: '#3e3846', wear: { kind: 'flowers', a: '#5ec2e8', b: '#2f9ccf', f1: '#ffd23f', f2: '#fff' }, noseCol: '#151018',
+        marks: '<g fill="#fbf8f2">' + [[30, 50], [38, 40], [50, 35], [62, 34], [74, 36], [84, 42], [90, 52], [26, 62], [94, 62]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="9"/>`).join('') + '</g>', hat: '<g transform="translate(0 -6)">' + HAT.sun() + '</g>', front: ACC.camera(), eyes: { col: '#120e14' }, line: '#e8c8d0' })),
+    extra({ id: 'ana-lucia', name: 'Ana Lucía', animal: 'quetzal', nl: 'quetzal', city: 'Ciudad de Guatemala', cc: 'GT', age: 32, female: true, trait: 'Collega op kantoor die alles als eerste weet. Begint elk verhaal met «dizque…».', color: '#1f9e6a' },
+      bird({ fur: ['#7ef0b0', '#22b876', '#0e7a4e'], beak: '#ffd23f', beak2: '#d9a010', wear: { kind: 'blazer', a: '#c9283b', b: '#a01f30', trim: '#e8344e', inner: '#fff' },
+        back: '<path d="M44 34C46 18 56 10 60 6C64 10 74 18 76 34Z" fill="#0e7a4e"/>', marks: '<path d="M26 86C36 98 84 98 94 86C88 98 74 102 60 102C46 102 32 98 26 86Z" fill="#e8344e"/>', eyes: { lash: true }, front: ACC.phone() })),
+    extra({ id: 'daniela', name: 'Daniela', animal: 'lobo marino', nl: 'zeeleeuw', city: 'Galápagos', cc: 'EC', age: 27, female: true, trait: 'Vrijwilligster op de Galápagos. Ruimt stranden op en weet alles van schildpadden.', color: '#3a7a8a' },
+      beast({ fur: ['#c9b8a4', '#9c8670', '#6e5a48'], ears: 'none', muzzle: '#d9cab8', mrx: 17, mry: 12, my: 82, nose: 'bear', noseCol: '#2a1e16', ny: 74, wear: { kind: 'tee', a: '#3a9d5d', b: '#2a7a44', trim: '#ffd23f' }, eyes: { r: 8, dx: 18 }, front: ACC.whisk('#5a4a3a') + ACC.badge(), hat: HAT.cap('#3a7a8a') })),
+    extra({ id: 'fer', name: 'Fer', animal: 'tlacuache', nl: 'opossum', city: 'Guadalajara', cc: 'MX', age: 26, female: false, trait: 'Tapatío, grappig en nieuwsgierig. Wil alles weten over je date en roept «¡no manches!».', color: '#7b68d8' },
+      beast({ fur: ['#f6f2ee', '#d8d0c8', '#aaa096'], ears: 'round', earIn: '#2e2a30', muzzle: '#fbf8f4', mrx: 13, mry: 13, nose: 'cat', noseCol: '#e87a98', wear: { kind: 'shirt', a: '#2a2a33', b: '#18181f', trim: '#3a3a46', inner: '#ffd23f' },
+        marks: '<path d="M30 58C34 52 46 52 50 60C48 68 36 70 30 64Z" fill="#4a4450" opacity=".35"/><path d="M90 58C86 52 74 52 70 60C72 68 84 70 90 64Z" fill="#4a4450" opacity=".35"/>', front: ACC.whisk('#9a9088') })),
+    extra({ id: 'moderadora', name: 'Moderadora', animal: 'puma', nl: 'poema', city: 'Cusco', cc: 'PE', age: 44, female: true, trait: 'Leidt het debat. Geeft iedereen netjes het woord en vat helder samen.', color: '#c98a3a' },
+      beast({ fur: ['#f2d2a4', '#d4a46a', '#a87840'], ears: 'round', earIn: '#5a3a20', cheeks: '#fbf2e4', nose: 'cat', noseCol: '#c97a6a', wear: { kind: 'blazer', a: '#3a2a5a', b: '#26183e', trim: '#4e3a74', inner: '#f2b134' }, eyes: { lash: true, iris: '#8a6a2a' }, front: ACC.mic() + ACC.whisk('#8a6440') })),
+    extra({ id: 'quispe', name: 'Prof. Quispe', animal: 'vicuña', nl: 'vicuña', city: 'Cusco', cc: 'PE', age: 61, female: false, trait: 'Professor die opkomt voor de Quechua-cultuur. Spreekt rustig en kiest zijn woorden zorgvuldig.', color: '#c9283b' },
+      beast({ fur: ['#f2c48a', '#d99a52', '#a8702e'], ears: 'point', earIn: '#f6d6b0', muzzle: '#fff6ea', mrx: 14, mry: 12, wear: { kind: 'poncho', a: '#c9283b', b: '#a01f30', trim: '#2fa79a', trim2: '#ffd23f' }, hat: HAT.chullo('#e8344e', '#ffd23f'), front: ACC.glasses('#5a4a3a'), nose: 'rabbit', noseCol: '#5a3a2a' })),
+    extra({ id: 'huaman', name: 'Sr. Huamán', animal: 'taruca', nl: 'Andeshert', city: 'Cusco', cc: 'PE', age: 55, female: false, trait: 'Heeft een winkeltje in Cusco. Blij met toeristen, maar maakt zich zorgen over de drukte.', color: '#6a4a2c' },
+      beast({ fur: ['#d6c2a6', '#ac926e', '#7e6646'], ears: 'side', earIn: '#ecdccc', muzzle: '#f6eee2', mrx: 13, mry: 13, my: 86, wear: { kind: 'vest', a: '#f2f2f2', b: '#dcdcdc', trim: '#6a4a2c' }, hat: '<g transform="translate(0 2)"><ellipse cx="60" cy="36" rx="34" ry="6" fill="#3a2a1a"/><path d="M40 36C40 20 50 16 60 16S80 20 80 36Z" fill="#4a3826"/><path d="M40 31H80V35H40Z" fill="#c9283b"/></g>', front: ACC.mustache('#4a3a2a'), mouthY: 89 })),
+    extra({ id: 'valentina-co', name: 'Valentina', animal: 'nutria', nl: 'otter', city: 'Bogotá', cc: 'CO', age: 29, female: true, trait: 'Droomt hardop: als ze de loterij won, kocht ze een koffiefinca in de Eje Cafetero.', color: '#8a5a3c' },
+      beast({ fur: ['#c49a74', '#94683e', '#6a4424'], ears: 'tiny', earIn: '#4a2e18', muzzle: '#f2e2cc', mrx: 17, mry: 12, my: 83, wear: { kind: 'tee', a: '#ffd23f', b: '#f2a81d', trim: '#1f4f9e' }, eyes: { lash: true }, front: ACC.whisk('#5a3a20') + ACC.earrings() })),
+    extra({ id: 'diego-pe', name: 'Diego', animal: 'pingüino de Humboldt', nl: 'humboldtpinguïn', city: 'Lima', cc: 'PE', age: 31, female: false, trait: 'Limeño die getuige is op de bruiloft van zijn broer, en daar behoorlijk zenuwachtig over is.', color: '#2a2a33' },
+      bird({ fur: ['#5a5a66', '#33333d', '#1e1e26'], beak: '#3a3a44', beak2: '#e8a0a8', wear: { kind: 'blazer', a: '#2a2a33', b: '#18181f', trim: '#3a3a46', inner: '#fff', pin: '#fff' },
+        marks: '<path d="M30 52C40 40 80 40 90 52C96 70 86 94 60 96C34 94 24 70 30 52Z" fill="#fbf8f2"/><path d="M28 52C36 38 52 34 60 34C68 34 84 38 92 52" fill="none" stroke="#fbf8f2" stroke-width="3"/>', eyes: { col: '#1a1018' }, front: '<path d="M52 100L60 104 68 100 68 108 60 104 52 108Z" fill="#2a2a33"/>' }))
+  );
+
+  /* ---------- jouw eigen personage (kies je in Perfil; staat rechts bij jouw zinnen in de dialogen) ---------- */
+  const me = (meta, art) => Object.assign({ player: true, age: null, cc: 'NL', city: 'jij' }, meta, art);
+  const PLAYERS = [
+    me({ id: 'p-zorro', name: 'Vos', animal: 'zorro', nl: 'vos', color: '#e8590f', trait: 'Slim en nieuwsgierig.' },
+      beast({ fur: ['#ffc48a', '#f28430', '#c95a14'], ears: 'point', earIn: '#3a2416', cheeks: '#fff6ec', nose: 'bear', noseCol: '#2a1a12', wear: { kind: 'tee', a: '#f28c1b', b: '#d96a0a', trim: '#fff4e6' }, front: ACC.whisk('#8a5a30') })),
+    me({ id: 'p-gato', name: 'Kat', animal: 'gato', nl: 'kat', color: '#6a7a9a', trait: 'Rustig en een tikje eigenwijs.' },
+      beast({ fur: ['#d8dce4', '#a8aebc', '#7a8090'], ears: 'point', earIn: '#f2b6c4', cheeks: '#f6f6f8', nose: 'cat', noseCol: '#e87a98', wear: { kind: 'stripes', a: '#2f6fb5', b: '#1f4f8e', trim: '#f28c1b', trim2: '#fff' },
+        marks: '<g fill="none" stroke="#6a7080" stroke-width="2.4" stroke-linecap="round" opacity=".8"><path d="M60 33V43M53 34.5 54.5 42.5M67 34.5 65.5 42.5M24 62h7M96 62h-7M25 68h6M95 68h-6"/></g>', front: ACC.whisk('#6a7080') })),
+    me({ id: 'p-perro', name: 'Hond', animal: 'perro', nl: 'hond', color: '#d9a020', trait: 'Trouw, vrolijk en altijd in voor een wandeling.' },
+      beast({ fur: ['#ffe2a8', '#f2bc5a', '#cf8e2a'], ears: 'none', muzzle: '#fff4dc', mrx: 15, mry: 12, wear: { kind: 'shirt', a: '#3a9d5d', b: '#2a7a44', trim: '#5cc47a' },
+        back: '<path d="M26 40C14 44 10 64 16 78C22 84 30 80 32 70C34 58 34 48 30 40Z" fill="#b8741e"/><path d="M94 40C106 44 110 64 104 78C98 84 90 80 88 70C86 58 86 48 90 40Z" fill="#b8741e"/>' })),
+    me({ id: 'p-conejo', name: 'Konijn', animal: 'conejo', nl: 'konijn', color: '#f0789f', trait: 'Snel en enthousiast.' },
+      beast({ fur: ['#ffffff', '#f2eeee', '#d8cfd2'], ears: 'long', earIn: '#f6b6c8', muzzle: '#fff', mrx: 13, mry: 10, nose: 'rabbit', noseCol: '#e87a98', wear: { kind: 'flowers', a: '#c28be8', b: '#9a5ec8', f1: '#fff', f2: '#ffd23f' }, eyes: { lash: true }, front: ACC.whisk('#b8a8ae') })),
+    me({ id: 'p-panda', name: 'Panda', animal: 'panda', nl: 'panda', color: '#2a2a33', trait: 'Relaxed en altijd trek.' },
+      beast({ fur: ['#ffffff', '#f2f0ee', '#d6d2cc'], ears: 'round', earIn: '#2a2a33', muzzle: '#fff', mrx: 14, mry: 10, wear: { kind: 'tee', a: '#3a9d5d', b: '#2a7a44', trim: '#ffd23f' },
+        back: '<circle cx="29" cy="36" r="12" fill="#2a2a33"/><circle cx="91" cy="36" r="12" fill="#2a2a33"/>', marks: '<ellipse cx="41" cy="65" rx="11" ry="13" transform="rotate(25 41 65)" fill="#2a2a33"/><ellipse cx="79" cy="65" rx="11" ry="13" transform="rotate(-25 79 65)" fill="#2a2a33"/>', eyes: { col: '#120e14', iris: '#4a3a4a' } })),
+    me({ id: 'p-tortuga', name: 'Schildpad', animal: 'tortuga', nl: 'schildpad', color: '#3a9d5d', trait: 'Langzaam maar zeker: elke dag een beetje.' },
+      beast({ fur: ['#c8eca8', '#86c66a', '#4e9440'], ears: 'none', wear: { kind: 'tee', a: '#8a5a2c', b: '#6a4220', trim: '#ffd23f' }, under: '<g fill="none" stroke="#c9a46a" stroke-width="1.6"><path d="M30 104l10 6 10-6 10 6 10-6 10 6 10-6"/></g>', marks: SPOTS('#5e9a4a', [[36, 44, 2.4], [84, 44, 2.4], [60, 38, 2], [26, 70, 1.8], [94, 70, 1.8]]), nose: 'dots', noseCol: '#3a6a2a', hat: HAT.cap('#f28c1b'), line: '#3a6a2a' })),
+    me({ id: 'p-loro', name: 'Papegaai', animal: 'loro', nl: 'papegaai', color: '#3fb88a', trait: 'Herhaalt alles hardop, perfect om te oefenen.' },
+      bird({ fur: ['#a8f0a0', '#4cc45a', '#2a8a3a'], hook: true, beak: '#fff2c8', beak2: '#3a3a44', wear: { kind: 'tee', a: '#f28c1b', b: '#d96a0a', trim: '#fff4e6' },
+        back: '<path d="M50 34C48 22 54 14 60 10C60 18 64 24 68 32Z" fill="#ffd23f"/>', marks: '<path d="M40 34C46 30 74 30 80 34C74 40 46 40 40 34Z" fill="#ffd23f" opacity=".85"/>' })),
+    me({ id: 'p-ajolote', name: 'Axolotl', animal: 'ajolote azul', nl: 'blauwe axolotl', color: '#5ec2e8', trait: 'Een vriendje van Lupe, maar dan blauw.' },
+      ({
+        defs: fur('#e2f4fc', '#a8dcf2', '#6ab8de') + lin('o', '#f28c1b', '#d96a0a') + `<linearGradient id="ID-g" x1="0" y1="0" x2="0" y2="-33" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2a8ac0"/><stop offset="1" stop-color="#7ed0f0"/></linearGradient>`,
+        draw: u => CAST.find(c => c.id === 'abuela-lupe').draw(u).replace(/<g transform="translate\(36 40\)">.*?<\/g><\/g>|<g fill="none" stroke="#b08a3a"[^]*?<\/g>|<circle cx="(42|78)" cy="66" r="10" fill="#fff" opacity=".12"\/>|<g class="c-eyes">[^]*?<\/g>\s*<path d="M33 68.5[^"]*"[^>]*\/>/g, '') .replace('<g class="m-closed"', eyes({ dx: 18, y: 64, r: 7.4 }) + '<g class="m-closed"')
+      }))
+  ];
+
+  /* Vaste stem per personage (edge-tts, gebruikt door tools/tts-texts.js voor de dialoogopnames): stem, toonhoogte, tempo. */
+  const V = (v, pitch = 0, rate = 0) => ({ v: v + 'Neural', pitch, rate });
+  const VOICE = {
+    mateo: V('es-CO-Gonzalo'), sofia: V('es-MX-Dalia', 6), diego: V('es-MX-Jorge'), juliana: V('es-CO-Salome', 2, 4), lucia: V('es-PE-Camila', 4),
+    rosa: V('es-PE-Camila', -8, 6), catalina: V('es-CL-Catalina'), facundo: V('es-UY-Mateo', -2, -6), yaritza: V('es-PA-Margarita', 0, -8),
+    coralis: V('es-PR-Karina', 6, 4), 'abuela-lupe': V('es-MX-Dalia', -14, -10), elena: V('es-EC-Andrea', -6, -4), daniel: V('es-US-Alonso', 6),
+    andres: V('es-PE-Alex'), 'valentina-ar': V('es-AR-Elena'), camila: V('es-CL-Catalina', 8), 'senora-cartagena': V('es-CO-Salome', -10, -6),
+    ana: V('es-MX-Dalia', 10), mesero: V('es-MX-Jorge', -4), vendedora: V('es-CO-Salome', 4), andrea: V('es-CR-Maria'), carlos: V('es-GT-Andres'),
+    doctora: V('es-MX-Dalia', -6, -4), entrevistadora: V('es-MX-Dalia', -4), yarisel: V('es-PA-Margarita'), yokasta: V('es-DO-Ramona'),
+    paola: V('es-MX-Dalia'), 'tio-beto': V('es-MX-Jorge', -10, -6), lupita: V('es-MX-Dalia', 8, 6), mauricio: V('es-CR-Juan', 0, -4),
+    turista: V('es-US-Alonso', -4, -4), 'ana-lucia': V('es-GT-Marta'), daniela: V('es-EC-Andrea'), fer: V('es-MX-Jorge', 6, 4),
+    moderadora: V('es-PE-Camila', -4), quispe: V('es-PE-Alex', -8, -6), huaman: V('es-BO-Marcelo'), 'valentina-co': V('es-CO-Salome'), 'diego-pe': V('es-PE-Alex')
+  };
+  CAST.forEach(c => { c.voice = VOICE[c.id] || null; });
+  const BY = Object.fromEntries([...CAST, ...PLAYERS].map(c => [c.id, c]));
 
   /* Welk personage hoort bij welke dialoogspreker. Sleutel: naam, of naam@landcode als dezelfde naam in een ander land iemand anders is. */
   const SPEAKERS = {
-    'Mateo': 'mateo', 'Sofía': 'sofia', 'Diego': 'diego', 'Diego@PE': null, 'Juliana': 'juliana', 'Lucía': 'lucia', 'Rosa': 'rosa',
+    'Mateo': 'mateo', 'Sofía': 'sofia', 'Diego': 'diego', 'Diego@PE': 'diego-pe', 'Juliana': 'juliana', 'Lucía': 'lucia', 'Rosa': 'rosa',
     'Catalina': 'catalina', 'Facundo': 'facundo', 'Yaritza': 'yaritza', 'Coralis': 'coralis', 'Abuela Lupe': 'abuela-lupe',
-    'Señora Elena': 'elena', 'Daniel': 'daniel'
+    'Señora Elena': 'elena', 'Daniel': 'daniel',
+    'Andrés': 'andres', 'Valentina': 'valentina-co', 'Valentina@PE': 'valentina-ar', 'Camila': 'camila', 'Señora': 'senora-cartagena', 'Ana': 'ana',
+    'Mesero': 'mesero', 'Vendedora': 'vendedora', 'Andrea': 'andrea', 'Carlos': 'carlos', 'Doctora': 'doctora', 'Entrevistadora': 'entrevistadora',
+    'Yarisel': 'yarisel', 'Yokasta': 'yokasta', 'Paola': 'paola', 'Tío Beto': 'tio-beto', 'Lupita': 'lupita', 'Guía Mauricio': 'mauricio',
+    'Turista': 'turista', 'Ana Lucía': 'ana-lucia', 'Daniela': 'daniela', 'Fer': 'fer', 'Moderadora': 'moderadora', 'Prof. Quispe': 'quispe', 'Sr. Huamán': 'huaman'
   };
   function country(place) {
     const cps = [...String(place || '')].map(c => c.codePointAt(0)).filter(c => c >= 0x1F1E6 && c <= 0x1F1FF);
@@ -404,5 +636,5 @@
     return () => { talkers.delete(fn); fn(false, null); };
   }
 
-  S.Cast = { list: CAST, get: id => BY[id], SPEAKERS, forSpeaker, svg, avatar, country, onTalk };
+  S.Cast = { list: CAST, players: PLAYERS, get: id => BY[id], SPEAKERS, forSpeaker, svg, avatar, country, onTalk };
 })(window.SPT = window.SPT || {});
