@@ -1,0 +1,28 @@
+# Proef: maakt stemvoorbeelden om te vergelijken (alleen op deze proefbranch, niet voor de app).
+name: Stemvoorbeelden
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/project-thread-dfzhkv']
+    paths: ['.github/voorbeelden/**', '.github/workflows/stemvoorbeelden.yml']
+permissions:
+  contents: write
+jobs:
+  maak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install "edge-tts>=7,<8"
+      - run: python .github/voorbeelden/maak.py
+      - name: Opslaan
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A voorbeelden
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -q -m "Stemvoorbeelden gemaakt"
+          git pull --rebase -q origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
