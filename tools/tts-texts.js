@@ -32,6 +32,27 @@ function country(place) {
   const cps = [...String(place || '')].map(c => c.codePointAt(0)).filter(c => c >= 0x1F1E6 && c <= 0x1F1FF);
   return cps.length >= 2 ? String.fromCharCode(cps[0] - 0x1F1E6 + 65, cps[1] - 0x1F1E6 + 65) : null;
 }
+/* Dialogen (naamruimte 'dlg'): elke spreker een eigen stem die past bij man/vrouw.
+   Mannen herkennen we aan de naam (eerste woord niet op -a), met een paar uitzonderingen. */
+const FEMALE = new Set(['Yarisel', 'Coralis', 'Fer', 'Abuela Lupe', 'Señora Elena', 'Beatriz', 'Isabel', 'Carmen', 'Raquel', 'Inés', 'Pilar', 'Mercedes', 'Luz', 'Sol', 'Belén', 'Abigail', 'Ruth', 'Esther', 'Maribel', 'Soledad', 'Rocío', 'Consuelo', 'Nicole', 'Doña Rosa']);
+const MALE = new Set(['Turista', 'Guía Mauricio', 'Mark', 'Luca', 'Nicola', 'Joshua', 'Elías']);
+const isMale = w => MALE.has(w) || (!FEMALE.has(w) && !/(a|ora)$/i.test(String(w).split(/\s+/)[0].replace(/[.,]/g, '')) && !/^(Sra|Señorita|Doña|Tía|Abuela|Doctora|Profa)\b/i.test(w));
+// eerst de stem van het land; doen er twee mannen of twee vrouwen mee (of Mark naast een man uit het land), dan een andere stem
+function castVoices(who, c) {
+  const [vf, vm] = VOICES[c] || VOICES.MX;
+  const pool = { f: [vf, 'es-MX-DaliaNeural', 'es-US-PalomaNeural', 'es-CO-SalomeNeural'], m: [vm, 'es-MX-JorgeNeural', 'es-US-AlonsoNeural', 'es-CO-GonzaloNeural'] };
+  const taken = new Set(), cast = {};
+  const pick = g => { const v = pool[g].find(x => !taken.has(x)) || pool[g][0]; taken.add(v); return v; };
+  who.filter(w => w !== 'Mark').forEach(w => { cast[w] = pick(isMale(w) ? 'm' : 'f'); });
+  if (who.includes('Mark')) cast.Mark = pick('m');
+  return cast;
+}
+/* Wat meer leven in dialoogzinnen: uitroepen iets vlotter en hoger, vragen iets hoger. */
+function mood(es) {
+  if (/[¡!]/.test(es)) return { rate: '+8%', pitch: '+5Hz' };
+  if (/[¿?]/.test(es)) return { pitch: '+3Hz' };
+  return {};
+}
 let LV = 'X'; // niveau van de unit die nu wordt doorlopen (voor 'offline downloaden per niveau'); X = overig
 function add(text, voice = DEF) {
   if (!text || !/[a-záéíóúñü]/i.test(text)) return;
@@ -49,7 +70,13 @@ for (const u of S.C.all()) {
   (u.grammar || []).forEach(g => (g.ex || []).forEach(([e]) => add(e)));
   if (u.dialogue) {
     const who = [...new Set(u.dialogue.lines.map(l => l[0]))];
-    u.dialogue.lines.forEach(([w, es]) => add(es, w === 'Mark' ? vm_ : (who.filter(x => x !== 'Mark').indexOf(w) % 2 ? vm_ : vf)));
+    u.dialogue.lines.forEach(([w, es]) => add(es, w === 'Mark' ? vm_ : (who.filter(x => x !== 'Mark').indexOf(w) % 2 ? vm_ : vf))); // oude opnames (andere plekken)
+    const cast = castVoices(who, c);
+    u.dialogue.lines.forEach(([w, es]) => {
+      const k = S.Speech.clipKey(es, 'dlg');
+      if (!out.has(k)) out.set(k, Object.assign({ k, ns: 'dlg', text: S.Speech.clean(es), voice: cast[w], lv: [LV] }, mood(es)));
+      else if (!out.get(k).lv.includes(LV)) out.get(k).lv.push(LV);
+    });
   }
   if (u.reading) {
     u.reading.p.forEach(([es]) => {

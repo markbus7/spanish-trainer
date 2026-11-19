@@ -240,7 +240,18 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
     }
     u.dialogue.lines.forEach(l => want(l[1])); u.reading.p.forEach(p => want(p[0]));
   }
-  ok(list.some(x => x.ns === 'en-es') && list.some(x => x.ns === 'nl-es') && list.filter(x => x.ns && !x.ns.startsWith('lupe')).every(x => x.lv.every(l => l.startsWith(x.ns + ':'))), 'opnames: Engels en Nederlands met eigen naamruimte en niveaus');
+  { // dialogen: eigen opname per zin (naamruimte dlg), mannen met een mannenstem en vrouwen met een vrouwenstem
+    const dlg = new Map(list.filter(x => x.ns === 'dlg').map(x => [x.k, x.voice]));
+    const male = v => /(Jorge|Gonzalo|Alonso|Tomas|Lorenzo|Alex|Juan|Andres|Luis|Roberto|Emilio|Manuel|Sebastian|Mateo|Marcelo|Mario|Rodrigo|Carlos|Federico|Victor|Alvaro|Javier)Neural$/.test(v);
+    const G = { Mateo: 1, Diego: 1, Carlos: 1, Facundo: 1, Mesero: 1, Mark: 1, 'Sr. Huamán': 1, 'Guía Mauricio': 1, Sofía: 0, Juliana: 0, Ana: 0, Fer: 0, Yarisel: 0, Coralis: 0, 'Abuela Lupe': 0 };
+    let bad = [];
+    for (const u of units) u.dialogue && u.dialogue.lines.forEach(([w, es]) => {
+      const v = dlg.get(S.Speech.clipKey(es, 'dlg'));
+      if (!v) bad.push('geen opname: ' + es); else if (w in G && male(v) !== !!G[w]) bad.push(w + ' → ' + v);
+    });
+    ok(!bad.length, 'opnames: dialoogstem past bij de spreker' + (bad.length ? ' (' + bad.slice(0, 3).join('; ') + ')' : ''));
+  }
+  ok(list.some(x => x.ns === 'en-es') && list.some(x => x.ns === 'nl-es') && list.filter(x => x.ns && !x.ns.startsWith('lupe') && x.ns !== 'dlg').every(x => x.lv.every(l => l.startsWith(x.ns + ':'))), 'opnames: Engels en Nederlands met eigen naamruimte en niveaus');
   ok(!miss.size, 'opnames: ' + miss.size + ' teksten ontbreken, bv. ' + [...miss].slice(0, 5).join(' | '));
   // Profe Lupe: vaste zinnen zijn in beide stemvarianten ingesproken, ook die met een getal
   const L = S.Tutor.lines, lupeMiss = [];
