@@ -319,6 +319,31 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .dl.right .bubble { border-radius: 16px 16px 4px 16px; background: var(--accent-soft); border-color: transparent; }
 .dl .who { font-size: .72rem; font-weight: 700; color: var(--muted); } .dl .icon-btn { margin: 0; }
 .dl.active .bubble { outline: 3px solid var(--gold); }
+/* Personages in de dialoog (js/cast.js) */
+.dl .avatar.me { background: linear-gradient(135deg, var(--accent), var(--gold)); font-size: .7rem; width: 38px; height: 38px; }
+.dl .cast { flex: none; align-self: flex-end; }
+.cast { line-height: 0; }
+.cast svg { display: block; overflow: visible; }
+.cast .m-open { opacity: 0; }
+.cast .c-eyes { transform-box: fill-box; transform-origin: center; animation: lupe-blink 6.5s infinite; }
+.cast.talking .m-open { animation: lupe-talk .24s infinite alternate ease-in-out; }
+.cast.talking .m-closed { animation: lupe-talk .24s infinite alternate-reverse ease-in-out; }
+.cast.talking { animation: cast-bob .5s infinite ease-in-out; }
+@keyframes cast-bob { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-3px) rotate(-1.5deg); } }
+.dl-stage { display: flex; justify-content: center; align-items: flex-end; gap: clamp(.5rem, 4vw, 2rem); margin: .4rem 0 .2rem; }
+.cast-pick { background: none; border: 0; padding: 0; display: flex; flex-direction: column; align-items: center; gap: .15rem; cursor: pointer; color: inherit; font: inherit; }
+.cast-pick .cast { filter: drop-shadow(0 4px 6px rgb(0 0 0 / .12)); transition: transform .2s, opacity .2s; }
+.dl-stage.speaking .cast-pick .cast:not(.talking) { opacity: .55; transform: scale(.94); }
+.dl-stage .cast.talking { transform: scale(1.06); }
+.cast-name { font-size: .78rem; font-weight: 700; color: var(--muted); }
+.cast-info { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: .55rem .8rem; margin: .3rem auto .4rem; max-width: 520px; font-size: .9rem; }
+.cast-info .small { color: var(--muted); margin-top: .2rem; }
+.cast-info.hidden, .scene-bubble.hidden { display: none; }
+.scene-bubble { position: relative; max-width: 560px; margin: .7rem auto .3rem; background: var(--card); border: 2px solid var(--gold); border-radius: 18px; padding: .6rem .9rem; font-size: 1.12rem; box-shadow: var(--shadow); animation: bubble-in .18s ease-out; }
+.scene-bubble::before { content: ''; position: absolute; top: -9px; left: calc(var(--tail, 50%) - 8px); width: 14px; height: 14px; background: var(--card); border-left: 2px solid var(--gold); border-top: 2px solid var(--gold); transform: rotate(45deg); border-radius: 3px 0 0 0; }
+.scene-bubble .who { font-size: .72rem; font-weight: 700; color: var(--muted); }
+@keyframes bubble-in { from { opacity: 0; transform: translateY(4px) scale(.97); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .cast, .cast * { animation-duration: 0s !important; } .cast.talking .m-open { opacity: 1; animation: none; } .cast.talking .m-closed { opacity: 0; animation: none; } }
 .reading .rd-body { display: flex; flex-direction: column; gap: .7rem; margin-top: 1rem; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: .9rem 1rem; }
 .rd-p { display: flex; gap: .5rem; align-items: flex-start; }
 .rd-p .icon-btn { margin: 0; flex: none; }
@@ -1177,3 +1202,17 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .pl-search:focus { outline: none; border-color: var(--accent); }
 .pl-count { margin: .2rem 0 .4rem; }
 .pl-other { display: inline-flex; text-decoration: none; }
+@media (min-width: 700px) { .dl-stage .cast svg { width: 124px; height: 124px; } .dl-stage.many .cast svg { width: 100px; height: 100px; } }
+/* Eigen personage kiezen (Perfil) */
+.prof-av { position: relative; background: none; border: 0; padding: 0; cursor: pointer; flex: none; line-height: 0; display: block; min-width: max-content; }
+.prof-av .avatar { margin: 0; }
+.prof-av .cast { width: 76px; height: 76px; border-radius: 50%; background: var(--bg2); overflow: hidden; box-shadow: var(--shadow); }
+.prof-av-edit { position: absolute; right: -2px; bottom: -2px; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff; font-size: .8rem; line-height: 24px; text-align: center; box-shadow: var(--shadow); }
+.me-picker.hidden { display: none; }
+.me-picker { margin: .6rem 0 1rem; }
+.me-picker p { margin: .2rem 0 .6rem; }
+.me-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: .5rem; margin-bottom: .5rem; }
+.me-opt { display: flex; flex-direction: column; align-items: center; gap: .2rem; background: var(--bg2); border: 2px solid transparent; border-radius: 16px; padding: .5rem .3rem .4rem; cursor: pointer; color: inherit; font: inherit; font-size: .8rem; font-weight: 600; }
+.me-opt.on { border-color: var(--accent); background: var(--accent-soft); }
+.me-opt:hover .cast { transform: translateY(-2px); }
+@media (max-width: 520px) { .dl-stage.many { gap: .35rem; flex-wrap: wrap; } .dl-stage.many .cast svg { width: 64px; height: 64px; } .dl-stage.many .cast-name { font-size: .68rem; max-width: 76px; text-align: center; } }

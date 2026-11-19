@@ -268,6 +268,7 @@
     out.settings.aiKey = aiKey;
     if (!N.placement.done && O.placement.done) out.placement = clone(O.placement);
     if (!out.name && O.name) out.name = O.name;
+    if (out.me === undefined && O.me) out.me = O.me; // eigen personage (js/cast.js); '' = bewust geen
     // units: stappen en status samenvoegen
     for (const id in O.units) {
       const o = O.units[id], n = out.units[id];

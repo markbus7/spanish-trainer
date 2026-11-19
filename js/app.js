@@ -690,7 +690,8 @@
   function dialogueRead(u) {
     const d = u.dialogue, seen = new Set();
     return h('div', { class: 'dl-list read' }, h('p', { class: 'muted small' }, d.place + ' — ' + d.t),
-      d.lines.map(([who, es, nl, x]) => { const nt = S.Lesson.noteToggle(S.Lesson.findNotes(es, { extra: x, seen })); return h('div', { class: 'dl-read' }, S.Lesson.speakBtn(es), h('div', { class: 'grow' }, h('b', null, who + ': '), h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl), nt && nt.box), nt && nt.btn); }));
+      d.lines.map(([who, es, nl, x]) => { const nt = S.Lesson.noteToggle(S.Lesson.findNotes(es, { extra: x, seen })); const ch = S.Cast && (who === 'Mark' ? st().me && S.Cast.get(st().me) : S.Cast.forSpeaker(who, d.place));
+        return h('div', { class: 'dl-read' }, ch ? S.Cast.avatar(ch.id, 36, 'dl-read-av') : null, S.Lesson.speakBtn(es, { clipNs: S.course.ns ? undefined : 'ch' }), h('div', { class: 'grow' }, h('b', null, who + ': '), h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl), nt && nt.box), nt && nt.btn); }));
   }
 
   function readingRead(u) {
@@ -1112,12 +1113,30 @@
     // ---- kop ----
     const initial = (s.name || '?').trim().charAt(0).toUpperCase() || '?';
     const activeDays = Object.values(s.days).filter(d => d.min > 0 || d.items > 0).length;
+    // eigen personage (js/cast.js): staat ook rechts bij jouw zinnen in de dialogen
+    const mine = S.Cast && s.me && S.Cast.get(s.me);
+    const picker = h('div', { class: 'me-picker card hidden' });
+    function fillPicker() {
+      picker.innerHTML = '';
+      picker.append(h('b', null, 'Kies je personage'), h('p', { class: 'muted small' }, 'Je personage staat in de dialogen bij jouw zinnen, naast Mateo, Sofía en de anderen.'),
+        h('div', { class: 'me-grid' }, S.Cast.players.map(c => h('button', { class: 'me-opt' + (s.me === c.id ? ' on' : ''), type: 'button', 'aria-pressed': String(s.me === c.id), onclick: () => {
+          s.me = c.id; Store.save(); render();
+        } }, S.Cast.avatar(c.id, 76), h('span', null, c.nl)))),
+        s.me ? h('button', { class: 'btn ghost small', type: 'button', onclick: () => { s.me = ''; Store.save(); render(); } }, 'Geen personage (alleen «Jij»)') : null);
+    }
+    const headAv = mine ? S.Cast.avatar(mine.id, 76, 'prof-cast') : h('div', { class: 'avatar' }, initial);
+    const avBtn = h('button', { class: 'prof-av', type: 'button', title: 'Kies je personage', 'aria-label': 'Kies je personage', onclick: () => { fillPicker(); picker.classList.toggle('hidden'); } },
+      headAv, h('span', { class: 'prof-av-edit' }, '✎'));
     wrap.append(h('div', { class: 'prof-head' },
-      h('div', { class: 'avatar' }, initial),
+      S.Cast ? avBtn : h('div', { class: 'avatar' }, initial),
       h('div', { class: 'grow' },
         h('h1', null, s.name || 'Mijn profiel'),
         h('p', { class: 'muted small' }, 'Leert Spaans sinds ' + fmtDate(s.created) + ' · ' + U.plural(activeDays, 'dag', 'dagen') + ' geoefend'),
         h('div', { class: 'chips' }, h('span', { class: 'chip' }, '📈 ' + est.label), h('span', { class: 'chip' }, '🔥 ' + U.plural(Store.liveStreak(), 'dag', 'dagen')), h('span', { class: 'chip' }, '⭐ ' + s.xp + ' XP')))));
+    if (S.Cast) {
+      wrap.append(picker);
+      if (!mine && s.me === undefined) { fillPicker(); picker.classList.remove('hidden'); }
+    }
     wrap.append(S.Tutor.coach(S.Tutor.lines.profile({ words: wordStats(C.all()).seen, days: activeDays, streak: Store.liveStreak() }), { full: true }));
 
     // ---- niveau ----
