@@ -1256,8 +1256,8 @@ body.ask-fab-on .page .lupe-coach.with-me .lc-bubble { margin-right: 0; }
 
 /* Jouw leven (js/life.js): een wereld die meegroeit, met scènes waarin je personage leeft */
 .life-card .life-scene { position: relative; border-radius: 18px; overflow: hidden; margin: .5rem 0 0; box-shadow: var(--shadow); }
-.life-scene .life-svg { display: block; width: 100%; height: auto; }
-.life-acts { display: flex; gap: .35rem; flex-wrap: wrap; justify-content: center; margin: .6rem 0 .2rem; }
+.life-scene .life-svg { display: block; width: 100%; height: auto; transition: opacity .6s; }
+.life-scene.fade .life-svg { opacity: 0; }
 .life-name { text-align: center; margin: .5rem 0 .1rem; font-size: 1.05rem; }
 .life-word { color: var(--accent); font-weight: 600; }
 .life-card > p { text-align: center; margin: .2rem 0; }

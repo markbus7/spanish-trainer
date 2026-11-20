@@ -435,27 +435,30 @@
   };
   /* Jouw leven (Perfil): je personage in zijn wereld, bezig met iets (scènes om uit te kiezen), wat er nieuw is,
      wat de volgende stap is en de hele weg. Alles groeit vanzelf mee met wat je weet, in al je talen samen. */
-  let lifeAct = null;
   function lifeCard(s) {
     const L = S.Life.now(), W = L.world, fresh = S.Life.fresh(L.i);
     const stage = h('div', { class: 'life-scene' });
-    const acts = S.Life.acts(W);
-    let cur = lifeAct && acts.some(a => a.id === lifeAct) ? lifeAct : S.Life.pick(W, new Date().getHours());
-    const chips = h('div', { class: 'life-acts' });
-    const draw = () => {
-      stage.innerHTML = S.Life.scene(L.i, { act: cur });
-      chips.replaceChildren(...acts.map(a => h('button', { class: 'chip toggle' + (a.id === cur ? ' on' : ''), type: 'button', 'aria-pressed': String(a.id === cur), onclick: () => { cur = lifeAct = a.id; draw(); } }, a.label)));
-    };
+    // een dag uit het leven van je personage: het doet vanzelf steeds iets anders, van ochtend tot nacht
+    const ORDER = { dawn: 0, day: 1, dusk: 2, night: 3 };
+    const day = S.Life.acts(W).slice().sort((a, b) => ORDER[a.sky] - ORDER[b.sky]);
+    let k = Math.max(0, day.findIndex(a => a.id === S.Life.pick(W, new Date().getHours())));
+    const draw = () => { stage.innerHTML = S.Life.scene(L.i, { act: day[k].id }); };
     draw();
+    const timer = setInterval(() => {
+      if (!stage.isConnected) { clearInterval(timer); return; }
+      if (document.hidden) return;
+      stage.classList.add('fade');
+      setTimeout(() => { k = (k + 1) % day.length; draw(); stage.classList.remove('fade'); }, 600);
+    }, 11000);
     const langs = (S.Profiles && S.Profiles.active() && S.Profiles.active().courses.length) || 1;
     const road = h('div', { class: 'life-road' }, S.Life.STEPS.map((st, i) => h('div', { class: 'life-stop' + (i < L.i ? ' done' : i === L.i ? ' now' : ' locked'), title: st.name + (i > L.i ? ' · vanaf ' + st.at + ' punten' : '') },
       h('span', { class: 'ic' }, st.icon), i > L.i ? '🔒 ' + st.at : st.name)));
     return h('div', { class: 'card life-card' },
       h('div', { class: 'dp-title' }, h('h2', { class: 'sec-title' }, '🏡 Jouw leven'), h('span', { class: 'dp-count' }, `Stap ${L.i + 1} van ${S.Life.STEPS.length}`)),
       fresh.length ? h('div', { class: 'life-new' }, '✨ Nieuw sinds je vorige bezoek: ' + fresh.map(x => x.icon + ' ' + x.name).join(', ')) : null,
-      stage, chips,
+      stage,
       h('div', { class: 'life-name' }, h('b', null, L.step.icon + ' ' + L.step.name), ' · ', h('span', { class: 'life-word', lang: (S.course && S.course.target) || 'es' }, S.Life.word(L.step))),
-      h('p', { class: 'muted small' }, 'Je wereld groeit vanzelf mee met wat je weet' + (langs > 1 ? ', in al je talen samen.' : '. Leer je later nog een taal, dan telt die ook mee.') + ' Kies hierboven wat je personage aan het doen is.'),
+      h('p', { class: 'muted small' }, 'Je wereld groeit vanzelf mee met wat je weet' + (langs > 1 ? ', in al je talen samen.' : '. Leer je later nog een taal, dan telt die ook mee.') + ''),
       L.next ? h('div', { class: 'life-next' }, h('div', { class: 'bar' }, h('i', { style: { width: Math.round(L.pct * 100) + '%' } })),
         h('p', { class: 'small' }, `Nog ${L.left} ${L.left === 1 ? 'punt' : 'punten'} tot de volgende stap: ${L.next.icon} ${L.next.name}.`))
         : h('p', { class: 'small' }, '🎉 Je hebt de hele weg afgelegd. ¡Felicidades!'),
