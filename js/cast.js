@@ -616,6 +616,7 @@
     hat: [['', 'Geen'], ['cap', 'Pet'], ['sun', 'Zonnehoed'], ['beret', 'Baret'], ['chullo', 'Muts'], ['sombrero', 'Sombrero'], ['party', 'Feesthoedje'], ['flower', 'Bloem'], ['bow', 'Strik']],
     glasses: [['', 'Geen'], ['round', 'Brilletje'], ['sun', 'Zonnebril'], ['star', 'Sterrenbril']],
     neck: [['', 'Niets'], ['scarf', 'Sjaal'], ['bowtie', 'Vlinderdas'], ['beads', 'Ketting']],
+    build: [['slim', 'Slank', .68], ['', 'Normaal', .8], ['stout', 'Stevig', 1]],
     shirt: [['', 'Standaard'], ['orange', '#f28c1b', '#d96a0a'], ['red', '#e8344e', '#b51d3a'], ['pink', '#f0789f', '#d14f8a'], ['purple', '#9a6ad8', '#7046b0'],
       ['blue', '#3a78d6', '#1f4f9e'], ['teal', '#2fa79a', '#1d7a70'], ['green', '#3a9d5d', '#2a7a44'], ['yellow', '#ffd23f', '#f2a81d'], ['black', '#3a3a46', '#22222b']]
   };
@@ -677,6 +678,7 @@
     return { back: (tail ? `<g transform="translate(5 8)">${tail.replace(/URL_F/g, u('f'))}</g>` : '') + legs + torso, front: arm(-1) + arm(1) };
   }
 
+  const CUT = 97; // hoogte van de kin: daaronder begint het lijf
   function svg(id, size = 64, opt = {}) {
     const c = BY[id]; if (!c) return '';
     const n = 'cs' + (++uid), u = k => `url(#${n}-${k})`;
@@ -689,8 +691,18 @@
     const cloth = L && L.shirt ? L.shirt[2] : m ? m[2] : '#888';
     const body = full ? fullBody(c, u, opt.look, cloth) : null;
     const h = full ? 182 : 120, w = Math.round(size * 120 / h);
+    const top = c.draw(u) + (L ? L.neck + L.hat + L.glasses : '');
+    let art = top;
+    if (full) {
+      // postuur: alles onder de kin (schouders, romp, armen, benen) wordt smaller of breder, het hoofd blijft gelijk
+      const b = LOOKS.build.find(x => x[0] === ((c.player && opt.look && opt.look.build) || '')) || LOOKS.build[1];
+      const k = b[2], sx = g => k === 1 ? g : `<g transform="translate(${60 - 60 * k} 0) scale(${k} 1)">${g}</g>`;
+      art = k === 1 ? body.back + top + body.front
+        : `<clipPath id="${n}-lo"><rect x="-20" y="${CUT}" width="160" height="${h}"/></clipPath><clipPath id="${n}-hi"><rect x="-20" y="-20" width="160" height="${CUT + 20}"/></clipPath>`
+          + sx(body.back + `<g clip-path="url(#${n}-lo)">${top}</g>`) + `<g clip-path="url(#${n}-hi)">${top}</g>` + sx(body.front);
+    }
     return `<svg class="cast-svg${full ? ' cast-full' : ''}" viewBox="0 0 120 ${h}" width="${full ? w : size}" height="${size}" role="img" aria-label="${c.player ? 'Jij' : c.name}, ${c.animal}" xmlns="http://www.w3.org/2000/svg">
-  <defs>${defs.replace(/ID-/g, n + '-')}</defs>${body ? body.back : ''}${c.draw(u)}${L ? L.neck + L.hat + L.glasses : ''}${body ? body.front : ''}
+  <defs>${defs.replace(/ID-/g, n + '-')}</defs>${art}
 </svg>`;
   }
   function avatar(id, size = 64, cls = '', opt) {
