@@ -691,7 +691,7 @@
     const d = u.dialogue, seen = new Set();
     return h('div', { class: 'dl-list read' }, h('p', { class: 'muted small' }, d.place + ' — ' + d.t),
       d.lines.map(([who, es, nl, x]) => { const nt = S.Lesson.noteToggle(S.Lesson.findNotes(es, { extra: x, seen })); const ch = S.Cast && (who === 'Mark' ? st().me && S.Cast.get(st().me) : S.Cast.forSpeaker(who, d.place));
-        return h('div', { class: 'dl-read' }, ch ? S.Cast.avatar(ch.id, 36, 'dl-read-av') : null, S.Lesson.speakBtn(es, { clipNs: S.course.ns ? undefined : 'ch' }), h('div', { class: 'grow' }, h('b', null, who + ': '), h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl), nt && nt.box), nt && nt.btn); }));
+        return h('div', { class: 'dl-read' }, ch ? S.Cast.avatar(ch.id, 36, 'dl-read-av', { look: ch.player ? st().meLook : null }) : null, S.Lesson.speakBtn(es, { clipNs: S.course.ns ? undefined : 'ch' }), h('div', { class: 'grow' }, h('b', null, who + ': '), h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl), nt && nt.box), nt && nt.btn); }));
   }
 
   function readingRead(u) {
@@ -1113,19 +1113,36 @@
     // ---- kop ----
     const initial = (s.name || '?').trim().charAt(0).toUpperCase() || '?';
     const activeDays = Object.values(s.days).filter(d => d.min > 0 || d.items > 0).length;
-    // eigen personage (js/cast.js): staat ook rechts bij jouw zinnen in de dialogen
+    // eigen personage (js/cast.js): staat ook rechts bij jouw zinnen in de dialogen. Aan te passen met hoedje, bril, hals en shirtkleur.
     const mine = S.Cast && s.me && S.Cast.get(s.me);
     const picker = h('div', { class: 'me-picker card hidden' });
+    const look = () => Object.assign({}, s.meLook || {});
+    function setLook(k, v) { const l = look(); l[k] = v; s.meLook = l; Store.save(); fillPicker(); refreshHead(); }
     function fillPicker() {
       picker.innerHTML = '';
-      picker.append(h('b', null, 'Kies je personage'), h('p', { class: 'muted small' }, 'Je personage staat in de dialogen bij jouw zinnen, naast Mateo, Sofía en de anderen.'),
-        h('div', { class: 'me-grid' }, S.Cast.players.map(c => h('button', { class: 'me-opt' + (s.me === c.id ? ' on' : ''), type: 'button', 'aria-pressed': String(s.me === c.id), onclick: () => {
-          s.me = c.id; Store.save(); render();
-        } }, S.Cast.avatar(c.id, 76), h('span', null, c.nl)))),
+      const cur = s.me && S.Cast.get(s.me), L = look(), O = S.Cast.LOOKS, eff = Object.assign({}, cur && cur.look, L); // eff: met de standaard van het dier (de schildpad heeft een pet)
+      const row = (k, title) => h('div', { class: 'me-row' }, h('div', { class: 'me-row-t' }, title),
+        h('div', { class: 'me-chips' }, O[k].map(([v, lab, c1]) => k === 'shirt' && v
+          ? h('button', { class: 'me-swatch' + ((eff[k] || '') === v ? ' on' : ''), type: 'button', title: v, 'aria-label': 'Shirtkleur ' + v, 'aria-pressed': String((eff[k] || '') === v), style: { background: c1 }, onclick: () => setLook(k, v) })
+          : h('button', { class: 'chip toggle' + ((eff[k] || '') === v ? ' on' : ''), type: 'button', 'aria-pressed': String((eff[k] || '') === v), onclick: () => setLook(k, v) }, lab))));
+      picker.append(h('b', null, cur ? 'Jouw personage' : 'Kies je personage'),
+        h('p', { class: 'muted small' }, 'Je personage staat in de dialogen bij jouw zinnen, naast Mateo, Sofía en de anderen.'),
+        h('div', { class: 'me-studio' },
+          cur ? h('div', { class: 'me-preview' }, S.Cast.avatar(cur.id, 230, 'me-big', { full: true, look: L })) : null,
+          h('div', { class: 'me-side' },
+            h('div', { class: 'me-grid' }, S.Cast.players.map(c => h('button', { class: 'me-opt' + (s.me === c.id ? ' on' : ''), type: 'button', 'aria-pressed': String(s.me === c.id), onclick: () => {
+              s.me = c.id; Store.save(); fillPicker(); refreshHead();
+            } }, S.Cast.avatar(c.id, 60, '', { look: L }), h('span', null, c.nl)))),
+            cur ? h('div', { class: 'me-rows' }, row('hat', '🎩 Hoedje'), row('glasses', '👓 Bril'), row('neck', '🧣 Om je hals'), row('shirt', '👕 Shirtkleur')) : null)),
         s.me ? h('button', { class: 'btn ghost small', type: 'button', onclick: () => { s.me = ''; Store.save(); render(); } }, 'Geen personage (alleen «Jij»)') : null);
     }
-    const headAv = mine ? S.Cast.avatar(mine.id, 76, 'prof-cast') : h('div', { class: 'avatar' }, initial);
-    const avBtn = h('button', { class: 'prof-av', type: 'button', title: 'Kies je personage', 'aria-label': 'Kies je personage', onclick: () => { fillPicker(); picker.classList.toggle('hidden'); } },
+    const headAv = mine ? S.Cast.avatar(mine.id, 76, 'prof-cast', { look: look() }) : h('div', { class: 'avatar' }, initial);
+    function refreshHead() {
+      const c = s.me && S.Cast.get(s.me);
+      const el = c ? S.Cast.avatar(c.id, 76, 'prof-cast', { look: look() }) : h('div', { class: 'avatar' }, initial);
+      const old = avBtn.firstChild; avBtn.replaceChild(el, old);
+    }
+    const avBtn = h('button', { class: 'prof-av', type: 'button', title: 'Je personage kiezen en aanpassen', 'aria-label': 'Je personage kiezen en aanpassen', onclick: () => { fillPicker(); picker.classList.toggle('hidden'); } },
       headAv, h('span', { class: 'prof-av-edit' }, '✎'));
     wrap.append(h('div', { class: 'prof-head' },
       S.Cast ? avBtn : h('div', { class: 'avatar' }, initial),
