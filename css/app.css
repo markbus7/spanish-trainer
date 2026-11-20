@@ -1257,7 +1257,6 @@ body.ask-fab-on .page .lupe-coach.with-me .lc-bubble { margin-right: 0; }
 /* Jouw leven (js/life.js): een wereld die meegroeit, met scènes waarin je personage leeft */
 .life-card .life-scene { position: relative; border-radius: 18px; overflow: hidden; margin: .5rem 0 0; box-shadow: var(--shadow); }
 .life-scene .life-svg { display: block; width: 100%; height: auto; transition: opacity .6s; }
-.life-scene.fade .life-svg { opacity: 0; }
 .life-name { text-align: center; margin: .5rem 0 .1rem; font-size: 1.05rem; }
 .life-word { color: var(--accent); font-weight: 600; }
 .life-card > p { text-align: center; margin: .2rem 0; }
@@ -1323,6 +1322,7 @@ body.ask-fab-on .page .lupe-coach.with-me .lc-bubble { margin-right: 0; }
 .lv-note { animation: lv-note 2.4s ease-out infinite; opacity: 0; }
 @keyframes lv-note { 0% { transform: translate(0, 0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(16px, -40px); opacity: 0; } }
 .lv-z { animation: lv-note 2.7s ease-out infinite; opacity: 0; }
+.lv-birds { animation: lv-fly 30s linear -8s infinite; }
 .lv-fly { animation: lv-fly 22s linear infinite; }
 @keyframes lv-fly { from { transform: translateX(-80px); } to { transform: translateX(560px); } }
 @media (prefers-reduced-motion: reduce) { .life-scene * { animation: none !important; opacity: 1; } }

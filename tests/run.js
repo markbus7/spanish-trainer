@@ -647,7 +647,7 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   const badScene = [];
   LF.STEPS.forEach((s, i) => LF.acts(LF.world(i)).forEach(a => { const v = LF.scene(i, { act: a.id }); if (!v.startsWith('<svg') || /NaN|undefined/.test(v)) badScene.push(i + ':' + a.id); }));
   ok(!badScene.length, 'leven: elke scène in elke stap is een geldige tekening' + (badScene.length ? ' (' + badScene.slice(0, 5).join(', ') + ')' : ''));
-  ok(LF.acts(LF.world(0)).map(a => a.id).join() === 'walk,sleep' && LF.acts(LF.world(LF.STEPS.length - 1)).length >= 10, 'leven: scènes komen erbij naarmate je meer hebt');
+  ok(LF.acts(LF.world(0)).length <= 4 && LF.acts(LF.world(LF.STEPS.length - 1)).length >= 12, 'leven: scènes komen erbij naarmate je meer hebt');
   ok(!LF.world(LF.STEPS.findIndex(s => s.home === 'casita')).items.has('fire'), 'leven: spullen staan alleen waar ze passen (geen kampvuur in het dorp)');
   const sc = LF.score({ a: { i: 1 }, b: { i: 10 }, c: { i: 30 } });
   ok(sc.points === 6 && LF.stepAt(0) === 0 && LF.stepAt(1e6) === LF.STEPS.length - 1, 'leven: 🌱 1, 🌳 2, ⭐ 3 punten');
