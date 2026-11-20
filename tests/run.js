@@ -636,7 +636,8 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   const badFull = [];
   ids.forEach(id => ['slim', '', 'stout'].forEach(b => { const v = K.svg(id, 120, { full: true, look: { build: b } }); if (!v.startsWith('<svg') || /NaN|undefined|null/.test(v)) badFull.push(id + '/' + (b || 'normaal')); }));
   ok(!badFull.length, 'cast: heel lijf in elk postuur geldig' + (badFull.length ? ': ' + badFull.slice(0, 5).join(', ') : ''));
-  ok(K.LOOKS.build.find(x => x[0] === '')[2] < 1, 'cast: standaardpostuur is slanker dan stevig');
+  const nid = v => v.replace(/cs\d+/g, 'X');
+  ok(nid(K.svg('p-zorro', 120, { full: true, look: { build: 'slim' } })) !== nid(K.svg('p-zorro', 120, { full: true, look: { build: 'stout' } })), 'cast: postuur verandert de tekening');
   ok(K.players.length >= 6 && K.players.every(x => x.player), 'cast: keuze uit eigen personages voor je profiel');
   ok(html.indexOf('js/cast.js') > html.indexOf('js/tutor.js') && html.indexOf('js/cast.js') < html.indexOf('js/lesson.js') && sw.includes("'js/cast.js'"), 'cast: script geladen en in de offline-cache');
 }
