@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.33.0', date: '2026-11-20',
+    nl: ['Je eigen personage kun je nu aankleden: kies een hoedje, een bril, iets om je hals en de kleur van je shirt (Perfil, tik op je personage).', 'Personages staan nu met hun hele lijf op de grote plekken: bovenaan in de dialoog en in Perfil. Bij de zinnen blijven de kopjes.'],
+    es: [] },
   { v: '1.32.0', date: '2026-11-19',
     nl: ['Dialogen met getekende personages: 39 dieren uit Latijns-Amerika (zoals Mateo de brilbeer en Sofía de ocelot). Wie praat, beweegt zijn mond en krijgt een tekstballon.', 'Elk personage heeft een vaste eigen stem uit zijn land.', 'Kies in Perfil je eigen personage; dat staat in de dialogen bij jouw zinnen.'],
     es: [] },

@@ -275,9 +275,10 @@
     const mine = Cast && S.Store.state.me && Cast.get(S.Store.state.me); // jouw eigen personage (Perfil)
     const charOf = who => Cast && (who === me ? mine : Cast.forSpeaker(who, d.place));
     const side = who => me ? (who === me ? 'right' : 'left') : (speakers.indexOf(who) % 2 ? 'right' : 'left');
-    const face = (who, size, cls) => {
+    const look = S.Store.state.meLook || {};
+    const face = (who, size, cls, full) => {
       const c = charOf(who);
-      if (c) { const el = Cast.avatar(c.id, size, cls); el.dataset.who = who; el.title = who + ' · ' + c.animal; return el; }
+      if (c) { const el = Cast.avatar(c.id, size, cls, { full, look: c.player ? look : null }); el.dataset.who = who; el.title = who + ' · ' + c.animal; return el; }
       return h('div', { class: 'avatar' + (who === me ? ' me' : ''), title: who, 'data-who': who }, who === me ? 'Jij' : who[0]);
     };
     const lines = d.lines.map(([who, es, nl, x]) => {
@@ -306,7 +307,7 @@
         info.classList.toggle('hidden', open); info.dataset.who = w; info.innerHTML = '';
         if (!open) info.append(...(c.player ? [h('b', null, 'Dit ben jij'), ' · ' + c.nl, h('div', { class: 'small' }, 'Een ander personage kiezen kan in Perfil.')]
           : [h('b', null, c.name), ' · ', c.animal + ' (' + c.nl + ') · ' + c.city + ' · ' + c.age + ' jaar', h('div', { class: 'small' }, c.trait)]));
-      } }, face(w, cast.length > 2 ? 78 : 96, 'on-stage'), h('span', { class: 'cast-name' }, c.player ? 'Jij' : c.name));
+      } }, face(w, cast.length > 2 ? 132 : 158, 'on-stage', true), h('span', { class: 'cast-name' }, c.player ? 'Jij' : c.name));
     })) : null;
     if (Cast && stage) {
       const els = () => [...(stage ? stage.querySelectorAll('[data-who]') : []), ...list.querySelectorAll('[data-who]')];
