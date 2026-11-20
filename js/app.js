@@ -379,6 +379,7 @@
 
   /* ================= HOY ================= */
   routes.hoy = function () {
+    if (S.Life && S.Life.adoptMe(st())) save();
     const s = st(); const d = Store.today(); const u = P.current(); const step = P.nextStep(u);
     const due = SRS.dueCount(); const goal = s.settings.goal;
     const min = Math.round(d.min);
@@ -432,6 +433,29 @@
     if (!Store.ok) wrap.append(h('p', { class: 'warn' }, '⚠️ Je browser staat opslaan niet toe (privévenster?). Je voortgang wordt niet bewaard.'));
     return wrap;
   };
+  /* Mijn leven (Perfil): je personage voor zijn huis, de volgende stap en de hele weg. Alles groeit vanzelf mee, er is niets te kopen. */
+  function lifeCard(s) {
+    const L = S.Life.now(), c = s.me && S.Cast && S.Cast.get(s.me);
+    const stage = h('div', { class: 'life-stage' }); stage.innerHTML = S.Life.scene(L.i);
+    if (c) stage.append(S.Cast.avatar(c.id, 200, 'life-me', { full: true, look: s.meLook || {} }));
+    const langs = (S.Profiles && S.Profiles.active() && S.Profiles.active().courses.length) || 1;
+    const strip = h('div', { class: 'life-strip' }, S.Life.STAGES.map((st, i) => {
+      const el = h('div', { class: 'life-step' + (i < L.i ? ' done' : i === L.i ? ' now' : ' locked'), title: st.home + (i > L.i ? ' · vanaf ' + st.at + ' punten' : '') });
+      el.innerHTML = S.Life.scene(i);
+      el.append(h('small', null, i > L.i ? '🔒 ' + st.at : st.home));
+      return el;
+    }));
+    return h('div', { class: 'card life-card' },
+      h('div', { class: 'dp-title' }, h('h2', { class: 'sec-title' }, '🏡 Jouw leven'), h('span', { class: 'dp-count' }, `Fase ${L.i + 1} van ${S.Life.STAGES.length}`)),
+      stage,
+      h('div', { class: 'life-name' }, h('b', null, L.stage.home), L.stage.ride !== 'te voet' ? h('span', { class: 'muted' }, ' ', 'met ' + L.stage.ride) : null, ' · ', h('span', { class: 'life-word', lang: (S.course && S.course.target) || 'es' }, S.Life.word(L.stage))),
+      h('p', { class: 'muted small' }, 'Je huis en je vervoer groeien vanzelf mee met wat je weet' + (langs > 1 ? ', in al je talen samen.' : '. Leer je later nog een taal, dan telt die ook mee.')),
+      L.next ? h('div', { class: 'life-next' }, h('div', { class: 'bar' }, h('i', { style: { width: Math.round(L.pct * 100) + '%' } })),
+        h('p', { class: 'small' }, `Nog ${L.left} ${L.left === 1 ? 'punt' : 'punten'} tot je volgende stap: ${L.next.home} (${L.next.ride}).`))
+        : h('p', { class: 'small' }, '🎉 Je hebt de mooiste plek bereikt. ¡Felicidades!'),
+      h('p', { class: 'muted small life-pts' }, `🌱 ${L.learning} × 1 + 🌳 ${L.known} × 2 + ⭐ ${L.mastered} × 3 = ${L.points} punten`),
+      strip);
+  }
   /* Je eigen personage op Hoy: staat rechts tegenover Lupe en zwaait bij binnenkomst en als je erop tikt.
      Nog nooit gekozen: een uitnodiging om er een te kiezen. Bewust 'geen personage': niets. */
   function meOnHoy(s) {
@@ -439,9 +463,16 @@
     if (s.me === undefined && S.Cast) return h('a', { class: 'hoy-me hoy-me-pick', href: '#/perfil', title: 'Kies je eigen personage' }, h('span', { class: 'hm-q' }, '?'), h('small', null, 'Kies je personage'));
     if (!c) return null;
     const av = S.Cast.avatar(c.id, 150, 'hoy-me-av', { full: true, look: s.meLook || {} });
+    const life = S.Life ? S.Life.now() : null, isNew = life && S.Life.fresh(life.i);
     const wave = () => { av.classList.remove('talking'); void av.offsetWidth; av.classList.add('talking'); clearTimeout(av._t); av._t = setTimeout(() => av.classList.remove('talking'), 1800); };
     setTimeout(wave, 700);
-    return h('button', { class: 'hoy-me', type: 'button', title: 'Dit ben jij (' + c.nl + ')', 'aria-label': 'Jouw personage: ' + c.nl + '. Tik om te zwaaien.', onclick: wave }, av, h('span', { class: 'hm-name' }, s.name || 'Jij'));
+    if (!life) return h('button', { class: 'hoy-me', type: 'button', title: 'Dit ben jij (' + c.nl + ')', 'aria-label': 'Jouw personage: ' + c.nl + '. Tik om te zwaaien.', onclick: wave }, av, h('span', { class: 'hm-name' }, s.name || 'Jij'));
+    // je personage voor je eigen huis (of tentje): groeit vanzelf mee met wat je weet
+    const scene = h('div', { class: 'hm-scene' }); scene.innerHTML = S.Life.scene(life.i);
+    return h('div', { class: 'hoy-me with-life' + (isNew ? ' is-new' : '') },
+      isNew ? h('a', { class: 'hm-new', href: '#/perfil' }, '✨ Nieuw: ' + life.stage.home) : null,
+      h('div', { class: 'hm-stage' }, scene, h('button', { class: 'hm-me', type: 'button', title: 'Dit ben jij (' + c.nl + ')', 'aria-label': 'Jouw personage: ' + c.nl + '. Tik om te zwaaien.', onclick: wave }, av)),
+      h('a', { class: 'hm-name', href: '#/perfil', title: 'Bekijk hoe je leven meegroeit' }, (s.name || 'Jij') + ' · ' + life.stage.home));
   }
   /* Oefentegel: titel, één zin wat je er doet (x) en daaronder kort hoe lang/hoeveel (s). */
   function quick(icon, t, s, fn, done, x) { return h('button', { class: 'quick-btn' + (done ? ' did' : ''), type: 'button', onclick: fn }, h('span', { class: 'qi' }, S.Icons && S.Icons.has(icon) ? S.Icons.el(icon) : icon), done ? h('span', { class: 'qd', title: 'Vandaag gedaan' }, '✓') : null, h('b', null, t), x ? h('span', { class: 'qx' }, x) : null, h('small', null, s)); }
@@ -1123,6 +1154,7 @@
   }
 
   routes.perfil = function () {
+    if (S.Life && S.Life.adoptMe(st())) save();
     const s = st(); const wrap = h('div', { class: 'page profile' });
     const est = P.estimate(); const t = lastTest();
     // ---- kop ----
@@ -1169,6 +1201,7 @@
       wrap.append(picker);
       if (!mine && s.me === undefined) { fillPicker(); picker.classList.remove('hidden'); }
     }
+    if (S.Life) wrap.append(lifeCard(s));
     wrap.append(S.Tutor.coach(S.Tutor.lines.profile({ words: wordStats(C.all()).seen, days: activeDays, streak: Store.liveStreak() }), { full: true }));
 
     // ---- niveau ----

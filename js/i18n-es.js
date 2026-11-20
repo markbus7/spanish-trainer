@@ -1105,6 +1105,25 @@
     "van {0}'": "de {0}'",
     "{0} dagen": "{0} días",
     "Pincode": "PIN",
-    "▶ Start · {0} · ±{1} min": "▶ Empezar · {0} · ±{1} min"
+    "▶ Start · {0} · ±{1} min": "▶ Empezar · {0} · ±{1} min",
+    "🏡 Jouw leven": "🏡 Tu vida",
+    "Fase {0} van {1}": "Etapa {0} de {1}",
+    "Rugzak en kampvuur": "Mochila y fogata",
+    "Tentje": "Carpita",
+    "Hutje met palmdak": "Cabaña de palma",
+    "Casita": "Casita",
+    "Huis met tuin": "Casa con jardín",
+    "Huis aan zee": "Casa en la playa",
+    "Hacienda": "Hacienda",
+    "met {0}": "con {0}",
+    "step": "patineta", "fiets": "bicicleta", "scooter": "motoneta", "autootje": "carrito", "busje": "combi", "vliegtuigje": "avioneta",
+    "Je huis en je vervoer groeien vanzelf mee met wat je weet, in al je talen samen.": "Tu casa y tu transporte crecen solos con todo lo que sabes, en todos tus idiomas juntos.",
+    "Je huis en je vervoer groeien vanzelf mee met wat je weet. Leer je later nog een taal, dan telt die ook mee.": "Tu casa y tu transporte crecen solos con todo lo que sabes. Si después aprendes otro idioma, también cuenta.",
+    "Nog {0} punten tot je volgende stap: {1} ({2}).": "Te faltan {0} puntos para tu siguiente etapa: {1} ({2}).",
+    "Nog 1 punt tot je volgende stap: {0} ({1}).": "Te falta 1 punto para tu siguiente etapa: {0} ({1}).",
+    "🎉 Je hebt de mooiste plek bereikt. ¡Felicidades!": "🎉 Llegaste al lugar más bonito. ¡Felicidades!",
+    "🌱 {0} × 1 + 🌳 {1} × 2 + ⭐ {2} × 3 = {3} punten": "🌱 {0} × 1 + 🌳 {1} × 2 + ⭐ {2} × 3 = {3} puntos",
+    "✨ Nieuw: {0}": "✨ Nuevo: {0}",
+    "Bekijk hoe je leven meegroeit": "Mira cómo crece tu vida"
 });
 })(window.SPT);

@@ -639,6 +639,14 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   const nid = v => v.replace(/cs\d+/g, 'X');
   ok(nid(K.svg('p-zorro', 120, { full: true, look: { build: 'slim' } })) !== nid(K.svg('p-zorro', 120, { full: true, look: { build: 'stout' } })), 'cast: postuur verandert de tekening');
   ok(K.players.length >= 6 && K.players.every(x => x.player), 'cast: keuze uit eigen personages voor je profiel');
+  // Jouw leven: fase volgt uit punten (alle talen samen), elke fase heeft een tekening
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/life.js'), 'utf8'), c, { filename: 'js/life.js' });
+  const LF = c.window.SPT.Life;
+  ok(LF && LF.STAGES.length >= 5 && LF.STAGES.every((s, i) => i === 0 ? s.at === 0 : s.at > LF.STAGES[i - 1].at), 'leven: fases met oplopende drempels');
+  ok(LF.STAGES.every((s, i) => { const v = LF.scene(i); return v.startsWith('<svg') && !/NaN|undefined/.test(v) && s.es && s.en && s.nl; }), 'leven: elke fase heeft een tekening en een woord in elke taal');
+  const sc = LF.score({ a: { i: 1 }, b: { i: 10 }, c: { i: 30 } });
+  ok(sc.points === 6 && LF.stageAt(0) === 0 && LF.stageAt(1e6) === LF.STAGES.length - 1, 'leven: 🌱 1, 🌳 2, ⭐ 3 punten');
+  ok(html.indexOf('js/life.js') > html.indexOf('js/cast.js') && html.indexOf('js/life.js') < html.indexOf('js/app.js') && sw.includes("'js/life.js'"), 'leven: script geladen en in de offline-cache');
   ok(html.indexOf('js/cast.js') > html.indexOf('js/tutor.js') && html.indexOf('js/cast.js') < html.indexOf('js/lesson.js') && sw.includes("'js/cast.js'"), 'cast: script geladen en in de offline-cache');
 }
 { // eigen iconen en illustraties (js/icons.js)
