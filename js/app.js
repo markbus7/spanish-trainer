@@ -438,18 +438,8 @@
   function lifeCard(s) {
     const L = S.Life.now(), W = L.world, fresh = S.Life.fresh(L.i);
     const stage = h('div', { class: 'life-scene' });
-    // een dag uit het leven van je personage: het doet vanzelf steeds iets anders, van ochtend tot nacht
-    const ORDER = { dawn: 0, day: 1, dusk: 2, night: 3 };
-    const day = S.Life.acts(W).slice().sort((a, b) => ORDER[a.sky] - ORDER[b.sky]);
-    let k = Math.max(0, day.findIndex(a => a.id === S.Life.pick(W, new Date().getHours())));
-    const draw = () => { stage.innerHTML = S.Life.scene(L.i, { act: day[k].id }); };
-    draw();
-    const timer = setInterval(() => {
-      if (!stage.isConnected) { clearInterval(timer); return; }
-      if (document.hidden) return;
-      stage.classList.add('fade');
-      setTimeout(() => { k = (k + 1) % day.length; draw(); stage.classList.remove('fade'); }, 600);
-    }, 11000);
+    // één levend beeld: de lucht volgt het uur van de dag, je personage loopt rond en alles om hem heen beweegt
+    stage.innerHTML = S.Life.scene(L.i, { act: S.Life.pick(W, new Date().getHours()) });
     const langs = (S.Profiles && S.Profiles.active() && S.Profiles.active().courses.length) || 1;
     const road = h('div', { class: 'life-road' }, S.Life.STEPS.map((st, i) => h('div', { class: 'life-stop' + (i < L.i ? ' done' : i === L.i ? ' now' : ' locked'), title: st.name + (i > L.i ? ' · vanaf ' + st.at + ' punten' : '') },
       h('span', { class: 'ic' }, st.icon), i > L.i ? '🔒 ' + st.at : st.name)));

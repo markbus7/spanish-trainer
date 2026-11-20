@@ -171,7 +171,8 @@
       out += `<circle cx="326" cy="46" r="15" fill="#fff6d8"/><circle cx="332" cy="41" r="13" fill="url(#${u}sky)"/>`;
       for (let k = 0; k < 34; k++) { const x = (k * 97) % 390 + 5, y = (k * 53) % 120 + 6; out += `<circle class="lv-star" style="animation-delay:${(k % 7) * .4}s" cx="${x}" cy="${y}" r="${k % 3 ? 1 : 1.6}" fill="#fff"/>`; }
     } else if (sky === 'day') out += `<circle cx="330" cy="46" r="20" fill="#ffe27a"/><circle cx="330" cy="46" r="28" fill="#ffe27a" opacity=".25"/>` + cloud(60, 40, 1, 60) + cloud(220, 26, .8, 80) + cloud(140, 70, .6, 70);
-    else if (sky === 'dawn') out += `<circle cx="70" cy="150" r="24" fill="#ffb86a" opacity=".9"/>` + cloud(260, 40, .9, 90);
+    if (sky === 'day' || sky === 'dawn') out += `<g class="lv-birds">${[[0, 0], [14, 6], [26, -2]].map(([x, y]) => `<path d="M${x} ${y + 60}q4-4 8 0q4-4 8 0" stroke="#33333d" stroke-width="1.4" fill="none" opacity=".6"/>`).join('')}</g>`;
+    if (sky === 'dawn') out += `<circle cx="70" cy="150" r="24" fill="#ffb86a" opacity=".9"/>` + cloud(260, 40, .9, 90);
     else out += `<circle cx="330" cy="150" r="26" fill="#ff7a4a" opacity=".85"/>` + cloud(90, 50, .8, 90);
     return out;
   }
@@ -252,6 +253,8 @@
   const ACTS = [
     { id: 'walk', label: '🥾 Wandelen', sky: 'day', ok: () => true,
       draw: () => `<g class="lv-walk"><g class="lv-flip">${me(60, 230, 92, { cls: 'lv-step' })}</g></g>` },
+    { id: 'morning', label: '🥾 Ochtendwandeling', sky: 'dawn', ok: () => true, draw: () => `<g class="lv-walk"><g class="lv-flip">${me(60, 230, 92, { cls: 'lv-step' })}</g></g>` },
+    { id: 'evening', label: '🥾 Avondwandeling', sky: 'dusk', ok: () => true, draw: () => `<g class="lv-walk"><g class="lv-flip">${me(60, 230, 92, { cls: 'lv-step' })}</g></g>` },
     { id: 'garden', label: '🌻 Tuinieren', sky: 'dawn', ok: w => w.items.has('garden'),
       draw: () => `${me(116, 230, 92, { cls: 'lv-bob' })}<g transform="translate(92 186) rotate(-24)"><path d="M0 0H18V12H0Z" fill="#2fa79a"/><path d="M0 4-14-4" stroke="#2fa79a" stroke-width="3"/><path d="M2 0C4-8 14-8 16 0" stroke="#1d7a70" stroke-width="2" fill="none"/></g>
         ${[0, 1, 2, 3].map(k => `<ellipse class="lv-drop" style="animation-delay:${k * .25}s" cx="${76 + k * 3}" cy="190" rx="1.2" ry="2.2" fill="#7fd6f0"/>`).join('')}` },
@@ -284,9 +287,8 @@
   function pick(w, hour) {
     const av = acts(w).map(a => a.id), has = id => av.includes(id), last = list => list.filter(has).pop();
     if (hour >= 22 || hour < 6) return 'sleep';
-    if (hour < 10) return has('garden') ? 'garden' : 'walk';
-    if (hour >= 18) return w.items.has('fireworks') && hour >= 20 ? 'party' : last(['fire', 'guitar', 'grill']) || 'walk';
-    return last(['hammock', 'bike', 'dog', 'surf', 'sail', 'horse']) || 'walk';
+    if (hour >= 18) return w.items.has('fireworks') && hour >= 20 ? 'party' : last(['fire', 'guitar', 'grill']) || 'evening';
+    return hour < 10 ? 'morning' : 'walk';
   }
 
   /* De hele wereld als svg-tekst. opt.act = scène-id, opt.w = breedte. */
@@ -303,7 +305,7 @@
     const smoke = w.home === 'jardin' && sky !== 'day' ? puffs(255, 66) : '';
     const front = (it('garden') ? garden() : '') + (it('fountain') ? fountain(120, 214) : '') + (it('fire') ? fire(126, 214) : '')
       + (it('grill') ? grill(290, 224, false) : '') + (it('surf') ? surfboard(352, 196) : '') + (act.hideRide ? '' : ride(w.ride))
-      + (it('dog') ? dog(162, 234, 'lv-idle') : '');
+      + (it('dog') ? (sky === 'night' ? dog(162, 234, 'lv-idle') : dog(162, 234, 'lv-jump') + `<circle class="lv-ball" cx="140" cy="200" r="4.5" fill="#e8344e"/>`) : '');
     const shade = night ? `<rect width="400" height="240" fill="#0a1030" opacity=".32"/>` : sky === 'dusk' ? `<rect width="400" height="240" fill="#ff7a4a" opacity=".08"/>` : '';
     return `<svg class="life-svg" viewBox="0 0 400 240" ${opt.w ? `width="${opt.w}" height="${Math.round(opt.w * .6)}"` : ''} role="img" aria-label="${STEPS[i].name}: ${act.label.replace(/^\S+\s/, '')}" xmlns="http://www.w3.org/2000/svg">
   <defs>${G(u + 'sky', SKY[sky][0], SKY[sky][1], true)}${G(u + 'gr', w.biome === 'mar' ? '#f2dcaa' : '#9ed882', w.biome === 'mar' ? '#e8cc90' : '#5fb35e', true)}${G(u + 'sea', '#5ec4ea', '#1f8ac0', true)}</defs>
