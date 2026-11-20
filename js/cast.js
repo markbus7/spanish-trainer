@@ -616,7 +616,7 @@
     hat: [['', 'Geen'], ['cap', 'Pet'], ['sun', 'Zonnehoed'], ['beret', 'Baret'], ['chullo', 'Muts'], ['sombrero', 'Sombrero'], ['party', 'Feesthoedje'], ['flower', 'Bloem'], ['bow', 'Strik']],
     glasses: [['', 'Geen'], ['round', 'Brilletje'], ['sun', 'Zonnebril'], ['star', 'Sterrenbril']],
     neck: [['', 'Niets'], ['scarf', 'Sjaal'], ['bowtie', 'Vlinderdas'], ['beads', 'Ketting']],
-    build: [['slim', 'Slank', .68], ['', 'Normaal', .8], ['stout', 'Stevig', 1]],
+    build: [['slim', 'Slank'], ['', 'Normaal'], ['stout', 'Stevig']],
     shirt: [['', 'Standaard'], ['orange', '#f28c1b', '#d96a0a'], ['red', '#e8344e', '#b51d3a'], ['pink', '#f0789f', '#d14f8a'], ['purple', '#9a6ad8', '#7046b0'],
       ['blue', '#3a78d6', '#1f4f9e'], ['teal', '#2fa79a', '#1d7a70'], ['green', '#3a9d5d', '#2a7a44'], ['yellow', '#ffd23f', '#f2a81d'], ['black', '#3a3a46', '#22222b']]
   };
@@ -658,27 +658,43 @@
     ringed: `<path d="M86 150C106 150 116 132 110 112C107 106 101 110 102 116C105 130 98 142 84 144Z" fill="URL_F"/><g stroke="#3a2a1a" stroke-width="3" opacity=".55"><path d="M101 141 106 145M106 131 112 132M106 121 111 119"/></g>`
   };
   const TAIL_OF = { sofia: 'cat', carlos: 'ringed', moderadora: 'cat', 'tio-beto': 'ringed', 'abuela-lupe': 'axo', andres: 'fox', fer: 'cat', andrea: 'ringed', paola: 'fox', diego: 'fox' };
+  /* Postuur: elk een eigen silhouet (schouders, taille, buik), eigen armen en benen. Het shirt van het borstbeeld wordt
+     in dat silhouet geknipt, dus de print loopt door maar de vorm verschilt echt. */
+  const BUILD = {
+    slim: { sil: 'M40 93C33 95 30 100 29 108C29 120 35 130 36 140L35 152H85L84 140C85 130 91 120 91 108C90 100 87 95 80 93Z',
+      arm: [33, 26, 133, 9, 5], leg: [49, 71, 4.3], belt: 'M35 146H85L86 156H34Z' },
+    '': { sil: 'M38 93C27 95 21 102 20 112C20 128 26 140 28 152H92C94 140 100 128 100 112C99 102 93 95 82 93Z',
+      arm: [26, 16, 136, 12, 6.2], leg: [46, 74, 6], belt: 'M28 146H92L93 156H27Z' },
+    stout: { sil: 'M38 93C27 95 21 102 19 112C11 122 11 144 26 154H94C109 144 109 122 101 112C99 102 93 95 82 93Z',
+      arm: [26, 9, 138, 14, 7], leg: [45, 75, 8], belt: 'M25 148H95L94 158H26Z',
+      belly: '<path d="M22 138Q60 160 98 138" fill="none" stroke="#000" stroke-width="3" opacity=".08"/><ellipse cx="52" cy="124" rx="16" ry="8" fill="#fff" opacity=".07"/>' }
+  };
+  const buildOf = (c, look) => BUILD[(c.player && look && look.build) || ''] || BUILD[''];
   function fullBody(c, u, look, cloth) {
     const bird = c.kind === 'bird', fem = !!c.female && !c.player;
+    const B = buildOf(c, look);
     const pants = c.pants || (c.player ? '#3a4a6a' : fem ? null : '#4a3e36');
     const shoe = c.shoe || '#4a2e22';
     const tail = TAILS[c.tail || TAIL_OF[c.id]];
-    const legs = [46, 74].map((x, i) => `<path d="M${x - 6.5} 146V170Q${x} 174 ${x + 6.5} 170V146Z" fill="${pants || u('f')}"/>
+    const [lx, rx, hw] = B.leg;
+    const legs = [lx, rx].map((x, i) => `<path d="M${x - hw} 146V170Q${x} 174 ${x + hw} 170V146Z" fill="${pants || u('f')}"/>
       <path d="M${x - (i ? 7 : 11)} 171Q${x - (i ? 7 : 11)} 165 ${x} 165Q${x + (i ? 11 : 7)} 165 ${x + (i ? 11 : 7)} 172Q${x} 176 ${x - (i ? 7 : 11)} 171Z" fill="${shoe}"/>
       <ellipse cx="${x - 2}" cy="167.5" rx="3.4" ry="1.4" fill="#fff" opacity=".25"/>`).join('');
-    const torso = `<path d="M18 116C17 132 22 146 30 152H90C98 146 103 132 102 116Z" fill="${cloth}"/>`
+    const torso = `<path d="${B.sil}" fill="${cloth}"/>`
       + (fem ? `<path d="M26 134Q60 142 94 134L104 160Q60 170 16 160Z" fill="${cloth}"/><path d="M17 158Q60 168 103 158" fill="none" stroke="#fff" stroke-width="2" opacity=".55"/><path d="M38 141 34 162M60 143V166M82 141 86 162" stroke="#000" stroke-width="1" opacity=".12"/>`
-        : `<path d="M30 146H90L92 156H28Z" fill="${pants}"/><path d="M30 148H90" stroke="#000" stroke-width="2" opacity=".15"/>`);
+        : `<path d="${B.belt}" fill="${pants}"/>`);
+    const [ax, hx0, hy, aw, hr] = B.arm;
     const arm = side => {
-      const sx = side < 0 ? 24 : 96, hx = side < 0 ? 15 : 105;
-      const sleeve = `<path d="M${sx - side * 5} 100C${sx + side * 2} 112 ${hx + side * 2} 124 ${hx} 136" fill="none" stroke="${cloth}" stroke-width="14" stroke-linecap="round"/><path d="M${sx - side * 5} 100C${sx + side * 2} 112 ${hx + side * 2} 124 ${hx} 136" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" opacity=".08"/>`;
-      const hand = bird ? `<path d="M${hx - 6} 132Q${hx} 152 ${hx + 6} 132Z" fill="${u('f')}"/>` : `<circle cx="${hx}" cy="${140}" r="6.6" fill="${u('f')}"/><path d="M${hx - 2.5} ${143}h5" stroke="#000" stroke-width="1" opacity=".18" stroke-linecap="round"/>`;
-      return `<g class="c-arm ${side < 0 ? 'c-arm-l' : 'c-arm-r'}">${sleeve}${hand}</g>`;
+      const sx = side < 0 ? ax : 120 - ax, hx = side < 0 ? hx0 : 120 - hx0;
+      const d = `M${sx} 103Q${hx + (sx - hx) * .15} 114 ${hx} ${hy}`;
+      const sleeve = `<path d="${d}" fill="none" stroke="${cloth}" stroke-width="${aw}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#fff" stroke-width="${aw}" stroke-linecap="round" opacity=".08"/>`;
+      const hand = bird ? `<path d="M${hx - hr} ${hy - 4}Q${hx} ${hy + 16} ${hx + hr} ${hy - 4}Z" fill="${u('f')}"/>` : `<circle cx="${hx}" cy="${hy + 4}" r="${hr}" fill="${u('f')}"/><path d="M${hx - 2.5} ${hy + 7}h5" stroke="#000" stroke-width="1" opacity=".18" stroke-linecap="round"/>`;
+      return `<g class="c-arm ${side < 0 ? 'c-arm-l' : 'c-arm-r'}"${side > 0 ? ` style="transform-origin:${sx}px 103px"` : ''}>${sleeve}${hand}</g>`;
     };
-    return { back: (tail ? `<g transform="translate(5 8)">${tail.replace(/URL_F/g, u('f'))}</g>` : '') + legs + torso, front: arm(-1) + arm(1) };
+    return { sil: B.sil, back: (tail ? `<g transform="translate(5 8)">${tail.replace(/URL_F/g, u('f'))}</g>` : '') + legs + torso, mid: B.belly || '', front: arm(-1) + arm(1) };
   }
 
-  const CUT = 97; // hoogte van de kin: daaronder begint het lijf
+  const CUT = 93; // boven de hals: daaronder neemt het silhouet van het postuur het over
   function svg(id, size = 64, opt = {}) {
     const c = BY[id]; if (!c) return '';
     const n = 'cs' + (++uid), u = k => `url(#${n}-${k})`;
@@ -694,12 +710,9 @@
     const top = c.draw(u) + (L ? L.neck + L.hat + L.glasses : '');
     let art = top;
     if (full) {
-      // postuur: alles onder de kin (schouders, romp, armen, benen) wordt smaller of breder, het hoofd blijft gelijk
-      const b = LOOKS.build.find(x => x[0] === ((c.player && opt.look && opt.look.build) || '')) || LOOKS.build[1];
-      const k = b[2], sx = g => k === 1 ? g : `<g transform="translate(${60 - 60 * k} 0) scale(${k} 1)">${g}</g>`;
-      art = k === 1 ? body.back + top + body.front
-        : `<clipPath id="${n}-lo"><rect x="-20" y="${CUT}" width="160" height="${h}"/></clipPath><clipPath id="${n}-hi"><rect x="-20" y="-20" width="160" height="${CUT + 20}"/></clipPath>`
-          + sx(body.back + `<g clip-path="url(#${n}-lo)">${top}</g>`) + `<g clip-path="url(#${n}-hi)">${top}</g>` + sx(body.front);
+      // het borstbeeld twee keer: het hoofd (alles boven de hals plus de onderkant van het hoofd) en het shirt, geknipt in het silhouet van het postuur
+      art = `<clipPath id="${n}-hi"><rect x="-20" y="-20" width="160" height="${CUT + 20}"/><ellipse cx="60" cy="80" rx="40" ry="21"/></clipPath><clipPath id="${n}-lo"><path d="${body.sil}"/></clipPath>`
+        + body.back + `<g clip-path="url(#${n}-lo)">${top}</g>` + body.mid + `<g clip-path="url(#${n}-hi)">${top}</g>` + body.front;
     }
     return `<svg class="cast-svg${full ? ' cast-full' : ''}" viewBox="0 0 120 ${h}" width="${full ? w : size}" height="${size}" role="img" aria-label="${c.player ? 'Jij' : c.name}, ${c.animal}" xmlns="http://www.w3.org/2000/svg">
   <defs>${defs.replace(/ID-/g, n + '-')}</defs>${art}
