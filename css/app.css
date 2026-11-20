@@ -1254,38 +1254,75 @@ body.ask-fab-on .page .lupe-coach.with-me .lc-bubble { margin-right: 0; }
   .hoy-me-pick { width: 72px; height: 104px; }
 }
 
-/* Jouw leven: huis en vervoer groeien mee met wat je weet (js/life.js) */
-.life-card .life-stage { position: relative; max-width: 520px; margin: .4rem auto 0; }
-.life-stage .life-svg { display: block; width: 100%; height: auto; }
-.life-stage .life-me { position: absolute; left: 3%; bottom: 3%; height: 62%; }
-.life-stage .life-me svg { height: 100%; width: auto; display: block; }
-.life-name { text-align: center; margin: .3rem 0 .2rem; font-size: 1.05rem; }
+/* Jouw leven (js/life.js): een wereld die meegroeit, met scènes waarin je personage leeft */
+.life-card .life-scene { position: relative; border-radius: 18px; overflow: hidden; margin: .5rem 0 0; box-shadow: var(--shadow); }
+.life-scene .life-svg { display: block; width: 100%; height: auto; }
+.life-acts { display: flex; gap: .35rem; flex-wrap: wrap; justify-content: center; margin: .6rem 0 .2rem; }
+.life-name { text-align: center; margin: .5rem 0 .1rem; font-size: 1.05rem; }
 .life-word { color: var(--accent); font-weight: 600; }
 .life-card > p { text-align: center; margin: .2rem 0; }
-.life-next { max-width: 420px; margin: .5rem auto .2rem; text-align: center; }
+.life-new { background: var(--accent-soft); color: var(--ink); border-radius: 12px; padding: .5rem .8rem; margin: .5rem 0 0; text-align: center; font-weight: 600; }
+.life-next { max-width: 440px; margin: .5rem auto .2rem; text-align: center; }
 .life-next .bar { height: 10px; border-radius: 99px; background: var(--bg2); overflow: hidden; }
 .life-next .bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #6cbf6a, #3a9d5d); }
 .life-next p { margin: .35rem 0 0; }
-.life-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: .35rem; margin-top: .8rem; }
-.life-step { text-align: center; border-radius: 12px; padding: .2rem .1rem .3rem; background: var(--bg2); }
-.life-step .life-svg { display: block; width: 100%; height: auto; }
-.life-step small { display: block; font-size: .62rem; line-height: 1.15; color: var(--muted); }
-.life-step.now { outline: 2px solid var(--accent); background: var(--card); }
-.life-step.now small { color: var(--ink); font-weight: 700; }
-.life-step.locked .life-svg { filter: grayscale(1); opacity: .35; }
-@media (max-width: 520px) { .life-strip { grid-template-columns: repeat(4, 1fr); } }
-
-/* op Hoy: je personage voor je huis */
-.hoy-me.with-life { cursor: default; position: relative; }
-.hm-stage { position: relative; width: 210px; }
-.hm-scene .life-svg { display: block; width: 100%; height: auto; }
-.hm-me { position: absolute; left: 0; bottom: 2px; height: 82%; background: none; border: 0; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.hm-me .cast, .hm-me .cast svg { height: 100%; width: auto; display: block; }
-.hoy-me.with-life .hm-name { max-width: 210px; color: var(--muted); text-decoration: none; }
-.hm-new { position: absolute; top: -.3rem; right: 0; z-index: 2; font-size: .72rem; font-weight: 700; background: var(--accent); color: var(--accent-ink); padding: .15rem .5rem; border-radius: 99px; text-decoration: none; box-shadow: var(--shadow); animation: pop .5s; }
-@media (max-width: 520px) {
-  .hm-stage { width: 168px; }
-  .hoy-me.with-life .cast svg { width: auto; height: 100%; }
-  .hoy-me.with-life .hm-name { max-width: 168px; }
-  .lupe-coach.with-me .hoy-me.with-life { margin-right: 46px; }
-}
+.life-road { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: .35rem; margin-top: .4rem; }
+.life-road-wrap > summary { cursor: pointer; text-align: center; font-weight: 600; margin-top: .7rem; color: var(--ink2); }
+.life-stop { text-align: center; border-radius: 12px; padding: .45rem .2rem; background: var(--bg2); font-size: .72rem; line-height: 1.2; color: var(--muted); }
+.life-stop .ic { display: block; font-size: 1.4rem; margin-bottom: .15rem; }
+.life-stop.done { color: var(--ink2); }
+.life-stop.now { outline: 2px solid var(--accent); background: var(--card); color: var(--ink); font-weight: 700; }
+.life-stop.locked .ic { filter: grayscale(1); opacity: .35; }
+.lv-cloud { animation: lv-cloud 70s linear infinite; }
+@keyframes lv-cloud { from { transform: translateX(-60px); } to { transform: translateX(440px); } }
+.lv-star { animation: lv-twinkle 2.4s ease-in-out infinite; }
+@keyframes lv-twinkle { 50% { opacity: .25; } }
+.lv-wave { animation: lv-wave 4s ease-in-out infinite; }
+@keyframes lv-wave { 50% { transform: translateX(8px); } }
+.lv-flame { transform-box: fill-box; transform-origin: 50% 100%; animation: lv-flame .5s ease-in-out infinite alternate; }
+@keyframes lv-flame { to { transform: scale(.88, 1.12); } }
+.lv-spark { animation: lv-rise 2s ease-out infinite; }
+@keyframes lv-rise { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-28px); opacity: 0; } }
+.lv-smoke { transform-box: fill-box; transform-origin: center; animation: lv-smoke 3.3s ease-out infinite; opacity: 0; }
+@keyframes lv-smoke { 0% { transform: translate(0, 0) scale(.6); opacity: .8; } 100% { transform: translate(8px, -40px) scale(2); opacity: 0; } }
+.lv-walk { animation: lv-walk 12s ease-in-out infinite; }
+@keyframes lv-walk { 0%, 100% { transform: translateX(0); } 45%, 50% { transform: translateX(96px); } }
+.lv-flip { transform-box: fill-box; transform-origin: center; animation: lv-flip 12s steps(1) infinite; }
+@keyframes lv-flip { 0%, 47% { transform: scaleX(1); } 48%, 98% { transform: scaleX(-1); } }
+.lv-step, .lv-bob { transform-box: fill-box; transform-origin: 50% 100%; animation: lv-bob 1.6s ease-in-out infinite; }
+.lv-step { animation-duration: .5s; }
+@keyframes lv-bob { 50% { transform: translateY(-2px) scaleY(.98); } }
+.lv-hop { animation: lv-hop .7s ease-in-out infinite; }
+@keyframes lv-hop { 50% { transform: translateY(-8px); } }
+.lv-ride { animation: lv-ride 9s linear -3s infinite; }
+@keyframes lv-ride { from { transform: translateX(-70px); } to { transform: translateX(470px); } }
+.lv-pedal { transform-box: fill-box; transform-origin: 50% 100%; animation: lv-bob .4s ease-in-out infinite; }
+.lv-swing { transform-box: view-box; animation: lv-swing 3.4s ease-in-out infinite; }
+@keyframes lv-swing { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+.lv-sway { transform-box: fill-box; transform-origin: 50% 100%; animation: lv-sway 3s ease-in-out infinite; }
+@keyframes lv-sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+.lv-drop { animation: lv-drop 1s linear infinite; }
+@keyframes lv-drop { from { transform: translateY(0); opacity: 1; } to { transform: translateY(22px); opacity: 0; } }
+.lv-jump { animation: lv-jump .9s ease-in-out infinite; }
+@keyframes lv-jump { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-20px) rotate(-8deg); } }
+.lv-ball { animation: lv-ball 1.8s ease-in-out infinite; }
+@keyframes lv-ball { 0%, 100% { transform: translate(-12px, 6px); } 50% { transform: translate(14px, -26px); } }
+.lv-wag { transform-box: view-box; animation: lv-wag .35s ease-in-out infinite alternate; }
+@keyframes lv-wag { from { transform: rotate(-14deg); } to { transform: rotate(14deg); } }
+.lv-swish { transform-box: view-box; animation: lv-wag 1.4s ease-in-out infinite alternate; }
+.lv-brush { transform-box: view-box; animation: lv-brush 1.2s ease-in-out infinite; }
+@keyframes lv-brush { 50% { transform: translate(10px, 6px); } }
+.lv-rock { transform-box: fill-box; transform-origin: 50% 100%; animation: lv-swing 3s ease-in-out infinite; }
+.lv-surf { transform-box: view-box; animation: lv-surf 2.4s ease-in-out infinite; }
+@keyframes lv-surf { 0%, 100% { transform: translate(0, 0) rotate(-3deg); } 50% { transform: translate(14px, -5px) rotate(3deg); } }
+.lv-spray { animation: lv-twinkle 1.2s ease-in-out infinite; }
+.lv-beam { transform-box: view-box; animation: lv-beam 4s linear infinite; }
+@keyframes lv-beam { 0%, 100% { transform: rotate(-20deg); opacity: .9; } 50% { transform: rotate(20deg); opacity: .5; } }
+.lv-burst { transform-box: view-box; animation: lv-burst 2.7s ease-out infinite; opacity: 0; }
+@keyframes lv-burst { 0% { transform: scale(.1); opacity: 1; } 60% { transform: scale(1.2); opacity: .9; } 100% { transform: scale(1.4); opacity: 0; } }
+.lv-note { animation: lv-note 2.4s ease-out infinite; opacity: 0; }
+@keyframes lv-note { 0% { transform: translate(0, 0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(16px, -40px); opacity: 0; } }
+.lv-z { animation: lv-note 2.7s ease-out infinite; opacity: 0; }
+.lv-fly { animation: lv-fly 22s linear infinite; }
+@keyframes lv-fly { from { transform: translateX(-80px); } to { transform: translateX(560px); } }
+@media (prefers-reduced-motion: reduce) { .life-scene * { animation: none !important; opacity: 1; } }
