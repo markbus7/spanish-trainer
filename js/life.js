@@ -47,10 +47,13 @@
     o.points = o.learning + o.known * 2 + o.mastered * 3;
     return o;
   }
-  /* Alle cursussen van het actieve profiel samen; de open cursus komt uit het geheugen (meest actueel). */
+  /* Alle cursussen van het actieve profiel met dezelfde hoofdtaal (uitlegtaal) samen: vanuit het Nederlands tellen
+     Spaans, Duits, Frans ... bij elkaar op; leer je iets vanuit het Engels, dan begint dat leven opnieuw bij 0.
+     De open cursus komt uit het geheugen (meest actueel). */
+  const base = c => (S.COURSES && S.COURSES[c] && S.COURSES[c].ui) || 'nl';
   function total() {
     const P = S.Profiles, cur = S.course && S.course.id;
-    const ids = (P && P.active() && P.active().courses) || [cur];
+    const ids = ((P && P.active() && P.active().courses) || [cur]).filter(c => base(c) === base(cur));
     const sum = { learning: 0, known: 0, mastered: 0, points: 0, langs: 0 };
     ids.forEach(c => {
       let srs = null;
@@ -623,7 +626,7 @@
   }
   /* Wat is er nieuw sinds je vorige bezoek? Eén keer per profiel (niet per taal). Geeft de nieuwe stappen terug. */
   function fresh(i) {
-    const k = 'spt.life.' + (S.Profiles ? S.Profiles.activeId() : 'main');
+    const ui = base(S.course && S.course.id), k = 'spt.life.' + (S.Profiles ? S.Profiles.activeId() : 'main') + (ui === 'nl' ? '' : '.' + ui);
     let seen = null; try { seen = localStorage.getItem(k); } catch (e) { /* negeer */ }
     try { if (seen == null || +seen < i) localStorage.setItem(k, String(i)); } catch (e) { /* negeer */ }
     return seen != null && +seen < i ? STEPS.slice(+seen + 1, i + 1) : [];

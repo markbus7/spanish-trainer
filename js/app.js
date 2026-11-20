@@ -434,7 +434,7 @@
     return wrap;
   };
   /* Jouw leven (Perfil): je personage in zijn wereld, bezig met iets (scènes om uit te kiezen), wat er nieuw is,
-     wat de volgende stap is en de hele weg. Alles groeit vanzelf mee met wat je weet, in al je talen samen. */
+     wat de volgende stap is en de hele weg. Alles groeit vanzelf mee met wat je weet, in al je talen met dezelfde hoofdtaal samen (vanuit het Nederlands apart van vanuit het Spaans). */
   function lifeCard(s) {
     const L = S.Life.now(), W = L.world, fresh = S.Life.fresh(L.i);
     const stage = h('div', { class: 'life-scene' });
@@ -448,7 +448,7 @@
       fresh.length ? h('div', { class: 'life-new' }, '✨ Nieuw sinds je vorige bezoek: ' + fresh.map(x => x.icon + ' ' + x.name).join(', ')) : null,
       stage,
       h('div', { class: 'life-name' }, h('b', null, L.step.icon + ' ' + L.step.name), ' · ', h('span', { class: 'life-word', lang: (S.course && S.course.target) || 'es' }, S.Life.word(L.step))),
-      h('p', { class: 'muted small' }, 'Je wereld groeit vanzelf mee met wat je weet' + (langs > 1 ? ', in al je talen samen.' : '. Leer je later nog een taal, dan telt die ook mee.') + ''),
+      h('p', { class: 'muted small' }, 'Je wereld groeit vanzelf mee met wat je weet' + (langs > 1 ? ', in al je talen vanuit het Nederlands samen.' : '. Leer je later nog een taal vanuit het Nederlands, dan telt die ook mee.') + ''),
       L.next ? h('div', { class: 'life-next' }, h('div', { class: 'bar' }, h('i', { style: { width: Math.round(L.pct * 100) + '%' } })),
         h('p', { class: 'small' }, `Nog ${L.left} ${L.left === 1 ? 'punt' : 'punten'} tot de volgende stap: ${L.next.icon} ${L.next.name}.`))
         : h('p', { class: 'small' }, '🎉 Je hebt de hele weg afgelegd. ¡Felicidades!'),

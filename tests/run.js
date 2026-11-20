@@ -651,6 +651,18 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   ok(!LF.world(LF.STEPS.findIndex(s => s.home === 'casita')).items.has('fire'), 'leven: spullen staan alleen waar ze passen (geen kampvuur in het dorp)');
   const sc = LF.score({ a: { i: 1 }, b: { i: 10 }, c: { i: 30 } });
   ok(sc.points === 6 && LF.stepAt(0) === 0 && LF.stepAt(1e6) === LF.STEPS.length - 1, 'leven: 🌱 1, 🌳 2, ⭐ 3 punten');
+  {
+    // per hoofdtaal: vanuit het Nederlands tellen alle talen samen, vanuit het Spaans begint het opnieuw
+    const SS = c.window.SPT, keep = { P: SS.Profiles, course: SS.course, Store: SS.Store, C: SS.COURSES, ls: c.localStorage };
+    const data = { 'k:es-nl': { srs: { a: { i: 1 } } }, 'k:de-nl': { srs: { b: { i: 30 } } }, 'k:en-es': { srs: { c: { i: 30 }, d: { i: 30 } } } };
+    SS.COURSES = { 'es-nl': { ui: 'nl' }, 'de-nl': { ui: 'nl' }, 'en-es': { ui: 'es' } };
+    SS.Profiles = { active: () => ({ courses: ['es-nl', 'de-nl', 'en-es'] }), activeId: () => 'x', storeKey: (id, cc) => 'k:' + cc };
+    c.localStorage = { getItem: k => JSON.stringify(data[k] || null), setItem() {} };
+    SS.course = { id: 'es-nl' }; SS.Store = { state: data['k:es-nl'] }; const nl = LF.total().points;
+    SS.course = { id: 'en-es' }; SS.Store = { state: data['k:en-es'] }; const es = LF.total().points;
+    Object.assign(SS, { Profiles: keep.P, course: keep.course, Store: keep.Store, COURSES: keep.C }); c.localStorage = keep.ls;
+    ok(nl === 4 && es === 6, 'leven: talen met dezelfde hoofdtaal tellen samen, een andere hoofdtaal begint opnieuw (' + nl + '/' + es + ')');
+  }
   ok(html.indexOf('js/life.js') > html.indexOf('js/cast.js') && html.indexOf('js/life.js') < html.indexOf('js/app.js') && sw.includes("'js/life.js'"), 'leven: script geladen en in de offline-cache');
   ok(html.indexOf('js/cast.js') > html.indexOf('js/tutor.js') && html.indexOf('js/cast.js') < html.indexOf('js/lesson.js') && sw.includes("'js/cast.js'"), 'cast: script geladen en in de offline-cache');
 }
