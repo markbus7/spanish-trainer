@@ -1230,3 +1230,26 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .cast.talking.full .c-arm-r { transform-box: view-box; transform-origin: 91px 100px; animation: cast-wave .9s infinite ease-in-out; }
 @keyframes cast-wave { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-12deg); } }
 @media (max-width: 520px) { .dl-stage:not(.many) .cast svg { width: auto; height: 132px; } }
+
+/* Je eigen personage op Hoy, rechts tegenover Lupe */
+.hoy-me { flex: none; display: flex; flex-direction: column; align-items: center; gap: .1rem; background: none; border: 0; padding: 0; margin: 0; color: var(--muted); font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; text-decoration: none; }
+.hoy-me .cast { display: block; }
+.hoy-me .cast:not(.talking) { animation: pop .5s; }
+.hoy-me .hm-name { font-size: .78rem; font-weight: 600; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hoy-me-pick { width: 92px; height: 120px; justify-content: center; border: 2px dashed var(--line); border-radius: 18px; text-align: center; }
+.hoy-me-pick .hm-q { width: 44px; height: 44px; border-radius: 50%; background: var(--card); display: grid; place-items: center; font-size: 1.4rem; font-weight: 700; color: var(--accent); box-shadow: var(--shadow); }
+.hoy-me-pick small { font-size: .72rem; line-height: 1.2; padding: 0 .3rem; }
+.lupe-coach.with-me .lc-bubble { margin-bottom: 2.2rem; }
+.hoy-me-solo { display: flex; justify-content: flex-end; margin: .6rem 0; }
+body.ask-fab-on .page .lupe-coach.with-me .lc-bubble { margin-right: 0; }
+@media (max-width: 520px) {
+  /* op de telefoon: ballon bovenaan, Lupe links en jij rechts eronder (vrij van de Vraag-Lupe-knop) */
+  .lupe-coach.with-me { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "b b b" "l . m"; align-items: end; gap: .35rem .5rem; }
+  .lupe-coach.with-me .coach-av { grid-area: l; }
+  .lupe-coach.with-me .lc-bubble { grid-area: b; margin: 0 !important; border-radius: 16px; }
+  .lupe-coach.with-me .lc-bubble::before { left: 46px; bottom: -7px; border-width: 7px 7px 0 7px; border-color: var(--lupe-bub) transparent transparent transparent; }
+  .lupe-coach.with-me .hoy-me { grid-area: m; margin-right: 54px; }
+  .hoy-me .cast svg { width: 70px; height: 106px; }
+  .hoy-me .hm-name { font-size: .7rem; max-width: 76px; }
+  .hoy-me-pick { width: 72px; height: 104px; }
+}

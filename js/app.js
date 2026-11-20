@@ -393,9 +393,13 @@
     const just = S.Dagplan.fresh(d, ds); save();
     // Profe Lupe begroet je en zegt waar je vandaag het best mee begint
     const anyDays = Object.values(s.days).some(x => x.min > 0 || x.items > 0);
-    wrap.append(S.Tutor.coach(S.Tutor.lines.hello({ paused: !!Paused.get(), goalDone: min >= goal, streak: Store.liveStreak(), lapsed: anyDays && !Store.liveStreak() && !d.items,
+    const lupeEl = S.Tutor.coach(S.Tutor.lines.hello({ paused: !!Paused.get(), goalDone: min >= goal, streak: Store.liveStreak(), lapsed: anyDays && !Store.liveStreak() && !d.items,
       due, step: step && step.id, unit: u.title, unitNl: u.nl, min,
-      chestReady: ds.all && !ds.chest, planDone: ds.chest, planLeft: ds.total - ds.n, planN: ds.n }), { cls: 'hoy-lupe', full: true, wave: true }));
+      chestReady: ds.all && !ds.chest, planDone: ds.chest, planLeft: ds.total - ds.n, planN: ds.n }), { cls: 'hoy-lupe', full: true, wave: true });
+    // je eigen personage staat rechts, tegenover Lupe (of alleen, als Lupe uit staat)
+    const meEl = meOnHoy(s);
+    if (lupeEl) { if (meEl) { lupeEl.classList.add('with-me'); lupeEl.append(meEl); } wrap.append(lupeEl); }
+    else if (meEl) wrap.append(h('div', { class: 'hoy-me-solo' }, meEl));
 
     const plan = h('div', { class: 'plan' });
     // 0. onderbroken oefening
@@ -428,6 +432,17 @@
     if (!Store.ok) wrap.append(h('p', { class: 'warn' }, '⚠️ Je browser staat opslaan niet toe (privévenster?). Je voortgang wordt niet bewaard.'));
     return wrap;
   };
+  /* Je eigen personage op Hoy: staat rechts tegenover Lupe en zwaait bij binnenkomst en als je erop tikt.
+     Nog nooit gekozen: een uitnodiging om er een te kiezen. Bewust 'geen personage': niets. */
+  function meOnHoy(s) {
+    const c = s.me && S.Cast && S.Cast.get(s.me);
+    if (s.me === undefined && S.Cast) return h('a', { class: 'hoy-me hoy-me-pick', href: '#/perfil', title: 'Kies je eigen personage' }, h('span', { class: 'hm-q' }, '?'), h('small', null, 'Kies je personage'));
+    if (!c) return null;
+    const av = S.Cast.avatar(c.id, 150, 'hoy-me-av', { full: true, look: s.meLook || {} });
+    const wave = () => { av.classList.remove('talking'); void av.offsetWidth; av.classList.add('talking'); clearTimeout(av._t); av._t = setTimeout(() => av.classList.remove('talking'), 1800); };
+    setTimeout(wave, 700);
+    return h('button', { class: 'hoy-me', type: 'button', title: 'Dit ben jij (' + c.nl + ')', 'aria-label': 'Jouw personage: ' + c.nl + '. Tik om te zwaaien.', onclick: wave }, av, h('span', { class: 'hm-name' }, s.name || 'Jij'));
+  }
   /* Oefentegel: titel, één zin wat je er doet (x) en daaronder kort hoe lang/hoeveel (s). */
   function quick(icon, t, s, fn, done, x) { return h('button', { class: 'quick-btn' + (done ? ' did' : ''), type: 'button', onclick: fn }, h('span', { class: 'qi' }, S.Icons && S.Icons.has(icon) ? S.Icons.el(icon) : icon), done ? h('span', { class: 'qd', title: 'Vandaag gedaan' }, '✓') : null, h('b', null, t), x ? h('span', { class: 'qx' }, x) : null, h('small', null, s)); }
 
