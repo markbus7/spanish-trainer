@@ -642,10 +642,15 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   // Jouw leven: fase volgt uit punten (alle talen samen), elke fase heeft een tekening
   vm.runInContext(fs.readFileSync(path.join(root, 'js/life.js'), 'utf8'), c, { filename: 'js/life.js' });
   const LF = c.window.SPT.Life;
-  ok(LF && LF.STAGES.length >= 5 && LF.STAGES.every((s, i) => i === 0 ? s.at === 0 : s.at > LF.STAGES[i - 1].at), 'leven: fases met oplopende drempels');
-  ok(LF.STAGES.every((s, i) => { const v = LF.scene(i); return v.startsWith('<svg') && !/NaN|undefined/.test(v) && s.es && s.en && s.nl; }), 'leven: elke fase heeft een tekening en een woord in elke taal');
+  ok(LF && LF.STEPS.length >= 20 && LF.STEPS.every((s, i) => i === 0 ? s.at === 0 : s.at > LF.STEPS[i - 1].at), 'leven: een lange weg met oplopende drempels');
+  ok(LF.STEPS.every(s => s.es && s.en && s.nl && s.icon && s.name && (s.home || s.add || s.ride)), 'leven: elke stap heeft een naam, icoon en woord in elke taal');
+  const badScene = [];
+  LF.STEPS.forEach((s, i) => LF.acts(LF.world(i)).forEach(a => { const v = LF.scene(i, { act: a.id }); if (!v.startsWith('<svg') || /NaN|undefined/.test(v)) badScene.push(i + ':' + a.id); }));
+  ok(!badScene.length, 'leven: elke scène in elke stap is een geldige tekening' + (badScene.length ? ' (' + badScene.slice(0, 5).join(', ') + ')' : ''));
+  ok(LF.acts(LF.world(0)).map(a => a.id).join() === 'walk,sleep' && LF.acts(LF.world(LF.STEPS.length - 1)).length >= 10, 'leven: scènes komen erbij naarmate je meer hebt');
+  ok(!LF.world(LF.STEPS.findIndex(s => s.home === 'casita')).items.has('fire'), 'leven: spullen staan alleen waar ze passen (geen kampvuur in het dorp)');
   const sc = LF.score({ a: { i: 1 }, b: { i: 10 }, c: { i: 30 } });
-  ok(sc.points === 6 && LF.stageAt(0) === 0 && LF.stageAt(1e6) === LF.STAGES.length - 1, 'leven: 🌱 1, 🌳 2, ⭐ 3 punten');
+  ok(sc.points === 6 && LF.stepAt(0) === 0 && LF.stepAt(1e6) === LF.STEPS.length - 1, 'leven: 🌱 1, 🌳 2, ⭐ 3 punten');
   ok(html.indexOf('js/life.js') > html.indexOf('js/cast.js') && html.indexOf('js/life.js') < html.indexOf('js/app.js') && sw.includes("'js/life.js'"), 'leven: script geladen en in de offline-cache');
   ok(html.indexOf('js/cast.js') > html.indexOf('js/tutor.js') && html.indexOf('js/cast.js') < html.indexOf('js/lesson.js') && sw.includes("'js/cast.js'"), 'cast: script geladen en in de offline-cache');
 }
