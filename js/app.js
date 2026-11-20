@@ -1148,7 +1148,7 @@
             h('div', { class: 'me-grid' }, S.Cast.players.map(c => h('button', { class: 'me-opt' + (s.me === c.id ? ' on' : ''), type: 'button', 'aria-pressed': String(s.me === c.id), onclick: () => {
               s.me = c.id; Store.save(); fillPicker(); refreshHead();
             } }, S.Cast.avatar(c.id, 60, '', { look: L }), h('span', null, c.nl)))),
-            cur ? h('div', { class: 'me-rows' }, row('hat', '🎩 Hoedje'), row('glasses', '👓 Bril'), row('neck', '🧣 Om je hals'), row('shirt', '👕 Shirtkleur')) : null)),
+            cur ? h('div', { class: 'me-rows' }, row('build', '🧍 Postuur'), row('hat', '🎩 Hoedje'), row('glasses', '👓 Bril'), row('neck', '🧣 Om je hals'), row('shirt', '👕 Shirtkleur')) : null)),
         s.me ? h('button', { class: 'btn ghost small', type: 'button', onclick: () => { s.me = ''; Store.save(); render(); } }, 'Geen personage (alleen «Jij»)') : null);
     }
     const headAv = mine ? S.Cast.avatar(mine.id, 76, 'prof-cast', { look: look() }) : h('div', { class: 'avatar' }, initial);
