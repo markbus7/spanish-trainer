@@ -86,7 +86,7 @@
     const s = st();
     let lvl = 'A1', frac = 0;
     for (const L of C.LEVELS) {
-      if (!C.available(L.id)) break;
+      if (!C.available(L.id)) { if (lvl === 'A1' && !frac && !C.available('A1')) continue; break; }
       const p = P.levelProgress(L.id);
       if ((s.levels[L.id] && s.levels[L.id].passed) || p >= 0.999) { lvl = L.id; frac = 1; continue; }
       lvl = L.id; frac = p; break;
@@ -352,7 +352,8 @@
   function bar(frac, color) { return h('div', { class: 'pbar' }, h('i', { style: { width: Math.round(U.clamp(frac, 0, 1) * 100) + '%', background: color || '' } })); }
   function greeting() {
     const hr = new Date().getHours();
-    const g = hr < 12 ? '¡Buenos días' : hr < 19 ? '¡Buenas tardes' : '¡Buenas noches';
+    const en = S.course.target === 'en' && S.course.ui === 'nl';
+    const g = en ? (hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening') : hr < 12 ? '¡Buenos días' : hr < 19 ? '¡Buenas tardes' : '¡Buenas noches';
     return g + (st().name ? ', ' + st().name : '') + '!';
   }
 
@@ -366,14 +367,16 @@
       Store.save(); location.hash = '#/hoy'; render();
     });
     return h('div', { class: 'welcome' },
-      h('div', { class: 'hero' }, S.Tutor.coachOn() ? null : h('div', { class: 'hero-emoji' }, '🌎'), h('h1', null, '¡Bienvenido!'), h('p', null, 'Leer Latijns-Amerikaans Spaans stap voor stap: van A1 naar B1 en verder, tot C2.')),
+      h('div', { class: 'hero' }, S.Tutor.coachOn() ? null : h('div', { class: 'hero-emoji' }, '🌎'), h('h1', null, S.course.target === 'en' && S.course.ui === 'nl' ? 'Welcome!' : '¡Bienvenido!'), h('p', null, 'Leer Latijns-Amerikaans Spaans stap voor stap: van A1 naar B1 en verder, tot C2.')),
       S.Tutor.hero(S.Tutor.lines.welcome, '🌎', { wave: true }),
       section('Hoe heet je?', name),
       section('Waar begin je?',
         h('button', { class: 'choice primary', type: 'button', onclick: () => go(() => { location.hash = '#/toets'; }) }, h('b', null, '🧭 Niveautest (aanbevolen)'), h('span', null, '±8 minuten. Ik bepaal je niveau en zet je op de juiste plek. Je kunt de test later altijd opnieuw doen via je profiel.')),
-        h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.all()[0].id) }, h('b', null, '🌱 Vanaf het begin (A1)'), h('span', null, 'Je begint bij unit 1. Units die je al kent, kun je snel afronden met «Ik ken dit al».')),
+        h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.all()[0].id) }, h('b', null, '🌱 Vanaf het begin (' + C.all()[0].level + ')'), h('span', null, 'Je begint bij unit 1. Units die je al kent, kun je snel afronden met «Ik ken dit al».')),
         C.unitsOf('A2').length ? h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf('A2')[0].id) }, h('b', null, '🚀 Begin bij A2'), h('span', null, 'Je kunt je al redden in de presente en wilt de verleden tijden leren.')) : null,
         C.unitsOf('B1').length ? h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf('B1')[0].id) }, h('b', null, '🌠 Begin bij B1'), h('span', null, 'Je kent de verleden tijden en wilt de subjuntivo, de condicional en argumenteren leren.')) : null),
+        ...(S.course.allLevels ? [['B2', '🧗', 'Je spreekt al vlot en wilt lastige grammatica, valse vrienden en idioom onder de knie krijgen.'], ['C1', '🎯', 'Je Engels is erg goed; je werkt aan register, nuance en natuurlijk klinken.'], ['C2', '🏆', 'Bijna native: ironie, understatement, Brits en Amerikaans, de laatste puntjes op de i.']]
+          .filter(([l]) => C.unitsOf(l).length && C.all()[0].level !== l).map(([l, ic, t]) => h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf(l)[0].id) }, h('b', null, ic + ' Begin bij ' + l), h('span', null, t))) : []),
       h('p', { class: 'muted small center' }, '🔒 Je voortgang wordt alleen op dit apparaat bewaard. Via Perfil kun je een back-up maken.'));
   };
 
@@ -422,7 +425,7 @@
 
     // frase del día
     const ph = S.phrases && S.phrases.length ? S.phrases[U.dayIndex() % S.phrases.length] : null;
-    if (ph) wrap.append(section(S.course.target === 'es' ? 'La frase del día' : 'Frase del día', h('div', { class: 'phrase' }, h('div', { class: 'es', lang: 'es' }, ph[2] + ' ' + ph[0], S.Lesson.speakBtn(ph[0])), h('div', { class: 'muted' }, ph[1]))));
+    if (ph) wrap.append(section(S.course.target === 'es' ? 'La frase del día' : S.course.ui === 'nl' ? 'Phrase of the day' : 'Frase del día', h('div', { class: 'phrase' }, h('div', { class: 'es', lang: 'es' }, ph[2] + ' ' + ph[0], S.Lesson.speakBtn(ph[0])), h('div', { class: 'muted' }, ph[1]))));
 
     // snelle training
     wrap.append(section('Extra oefenen', h('div', { class: 'quick' },
@@ -641,14 +644,14 @@
     }
     const cur = P.current();
     // andere cursussen: alleen de niveaus met lesstof, plus het eerstvolgende als 'komt later'
-    const lvls = S.course.target === 'es' ? C.LEVELS : C.LEVELS.filter((L, i) => C.available(L.id) || (i > 0 && C.available(C.LEVELS[i - 1].id)));
+    const lvls = S.course.target === 'es' || S.course.allLevels ? C.LEVELS : C.LEVELS.filter((L, i) => C.available(L.id) || (i > 0 && C.available(C.LEVELS[i - 1].id)));
     lvls.forEach(L => {
       const us = C.unitsOf(L.id); const avail = us.length > 0;
       const prog = P.levelProgress(L.id); const lv = st().levels[L.id];
       const card = h('div', { class: 'level' + (avail ? '' : ' soon'), style: { '--lc': L.color } });
       card.append(h('div', { class: 'level-head' },
         h('div', { class: 'lv-badge' }, L.id),
-        h('div', { class: 'grow' }, h('b', null, L.name + ' · ' + L.es), avail ? bar(prog, L.color) : h('span', { class: 'muted small' }, 'Komt in een volgende fase — de app groeit met je mee')),
+        h('div', { class: 'grow' }, h('b', null, L.name + ' · ' + L.es), avail ? bar(prog, L.color) : h('span', { class: 'muted small', style: { display: 'block' } }, 'Komt in een volgende fase — de app groeit met je mee')),
         lv && lv.passed ? h('span', { class: 'chip ok' }, '🎓 behaald') : avail ? h('span', { class: 'muted small' }, Math.round(prog * 100) + '%') : h('span', { class: 'chip' }, '🔒')));
       card.append(h('ul', { class: 'can-do' }, L.can.map(c => h('li', null, c))));
       if (avail) {
@@ -1420,7 +1423,8 @@
   routes.regios.tab = 'ruta';
 
   /* ================= NIVEAUTEST (herhaalbaar) ================= */
-  const TEST_ORDER = ['A1', 'A2', 'B1', 'B2'];
+  // niveaus in de test: alle niveaus met vragen in de vragenbank (Spaans A1–B2, Engels voor Nederlanders A1–C2)
+  const TEST_ORDER = C.LEVELS.map(l => l.id).filter((l, i) => i < 4 || S.placement.some(q => q.lv === l));
   const PART_NL = { grammar: 'grammatica', vocab: 'woordenschat', listen: 'luisteren' };
   const lvIdx = id => C.LEVELS.findIndex(l => l.id === id);
   const availLevels = () => C.LEVELS.filter(l => C.available(l.id)).map(l => l.id);
@@ -1748,7 +1752,7 @@
         h('div', { class: 'row gap end wrap' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => { if (!ok.disabled) close(); } }, 'Annuleren'), ok))));
   }
   const CNAME = c => { const x = S.COURSES[c]; return x ? x.flag + ' ' + (S.course.ui === 'es' ? x.name.es.replace(/^./, m => m.toUpperCase()) : x.name.nl) : c; };
-  const CLONG = { 'es-nl': 'Spaans leren · uitleg in het Nederlands', 'en-es': 'Inglés · explicaciones en español', 'nl-es': 'Neerlandés · explicaciones en español' };
+  const CLONG = { 'es-nl': 'Spaans leren · uitleg in het Nederlands', 'en-nl': 'Engels leren (A1–C2) · uitleg in het Nederlands', 'en-es': 'Inglés · explicaciones en español', 'nl-es': 'Neerlandés · explicaciones en español' };
   function profilesCard() {
     const Pr = P_(); const card = h('div', { class: 'card form prof-card' });
     const draw = () => {
@@ -1766,7 +1770,7 @@
       card.append(list);
       // cursus van dit profiel: wisselen of er een bij nemen
       const me = Pr.active();
-      const csel = h('select', { class: 'input', 'aria-label': 'Cursus' }, Object.keys(S.COURSES).map(c => h('option', { value: c, selected: c === me.course ? true : null }, CLONG[c] + (me.courses.includes(c) ? '' : ' (nieuw)'))));
+      const csel = h('select', { class: 'input', 'aria-label': 'Cursus', 'data-notr': '' }, Object.keys(S.COURSES).map(c => h('option', { value: c, selected: c === me.course ? true : null }, CLONG[c] + (me.courses.includes(c) ? '' : ' (nieuw)'))));
       csel.onchange = () => {
         const c = csel.value; if (c === me.course) return;
         if (me.courses.includes(c)) { Pr.switchCourse(me.id, c); return; }
@@ -1778,7 +1782,7 @@
       const nameIn = h('input', { class: 'input', placeholder: 'Naam', maxlength: '30' });
       const avs = h('div', { class: 'chips prof-avs' }, Pr.AVATARS.map(a => h('button', { class: 'chip toggle' + (a === av ? ' on' : ''), type: 'button', 'aria-label': 'Kies ' + a, onclick: e => { av = a; avs.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === e.currentTarget)); } }, a)));
       const out = h('p', { class: 'small warn', role: 'status' });
-      const ncs = h('select', { class: 'input' }, Object.keys(S.COURSES).map(c => h('option', { value: c }, CLONG[c])));
+      const ncs = h('select', { class: 'input', 'data-notr': '' }, Object.keys(S.COURSES).map(c => h('option', { value: c }, CLONG[c])));
       const form = h('div', { class: 'prof-new', hidden: true }, label('Naam van het nieuwe profiel', nameIn), avs, label('Wat wil deze persoon leren?', ncs), out,
         h('div', { class: 'row gap wrap' },
           h('button', { class: 'btn primary', type: 'button', onclick: () => { try { const id = Pr.add(nameIn.value, av, ncs.value); S.confirm('Profiel gemaakt', 'Wil je nu naar het profiel van ' + Pr.label(id) + ' gaan? Daar begin je met een lege voortgang en de niveautest.', 'Ga naar ' + Pr.label(id), () => Pr.switchTo(id), 'Later', () => { draw(); updateProfileChip(); }); } catch (e) { out.textContent = '⚠️ ' + e.message; } } }, 'Profiel maken'),
@@ -1810,7 +1814,7 @@
     wrap.append(h('a', { class: 'btn link', href: '#/ajustes' }, '← Instellingen'), h('h1', null, '📊 Overzicht van iedereen'));
     if (S.Profiles && S.Profiles.locked()) { wrap.append(h('div', { class: 'card' }, h('p', null, 'Dit overzicht zit achter de pincode van de beheerder.'), h('button', { class: 'btn primary', type: 'button', onclick: () => guard(render) }, '🔒 Ontgrendelen'))); return wrap; }
     if (!S.Sync || !S.Sync.enabled()) { wrap.append(h('div', { class: 'card' }, h('p', null, 'Zet eerst synchroniseren aan in dit profiel (Instellingen › Synchroniseren). Het overzicht leest alle voortgangen op dat GitHub-account.'))); return wrap; }
-    const box = h('div', { class: 'admin-list' }, h('p', { class: 'muted' }, '🔄 Voortgangen ophalen…'));
+    const box = h('div', { class: 'admin-list', 'data-notr': '' }, h('p', { class: 'muted' }, '🔄 Voortgangen ophalen…'));
     wrap.append(h('p', { class: 'small muted' }, 'Alle voortgangen op @' + S.Sync.status().login + ', de nieuwste bovenaan. Een profiel dat je niet meer gebruikt, haal je weg met 🗑 Verwijderen.'), box);
     const fmtDay = k => { if (!k) return 'nog nooit'; const t = U.todayKey(), y = U.todayKey(new Date(Date.now() - 864e5)); if (k === t) return 'vandaag'; if (k === y) return 'gisteren'; const d = new Date(k + 'T12:00:00'); return d.toLocaleDateString(S.LOC, { weekday: 'short', day: 'numeric', month: 'short' }); };
     const courseOf = f => { const m = /--([a-z]{2}-[a-z]{2})\.json$/.exec(f); const c = S.COURSES && S.COURSES[m ? m[1] : 'es-nl']; return c ? c.flag + ' ' + c.name.nl : '🌎 Spaans'; };
@@ -1955,7 +1959,7 @@
   const LOG = self.SPT_CHANGELOG || [];
   const logText = e => (S.i18n && S.i18n.on && e.es && e.es.length ? e.es : e.nl) || [];
   function logList(entries, cur) {
-    return h('div', { class: 'wn-list', 'data-notr': S.i18n && S.i18n.on ? '' : null },
+    return h('div', { class: 'wn-list', 'data-notr': S.i18n && (S.i18n.on || S.i18n.sub) ? '' : null },
       entries.map(e => h('section', { class: 'wn-item' + (e.v === cur ? ' current' : '') },
         h('div', { class: 'wn-head' }, h('b', null, 'v' + e.v), h('small', { class: 'muted' }, versionDate(e.date)),
           e.v === cur ? h('span', { class: 'wn-tag' }, S.t('jouw versie')) : null),

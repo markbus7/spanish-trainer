@@ -152,7 +152,7 @@ for (const es of S.Tutor.lines.every(S.C.all())) for (const [v, o] of Object.ent
 
 /* Andere cursussen (uitleg in het Spaans): Amerikaans-Engelse en Nederlandse stemmen, eigen naamruimte (= cursus-id),
    en per niveau 'cursus:niveau' voor offline downloaden. */
-const OTHER = { 'en-es': ['en-US-JennyNeural', 'en-US-GuyNeural'], 'nl-es': ['nl-NL-FennaNeural', 'nl-NL-MaartenNeural'] };
+const OTHER = { 'en-es': ['en-US-JennyNeural', 'en-US-GuyNeural'], 'en-nl': ['en-US-AriaNeural', 'en-US-GuyNeural'], 'nl-es': ['nl-NL-FennaNeural', 'nl-NL-MaartenNeural'] };
 for (const [course, [vf, vm_]] of Object.entries(OTHER)) {
   S = load(course);
   const ns = S.course.ns;

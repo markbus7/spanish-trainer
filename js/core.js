@@ -42,7 +42,10 @@
     'en-es': { id: 'en-es', target: 'en', ui: 'es', speak: 'en-US', listen: 'en-US', flag: '🇺🇸', ns: 'en-es', hello: 'Hello! How are you? Welcome to your English class.', device: 'And this is the voice of your device.',
       brand: 'English <em>fácil</em>', title: 'English Fácil', name: { nl: 'Engels', es: 'inglés' }, ai: { target: 'American English', native: 'Latin American Spanish' } },
     'nl-es': { id: 'nl-es', target: 'nl', ui: 'es', speak: 'nl-NL', listen: 'nl-NL', flag: '🇳🇱', ns: 'nl-es', hello: 'Hallo! Hoe gaat het? Welkom bij je les Nederlands.', device: 'En dit is de stem van je apparaat.',
-      brand: 'Neerlandés <em>fácil</em>', title: 'Neerlandés Fácil', name: { nl: 'Nederlands', es: 'neerlandés' }, ai: { target: 'Dutch (as spoken in the Netherlands)', native: 'Latin American Spanish' } }
+      brand: 'Neerlandés <em>fácil</em>', title: 'Neerlandés Fácil', name: { nl: 'Nederlands', es: 'neerlandés' }, ai: { target: 'Dutch (as spoken in the Netherlands)', native: 'Latin American Spanish' } },
+    // Engels voor Nederlandstaligen, A1 t/m C2 (Amerikaans Engels; Britse verschillen worden uitgelegd).
+    'en-nl': { id: 'en-nl', target: 'en', ui: 'nl', speak: 'en-US', listen: 'en-US', flag: '🇺🇸', ns: 'en-nl', hello: 'Hello! How are you? Welcome to your English class.', device: 'And this is the voice of your device.',
+      brand: 'English <em>pro</em>', title: 'English Pro', name: { nl: 'Engels', es: 'inglés' }, ai: { target: 'American English', native: 'Dutch' }, allLevels: true }
   };
   S.COURSES = COURSES;
 

@@ -6,6 +6,12 @@
   'use strict';
   const course = S.course || { ui: 'nl', target: 'es', name: { es: 'español' } };
   const on = course.ui === 'es';
+  /* Nederlandse schermteksten bij een andere doeltaal dan Spaans (bijv. Engels): «Spaans» wordt de doeltaal. */
+  const N = course.name && course.name.nl;
+  const SUBS = !on && course.ui === 'nl' && course.target !== 'es' && N ? [
+    [/Latijns-Amerikaans(?:e)? Spaans/g, N], [/Spaans \(Mexico\)/g, N + ' (VS)'], [/\bSpaanse\b/g, N + 'e'], [/\bSpaans\b/g, N], [/🇪🇸/g, course.flag]
+  ] : null;
+  const sub = s => { let r = s; for (const [re, v] of SUBS) r = r.replace(re, v); return r; };
   const LANG = course.name.es;
   const dict = Object.create(null), pats = [];
   const fill = v => String(v).replace(/\{L\}/g, LANG);
@@ -24,6 +30,7 @@
   }
   /* Eén tekst vertalen; spaties aan begin en eind blijven staan. Onbekend = ongewijzigd. */
   function t(text) {
+    if (SUBS && text != null) return /Spaans|🇪🇸/.test(text) ? sub(String(text)) : text;
     if (!on || text == null) return text;
     const s = String(text), m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s), core = m[2];
     if (!core || !/[a-zA-Zë]/.test(core)) return s;
@@ -66,8 +73,8 @@
     for (let n = w.nextNode(); n; n = w.nextNode()) doText(n);
   }
   function start() {
-    if (!on || typeof MutationObserver !== 'function') return;
-    document.documentElement.lang = 'es';
+    if (!(on || SUBS) || typeof MutationObserver !== 'function') return;
+    document.documentElement.lang = on ? 'es' : 'nl';
     walk(document.body);
     new MutationObserver(list => {
       for (const m of list) {
@@ -78,7 +85,7 @@
     }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS.concat(['lang']) });
   }
 
-  S.i18n = { on, add, t, start, dict, pats, LOC: on ? 'es-PA' : 'nl-NL' };
+  S.i18n = { on, sub: !!SUBS, add, t, start, dict, pats, LOC: on ? 'es-PA' : 'nl-NL' };
   S.t = t;
   // meervouden die de code zelf samenstelt (U.plural) gaan ook door de vertaling
   if (on && S.U) { const plural = S.U.plural; S.U.plural = (n, one, many) => plural(n, t(one), t(many)); }
