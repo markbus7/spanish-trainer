@@ -4,8 +4,17 @@
   const { U, Speech, Sound } = S;
   const h = U.h;
 
-  const PRAISE = ['¡Muy bien!', '¡Excelente!', '¡Eso es!', '¡Perfecto!', '¡Bien hecho!', '¡Genial!', '¡Correcto!', '¡Así se hace!'];
-  const OOPS = ['Casi…', 'No exactamente', 'Ups…', 'Todavía no'];
+  // Engels voor Nederlanders: lof en instructies in het Engels (de doeltaal); anders in het Spaans.
+  const EN = S.course.target === 'en' && S.course.ui === 'nl';
+  const PRAISE = EN ? ['Well done!', 'Excellent!', 'Spot on!', 'Perfect!', 'Nice one!', 'Great!', 'Correct!', 'Brilliant!']
+    : ['¡Muy bien!', '¡Excelente!', '¡Eso es!', '¡Perfecto!', '¡Bien hecho!', '¡Genial!', '¡Correcto!', '¡Así se hace!'];
+  const OOPS = EN ? ['Almost…', 'Not quite', 'Oops…', 'Not yet'] : ['Casi…', 'No exactamente', 'Ups…', 'Todavía no'];
+  const T_EN = {
+    check: 'Check', next: 'Continue', skip: 'Skip', gotit: 'Got it', choose: 'Choose the right answer', fill: 'Fill in the gap', translate: 'Translate into English',
+    aslesson: 'Translate as in the lesson', order: 'Put the sentence in order', match: 'Match the pairs', listen: 'Listen and type what you hear', speak: 'Say it out loud',
+    conj: 'Conjugate the verb', type: 'Type in English', meaning: 'What does this mean?', howsay: 'How do you say this in English?', hear: 'What do you hear?',
+    newword: 'New word', correct: 'Correct answer', write: 'Writing task'
+  };
 
   function esMode() {
     if (S.course.ui !== 'nl') return false; // uitleg staat al in het Spaans
@@ -23,7 +32,7 @@
     meaning: ['Wat betekent dit?', '¿Qué significa?'], howsay: ['Hoe zeg je dit in het Spaans?', '¿Cómo se dice en español?'], hear: ['Wat hoor je?', '¿Qué escuchas?'],
     newword: ['Nieuw woord', 'Palabra nueva'], correct: ['Juiste antwoord', 'Respuesta correcta'], write: ['Schrijfopdracht', 'Tarea de escritura']
   };
-  function T(k) { const v = T_[k]; return v ? v[esMode() ? 1 : 0] : k; }
+  function T(k) { const v = T_[k]; return v ? (esMode() ? (EN ? T_EN[k] || v[1] : v[1]) : v[0]) : k; }
   const Q_MAP = { 'Wat betekent dit?': 'meaning', 'Hoe zeg je dit in het Spaans?': 'howsay', 'Wat hoor je?': 'hear', 'Typ in het Spaans': 'type', 'Vertaal naar het Spaans': 'translate', 'Vertaal zoals in de les': 'aslesson', 'Vervoeg': 'conj' };
 
   /* 🔊 normaal, 🐢 langzaam. Tik je nog eens op de 🐢, dan wordt het een 🐌: heel langzaam (en dat blijft hij bij deze vraag). */
@@ -246,7 +255,7 @@
     const sumEl = () => S.Tutor.coach({ es: g.sum, lang: S.course.target, nl: es ? '' : 'Kort samengevat, in het Spaans. Tik om het te horen.' }, { size: 54, label: 'Profe Lupe vat samen', cls: 'lc-sum' }) || h('div', { class: 'sum', lang: S.course.target }, (S.course.target === 'es' ? '🇪🇸 ' : S.course.flag + ' ') + g.sum);
     if (g.sum && es) wrap.append(sumEl());
     const body = h('div', { class: 'prose', html: g.html });
-    if (es) { const d = h('details', null, h('summary', null, 'Uitleg in het Nederlands'), body); wrap.append(d); } else wrap.append(body);
+    if (es && !EN) { const d = h('details', null, h('summary', null, 'Uitleg in het Nederlands'), body); wrap.append(d); } else wrap.append(body); // Engels voor Nederlanders: de uitleg blijft altijd open
     if (g.table) {
       const tb = h('table', { class: 'gtable' });
       g.table.forEach((row, ri) => tb.append(h('tr', null, row.map(c => h(ri === 0 ? 'th' : 'td', { html: c })))));
@@ -1042,10 +1051,10 @@
               fix ? h('div', { class: 'small muted fb-fix' }, '📋 Genoteerd in je rapport voor de volgende update. Dit antwoord telt voortaan als goed.') : null));
             if (j.correct) {
               foot.classList.remove('bad'); foot.classList.add('ok');
-              const ft = fb.querySelector('.fb-title'); if (ft) ft.textContent = esMode() ? '¡Sí estaba bien!' : 'Toch goed!';
+              const ft = fb.querySelector('.fb-title'); if (ft) ft.textContent = esMode() ? (EN ? 'It was right after all!' : '¡Sí estaba bien!') : 'Toch goed!';
               const fa = fb.querySelector('.fb-lupe'); if (fa) fa.classList.remove('sad');
               fb.querySelectorAll('.fb-wrong').forEach(x => x.remove());
-              const fe = fb.querySelector('.fb-exp'); if (fe && fe.firstChild) fe.firstChild.textContent = esMode() ? 'En la lección dice: ' : 'In de les staat: ';
+              const fe = fb.querySelector('.fb-exp'); if (fe && fe.firstChild) fe.firstChild.textContent = esMode() ? (EN ? 'The lesson says: ' : 'En la lección dice: ') : 'In de les staat: ';
               graded.set(it.orig || it, true);
               // de herkansing blijft: dan oefen je de zin zoals hij in de les staat
               const rq = queue.find((q, i) => i > idx && q.orig === (it.orig || it) && q.retry);

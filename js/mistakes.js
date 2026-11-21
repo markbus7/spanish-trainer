@@ -224,9 +224,9 @@
   /* ---------- Lupe stelt voor wat er in de volgende update moet komen (met AI-sleutel) ---------- */
   async function proposeUpdate() {
     const r = report(90);
-    const sys = `You are Profe Lupe, the Latin American Spanish teacher inside a language-learning web app${S.course.target === 'es' ? ' for a Dutch speaker' : ''}. The app maker asks you what should go into the NEXT UPDATE of the app, so the course fits this learner better.
+    const sys = `You are Profe Lupe, the ${S.course.target === 'es' ? 'Latin American Spanish' : S.course.ai.target} teacher inside a language-learning web app${S.course.ui === 'nl' ? ' for a Dutch speaker' : ''}. The app maker asks you what should go into the NEXT UPDATE of the app, so the course fits this learner better.
 Write in Dutch, as a short list of 3–7 concrete proposals (one line each, starting with "- "), most important first. No headings, no tables, no intro or outro.
-Each proposal must be something the app maker can build or change: e.g. add an accepted answer or synonym to a specific exercise, fix a wrong model answer, add exercises or a short explanation for a grammar topic the learner keeps getting wrong, add vocabulary, or a new feature that would help. Refer to the exact exercise or lesson when the report names one. Always Latin American Spanish norms (ustedes, never vosotros; regional vocabulary like carro, celular, computadora). Do not invent problems that are not supported by the report; if the report is thin, propose fewer items.`;
+Each proposal must be something the app maker can build or change: e.g. add an accepted answer or synonym to a specific exercise, fix a wrong model answer, add exercises or a short explanation for a grammar topic the learner keeps getting wrong, add vocabulary, or a new feature that would help. Refer to the exact exercise or lesson when the report names one. ${S.course.target === 'es' ? 'Always Latin American Spanish norms (ustedes, never vosotros; regional vocabulary like carro, celular, computadora).' : 'Teach ' + S.course.ai.target + '.'} Do not invent problems that are not supported by the report; if the report is thin, propose fewer items.`;
     const text = await S.AI.ask({ system: sys, prompt: asText(r, { advice: true, proposal: false }), maxTokens: 900 });
     db().update = { t: Date.now(), text: text.trim() };
     return db().update;
@@ -236,7 +236,10 @@ Each proposal must be something the app maker can build or change: e.g. add an a
   async function advise() {
     const r = report(30);
     const other = S.course.target !== 'es', T = S.course.ai.target;
-    const sys = other
+    const sys = other && S.course.ui === 'nl'
+      ? `You are Profe Lupe, a warm ${T} teacher in a learning app for a native Dutch speaker.
+Write in Dutch, max ~120 words, no headings, no tables. Based on the learner's mistake report: name the 2–3 most important things to improve (watch for typical Dutch-speaker mistakes, false friends and unnatural collocations), explain each in one short sentence with one ${T} example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).`
+      : other
       ? `You are Profe Lupe, a warm ${T} teacher in a learning app for a native speaker of Latin American Spanish. When you write Spanish, use Latin American norms (ustedes, never vosotros; celular, carro, computadora).
 Write in Latin American Spanish, max ~120 words, no headings, no tables. Based on the learner's mistake report: name the 2–3 most important things to improve, explain each in one short sentence with one ${T} example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).`
       : `You are Profe Lupe, a warm Latin American Spanish teacher in a learning app for a Dutch speaker. Always Latin American norms (ustedes, never vosotros).

@@ -129,10 +129,21 @@
     A1: 'Use very short, simple sentences in the present tense and the most frequent words only.',
     A2: 'Use short sentences. Simple past, future and common modal verbs are fine; avoid complex structures.',
     B1: 'Use natural everyday language at a moderate pace, including conditionals and common idioms.',
-    B2: 'Use natural, fluent language with idioms and all tenses.'
+    B2: 'Use natural, fluent language with idioms and all tenses.',
+    C1: 'Use rich, natural language with idioms, phrasal verbs, nuanced register and complex structures (inversion, cleft sentences). Correct subtle errors in collocation, register and naturalness, not only grammar.',
+    C2: 'Speak as to an educated native speaker: idiomatic, nuanced, with humor and irony where it fits. Point out anything that sounds slightly unnatural or non-native, including word choice, register, rhythm and collocations.'
   };
 
   function baseRules(p) {
+    if (CO().target !== 'es' && CO().ui === 'nl') {
+      return `You are an expert, warm and encouraging ${CO().ai.target} teacher, working inside a learning app for a native Dutch speaker from the Netherlands${p.name ? ' named ' + p.name : ''}.
+Learner level: ${p.level} (CEFR). ${LEVEL_GENERIC[p.level] || LEVEL_GENERIC.B1}
+Grammar the learner has studied so far: ${p.grammar.join('; ') || 'basics'}.
+${p.weak.length ? 'Known weak points to watch for: ' + p.weak.join(', ') + '.' : ''}
+Teach ${CO().ai.target}${CO().target === 'en' ? ' (US spelling and vocabulary; mention the British variant when it differs and it matters)' : ''}. Pay close attention to typical mistakes of Dutch speakers (false friends such as eventually/actually/sensible, since vs. for, present perfect vs. past simple, word order, make vs. do, too literal translations, "Dunglish").
+Whenever you explain or translate, write in natural Dutch as spoken in the Netherlands.
+Do not use Markdown headings or tables. Keep formatting minimal.`;
+    }
     if (CO().target !== 'es') {
       return `You are an expert, warm and encouraging ${CO().ai.target} teacher, working inside a learning app for a native speaker of Latin American Spanish from Panama${p.name ? ' named ' + p.name : ''}.
 Learner level: ${p.level} (CEFR). ${LEVEL_GENERIC[p.level] || LEVEL_GENERIC.B1}
@@ -180,7 +191,7 @@ ${logRule()}`;
 
 ${tutorPersona()}
 
-You answer the learner's questions about ${TL()} grammar, vocabulary, pronunciation and culture. Answer in ${explainLang()}, clearly and concisely (max ~150 words), with 2–4 short ${CO().ai.target} example sentences and their translations. ${CO().target === 'es' ? 'Mention regional differences when relevant (e.g. Mexico vs. Argentina vs. Spain).' : 'Point out where Spanish speakers typically go wrong when relevant.'} End with one tiny practice question when it fits.
+You answer the learner's questions about ${TL()} grammar, vocabulary, pronunciation and culture. Answer in ${explainLang()}, clearly and concisely (max ~150 words), with 2–4 short ${CO().ai.target} example sentences and their translations. ${CO().target === 'es' ? 'Mention regional differences when relevant (e.g. Mexico vs. Argentina vs. Spain).' : 'Point out where ' + (CO().ui === 'nl' ? 'Dutch' : 'Spanish') + ' speakers typically go wrong when relevant.' + (CO().ui === 'nl' && CO().target === 'en' ? ' At B2 and above, also explain nuance, register and collocation, and say when something is British rather than American.' : '')} End with one tiny practice question when it fits.
 ${BOLD_RULE_()}`;
   }
 

@@ -456,7 +456,7 @@
     return { title: 'Niveautest · ' + lvl, items: U.shuffle(items), mode: 'exam', level: lvl };
   }
   /* Uitslag van de blokken → niveau. bands: { A1: { ok, n }, ... } in volgorde gemaakt. */
-  function levelTestResult(bands, order = ['A1', 'A2', 'B1', 'B2']) {
+  function levelTestResult(bands, order = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']) {
     let level = null, next = null;
     for (const l of order) {
       const b = bands[l]; if (!b) break;
