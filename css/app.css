@@ -1373,6 +1373,9 @@ button.life-stop:hover { background: var(--card); }
 .life-ch:first-child { margin-top: 0; }
 .life-ch.now { color: var(--accent); }
 .life-prev-ch { margin: 0; }
+.life-flags { display: flex; flex-wrap: wrap; justify-content: center; gap: .35rem; margin: .45rem 0 .1rem; }
+.life-flag-chip { background: var(--bg2); border-radius: 99px; padding: .2rem .65rem; font-size: .8rem; color: var(--ink2); }
+.life-flag-chip b { color: var(--ink); font-weight: 600; }
 .modal.life-prev { max-width: 640px; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; }
 .modal.life-prev .life-scene { position: relative; border-radius: 16px; overflow: hidden; margin: .5rem 0; box-shadow: var(--shadow); }
 .modal.life-prev h3 { margin: .3rem 0 .2rem; font-family: var(--serif); }
