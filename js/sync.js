@@ -150,8 +150,8 @@
       found.sort((a, b) => b.updated - a.updated);
       const out = [];
       for (const f of found.slice(0, 25)) {
-        try { const d = await readRemote(f); if (d) out.push(Object.assign(Sync.summary(d), { file: f.file, updated: f.updated, mine: f.file === fileOf(cfg) })); }
-        catch (e) { out.push({ file: f.file, updated: f.updated, error: e.message }); }
+        try { const d = await readRemote(f); if (d) out.push(Object.assign(Sync.summary(d), { file: f.file, base: Sync.baseOf(f.file), updated: f.updated, mine: f.file === fileOf(cfg) })); }
+        catch (e) { out.push({ file: f.file, base: Sync.baseOf(f.file), updated: f.updated, error: e.message }); }
       }
       return out;
     },
@@ -198,6 +198,36 @@
     freshFile(name) {
       const slug = String(name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 20) || 'profiel';
       return 'espanol-latino-voortgang-' + slug + '-' + Math.random().toString(36).slice(2, 6) + '.json';
+    },
+    /* Hoofdbestand van een voortgang: «x--en-es.json» hoort bij «x.json». */
+    baseOf: f => String(f || FILE).replace(/--[a-z]{2}-[a-z]{2}\.json$/, '.json'),
+    /* Het hoofdbestand van een profiel op dit apparaat (of '' als het niet synchroniseert). */
+    localBase(id) {
+      try { const c = JSON.parse(localStorage.getItem(Profiles.syncKey(id)) || 'null'); return c && c.token ? Sync.baseOf(c.file || FILE) : ''; } catch (e) { return ''; }
+    },
+    /* Een hele voortgang (alle cursussen) uit de gists halen. Bevat een gist daarna niets meer, dan gaat de gist zelf weg.
+       token: dat van een ander profiel op dit apparaat; zonder token dat van het actieve profiel. Geeft het aantal verwijderde bestanden. */
+    async removeAccount(base, token) {
+      base = Sync.baseOf(base);
+      const prev = cfg, tok = token || cfg.token;
+      if (!tok) throw new Error('Zet eerst synchroniseren aan');
+      const mine = f => f === base || f.startsWith(base.replace(/\.json$/, '') + '--');
+      cfg = Object.assign({}, prev, { token: tok });
+      let n = 0;
+      try {
+        const hits = [];
+        for (let page = 1; page <= 5; page++) {
+          const list = await gh('/gists?per_page=100&page=' + page);
+          for (const g of list) { const names = Object.keys(g.files || {}), del = names.filter(mine); if (del.length) hits.push({ id: g.id, all: del.length === names.length, del }); }
+          if (list.length < 100) break;
+        }
+        for (const g of hits) {
+          if (g.all) await gh('/gists/' + g.id, { method: 'DELETE' });
+          else await gh('/gists/' + g.id, { method: 'PATCH', body: JSON.stringify({ files: Object.fromEntries(g.del.map(f => [f, null])) }) });
+          n += g.del.length;
+        }
+      } finally { cfg = prev; }
+      return n;
     },
     disconnect() { clearTimeout(pushTimer); pushTimer = null; cfg = { token: '', gistId: '', file: '', login: '', last: 0, error: '' }; try { localStorage.removeItem(CFG_KEY); } catch (e) { /* negeer */ } emit(); },
     syncNow,

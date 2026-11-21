@@ -1268,7 +1268,7 @@ body.ask-fab-on .page .lupe-coach.with-me .lc-bubble { margin-right: 0; }
 .life-road { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: .35rem; margin-top: .4rem; }
 .life-road-wrap > summary { cursor: pointer; text-align: center; font-weight: 600; margin-top: .7rem; color: var(--ink2); }
 .life-stop { text-align: center; border-radius: 12px; padding: .45rem .2rem; background: var(--bg2); font-size: .72rem; line-height: 1.2; color: var(--muted); }
-.life-stop .ic { display: block; font-size: 1.4rem; margin-bottom: .15rem; }
+.life-stop .ic { display: block; font-size: 1.4rem; line-height: 1.2; margin-bottom: .15rem; }
 .life-stop.done { color: var(--ink2); }
 .life-stop.now { outline: 2px solid var(--accent); background: var(--card); color: var(--ink); font-weight: 700; }
 .life-stop.locked .ic { filter: grayscale(1); opacity: .35; }
@@ -1326,3 +1326,19 @@ body.ask-fab-on .page .lupe-coach.with-me .lc-bubble { margin-right: 0; }
 .lv-fly { animation: lv-fly 22s linear infinite; }
 @keyframes lv-fly { from { transform: translateX(-80px); } to { transform: translateX(560px); } }
 @media (prefers-reduced-motion: reduce) { .life-scene * { animation: none !important; opacity: 1; } }
+/* profiel verwijderen (v1.40.0) */
+.btn.del-btn { color: var(--bad); }
+.del-modal .btn.danger { background: var(--bad); color: #fff; font-weight: 700; }
+.del-modal h3 { margin-top: 0; }
+.del-list { margin: .2rem 0 .6rem; padding-left: 1.2rem; }
+.del-list li { margin: .25rem 0; }
+.del-warn { background: var(--bad-soft); color: var(--bad); border-radius: 12px; padding: .6rem .75rem; font-size: .92rem; }
+.admin-foot { align-items: center; margin-top: .2rem; }
+.admin-main { font-style: italic; }
+/* voorproefje Jouw leven */
+button.life-stop { border: 0; font: inherit; font-size: .72rem; line-height: 1.2; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: auto; min-height: 0; }
+button.life-stop:hover { background: var(--card); }
+.life-road-tip { text-align: center; margin: .4rem 0 0; }
+.modal.life-prev { max-width: 640px; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; }
+.modal.life-prev .life-scene { position: relative; border-radius: 16px; overflow: hidden; margin: .5rem 0; box-shadow: var(--shadow); }
+.modal.life-prev h3 { margin: .3rem 0 .2rem; font-family: var(--serif); }
