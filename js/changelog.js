@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.44.0', date: '2026-11-21',
+    nl: ['Engels voor Nederlandstaligen: niveau C2 compleet (10 units: connotatie, idioom, ironie en understatement, ellips, woordvorming, Dunglish, stijl en interpunctie, spreektaal en slang, contracten en onderhandelen, humor en culturele verwijzingen)'],
+    es: [] },
   { v: '1.43.0', date: '2026-11-21',
     nl: ['Jouw leven is veel langer: 53 stappen in plaats van 26, met vijf nieuwe werelden (Andes, koffiestreek, jungle, Patagonië en een koloniale stad met je eigen taalschool). Genoeg om ook met Engels, Duits en Frans erbij nog lang te groeien. De hele weg is ingedeeld in hoofdstukken en het voorproefje laat het nieuwe ding in gebruik zien.'],
     es: [] },
