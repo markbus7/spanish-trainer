@@ -4,8 +4,11 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
-  { v: '1.42.0', date: '2026-11-21',
+  { v: '1.43.0', date: '2026-11-21',
     nl: ['Jouw leven is veel langer: 53 stappen in plaats van 26, met vijf nieuwe werelden (Andes, koffiestreek, jungle, Patagonië en een koloniale stad met je eigen taalschool). Genoeg om ook met Engels, Duits en Frans erbij nog lang te groeien. De hele weg is ingedeeld in hoofdstukken en het voorproefje laat het nieuwe ding in gebruik zien.'],
+    es: [] },
+  { v: '1.42.0', date: '2026-11-21',
+    nl: ['Engels voor Nederlandstaligen: niveau C1 compleet (10 units: inversie, cleft sentences, beleefd en voorzichtig formuleren, collocaties, idioom, participle clauses, lidwoorden, academische stijl, presenteren, subjunctive)'],
     es: [] },
   { v: '1.41.0', date: '2026-11-21',
     nl: ['Nieuwe cursus: Engels voor Nederlandstaligen (A1 t/m C2, Amerikaans Engels met Britse verschillen). Eerste levering: niveau B2 compleet (10 units: spijt en mixed conditionals, speculeren, passief en laten doen, valse vrienden en Dunglish, phrasal verbs, gerund/infinitief, reporting verbs, betrekkelijke bijzinnen, de toekomst, verbindingswoorden en formeel schrijven).', 'Niveautest voor Engels van A1 tot C2, gesprekken met Lupe tot C2-niveau. Kies de cursus via Instellingen › Profielen.'],
