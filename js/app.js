@@ -441,7 +441,8 @@
     // één levend beeld: de lucht volgt het uur van de dag, je personage loopt rond en alles om hem heen beweegt
     stage.innerHTML = S.Life.scene(L.i, { act: S.Life.pick(W, new Date().getHours()) });
     const langs = (S.Profiles && S.Profiles.active() && S.Profiles.active().courses.length) || 1;
-    const road = h('div', { class: 'life-road' }, S.Life.STEPS.map((st, i) => h('div', { class: 'life-stop' + (i < L.i ? ' done' : i === L.i ? ' now' : ' locked'), title: st.name + (i > L.i ? ' · vanaf ' + st.at + ' punten' : '') },
+    // elke stap is aan te tikken: een voorproefje van hoe je wereld er dan uitziet (ook om aan anderen te laten zien)
+    const road = h('div', { class: 'life-road' }, S.Life.STEPS.map((st, i) => h('button', { type: 'button', class: 'life-stop' + (i < L.i ? ' done' : i === L.i ? ' now' : ' locked'), title: st.name + (i > L.i ? ' · vanaf ' + st.at + ' punten' : ''), onclick: () => lifePreview(i, L) },
       h('span', { class: 'ic' }, st.icon), i > L.i ? '🔒 ' + st.at : st.name)));
     return h('div', { class: 'card life-card' },
       h('div', { class: 'dp-title' }, h('h2', { class: 'sec-title' }, '🏡 Jouw leven'), h('span', { class: 'dp-count' }, `Stap ${L.i + 1} van ${S.Life.STEPS.length}`)),
@@ -453,7 +454,31 @@
         h('p', { class: 'small' }, `Nog ${L.left} ${L.left === 1 ? 'punt' : 'punten'} tot de volgende stap: ${L.next.icon} ${L.next.name}.`))
         : h('p', { class: 'small' }, '🎉 Je hebt de hele weg afgelegd. ¡Felicidades!'),
       h('p', { class: 'muted small life-pts' }, `🌱 ${L.learning} × 1 + 🌳 ${L.known} × 2 + ⭐ ${L.mastered} × 3 = ${L.points} punten`),
-      h('details', { class: 'life-road-wrap' }, h('summary', null, `De hele weg (${S.Life.STEPS.length} stappen)`), road));
+      h('details', { class: 'life-road-wrap', open: L.i === 0 ? true : null }, h('summary', null, `De hele weg (${S.Life.STEPS.length} stappen)`), h('p', { class: 'muted small life-road-tip' }, '👀 Tik op een stap om te zien hoe je wereld er dan uitziet.'), road));
+  }
+  /* Voorproefje van stap i, met bladeren naar de vorige en volgende stap. */
+  function lifePreview(i, L) {
+    const root = document.getElementById('modal-root'), N = S.Life.STEPS.length;
+    const close = () => { root.innerHTML = ''; document.removeEventListener('keydown', keys); };
+    const keys = e => { if (e.key === 'Escape') close(); else if (e.key === 'ArrowLeft' && i > 0) show(i - 1); else if (e.key === 'ArrowRight' && i < N - 1) show(i + 1); };
+    const box = h('div', { class: 'modal life-prev', role: 'dialog', 'aria-modal': 'true' });
+    function show(n) {
+      i = n; const st = S.Life.STEPS[i], reached = i <= L.i;
+      const stage = h('div', { class: 'life-scene' }); stage.innerHTML = S.Life.scene(i, { act: 'walk' });
+      box.innerHTML = '';
+      box.append(
+        h('div', { class: 'row gap between' }, h('span', { class: 'dp-count' }, `Stap ${i + 1} van ${N}`), h('button', { class: 'btn link update-x', type: 'button', 'aria-label': 'Sluiten', onclick: close }, '✕')),
+        stage,
+        h('h3', null, st.icon + ' ' + st.name, ' · ', h('span', { class: 'life-word', lang: (S.course && S.course.target) || 'es' }, S.Life.word(st))),
+        h('p', { class: 'small' + (reached ? '' : ' muted') }, i === L.i ? '📍 Hier ben je nu.' : reached ? '✅ Al bereikt.' : `🔒 Voorproefje: dit krijg je bij ${st.at} punten. Nog ${st.at - L.points} te gaan.`),
+        h('div', { class: 'row gap between' },
+          h('button', { class: 'btn ghost', type: 'button', disabled: i === 0 ? true : null, onclick: () => show(i - 1) }, '← Vorige'),
+          h('button', { class: 'btn ghost', type: 'button', disabled: i === N - 1 ? true : null, onclick: () => show(i + 1) }, 'Volgende →')));
+    }
+    show(i);
+    root.innerHTML = '';
+    root.append(h('div', { class: 'modal-bg', onclick: e => { if (e.target.classList.contains('modal-bg')) close(); } }, box));
+    document.addEventListener('keydown', keys);
   }
   /* Je eigen personage op Hoy: staat rechts tegenover Lupe en zwaait bij binnenkomst en als je erop tikt.
      Nog nooit gekozen: een uitnodiging om er een te kiezen. Bewust 'geen personage': niets. */
@@ -1173,7 +1198,7 @@
               s.me = c.id; Store.save(); fillPicker(); refreshHead();
             } }, S.Cast.avatar(c.id, 60, '', { look: L }), h('span', null, c.nl)))),
             cur ? h('div', { class: 'me-rows' }, row('build', '🧍 Postuur'), row('hat', '🎩 Hoedje'), row('glasses', '👓 Bril'), row('neck', '🧣 Om je hals'), row('shirt', '👕 Shirtkleur')) : null)),
-        s.me ? h('button', { class: 'btn ghost small', type: 'button', onclick: () => { s.me = ''; Store.save(); render(); } }, 'Geen personage (alleen «Jij»)') : null);
+        s.me ? h('button', { class: 'btn ghost small', type: 'button', onclick: () => { s.me = ''; Store.save(); render(); } }, 'Geen personage (alleen «Jij»)') : '');
     }
     const headAv = mine ? S.Cast.avatar(mine.id, 76, 'prof-cast', { look: look() }) : h('div', { class: 'avatar' }, initial);
     function refreshHead() {
@@ -1685,6 +1710,43 @@
     el.hidden = !show;
     if (show) { el.innerHTML = ''; el.append(p.avatar || '🙂', h('span', { class: 'tb-prof-name' }, ' ' + Pr.label(p.id)), p.courses.length > 1 ? ' ' + S.course.flag : ''); el.title = 'Profiel: ' + Pr.label(p.id) + ' (tik om te wisselen)'; }
   }
+  /* Een profiel echt weghalen: van dit apparaat én (als het synchroniseert) uit de gists, zodat het niet terugkomt bij synchroniseren
+     en ook niet meer in het overzicht staat. Het eerste profiel (hoofdprofiel) kan nooit weg.
+     localId: profiel op dit apparaat (of null); base: hoofdbestand in de gist (of ''); courses: cursusnamen voor de uitleg. */
+  function deleteAccount({ name, localId, base, courses, done }) {
+    const Pr = P_(), Sync = S.Sync;
+    if (localId === Pr.MAIN || (base && Sync && Sync.baseOf(base) === Sync.FILE)) return;
+    let token = '';
+    if (localId) { try { const c = JSON.parse(localStorage.getItem(Pr.syncKey(localId)) || 'null'); token = (c && c.token) || ''; } catch (e) { /* negeer */ } }
+    if (localId && !base && token && Sync) base = Sync.localBase(localId);
+    const remote = !!(base && Sync && (token || Sync.enabled()));
+    const root = document.getElementById('modal-root');
+    const close = () => { root.innerHTML = ''; };
+    const out = h('p', { class: 'small warn', role: 'status' });
+    const what = [];
+    if (localId) what.push(h('li', null, '📱 Het profiel en alle voortgang op dit apparaat' + (courses && courses.length ? ' (' + courses.join(', ') + ')' : '')));
+    if (remote) what.push(h('li', null, '☁️ De voortgang in je GitHub-gist. Zo staat het niet meer in het overzicht en komt het niet terug bij synchroniseren.'));
+    const ok = h('button', { class: 'btn danger', type: 'button', onclick: async () => {
+      ok.disabled = true; out.textContent = '🗑 Bezig met verwijderen…';
+      try {
+        if (remote) await Sync.removeAccount(base, token || undefined);
+        const wasActive = localId && localId === Pr.activeId();
+        if (wasActive && Sync) Sync.disconnect(); // geen upload meer tijdens het herladen
+        if (localId) Pr.remove(localId);
+        close(); S.toast('🗑 ' + name + ' is verwijderd');
+        if (wasActive) { Pr.switchTo(Pr.MAIN); return; }
+        updateProfileChip(); if (done) done();
+      } catch (e) { ok.disabled = false; out.textContent = '⚠️ Niet gelukt: ' + e.message + '. Er is niets verwijderd van dit apparaat.'; }
+    } }, '🗑 Definitief verwijderen');
+    root.append(h('div', { class: 'modal-bg', onclick: e => { if (e.target.classList.contains('modal-bg') && !ok.disabled) close(); } },
+      h('div', { class: 'modal del-modal', role: 'dialog', 'aria-modal': 'true' },
+        h('h3', null, '⚠️ ' + name + ' verwijderen?'),
+        h('p', null, 'Dit wordt gewist:'), h('ul', { class: 'small del-list' }, what),
+        h('p', { class: 'del-warn' }, h('b', null, 'Dit kan niet ongedaan worden gemaakt.'), ' Alle woorden, units, reeksen en XP van ' + name + ' zijn daarna weg.'),
+        remote && !localId ? h('p', { class: 'small muted' }, 'Gebruikt ' + name + ' de app nog op een eigen telefoon of tablet? Dan komt de voortgang daar bij het volgende oefenen terug. Verwijder het profiel dan ook op dat apparaat.') : null,
+        out,
+        h('div', { class: 'row gap end wrap' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => { if (!ok.disabled) close(); } }, 'Annuleren'), ok))));
+  }
   const CNAME = c => { const x = S.COURSES[c]; return x ? x.flag + ' ' + (S.course.ui === 'es' ? x.name.es.replace(/^./, m => m.toUpperCase()) : x.name.nl) : c; };
   const CLONG = { 'es-nl': 'Spaans leren · uitleg in het Nederlands', 'en-es': 'Inglés · explicaciones en español', 'nl-es': 'Neerlandés · explicaciones en español' };
   function profilesCard() {
@@ -1699,7 +1761,7 @@
           h('span', { class: 'prof-av', 'aria-hidden': 'true' }, p.avatar || '🙂'),
           h('div', { class: 'grow' }, h('b', null, Pr.label(p.id)), h('small', { class: 'muted', style: { display: 'block' } }, (me ? 'Actief · ' : '') + p.courses.map(CNAME).join(' · ')), h('small', { class: 'muted', style: { display: 'block' } }, (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
           me ? null : h('button', { class: 'btn ghost small', type: 'button', onclick: () => Pr.switchTo(p.id) }, 'Wissel'),
-          p.id === Pr.MAIN || me ? null : h('button', { class: 'btn link small', type: 'button', 'aria-label': 'Verwijder ' + Pr.label(p.id), onclick: () => guard(() => S.confirm('Profiel verwijderen?', 'De voortgang van ' + Pr.label(p.id) + ' wordt van dit apparaat gewist. Staat die voortgang ook in een gist, dan blijft hij daar bewaard.', 'Verwijderen', () => { Pr.remove(p.id); draw(); updateProfileChip(); })) }, '🗑')));
+          p.id === Pr.MAIN ? null : h('button', { class: 'btn link small del-btn', type: 'button', title: 'Verwijder ' + Pr.label(p.id), 'aria-label': 'Verwijder ' + Pr.label(p.id), onclick: () => guard(() => deleteAccount({ name: Pr.label(p.id), localId: p.id, courses: p.courses.map(CNAME), done: draw })) }, '🗑 Verwijderen')));
       });
       card.append(list);
       // cursus van dit profiel: wisselen of er een bij nemen
@@ -1749,23 +1811,34 @@
     if (S.Profiles && S.Profiles.locked()) { wrap.append(h('div', { class: 'card' }, h('p', null, 'Dit overzicht zit achter de pincode van de beheerder.'), h('button', { class: 'btn primary', type: 'button', onclick: () => guard(render) }, '🔒 Ontgrendelen'))); return wrap; }
     if (!S.Sync || !S.Sync.enabled()) { wrap.append(h('div', { class: 'card' }, h('p', null, 'Zet eerst synchroniseren aan in dit profiel (Instellingen › Synchroniseren). Het overzicht leest alle voortgangen op dat GitHub-account.'))); return wrap; }
     const box = h('div', { class: 'admin-list' }, h('p', { class: 'muted' }, '🔄 Voortgangen ophalen…'));
-    wrap.append(h('p', { class: 'small muted' }, 'Alle voortgangen op @' + S.Sync.status().login + ', de nieuwste bovenaan. Dit leest alleen; er verandert niets.'), box);
+    wrap.append(h('p', { class: 'small muted' }, 'Alle voortgangen op @' + S.Sync.status().login + ', de nieuwste bovenaan. Een profiel dat je niet meer gebruikt, haal je weg met 🗑 Verwijderen.'), box);
     const fmtDay = k => { if (!k) return 'nog nooit'; const t = U.todayKey(), y = U.todayKey(new Date(Date.now() - 864e5)); if (k === t) return 'vandaag'; if (k === y) return 'gisteren'; const d = new Date(k + 'T12:00:00'); return d.toLocaleDateString(S.LOC, { weekday: 'short', day: 'numeric', month: 'short' }); };
     const courseOf = f => { const m = /--([a-z]{2}-[a-z]{2})\.json$/.exec(f); const c = S.COURSES && S.COURSES[m ? m[1] : 'es-nl']; return c ? c.flag + ' ' + c.name.nl : '🌎 Spaans'; };
-    S.Sync.overview().then(list => {
+    // welke voortgang hoort bij welk profiel op dit apparaat (dat profiel gaat bij verwijderen ook hier weg)
+    const Pr = S.Profiles, local = {};
+    if (Pr) Pr.list().forEach(p => { const b = S.Sync.localBase(p.id) || (p.id === Pr.activeId() ? S.Sync.baseOf(S.Sync.status().file) : ''); if (b) local[b] = p.id; });
+    const load = () => S.Sync.overview().then(list => {
       box.innerHTML = '';
       if (!list.length) { box.append(h('p', { class: 'muted' }, 'Nog geen voortgangen gevonden.')); return; }
+      const delBtn = r => {
+        const lid = local[r.base] || null;
+        if (r.base === S.Sync.FILE || (Pr && lid === Pr.MAIN)) return h('small', { class: 'muted admin-main' }, 'Hoofdprofiel, kan niet weg');
+        const who = r.name || (lid && Pr ? Pr.label(lid) : '') || 'Zonder naam';
+        const courses = list.filter(x => x.base === r.base).map(x => courseOf(x.file));
+        return h('button', { class: 'btn link small del-btn', type: 'button', 'aria-label': 'Verwijder ' + who, onclick: () => guard(() => deleteAccount({ name: who, localId: lid, base: r.base, courses, done: () => { box.innerHTML = ''; box.append(h('p', { class: 'muted' }, '🔄 Voortgangen ophalen…')); load(); } })) }, '🗑 Verwijderen');
+      };
       list.forEach(r => {
-        if (r.error) { box.append(h('div', { class: 'card admin-card' }, h('b', null, r.file), h('p', { class: 'small warn' }, '⚠️ ' + r.error))); return; }
+        if (r.error) { box.append(h('div', { class: 'card admin-card' }, h('b', null, r.file), h('p', { class: 'small warn' }, '⚠️ ' + r.error), h('div', { class: 'row end' }, delBtn(r)))); return; }
         const stat = (v, l) => h('div', { class: 'admin-stat' }, h('b', null, v), h('small', { class: 'muted' }, l));
         box.append(h('div', { class: 'card admin-card' },
           h('div', { class: 'row gap between wrap' }, h('div', null, h('b', { class: 'admin-name' }, r.name || 'Zonder naam'), r.mine ? h('span', { class: 'chip ok' }, 'dit profiel') : null, h('small', { class: 'muted', style: { display: 'block' } }, courseOf(r.file) + (r.unit ? ' · nu bij ' + r.unit : ''))),
             h('span', { class: 'chip' }, r.level || '–')),
           h('div', { class: 'admin-stats' }, stat('🔥 ' + r.streak, 'dagen op rij (record ' + r.best + ')'), stat(fmtDay(r.lastDay), 'laatst geoefend'), stat(r.weekMin + ' min', 'deze week'), stat('⭐ ' + r.xp, U.plural(r.words, 'woord', 'woorden') + ' · ' + U.plural(r.unitsDone, 'unit', 'units'))),
           r.weak.length ? h('div', { class: 'small' }, h('b', null, '🎯 Zwakke punten: '), r.weak.map(w => w.label + ' (' + w.pct + '%)').join(', ')) : h('div', { class: 'small muted' }, 'Nog geen zwakke punten.'),
-          h('small', { class: 'muted' }, 'Gesynchroniseerd ' + ago(r.updated))));
+          h('div', { class: 'row gap between wrap admin-foot' }, h('small', { class: 'muted' }, 'Gesynchroniseerd ' + ago(r.updated)), delBtn(r))));
       });
     }).catch(e => { box.innerHTML = ''; box.append(h('p', { class: 'warn' }, '⚠️ ' + e.message)); });
+    load();
     return wrap;
   };
   routes.beheer.tab = 'perfil';
