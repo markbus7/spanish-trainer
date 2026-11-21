@@ -649,6 +649,15 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   ok(!badScene.length, 'leven: elke scène in elke stap is een geldige tekening' + (badScene.length ? ' (' + badScene.slice(0, 5).join(', ') + ')' : ''));
   ok(LF.acts(LF.world(0)).length <= 4 && LF.acts(LF.world(LF.STEPS.length - 1)).length >= 12, 'leven: scènes komen erbij naarmate je meer hebt');
   ok(!LF.world(LF.STEPS.findIndex(s => s.home === 'casita')).items.has('fire'), 'leven: spullen staan alleen waar ze passen (geen kampvuur in het dorp)');
+  // genoeg stappen voor meer talen: één volle taal (±7.200 punten) haalt maar een klein deel van de weg
+  ok(LF.STEPS.length >= 50 && LF.STEPS[LF.STEPS.length - 1].at >= 40000, 'leven: lange weg, ook als er talen bijkomen (' + LF.STEPS.length + ' stappen, eind ' + LF.STEPS[LF.STEPS.length - 1].at + ')');
+  ok(LF.stepAt(7200) < LF.STEPS.length / 2 && LF.stepAt(15000) < LF.STEPS.length * .7, 'leven: één taal vult het leven niet');
+  ok(LF.STEPS.every((s, i) => !i || s.at - LF.STEPS[i - 1].at <= 2400), 'leven: nooit te lang wachten op de volgende stap');
+  const badPrev = LF.STEPS.map((s, i) => [i, LF.showAct(i)]).filter(([i, a]) => !LF.acts(LF.world(i)).some(x => x.id === a));
+  ok(!badPrev.length, 'leven: voorproefje toont het nieuwe ding in gebruik' + (badPrev.length ? ' (' + badPrev.join(' ') + ')' : ''));
+  ok(LF.showAct(LF.STEPS.findIndex(s => s.add === 'kayak')) === 'kayak' && LF.showAct(LF.STEPS.findIndex(s => s.add === 'pupils')) === 'teach', 'leven: voorproefje kajak en les geven');
+  ok(LF.chapter(0).first && LF.STEPS.filter((s, i) => LF.chapter(i).first).length >= 10 && LF.STEPS.every((s, i) => !/undefined/.test(LF.chapter(i).name)), 'leven: de weg is ingedeeld in hoofdstukken (landschappen)');
+  ok(!LF.world(LF.STEPS.length - 1).items.has('llama') && LF.world(LF.STEPS.findIndex(s => s.add === 'train')).items.has('llama'), 'leven: Andes-dieren blijven in de Andes');
   const sc = LF.score({ a: { i: 1 }, b: { i: 10 }, c: { i: 30 } });
   ok(sc.points === 6 && LF.stepAt(0) === 0 && LF.stepAt(1e6) === LF.STEPS.length - 1, 'leven: 🌱 1, 🌳 2, ⭐ 3 punten');
   {

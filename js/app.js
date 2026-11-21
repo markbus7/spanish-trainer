@@ -445,8 +445,10 @@
     stage.innerHTML = S.Life.scene(L.i, { act: S.Life.pick(W, new Date().getHours()) });
     const langs = (S.Profiles && S.Profiles.active() && S.Profiles.active().courses.length) || 1;
     // elke stap is aan te tikken: een voorproefje van hoe je wereld er dan uitziet (ook om aan anderen te laten zien)
-    const road = h('div', { class: 'life-road' }, S.Life.STEPS.map((st, i) => h('button', { type: 'button', class: 'life-stop' + (i < L.i ? ' done' : i === L.i ? ' now' : ' locked'), title: st.name + (i > L.i ? ' · vanaf ' + st.at + ' punten' : ''), onclick: () => lifePreview(i, L) },
-      h('span', { class: 'ic' }, st.icon), i > L.i ? '🔒 ' + st.at : st.name)));
+    // de weg in hoofdstukken (landschappen), zodat je ook bij veel stappen ziet waar je bent
+    const road = h('div', { class: 'life-road' }, S.Life.STEPS.flatMap((st, i) => [S.Life.chapter(i).first ? h('div', { class: 'life-ch' + (S.Life.chapter(i).id === W.biome ? ' now' : '') }, S.Life.chapter(i).name) : null,
+      h('button', { type: 'button', class: 'life-stop' + (i < L.i ? ' done' : i === L.i ? ' now' : ' locked'), title: st.name + (i > L.i ? ' · vanaf ' + st.at.toLocaleString('nl-NL') + ' punten' : ''), onclick: () => lifePreview(i, L) },
+        h('span', { class: 'ic' }, st.icon), i > L.i ? '🔒 ' + st.at.toLocaleString('nl-NL') : st.name)]).filter(Boolean));
     return h('div', { class: 'card life-card' },
       h('div', { class: 'dp-title' }, h('h2', { class: 'sec-title' }, '🏡 Jouw leven'), h('span', { class: 'dp-count' }, `Stap ${L.i + 1} van ${S.Life.STEPS.length}`)),
       fresh.length ? h('div', { class: 'life-new' }, '✨ Nieuw sinds je vorige bezoek: ' + fresh.map(x => x.icon + ' ' + x.name).join(', ')) : null,
@@ -454,9 +456,9 @@
       h('div', { class: 'life-name' }, h('b', null, L.step.icon + ' ' + L.step.name), ' · ', h('span', { class: 'life-word', lang: (S.course && S.course.target) || 'es' }, S.Life.word(L.step))),
       h('p', { class: 'muted small' }, 'Je wereld groeit vanzelf mee met wat je weet' + (langs > 1 ? ', in al je talen vanuit het Nederlands samen.' : '. Leer je later nog een taal vanuit het Nederlands, dan telt die ook mee.') + ''),
       L.next ? h('div', { class: 'life-next' }, h('div', { class: 'bar' }, h('i', { style: { width: Math.round(L.pct * 100) + '%' } })),
-        h('p', { class: 'small' }, `Nog ${L.left} ${L.left === 1 ? 'punt' : 'punten'} tot de volgende stap: ${L.next.icon} ${L.next.name}.`))
+        h('p', { class: 'small' }, `Nog ${L.left.toLocaleString('nl-NL')} ${L.left === 1 ? 'punt' : 'punten'} tot de volgende stap: ${L.next.icon} ${L.next.name}.`))
         : h('p', { class: 'small' }, '🎉 Je hebt de hele weg afgelegd. ¡Felicidades!'),
-      h('p', { class: 'muted small life-pts' }, `🌱 ${L.learning} × 1 + 🌳 ${L.known} × 2 + ⭐ ${L.mastered} × 3 = ${L.points} punten`),
+      h('p', { class: 'muted small life-pts' }, `🌱 ${L.learning} × 1 + 🌳 ${L.known} × 2 + ⭐ ${L.mastered} × 3 = ${L.points.toLocaleString('nl-NL')} punten`),
       h('details', { class: 'life-road-wrap', open: L.i === 0 ? true : null }, h('summary', null, `De hele weg (${S.Life.STEPS.length} stappen)`), h('p', { class: 'muted small life-road-tip' }, '👀 Tik op een stap om te zien hoe je wereld er dan uitziet.'), road));
   }
   /* Voorproefje van stap i, met bladeren naar de vorige en volgende stap. */
@@ -467,13 +469,14 @@
     const box = h('div', { class: 'modal life-prev', role: 'dialog', 'aria-modal': 'true' });
     function show(n) {
       i = n; const st = S.Life.STEPS[i], reached = i <= L.i;
-      const stage = h('div', { class: 'life-scene' }); stage.innerHTML = S.Life.scene(i, { act: 'walk' });
+      const stage = h('div', { class: 'life-scene' }); stage.innerHTML = S.Life.scene(i, { act: S.Life.showAct(i) });
       box.innerHTML = '';
       box.append(
         h('div', { class: 'row gap between' }, h('span', { class: 'dp-count' }, `Stap ${i + 1} van ${N}`), h('button', { class: 'btn link update-x', type: 'button', 'aria-label': 'Sluiten', onclick: close }, '✕')),
         stage,
         h('h3', null, st.icon + ' ' + st.name, ' · ', h('span', { class: 'life-word', lang: (S.course && S.course.target) || 'es' }, S.Life.word(st))),
-        h('p', { class: 'small' + (reached ? '' : ' muted') }, i === L.i ? '📍 Hier ben je nu.' : reached ? '✅ Al bereikt.' : `🔒 Voorproefje: dit krijg je bij ${st.at} punten. Nog ${st.at - L.points} te gaan.`),
+        h('p', { class: 'muted small life-prev-ch' }, S.Life.chapter(i).name),
+        h('p', { class: 'small' + (reached ? '' : ' muted') }, i === L.i ? '📍 Hier ben je nu.' : reached ? '✅ Al bereikt.' : `🔒 Voorproefje: dit krijg je bij ${st.at.toLocaleString('nl-NL')} punten. Nog ${(st.at - L.points).toLocaleString('nl-NL')} te gaan.`),
         h('div', { class: 'row gap between' },
           h('button', { class: 'btn ghost', type: 'button', disabled: i === 0 ? true : null, onclick: () => show(i - 1) }, '← Vorige'),
           h('button', { class: 'btn ghost', type: 'button', disabled: i === N - 1 ? true : null, onclick: () => show(i + 1) }, 'Volgende →')));

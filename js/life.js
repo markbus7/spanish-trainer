@@ -34,11 +34,47 @@
     { at: 4050, ride: 'plane', name: 'Vliegtuigje', icon: '✈️', es: 'la avioneta', en: 'the small plane', nl: 'het vliegtuigje' },
     { at: 4600, home: 'isla', name: 'Je eigen eiland', icon: '🏝️', es: 'la isla', en: 'the island', nl: 'het eiland' },
     { at: 5300, add: 'lighthouse', name: 'Vuurtoren', icon: '🗼', es: 'el faro', en: 'the lighthouse', nl: 'de vuurtoren' },
-    { at: 6100, add: 'fireworks', name: 'Groot feest', icon: '🎆', es: 'la fiesta', en: 'the party', nl: 'het feest' }
+    { at: 6100, add: 'fireworks', name: 'Groot feest', icon: '🎆', es: 'la fiesta', en: 'the party', nl: 'het feest' },
+    /* Nov 2026: de weg is veel langer gemaakt, zodat er ook met meer talen (Engels, later Duits, Frans ...) altijd iets te halen blijft.
+       Eén taal tot C2 brengt je ongeveer halverwege; voor het einde heb je meerdere talen nodig. */
+    { at: 6950, home: 'andes', name: 'Huis in de Andes', icon: '🏔️', es: 'la casa en los Andes', en: 'the house in the Andes', nl: 'het huis in de Andes' },
+    { at: 7850, add: 'llama', name: 'Lama', icon: '🦙', es: 'la llama', en: 'the llama', nl: 'de lama' },
+    { at: 8750, add: 'condor', name: 'Condor', icon: '🦅', es: 'el cóndor', en: 'the condor', nl: 'de condor' },
+    { at: 9700, add: 'telescope', name: 'Telescoop', icon: '🔭', es: 'el telescopio', en: 'the telescope', nl: 'de telescoop' },
+    { at: 10700, add: 'train', name: 'Treintje door de bergen', icon: '🚂', es: 'el tren', en: 'the train', nl: 'de trein' },
+    { at: 11750, home: 'finca', name: 'Koffieboerderij', icon: '☕', es: 'la finca cafetera', en: 'the coffee farm', nl: 'de koffieboerderij' },
+    { at: 12800, add: 'coffee', name: 'Koffieplantjes', icon: '🌱', es: 'el cafetal', en: 'the coffee plants', nl: 'de koffieplanten' },
+    { at: 13950, add: 'hens', name: 'Kippen', icon: '🐔', es: 'las gallinas', en: 'the hens', nl: 'de kippen' },
+    { at: 15100, ride: 'jeep', name: 'Jeep', icon: '🚙', es: 'el yipao', en: 'the jeep', nl: 'de jeep' },
+    { at: 16300, add: 'parrot', name: 'Papegaai Pepe', icon: '🦜', es: 'el loro', en: 'the parrot', nl: 'de papegaai' },
+    { at: 17550, home: 'arbol', name: 'Boomhut in de jungle', icon: '🌳', es: 'la casa del árbol', en: 'the tree house', nl: 'de boomhut' },
+    { at: 18850, add: 'falls', name: 'Waterval', icon: '💦', es: 'la cascada', en: 'the waterfall', nl: 'de waterval' },
+    { at: 20250, add: 'toucan', name: 'Toekan', icon: '🐦', es: 'el tucán', en: 'the toucan', nl: 'de toekan' },
+    { at: 21650, add: 'bridge', name: 'Hangbrug', icon: '🌉', es: 'el puente colgante', en: 'the rope bridge', nl: 'de hangbrug' },
+    { at: 23100, ride: 'balloon', name: 'Luchtballon', icon: '🎈', es: 'el globo aerostático', en: 'the hot-air balloon', nl: 'de luchtballon' },
+    { at: 24650, home: 'lodge', name: 'Blokhut in Patagonië', icon: '🏞️', es: 'la cabaña en la Patagonia', en: 'the lodge in Patagonia', nl: 'de blokhut in Patagonië' },
+    { at: 26250, add: 'dock', name: 'Steiger', icon: '🪵', es: 'el muelle', en: 'the dock', nl: 'de steiger' },
+    { at: 27900, add: 'kayak', name: 'Kajak', icon: '🛶', es: 'el kayak', en: 'the kayak', nl: 'de kajak' },
+    { at: 29600, add: 'penguins', name: 'Pinguïns', icon: '🐧', es: 'los pingüinos', en: 'the penguins', nl: 'de pinguïns' },
+    { at: 31400, add: 'cat', name: 'Poesje Luna', icon: '🐱', es: 'la gatita', en: 'the kitten', nl: 'het poesje' },
+    { at: 33250, home: 'casona', name: 'Koloniaal huis in de stad', icon: '🏛️', es: 'la casona colonial', en: 'the colonial house', nl: 'het koloniale huis' },
+    { at: 35200, add: 'terrace', name: 'Terrasje', icon: '🍰', es: 'la terraza', en: 'the terrace', nl: 'het terras' },
+    { at: 37250, add: 'picado', name: 'Papieren vlaggetjes', icon: '🎏', es: 'el papel picado', en: 'the paper banners', nl: 'de papieren vlaggetjes' },
+    { at: 39300, add: 'band', name: 'Muzikanten', icon: '🎺', es: 'los músicos', en: 'the musicians', nl: 'de muzikanten' },
+    { at: 41500, home: 'escuela', name: 'Je eigen taalschool', icon: '🏫', es: 'la escuela de idiomas', en: 'the language school', nl: 'de taalschool' },
+    { at: 43750, add: 'pupils', name: 'Leerlingen', icon: '🎒', es: 'los alumnos', en: 'the students', nl: 'de leerlingen' },
+    { at: 46100, add: 'world', name: 'Wereldfeest', icon: '🌍', es: 'la fiesta mundial', en: 'the world party', nl: 'het wereldfeest' }
   ];
-  const BIOME = { mochila: 'bosque', tienda: 'bosque', cabana: 'bosque', casita: 'pueblo', jardin: 'pueblo', playa: 'mar', hacienda: 'campo', isla: 'isla' };
+  const BIOME = { mochila: 'bosque', tienda: 'bosque', cabana: 'bosque', casita: 'pueblo', jardin: 'pueblo', playa: 'mar', hacienda: 'campo', isla: 'isla',
+    andes: 'andes', finca: 'cafe', arbol: 'selva', lodge: 'lago', casona: 'ciudad', escuela: 'ciudad' };
+  /* Hoofdstukken van de weg (per landschap), voor het overzicht in Perfil. */
+  const LANDS = { bosque: '🌲 Het bos', pueblo: '🏘️ Het dorp', mar: '🏖️ De zee', campo: '🌵 Het platteland', isla: '🏝️ Het eiland',
+    andes: '🏔️ De Andes', cafe: '☕ De koffiestreek', selva: '🌴 De jungle', lago: '🏞️ Patagonië', ciudad: '🏛️ De stad' };
   /* Waar iets kan staan: een kampvuur hoort bij kamperen, een boot bij het water. */
-  const FITS = { fire: ['bosque'], surf: ['mar', 'isla'], boat: ['mar', 'isla'], garden: ['bosque', 'pueblo', 'campo'], horse: ['campo'], fountain: ['campo'], lighthouse: ['isla'] };
+  const FITS = { fire: ['bosque'], surf: ['mar', 'isla'], boat: ['mar', 'isla'], garden: ['bosque', 'pueblo', 'campo', 'andes'], horse: ['campo'], fountain: ['campo'], lighthouse: ['isla'],
+    hammock: ['bosque', 'pueblo', 'campo', 'mar', 'isla', 'andes', 'cafe', 'selva'], grill: ['bosque', 'pueblo', 'campo', 'mar', 'isla', 'andes', 'cafe', 'selva', 'lago'],
+    llama: ['andes'], condor: ['andes'], train: ['andes'], coffee: ['cafe'], hens: ['cafe'], parrot: ['cafe', 'selva'], falls: ['selva'], toucan: ['selva'], bridge: ['selva'],
+    dock: ['lago'], kayak: ['lago'], penguins: ['lago'], terrace: ['ciudad'], picado: ['ciudad'], band: ['ciudad'], pupils: ['ciudad'] };
 
   /* Punten uit één herhalingsbak (srs-object van een cursus). Zelfde grenzen als SRS.status. */
   function score(srs) {
@@ -68,11 +104,11 @@
   function stepAt(points) { let i = 0; STEPS.forEach((s, n) => { if (points >= s.at) i = n; }); return i; }
   /* Wat je hebt bij stap i: onderkomen, landschap, spullen, vervoer. */
   function world(i) {
-    let home = 'mochila', ride = null, plane = false; const items = new Set();
-    STEPS.slice(0, i + 1).forEach(s => { if (s.home) home = s.home; if (s.add) items.add(s.add); if (s.ride === 'plane') plane = true; else if (s.ride) ride = s.ride; });
+    let home = 'mochila', ride = null, plane = false, balloon = false; const items = new Set();
+    STEPS.slice(0, i + 1).forEach(s => { if (s.home) home = s.home; if (s.add) items.add(s.add); if (s.ride === 'plane') plane = true; else if (s.ride === 'balloon') balloon = true; else if (s.ride) ride = s.ride; });
     const biome = BIOME[home];
     [...items].forEach(k => { if (FITS[k] && !FITS[k].includes(biome)) items.delete(k); });
-    return { home, biome, ride, plane, items, bike: STEPS.slice(0, i + 1).some(s => s.ride === 'bike') };
+    return { home, biome, ride, plane, balloon, items, bike: STEPS.slice(0, i + 1).some(s => s.ride === 'bike') };
   }
   function now() {
     const t = total(), i = stepAt(t.points), next = STEPS[i + 1] || null;
@@ -250,6 +286,11 @@
         + saguaro(18, 182, 1) + saguaro(372, 180, 1.1) + agave(52, 186, 1) + agave(336, 188, .9) + agave(398, 196, 1.1)
         + ground(u, 176, ['#7a8a3a', '#9aa04a', '#b0a858', '#6a7a30', '#c0b070'], { n: 900 });
     }
+    if (biome === 'andes') return landAndes(u);
+    if (biome === 'cafe') return landCafe(u);
+    if (biome === 'selva') return landSelva(u);
+    if (biome === 'lago') return landLago(u);
+    if (biome === 'ciudad') return landCiudad(u);
     if (biome === 'mar') {
       const r = rng(41); let glint = ''; for (let k = 0; k < 40; k++) { const x = 250 + r() * 140, y = 148 + r() * 34; glint += `<path d="M${R(x)} ${R(y)}h${R(2 + r() * 5)}" stroke="#fff" stroke-width=".8" opacity="${R(.3 + r() * .5)}"/>`; }
       return `<path d="M0 146H400V150H0Z" fill="#c8dce8" opacity=".6"/><path d="${ridge(rng(3), 140, 3, 8, 2, -10, 130)}" fill="#8aa0b0" opacity=".5" transform="translate(0 6) scale(1 .96)"/>`
@@ -270,22 +311,122 @@
       + grass(rng(57), 60, 360, 184, 222, 700, GRASS, (x, y) => ((x - 210) / 160) ** 2 + ((y - 201) / 22) ** 2 > 1 || onPath(x, y) || (y < 200 && x > 130 && x < 310))
       + flowers(rng(58), 20, 70, 350, 196, 220, (x, y) => ((x - 210) / 160) ** 2 + ((y - 201) / 22) ** 2 > 1);
   }
+  /* hooggebergte: pieken met kartelige randen; pts = [[x, y], ...] van links naar rechts (dal, top, dal ...).
+     Elke top krijgt een schaduwflank rechts en sneeuwgeulen. */
+  function peaks(seed, pts, fill, shade = .2) {
+    const r = rng(seed); let d = `M${pts[0][0]} 240L${pts[0][0]} ${pts[0][1]}`, sh = '', gul = '';
+    for (let k = 0; k < pts.length - 1; k++) {
+      const [ax, ay] = pts[k], [bx, by] = pts[k + 1], n = Math.max(2, Math.round(Math.abs(bx - ax) / 4));
+      for (let j = 1; j <= n; j++) { const t = j / n; d += `L${R(ax + (bx - ax) * t + (j < n ? (r() - .5) * 2.4 : 0))} ${R(ay + (by - ay) * t + (j < n ? (r() - .5) * 3.4 : 0))}`; }
+      if (by > ay && k > 0) { // van een top naar beneden: schaduwflank
+        sh += `<path d="M${ax} ${ay}L${bx} ${by}L${R(bx - (bx - ax) * .25)} ${by + 30}L${R(ax + (bx - ax) * .18)} ${by + 36}Z" fill="#1a2238" opacity="${shade}"/>`;
+        for (let g = 0; g < 4; g++) { const t = .15 + g * .2, gx = ax + (bx - ax) * t * .6, gy = ay + (by - ay) * t * .6; gul += `<path d="M${R(gx)} ${R(gy)}l${R(-2 - r() * 3)} ${R(6 + r() * 8)}" stroke="#fff" stroke-width="${R(.6 + r() * .6)}" opacity=".55"/>`; }
+      }
+    }
+    return `<path d="${d}V240Z" fill="${fill}"/>${sh}${gul}`;
+  }
+  /* terrassen langs een helling (Andes, koffie): gebogen lijntjes */
+  const terraces = (y0, n, gap, c, op = .4) => { let o = ''; for (let k = 0; k < n; k++) { const y = y0 + k * gap; o += `<path d="M-10 ${y}C80 ${y - 4} 150 ${y + 3} 230 ${y - 2}S350 ${y - 5} 410 ${y}" stroke="${c}" stroke-width=".9" fill="none" opacity="${op}"/>`; } return o; };
+  /* eucalyptus: hoge smalle boom met blauwgroen blad */
+  const euca = (x, y, s, seed) => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-1.6 0C-1-14-2-30 0-50L1.4-50C2-30 1.4-14 2 0Z" fill="#cfc2ae"/><path d="M0-30-8-42M0-38 7-48" stroke="#b8a890" stroke-width="1.2"/>${foliage(rng(seed), 0, -52, 10, 16, ['#2e4a42', '#47665a', '#6a8a7a', '#9ab4a4'], 70)}</g>`;
+  function landAndes(u) {
+    return peaks(61, [[-10, 112], [30, 84], [52, 100], [86, 50], [114, 94], [150, 70], [176, 98], [228, 38], [276, 94], [306, 64], [336, 90], [370, 48], [410, 98]], `url(#${u}m1)`)
+      + `<rect y="96" width="400" height="60" fill="url(#${u}haze)"/>`
+      + `<path d="${ridge(rng(62), 140, 14, 3, 4)}" fill="url(#${u}m2)"/>${terraces(146, 6, 4.4, '#c8d898', .45)}`
+      + [[40, 146], [58, 149], [318, 144], [334, 147], [352, 145]].map(([x, y], k) => `<rect x="${x}" y="${y}" width="9" height="6" fill="#f4f0e6"/><rect x="${x + 6}" y="${y}" width="3" height="6" fill="#000" opacity=".12"/><path d="M${x - 1} ${y + .5}L${x + 4.5} ${y - 3.4}L${x + 10} ${y + .5}Z" fill="#b0583a"/><rect x="${x + 2}" y="${y + 2}" width="2" height="3" fill="#3a3028"/>`).join('')
+      + `<path d="${ridge(rng(63), 164, 6, 6, 2)}" fill="url(#${u}m3)"/>${terraces(168, 3, 3.6, '#d8e0a0', .35)}`
+      + euca(14, 182, .9, 64) + euca(30, 180, .7, 65) + euca(378, 182, .85, 66) + euca(396, 180, .7, 67)
+      + ground(u, 178, ['#7a9a48', '#8aaa50', '#a8b860', '#6a8a3a', '#5a7a34']);
+  }
+  /* bananenplant: grote gescheurde bladeren */
+  const banana = (x, y, s = 1, seed = 1) => { const r = rng(seed); let o = `<path d="M-2 0C-1-12-2-22 0-30L2-30C2-22 3-12 3 0Z" fill="#6a8a3a"/><path d="M0-4V-28" stroke="#4a6a2a" stroke-width=".6"/>`;
+    [[-150, 26], [-120, 30], [-60, 30], [-30, 26], [-95, 22]].forEach(([a, l], k) => { const rad = a / 57.3, ex = Math.cos(rad) * l, ey = -30 + Math.sin(rad) * l * .9 + l * .35, mx = Math.cos(rad) * l * .5, my = -30 + Math.sin(rad) * l * .6 - 4;
+      o += `<path d="M0-30Q${R(mx - 4)} ${R(my - 5)} ${R(ex)} ${R(ey)}Q${R(mx + 3)} ${R(my + 5)} 0-28Z" fill="${k % 2 ? '#3e7a34' : '#5a9a40'}"/><path d="M0-30Q${R(mx)} ${R(my)} ${R(ex)} ${R(ey)}" stroke="#8aba5a" stroke-width=".6" fill="none"/>`;
+      for (let j = 0; j < 3; j++) { const t = .3 + j * .2; o += `<path d="M${R(mx * t * 2 * .9)} ${R(-30 + (my + 30) * t * 2 * .9)}l${R((r() - .5) * 3)} ${R(2 + r() * 2)}" stroke="#2a5a26" stroke-width=".5"/>`; } });
+    return `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="2" cy="1" rx="10" ry="2" fill="#1a2a10" opacity=".25"/>${o}</g>`; };
+  /* waspalm (palma de cera): heel hoog en dun */
+  const waxPalm = (x, y, h, s = 1) => { let fr = ''; [-160, -125, -90, -55, -20].forEach((a, k) => { const rad = a / 57.3, l = 9 * s; fr += `<path d="M0 0Q${R(Math.cos(rad) * l * .6)} ${R(Math.sin(rad) * l * .6 - 3)} ${R(Math.cos(rad) * l)} ${R(Math.sin(rad) * l * .5 + l * .5)}" stroke="${k % 2 ? '#3e6a3a' : '#5a8a4a'}" stroke-width="${R(2 * s)}" fill="none" stroke-linecap="round"/>`; });
+    return `<g transform="translate(${x} ${y})"><path d="M-.7 0V${-h}h1.4V0Z" fill="#d8d4c8"/><path d="M.3 0V${-h}" stroke="#a8a498" stroke-width=".4"/><g transform="translate(0 ${-h})">${fr}</g></g>`; };
+  /* koffiestruiken op rijen in de verte */
+  const coffeeRows = (seed, y0, rows, c1, c2) => { const r = rng(seed); let o = ''; for (let j = 0; j < rows; j++) { const y = y0 + j * 4.2; for (let x = -4; x < 404; x += 4 + r() * 1.6) o += `<ellipse cx="${R(x)}" cy="${R(y + Math.sin(x / 60 + j) * 2.4)}" rx="${R(2.2 + r())}" ry="${R(1.6 + r() * .6)}" fill="${r() > .5 ? c1 : c2}"/>`; } return o; };
+  function landCafe(u) {
+    return `<path d="${ridge(rng(71), 116, 22, 4, 6)}" fill="url(#${u}m1)"/><rect y="104" width="400" height="56" fill="url(#${u}haze)"/>`
+      + `<path d="M-10 240V136C40 118 90 126 140 140S240 132 300 124 380 128 410 134V240Z" fill="url(#${u}m2)"/>${coffeeRows(72, 140, 4, '#2e6a36', '#3e7a3e')}`
+      + [60, 66, 74, 250, 262, 300, 336].map((x, k) => waxPalm(x, 140 + (k % 3) * 2, 26 + (k % 3) * 7, .8)).join('')
+      + `<path d="M-10 240V160C60 150 120 158 200 162S330 152 410 158V240Z" fill="url(#${u}m3)"/>${coffeeRows(73, 164, 3, '#245a2c', '#2e6a34')}`
+      + banana(10, 186, 1, 74) + banana(392, 184, .95, 75) + banana(372, 190, .7, 76)
+      + ground(u, 178, ['#3e7a2a', '#4a8a36', '#6aa448', '#5a9a3a', '#2e6a24']);
+  }
+  /* jungle: lagen kruinen, nevel tussen de lagen, lianen */
+  const canopy = (seed, y, n, pal, rx = 14, ry = 10) => { const r = rng(seed); let o = ''; for (let k = 0; k < n; k++) { const x = -10 + k * (420 / n) + (r() - .5) * 8, yy = y - r() * 8; o += foliage(r, x, yy, rx + r() * 6, ry + r() * 4, pal, 46, 1.2); } return o; };
+  function landSelva(u) {
+    const vines = [22, 48, 352, 380].map((x, k) => `<path d="M${x} 104C${x + 4} 124 ${x - 4} 140 ${x + 2} ${152 + k * 4}" stroke="#2e5a26" stroke-width=".9" fill="none"/>`).join('');
+    return `<path d="${ridge(rng(81), 108, 26, 4, 6)}" fill="url(#${u}m1)"/><rect y="96" width="400" height="60" fill="url(#${u}haze)"/>`
+      + `<path d="${ridge(rng(82), 132, 10, 4, 4)}" fill="url(#${u}m2)"/>${canopy(83, 136, 22, ['#24503a', '#2e6044', '#3e7250', '#5a8a64'])}`
+      + `<rect y="128" width="400" height="30" fill="url(#${u}haze)" opacity=".5"/>`
+      + `<path d="${ridge(rng(84), 156, 6, 5, 3)}" fill="url(#${u}m3)"/>${canopy(85, 160, 18, ['#1e4a28', '#2a5e30', '#3e7a3a', '#64a04a'], 16, 12)}`
+      + vines + tree(8, 186, 1, ['#1a4424', '#2a5e30', '#3e7a3a', '#6aa84a'], 86) + tree(392, 186, 1.05, ['#1a4424', '#2a5e30', '#3e7a3a', '#6aa84a'], 87)
+      + banana(30, 190, .8, 88) + banana(370, 192, .8, 89)
+      + ground(u, 180, ['#2e6a24', '#3e7a2a', '#4a8a36', '#5a9a3a', '#245a1e']);
+  }
+  /* Patagonië: granieten pieken, gletsjer, turquoise meer, herfstbomen (lenga) */
+  function landLago(u) {
+    const r = rng(91); let glint = ''; for (let k = 0; k < 34; k++) { const x = r() * 400, y = 152 + r() * 28; glint += `<path d="M${R(x)} ${R(y)}h${R(2 + r() * 5)}" stroke="#fff" stroke-width=".7" opacity="${R(.25 + r() * .45)}"/>`; }
+    const lenga = (seed, y, n) => { const q = rng(seed); let o = ''; for (let k = 0; k < n; k++) { const x = -6 + k * (412 / n) + (q() - .5) * 6; o += `<ellipse cx="${R(x)}" cy="${R(y - 3 - q() * 3)}" rx="${R(3 + q() * 2.4)}" ry="${R(4 + q() * 2)}" fill="${['#b8401e', '#d8642a', '#e89a3a', '#8a3a1e', '#c8542a'][k % 5]}"/>`; } return o; };
+    return peaks(92, [[-10, 118], [24, 96], [60, 112], [120, 74], [150, 98], [178, 46], [192, 64], [206, 30], [222, 60], [240, 44], [262, 92], [300, 70], [340, 104], [372, 82], [410, 110]], `url(#${u}m1)`, .26)
+      + `<path d="M190 70C196 90 206 104 214 120L232 118C224 100 218 84 214 66Z" fill="#eaf4fa" opacity=".8"/><path d="M200 92C206 102 212 110 218 118" stroke="#9ac8dc" stroke-width=".8" fill="none"/>`
+      + `<rect y="100" width="400" height="50" fill="url(#${u}haze)"/>`
+      + `<path d="${ridge(rng(93), 140, 6, 5, 3)}" fill="url(#${u}m2)"/>${lenga(94, 146, 60)}`
+      + `<rect y="146" width="400" height="40" fill="url(#${u}lake)"/><rect y="146" width="400" height="40" fill="url(#${u}glint)" opacity=".5"/>${glint}`
+      + `<defs><clipPath id="${u}lk"><rect y="146" width="400" height="40"/></clipPath></defs><g opacity=".22" clip-path="url(#${u}lk)"><g transform="translate(0 292) scale(1 -1)">${peaks(92, [[-10, 118], [24, 96], [60, 112], [120, 74], [150, 98], [178, 46], [192, 64], [206, 30], [222, 60], [240, 44], [262, 92], [300, 70], [340, 104], [372, 82], [410, 110]], '#e8eef4', 0)}</g></g>`
+      + `<rect y="146" width="400" height="2" fill="#dcecf0" opacity=".6"/><g class="lv-wave">${[40, 150, 290, 350].map((x, k) => `<path d="M${x} ${160 + (k % 2) * 12}c6-1.6 12 1.6 18 0s12-1.6 18 0" stroke="#fff" stroke-width=".8" fill="none" opacity=".6"/>`).join('')}</g>`
+      + `<path d="M-10 240V186C60 178 140 184 220 182S350 178 410 184V240Z" fill="#8a8a6a"/>`
+      + pine(10, 196, .9, '#2e4a3a', 95) + pine(388, 194, .95, '#2e4a3a', 96)
+      + ground(u, 186, ['#a8a058', '#c0b46a', '#8a8a44', '#d0c27a', '#7a7a3a'], { n: 1000 });
+  }
+  /* stad: koloniale gevels in kleur, kathedraal, kinderkopjes */
+  function landCiudad(u) {
+    const r = rng(101);
+    const fac = (x, w, h, c, k) => { const y = 176 - h; let o = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}" ${tex('stucco')}/><rect x="${x}" y="${y}" width="${w}" height="3" fill="${darker(c, .8)}"/><rect x="${x}" y="${y - 2}" width="${w}" height="2" fill="#f4ece0"/>`;
+      const n = Math.max(1, Math.round(w / 16));
+      for (let j = 0; j < n; j++) { const wx = x + 4 + j * (w - 8) / n + ((w - 8) / n - 7) / 2;
+        o += `<rect x="${R(wx)}" y="${y + 8}" width="7" height="11" fill="url(#${u}glass)"/><rect x="${R(wx - 1.5)}" y="${y + 19}" width="10" height="2.4" fill="#5a3a24"/><path d="M${R(wx - 1.5)} ${y + 21.4}v-4M${R(wx + 8.5)} ${y + 21.4}v-4M${R(wx - 1.5)} ${y + 17.4}h10" stroke="#3a2a1a" stroke-width=".7"/>`;
+        if (h > 40) o += `<path d="M${R(wx)} ${y + h}V${y + 34}a3.5 3.5 0 0 1 7 0V${y + h}Z" fill="${k % 2 ? '#5a3a24' : '#2e5a7a'}"/>`; }
+      if (k % 2 === 0) o += foliage(rng(x + 7), x + w * .7, y + 20, 6, 3, ['#7a1a4a', '#b0306a', '#e04a8a', '#ff7ab0'], 30, .7);
+      return o; };
+    const church = `<g><rect x="168" y="70" width="74" height="40" fill="#e8c070" ${tex('stucco')}/><rect x="160" y="40" width="20" height="70" fill="#f0cc7a" ${tex('stucco')}/><rect x="230" y="40" width="20" height="70" fill="#f0cc7a" ${tex('stucco')}/>
+      <path d="M158 40h24l-12-14Z" fill="#c8a050"/><path d="M228 40h24l-12-14Z" fill="#c8a050"/><path d="M170 26v-8M167 21h6M240 26v-8M237 21h6" stroke="#5a4a3a" stroke-width="1"/>${[[166, 50], [236, 50]].map(([a, b]) => `<path d="M${a} ${b + 10}v-6a4 4 0 0 1 8 0v6Z" fill="#5a3a24"/><circle cx="${a + 4}" cy="${b + 8}" r="1.6" fill="#c8a040"/>`).join('')}
+      <path d="M186 70a19 19 0 0 1 38 0Z" fill="#d8a858"/><path d="M205 51v-8M202 46h6" stroke="#5a4a3a" stroke-width="1"/><path d="M196 110V92a9 9 0 0 1 18 0v18Z" fill="#5a3a24"/><circle cx="205" cy="80" r="4.4" fill="#f4ece0"/><circle cx="205" cy="80" r="3.2" fill="url(#${u}glass)"/></g>`;
+    let cob = ''; for (let k = 0; k < 520; k++) { const y = 178 + r() * 62, f = (y - 176) / 64, w = 1.2 + f * 3.4, x = r() * 400; cob += `<ellipse cx="${R(x)}" cy="${R(y)}" rx="${R(w)}" ry="${R(w * .55)}" fill="${['#9a8a72', '#b4a286', '#8a7a64', '#c4b496'][k % 4]}" stroke="#6a5a48" stroke-width=".3"/>`; }
+    return `<path d="${ridge(rng(102), 104, 16, 5, 4)}" fill="url(#${u}m1)" opacity=".8"/><rect y="90" width="400" height="40" fill="url(#${u}haze)"/>`
+      + church + `<rect y="96" width="400" height="30" fill="url(#${u}haze)" opacity=".5"/>`
+      + fac(-6, 36, 58, '#e8a848', 0) + fac(30, 30, 48, '#5aa0c8', 1) + fac(60, 40, 62, '#e87a6a', 2) + fac(100, 34, 44, '#8ac07a', 3)
+      + fac(276, 36, 46, '#f0d070', 4) + fac(312, 34, 60, '#c86a9a', 5) + fac(346, 30, 50, '#6ab0a8', 6) + fac(376, 32, 58, '#e89a5a', 7)
+      + `<path d="M-10 176H410V182H-10Z" fill="#cfc4b0"/><path d="M-10 182H410" stroke="#8a7a64" stroke-width=".8"/>`
+      + `<path d="M-10 182H410V240H-10Z" fill="url(#${u}gr)"/>${cob}<rect y="182" width="400" height="58" fill="url(#${u}eave)" opacity=".2"/>`
+      + [12, 128, 290, 392].map(x => `<g transform="translate(${x} 182)"><path d="M0 0V-30" stroke="#2a2a2e" stroke-width="1.4"/><path d="M-3-30h6l-1-6h-4Z" fill="#2a2a2e"/><rect x="-2" y="-35" width="4" height="4" fill="url(#${u}glass)"/></g>`).join('');
+  }
   /* kleuren per landschap: verre bergen, heuvels, grond */
   const LAND = {
     bosque: { m1: ['#6a7e9a', '#9aaec4'], m2: ['#4e6e5a', '#6a8a6a'], m3: ['#3e6a3a', '#5a8a44'], gr: ['#86ac56', '#6a9842', '#4a7a2e'] },
     pueblo: { m1: ['#7890b0', '#a8bcd0'], m2: ['#6e8a7a', '#93a88e'], m3: ['#5a7a48', '#7a9a5a'], gr: ['#8ab05a', '#6e9a44', '#4e7a30'] },
     campo: { m1: ['#b8a0a0', '#d8c0b0'], m2: ['#c8b07a', '#d8c08a'], m3: ['#a8a060', '#b8b070'], gr: ['#c8b878', '#b0a060', '#98884a'] },
     mar: { m1: ['#8aa0b0', '#b0c4d0'], m2: ['#8aa0b0', '#b0c4d0'], m3: ['#8aa0b0', '#b0c4d0'], gr: ['#ead8b0', '#e0c898', '#d4b882'] },
-    isla: { m1: ['#8aa0b0', '#b0c4d0'], m2: ['#8aa0b0', '#b0c4d0'], m3: ['#8aa0b0', '#b0c4d0'], gr: ['#8ab05a', '#6e9a44', '#4e7a30'] }
+    isla: { m1: ['#8aa0b0', '#b0c4d0'], m2: ['#8aa0b0', '#b0c4d0'], m3: ['#8aa0b0', '#b0c4d0'], gr: ['#8ab05a', '#6e9a44', '#4e7a30'] },
+    andes: { m1: ['#7a84a0', '#a4acc0'], m2: ['#6a8a58', '#88a46a'], m3: ['#5e8244', '#7a9a52'], gr: ['#a4b464', '#86a04e', '#647e36'], snow: .34 },
+    cafe: { m1: ['#6a8aa0', '#98b4c0'], m2: ['#3e7a44', '#5a9452'], m3: ['#3a7a3a', '#56943e'], gr: ['#7ab050', '#5e9a3e', '#3e7a2a'] },
+    selva: { m1: ['#5a7e8a', '#88a8ac'], m2: ['#2e6044', '#3e744c'], m3: ['#2a5e34', '#3a723c'], gr: ['#5a9a40', '#447a30', '#2e5a22'] },
+    lago: { m1: ['#56647e', '#8a98b0'], m2: ['#7a6a5a', '#9a8a72'], m3: ['#8a7a5a', '#a8986e'], gr: ['#c0b070', '#a49a58', '#848040'], snow: .3 },
+    ciudad: { m1: ['#a8a4a8', '#c8c2bc'], m2: ['#b8aca0', '#d0c4b4'], m3: ['#b8aca0', '#d0c4b4'], gr: ['#b8aa92', '#a08e74', '#82705a'] }
   };
   /* alle gedeelde verlopen en filters van één tekening */
   function defs(u, biome, sky) {
     const L = LAND[biome], night = sky === 'night', S3 = SKY[sky].map(c => c[0]);
     const glow = { day: '#fff2c0', dawn: '#ffc890', dusk: '#ff9a6a', night: '#c8d4ff' }[sky];
     return `<defs>${LG(u + 'sky', [[0, S3[0]], [.55, S3[1]], [1, S3[2]]])}${RG(u + 'glow', [[0, glow, .95], [.2, glow, .6], [1, glow, 0]])}
-      ${LG(u + 'haze', [[0, S3[2], 0], [1, S3[2], .65]])}<linearGradient id="${u}m1" gradientUnits="userSpaceOnUse" x1="0" y1="${biome === 'bosque' ? 74 : 100}" x2="0" y2="170">${(biome === 'bosque' ? [[0, '#f6f8fc'], [.24, '#e2e8f0'], [.3, L.m1[0]], [1, L.m1[1]]] : [[0, L.m1[0]], [1, L.m1[1]]]).map(([o, c]) => `<stop offset="${o}" stop-color="${c}"/>`).join('')}</linearGradient>${LG(u + 'm2', [[0, L.m2[0]], [1, L.m2[1]]])}${LG(u + 'm3', [[0, L.m3[0]], [1, L.m3[1]]])}
+      ${LG(u + 'haze', [[0, S3[2], 0], [1, S3[2], .65]])}<linearGradient id="${u}m1" gradientUnits="userSpaceOnUse" x1="0" y1="${biome === 'bosque' ? 74 : L.snow ? 30 : 100}" x2="0" y2="170">${(biome === 'bosque' ? [[0, '#f6f8fc'], [.24, '#e2e8f0'], [.3, L.m1[0]], [1, L.m1[1]]] : L.snow ? [[0, '#fbfcff'], [L.snow - .08, '#e4eaf2'], [L.snow, L.m1[0]], [1, L.m1[1]]] : [[0, L.m1[0]], [1, L.m1[1]]]).map(([o, c]) => `<stop offset="${o}" stop-color="${c}"/>`).join('')}</linearGradient>${LG(u + 'm2', [[0, L.m2[0]], [1, L.m2[1]]])}${LG(u + 'm3', [[0, L.m3[0]], [1, L.m3[1]]])}
       ${LG(u + 'rock', [[0, '#000', .25], [.4, '#000', 0]], 1, 0)}${LG(u + 'gr', [[0, L.gr[0]], [.4, L.gr[1]], [1, L.gr[2]]])}${LG(u + 'path', [[0, '#cbb894'], [1, '#a8936c']])}
-      ${LG(u + 'sea', [[0, '#5a9ec0'], [.4, '#2a7aaa'], [1, '#1a5a8a']])}${RG(u + 'glint', [[0, '#fff', .55], [1, '#fff', 0]], .8, .1, .5)}${RG(u + 'lag', [[.7, '#7ad8d0', .9], [1, '#7ad8d0', 0]])}
+      ${LG(u + 'sea', [[0, '#5a9ec0'], [.4, '#2a7aaa'], [1, '#1a5a8a']])}${RG(u + 'glint', [[0, '#fff', .55], [1, '#fff', 0]], .8, .1, .5)}${RG(u + 'lag', [[.7, '#7ad8d0', .9], [1, '#7ad8d0', 0]])}${LG(u + 'lake', [[0, '#7ac4c8'], [.35, '#3aa0b4'], [1, '#1e6e8a']])}${LG(u + 'fall', [[0, '#e8f6fa'], [.5, '#bfe4ee'], [1, '#f4fbfd']], 1, 0)}
       ${LG(u + 'glass', night ? [[0, '#fff2b0'], [.5, '#ffd270'], [1, '#e8a040']] : [[0, '#b8d4e4'], [.5, '#5e7e94'], [1, '#2e4454']], 1, 1)}
       ${LG(u + 'eave', [[0, '#2a1408', .45], [1, '#2a1408', 0]])}${RG(u + 'vig', [[.6, '#000', 0], [1, '#1a1008', .3]], .5, .45, .75)}
       <filter id="${u}soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation=".35"/></filter>
@@ -438,7 +579,89 @@
       <rect x="120" y="66" width="16" height="26" fill="#a8784a" ${tex('wood')}/><rect x="44" y="96" width="22" height="32" fill="#a8784a" ${tex('wood')}/>${[48, 52, 56, 60, 124, 128, 132].map(x => `<path d="M${x} ${x > 100 ? 66 : 96}v${x > 100 ? 26 : 32}" stroke="#4a3018" stroke-width=".5" opacity=".6"/>`).join('')}
       ${glassBig(78, 67, 38, 22)}${glassBig(72, 99, 50, 26)}${door(127, 100, 15, 28, '#4a3424', { frame: '#2a3038' })}
       <path d="M68 58V54H142V58" fill="none" stroke="#9aa4ac" stroke-width="1"/>${[72, 84, 96, 108, 120, 132].map(x => `<path d="M${x} 54v4" stroke="#9aa4ac" stroke-width=".8"/>`).join('')}<path d="M68 54H142" stroke="#c8e0ec" stroke-width="2" opacity=".5"/>
-      <rect x="14" y="124" width="42" height="9" rx="1" fill="#e8eaec"/><rect x="16" y="125.4" width="38" height="6.2" fill="#3ab0d0"/><path d="M18 128c4-1.4 8 1.4 12 0s8-1.4 12 0 6 1.4 10 0" stroke="#fff" stroke-width=".7" fill="none" opacity=".7"/>`; }
+      <rect x="14" y="124" width="42" height="9" rx="1" fill="#e8eaec"/><rect x="16" y="125.4" width="38" height="6.2" fill="#3ab0d0"/><path d="M18 128c4-1.4 8 1.4 12 0s8-1.4 12 0 6 1.4 10 0" stroke="#fff" stroke-width=".7" fill="none" opacity=".7"/>`; },
+    /* Andes: wit huis met natuurstenen onderbouw, blauw houten balkon (zoals in Cusco), dakpannen met kruisje en twee stiertjes */
+    andes: () => { const r = rng(311); let stones = ''; for (let y = 108; y < 124; y += 4) for (let x = 58 + (y % 8 ? 2.6 : 0); x < 146; x += 5.6 + r() * 1.6) stones += `<rect x="${R(x)}" y="${y}" width="${R(4.4 + r() * 1.4)}" height="3.4" rx="1.2" fill="${['#9a9080', '#b0a694', '#8a8070', '#a49a88'][Math.floor(r() * 4)]}"/>`;
+      return `${house({ x: 58, w: 88, h: 64, d: 36, dy: 11, roofH: 24, eave: 9, wall: ['#f4f0e6', '#cfc8b8'], roof: TILES, chimney: 136, found: '#7a7268',
+        texture: `<rect x="58" y="106" width="88" height="17" fill="#6e665c"/>${stones}<path d="M58 106H146" stroke="#5a5248" stroke-width="1"/>`,
+        side: `<rect x="0" y="42" width="36" height="17" fill="#5e574e"/>${win(12, 12, 12, 14, { frame: '#2e6aa8' })}`,
+        front: `${win(70, 72, 12, 15, { frame: '#2e6aa8' })}${win(122, 72, 12, 15, { frame: '#2e6aa8' })}${door(94, 72, 16, 18, '#2e6aa8', { frame: '#1e4a80' })}
+          <path d="M62 68H142L139 64H65Z" fill="#1e4a80"/><path d="M64 68V90M140 68V90" stroke="#1e4a80" stroke-width="1.6"/>
+          <rect x="62" y="88" width="80" height="9" fill="#2e6aa8" ${tex('wood')}/><path d="M62 88H142" stroke="#5a9ad8" stroke-width="1"/>${[66, 72, 78, 84, 90, 96, 102, 108, 114, 120, 126, 132, 138].map(x => `<path d="M${x} 89.4v6.4" stroke="#1e4a80" stroke-width="1.2"/>`).join('')}<path d="M62 97H142" stroke="#16386a" stroke-width="1.4"/><path d="M64 97l3 4M140 97l-3 4" stroke="#1e4a80" stroke-width="1.4"/>
+          ${door(93, 104, 18, 24, '#6a4024', { arch: true, frame: '#a49a88' })}${win(68, 110, 10, 9, { frame: '#8a8070', cross: false })}${win(126, 110, 10, 9, { frame: '#8a8070', cross: false })}${pot(86, 128, '#d8344e')}${pot(118, 128, '#f4d040')}`,
+        gableDeco: `<g transform="translate(102 41)"><path d="M0 0V-9M-3.4-6H3.4" stroke="#c8a040" stroke-width="1.2"/><ellipse cx="-6" cy="-1.6" rx="3" ry="1.8" fill="#8a3a1c"/><path d="M-8.4-2.6l-1-1.6M-3.6-2.6l1-1.6" stroke="#5a2a10" stroke-width=".6"/><ellipse cx="6" cy="-1.6" rx="3" ry="1.8" fill="#8a3a1c"/><path d="M3.6-2.6l-1-1.6M8.4-2.6l1-1.6" stroke="#5a2a10" stroke-width=".6"/></g>` })}
+      ${euca(200, 131, .9, 312)}`; },
+
+    /* koffieboerderij: wit met felgekleurd houtwerk en een balkon rondom (zoals in Salento) */
+    finca: () => { const C = ['#c43a46', '#e0b440', '#2e8a56', '#2e6aa8'];
+      return `${house({ x: 46, w: 112, h: 62, d: 36, dy: 11, roofH: 22, eave: 10, wall: ['#f6f2ea', '#d0c8b8'], roof: TILES, found: '#6a5a4a',
+        texture: `<rect x="46" y="112" width="112" height="11" fill="#2e8a56" ${tex('stucco')}/><path d="M46 112H158" stroke="#1e6a40" stroke-width="1"/>`,
+        side: `<rect x="0" y="51" width="36" height="11" fill="#1e6a40"/>${win(12, 10, 12, 14, { frame: '#c43a46' })}${win(12, 36, 12, 12, { frame: '#e0b440' })}`,
+        front: `${[56, 80, 116, 140].map((x, k) => door(x, 70, 11, 18, C[k], { frame: C[(k + 1) % 4] })).join('')}
+          <path d="M42 68H162L158 64H46Z" fill="#7a4a2a"/><rect x="42" y="88" width="120" height="3" fill="#7a4a2a"/>${[44, 160].map(x => `<path d="M${x} 68V91" stroke="#e0b440" stroke-width="2"/>`).join('')}
+          ${Array.from({ length: 24 }, (_, k) => `<path d="M${46 + k * 4.9} 79V88" stroke="${C[k % 4]}" stroke-width="1.6"/>`).join('')}<path d="M42 79H162" stroke="#c43a46" stroke-width="1.8"/>
+          ${[52, 76, 100, 124, 148].map((x, k) => `<path d="M${x} 79v3" stroke="#3a2a1a" stroke-width=".5"/>${foliage(rng(x + 330), x, 84, 5, 2.6, ['#2e5a26', '#4a7a36', k % 2 ? '#e04a8a' : '#d8344e', k % 2 ? '#ff8ac0' : '#ff6a6a'], 24, .7)}`).join('')}
+          ${win(56, 98, 12, 12, { frame: '#e0b440', shut: '#c43a46' })}${win(136, 98, 12, 12, { frame: '#e0b440', shut: '#2e6aa8' })}${door(92, 98, 20, 30, '#c43a46', { frame: '#e0b440' })}
+          ${pot(84, 128, '#e04a8a')}${pot(120, 128, '#f4d040')}` })}
+      ${banana(186, 130, 1.1, 331)}${banana(30, 132, .9, 332)}`; },
+
+    /* boomhut: reuzenboom (ceiba) met plankier, hutje met rieten dak, touwladder en lantaarntjes */
+    arbol: () => { const r = rng(341), CAN = ['#1a4424', '#2a5e30', '#3e7a3a', '#6aa84a'];
+      let bark = ''; for (let k = 0; k < 18; k++) { const x = 100 + r() * 26; bark += `<path d="M${R(x)} 128C${R(x + (r() - .5) * 4)} 110 ${R(x + (r() - .5) * 4)} 92 ${R(x)} 64" stroke="${k % 2 ? '#5a4030' : '#8a6a50'}" stroke-width=".6" fill="none" opacity=".7"/>`; }
+      return `${foliage(rng(342), 112, 30, 70, 26, CAN, 240, 1.4)}${foliage(rng(343), 52, 52, 30, 18, CAN, 110, 1.3)}${foliage(rng(344), 176, 50, 30, 18, CAN, 110, 1.3)}
+      <ellipse cx="114" cy="131" rx="64" ry="5" fill="#1a2a10" opacity=".3"/>
+      <path d="M80 129C94 124 98 116 100 100V40H126V100C128 116 132 124 148 129Z" fill="#7a6048" ${tex('wood')}/>${bark}<path d="M118 40V128" stroke="#000" stroke-width="8" opacity=".12"/>
+      <path d="M100 96C88 80 72 70 56 66M126 92C140 80 156 72 170 70" stroke="#6a5038" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <path d="M62 84 100 104M162 84 126 104" stroke="#5a3e26" stroke-width="2.4"/>
+      ${house({ x: 70, w: 70, h: 26, base: 80, d: 28, dy: 8, roofH: 26, eave: 11, wall: ['#b88a58', '#8a6440'], roof: ['#c8a050', '#8a6a2a'], kind: 'thatch', wallTex: 'wood', found: '#5a3a22',
+        texture: `${[0, 1, 2, 3].map(k => `<path d="M70 ${60 + k * 5}H140" stroke="#5a3a22" stroke-width=".7" opacity=".6"/>`).join('')}`,
+        front: `${door(98, 62, 14, 18, '#5a3a22', { frame: '#7a5030' })}${win(76, 62, 11, 9, { frame: '#7a5030' })}${win(123, 62, 11, 9, { frame: '#7a5030' })}` })}
+      <rect x="54" y="80" width="124" height="5" fill="#9a6a40" ${tex('wood')}/>${Array.from({ length: 16 }, (_, k) => `<path d="M${56 + k * 7.8} 80v5" stroke="#5a3a22" stroke-width=".6"/>`).join('')}
+      ${[56, 76, 96, 116, 136, 156, 176].map(x => `<path d="M${x} 85V72" stroke="#6a4424" stroke-width="1.6"/>`).join('')}<path d="M56 73Q66 76 76 73T96 73T116 73T136 73T156 73T176 73" stroke="#c8b08a" stroke-width="1" fill="none"/>
+      <path d="M160 85 166 129M168 85 174 129" stroke="#c8b08a" stroke-width="1"/>${Array.from({ length: 8 }, (_, k) => `<path d="M${R(160.6 + k * .7)} ${R(90 + k * 5.4)}h8" stroke="#8a6a40" stroke-width="1.6"/>`).join('')}
+      ${[64, 150].map(x => `<path d="M${x} 85v6" stroke="#3a2a1a" stroke-width=".5"/><circle cx="${x}" cy="93" r="2.6" fill="url(#${U}glass)"/><path d="M${x - 2} 91h4" stroke="#3a2a1a" stroke-width=".8"/>`).join('')}
+      ${[40, 70, 160, 188].map((x, k) => `<path d="M${x} 50C${x + 3} 70 ${x - 3} 90 ${x + 1} ${104 + k * 6}" stroke="#2e5a26" stroke-width=".9" fill="none"/>`).join('')}`; },
+
+    /* blokhut in Patagonië: steil A-dak, glazen puntgevel, stenen schoorsteen, houtstapel en herfstboom */
+    lodge: () => house({ x: 54, w: 96, h: 44, d: 40, dy: 12, roofH: 44, eave: 10, wall: ['#9a6a42', '#74502e'], wallTex: 'wood', roof: ['#4e6a5a', '#2e4a3e'], kind: 'sheet', found: '#6a6a6e', chimney: 138,
+      behind: `${tree(196, 130, .85, ['#6a2a1a', '#a8401e', '#d8642a', '#f0a040'], 351)}`,
+      texture: `${Array.from({ length: 9 }, (_, k) => `<path d="M54 ${86 + k * 4.6}H150" stroke="#4a2e18" stroke-width="1" opacity=".55"/><path d="M54 ${87.4 + k * 4.6}H150" stroke="#c89a6a" stroke-width=".5" opacity=".5"/>`).join('')}`,
+      side: `${Array.from({ length: 9 }, (_, k) => `<path d="M0 ${4 + k * 4.6}H40" stroke="#3a2410" stroke-width="1" opacity=".55"/>`).join('')}${win(13, 12, 13, 14, { frame: '#3a2a1a' })}`,
+      gableDeco: `<path d="M68 82 102 46 136 82Z" fill="#3a2a1a"/><path d="M71 80.6 102 48.6 133 80.6Z" fill="url(#${U}glass)"/><path d="M102 48.6V80.6M86 64.6V80.6M118 64.6V80.6M78 72H126" stroke="#3a2a1a" stroke-width="1.2"/><path d="M76 78 98 54" stroke="#fff" stroke-width="1.6" opacity=".25"/>`,
+      front: `${win(62, 92, 14, 22, { frame: '#3a2a1a' })}${win(128, 92, 14, 22, { frame: '#3a2a1a' })}${door(92, 96, 20, 32, '#5a3418', { frame: '#3a2a1a' })}
+        <path d="M86 94H118L114 90H90Z" fill="#2e4a3e"/>`,
+      after: `<g>${Array.from({ length: 12 }, (_, k) => { const x = 160 + (k % 4) * 6.2 + (Math.floor(k / 4) % 2) * 3, y = 126 - Math.floor(k / 4) * 5.2; return `<circle cx="${x}" cy="${y}" r="2.8" fill="#8a5a32"/><circle cx="${x}" cy="${y}" r="1.9" fill="#d8b080"/><circle cx="${x}" cy="${y}" r=".8" fill="none" stroke="#a87a4a" stroke-width=".4"/>`; }).join('')}</g>` }),
+
+    /* koloniaal huis: okergeel, houten balkons met bougainville, grote poort met nagels, smeedijzeren tralies */
+    casona: () => { const bal = x => `<g><path d="M${x - 3} 70H${x + 23}L${x + 21} 66H${x - 1}Z" fill="#5a3418"/><rect x="${x - 3}" y="84" width="26" height="12" fill="#6a4024" ${tex('wood')}/>${[0, 1, 2, 3, 4].map(k => `<rect x="${x - 1 + k * 5}" y="86" width="3" height="8" fill="#4a2a14"/>`).join('')}<path d="M${x - 3} 84H${x + 23}" stroke="#8a5a34" stroke-width="1.2"/><path d="M${x - 1} 96l2 3M${x + 21} 96l-2 3" stroke="#4a2a14" stroke-width="1.6"/>${win(x + 2, 72, 16, 12, { frame: '#5a3418' })}</g>`;
+      return house({ x: 36, w: 136, h: 68, d: 30, dy: 9, roofH: 14, eave: 7, wall: ['#e8a848', '#b88030'], roof: TILES, found: '#8a6a4a',
+        texture: `<path d="M36 100H172" stroke="#c88a30" stroke-width="2"/><path d="M36 101.6H172" stroke="#fff" stroke-width=".5" opacity=".4"/>`,
+        side: `${win(10, 12, 10, 14, { frame: '#5a3418' })}${win(10, 44, 10, 14, { frame: '#5a3418' })}`,
+        front: `${bal(48)}${bal(94)}${bal(140)}
+          ${foliage(rng(361), 50, 98, 12, 4, ['#7a1a4a', '#b0306a', '#e04a8a', '#ff7ab0'], 50, .8)}${foliage(rng(362), 164, 96, 10, 6, ['#7a1a4a', '#b0306a', '#e04a8a', '#ff7ab0'], 50, .8)}${foliage(rng(363), 168, 108, 4, 10, ['#2e5a26', '#4a7a36', '#e04a8a', '#ff7ab0'], 40, .7)}
+          <path d="M88 128V108A16 16 0 0 1 120 108V128Z" fill="#d8c8a8"/><path d="M91 128V108A13 13 0 0 1 117 108V128Z" fill="#5a3418" ${tex('wood')}/><path d="M104 95V128" stroke="#2a1a0a" stroke-width="1"/>${[100, 108].map(x => [104, 110, 116, 122].map(y => `<circle cx="${x}" cy="${y}" r=".9" fill="#c8a040"/>`).join('')).join('')}
+          ${[48, 142].map(x => `${win(x, 106, 16, 16, { frame: '#d8c8a8', cross: false })}${[3, 7, 11, 15].map(k => `<path d="M${x + k - 1} 105v18" stroke="#1a1a1e" stroke-width=".9"/>`).join('')}<path d="M${x - 1} 113h18" stroke="#1a1a1e" stroke-width=".8"/>`).join('')}
+          <path d="M72 108l-3-4h6Z" fill="#2a2a2e"/>${lamp(80, 102)}` }); },
+
+    /* je eigen taalschool: groot koloniaal gebouw met klokje, bord en vlaggen van je talen */
+    escuela: () => { const flag = (x, y, f) => `<path d="M${x} ${y}V${y - 24}" stroke="#5a5a62" stroke-width="1"/><g class="lv-flag" style="transform-origin:${x}px ${y - 20}px">${f(x + .5, y - 24)}</g>`;
+      const nl = (x, y) => `<rect x="${x}" y="${y}" width="12" height="2.7" fill="#ae1c28"/><rect x="${x}" y="${y + 2.7}" width="12" height="2.6" fill="#fff"/><rect x="${x}" y="${y + 5.3}" width="12" height="2.7" fill="#21468b"/>`;
+      const mx = (x, y) => `<rect x="${x}" y="${y}" width="4" height="8" fill="#006847"/><rect x="${x + 4}" y="${y}" width="4" height="8" fill="#fff"/><rect x="${x + 8}" y="${y}" width="4" height="8" fill="#ce1126"/><circle cx="${x + 6}" cy="${y + 4}" r="1.1" fill="#8a5a2a"/>`;
+      const us = (x, y) => `<rect x="${x}" y="${y}" width="12" height="8" fill="#fff"/>${[0, 2, 4, 6].map(k => `<rect x="${x}" y="${y + k * 1.15}" width="12" height=".6" fill="#b22234"/>`).join('')}<rect x="${x}" y="${y + 7.4}" width="12" height=".6" fill="#b22234"/><rect x="${x}" y="${y}" width="5.4" height="4.4" fill="#3c3b6e"/>`;
+      const de = (x, y) => `<rect x="${x}" y="${y}" width="12" height="2.7" fill="#1a1a1a"/><rect x="${x}" y="${y + 2.7}" width="12" height="2.6" fill="#dd0000"/><rect x="${x}" y="${y + 5.3}" width="12" height="2.7" fill="#ffce00"/>`;
+      const fr = (x, y) => `<rect x="${x}" y="${y}" width="4" height="8" fill="#0055a4"/><rect x="${x + 4}" y="${y}" width="4" height="8" fill="#fff"/><rect x="${x + 8}" y="${y}" width="4" height="8" fill="#ef4135"/>`;
+      return house({ x: 26, w: 156, h: 70, d: 30, dy: 9, roofH: 16, eave: 7, wall: ['#f4ead8', '#cbbfa8'], roof: TILES, found: '#8a7a64',
+        behind: `<g><rect x="90" y="18" width="28" height="44" fill="#f4ead8" ${tex('stucco')}/><path d="M118 18l6-2v44l-6 2Z" fill="#cbbfa8"/><path d="M86 20 104 4 122 20Z" fill="#c05c34"/><path d="M104 4 126 16 122 20Z" fill="#8a3a1c"/><circle cx="104" cy="34" r="8" fill="#fff" stroke="#2e6aa8" stroke-width="1.6"/><path d="M104 34V28.6M104 34l3.4 2" stroke="#1a1a1e" stroke-width="1" stroke-linecap="round"/><path d="M98 60V50a6 6 0 0 1 12 0v10Z" fill="#3a2a1a"/><path d="M104 48v6" stroke="#c8a040" stroke-width="1.4"/></g>`,
+        texture: `<path d="M26 98H182" stroke="#2e6aa8" stroke-width="2.4"/><path d="M26 124H182" stroke="#2e6aa8" stroke-width="1.6"/>`,
+        side: `${win(10, 12, 10, 14, { arch: true, frame: '#2e6aa8' })}${win(10, 42, 10, 14, { arch: true, frame: '#2e6aa8' })}`,
+        front: `${[34, 54, 74, 122, 142, 162].map(x => win(x, 66, 12, 18, { arch: true, frame: '#2e6aa8', box: x < 100 ? ['#d8344e', '#fff'] : ['#f4d040', '#e04a8a'] })).join('')}
+          ${[34, 54, 142, 162].map(x => win(x, 104, 12, 14, { arch: true, frame: '#2e6aa8' })).join('')}
+          <rect x="70" y="60" width="68" height="0" fill="none"/>
+          <path d="M82 128V108A22 22 0 0 1 126 108V128Z" fill="#e8dcc6"/><path d="M86 128V108A18 18 0 0 1 122 108V128Z" fill="#2e6aa8" ${tex('wood')}/><path d="M104 90V128" stroke="#1e4a80" stroke-width="1.2"/><path d="M90 106h28M90 116h28" stroke="#1e4a80" stroke-width=".8"/>
+          <rect x="72" y="86" width="64" height="12" rx="2" fill="#2e6aa8"/><rect x="73.5" y="87.5" width="61" height="9" rx="1.4" fill="none" stroke="#e0b440" stroke-width=".6"/>
+          <text x="104" y="94.4" text-anchor="middle" font-family="Georgia, serif" font-size="4.9" font-weight="700" fill="#fff">ESCUELA DE IDIOMAS</text>
+          ${pot(72, 128, '#e04a8a')}${pot(136, 128, '#d8344e')}`,
+        after: `${flag(40, 60, nl)}${flag(62, 60, mx)}${flag(146, 60, us)}${flag(168, 60, de)}${flag(186, 62, fr)}` }); }
   };
 
   /* wiel met band, velg, glans en naaf */
@@ -470,6 +693,14 @@
       <rect x="-25" y="-36" width="12" height="9" rx="2" fill="#a8c8dc"/><rect x="-9" y="-36" width="12" height="9" rx="2" fill="#a8c8dc"/><path d="M7-36H20C23-36 24-34 24-31V-27H7Z" fill="#a8c8dc"/><path d="M-22-29l4-5M-6-29l4-5M10-29l5-6" stroke="#fff" stroke-width="1.4" opacity=".6"/>
       <path d="M4-38V-24" stroke="#e8701a" stroke-width="1.6"/><circle cx="26" cy="-17" r="2.6" fill="#fff6c8"/><rect x="-32" y="-14" width="3" height="5" rx="1" fill="#c43a46"/>
       ${wheel(-16, -5, 6.5)}${wheel(16, -5, 6.5)}<path d="M-27-46H23" stroke="#7a4a22" stroke-width="2.4" stroke-linecap="round"/><path d="M-22-46V-41M18-46V-41" stroke="#7a4a22" stroke-width="1.6"/><rect x="-24" y="-53" width="38" height="6" rx="3" fill="#2e8a80"/><path d="M-22-50H12" stroke="#5fd4c4" stroke-width="1.2"/></g>`,
+    /* jeep (yipao) uit de koffiestreek, met zakken koffie en een tros bananen achterop */
+    jeep: () => `<g transform="translate(210 128)"><ellipse cx="0" cy="0" rx="34" ry="3" fill="#000" opacity=".16"/>
+      <path d="M-30-8V-22H-4L2-34H6L2-22H28C30-22 31-20 31-18V-8Z" fill="#2e6e4a" ${tex('cloth')}/><path d="M-30-22H28" stroke="#e0b440" stroke-width="1.6"/><path d="M-30-14H31" stroke="#1e4a30" stroke-width=".8"/>
+      <path d="M-30-8V-22" stroke="#1e4a30" stroke-width="1"/><path d="M2-22 6-34" stroke="#1e3a28" stroke-width="1.8"/><path d="M3.4-24 6.4-32" stroke="#a8c8dc" stroke-width="2.4" opacity=".8"/>
+      <rect x="24" y="-21" width="7" height="9" rx="1" fill="#1e4a30"/>${[25.6, 27.6, 29.6].map(x => `<path d="M${x}-20v7" stroke="#0e2a18" stroke-width=".8"/>`).join('')}<circle cx="29" cy="-17" r="2.4" fill="#fff6c8" stroke="#1e3a28" stroke-width=".6"/>
+      <path d="M-32-8H33" stroke="#2a2a2e" stroke-width="2.4" stroke-linecap="round"/>${wheel(-18, -6, 7, '#c43a46')}${wheel(18, -6, 7, '#c43a46')}<path d="M-27-10a9 9 0 0 1 18 0M9-10a9 9 0 0 1 18 0" stroke="#1e4a30" stroke-width="2.4" fill="none"/>
+      <path d="M-29-22C-30-30-26-32-22-30C-20-34-14-34-12-30C-10-33-4-32-4-27V-22Z" fill="#c8b088" ${tex('cloth')}/><path d="M-22-30C-21-27-21-24-22-22M-12-30C-11-27-11-24-12-22" stroke="#8a6a44" stroke-width=".7" fill="none"/><text x="-20" y="-24.6" font-size="3.4" font-family="sans-serif" font-weight="700" fill="#6a4a2a">CAFÉ</text>
+      ${[-3, -1, 1, 3, 5].map((d, k) => `<path d="M${-6 + k * 2.2}-28q${d} -6 ${d + 4} -7" stroke="${k % 2 ? '#e8c830' : '#d8b820'}" stroke-width="2.4" stroke-linecap="round" fill="none"/>`).join('')}</g>`,
     plane: () => `<g transform="translate(205 34) rotate(-8)"><path d="M-6-2-14-22H-6L6-2Z" fill="#e2e6ea"/>
       <path d="M-26 0C-26-6-16-9 0-9C16-9 26-5 29 0C26 5 16 7 0 7C-16 7-26 5-26 0Z" fill="#c43a46"/><path d="M-24 2C-10 5 14 5 28 1C26 5 16 7 0 7C-16 7-26 5-24 2Z" fill="#000" opacity=".15"/><path d="M-20-4C-6-7 10-7 22-4" stroke="#fff" stroke-width="1.4" opacity=".5" fill="none"/>
       <path d="M-26-2-32-14H-25L-18-2Z" fill="#fff"/><path d="M-6 2-14 21H-6L6 2Z" fill="#fff"/><path d="M-12 16H-5" stroke="#c43a46" stroke-width="2"/>
@@ -541,6 +772,125 @@
   const ride = (k, x = 350, y = 218) => k && RIDES[k] ? `<g transform="translate(${x - 210} ${y - 128})">${RIDES[k]()}</g>` : '';
   const flyingPlane = () => `<g class="lv-fly"><g transform="translate(-170 -6) scale(.8)">${RIDES.plane()}</g></g>`;
 
+  /* ---------- spullen van de lange weg (nov 2026) ---------- */
+  /* ander personage uit de cast (muzikanten, leerlingen) op dezelfde manier als je eigen personage */
+  function castAt(id, cx, foot, hgt, cls = '', flip) {
+    if (!S.Cast || !S.Cast.get(id)) return '';
+    const w = hgt * 120 / 182, x = cx - w / 2;
+    const v = S.Cast.svg(id, hgt, { full: true }).replace(/^<svg[^>]*>/, `<svg x="${R(flip ? -x - w : x)}" y="${R(foot - hgt)}" width="${R(w)}" height="${hgt}" viewBox="0 0 120 182" overflow="visible" class="${cls}">`);
+    return flip ? `<g transform="scale(-1 1)">${v}</g>` : v;
+  }
+  /* condor: zwevend, witte vleugelvlakken, gespreide slagpennen */
+  const condor = (x, y, s = 1) => `<g class="lv-soar"><g transform="translate(${x} ${y}) scale(${s})"><path d="M0 0C-7-3-15-5-23-2L-20-.6-22.6 1-18.6.8-20.4 2.8-15.6 1.6C-10 2.4-4 2.2 0 3.4C4 2.2 10 2.4 15.6 1.6L20.4 2.8 18.6.8 22.6 1 20-.6 23-2C15-5 7-3 0 0Z" fill="#1c1c22"/>
+    <path d="M-5 .9C-9 .2-13 .2-16.6 1.2M5 .9C9 .2 13 .2 16.6 1.2" stroke="#ecebe6" stroke-width="1.3" opacity=".85"/><path d="M-2.6 2.8 0 6.4 2.6 2.8Z" fill="#1c1c22"/><circle cx="0" cy="-.4" r="1.8" fill="#c8848a"/><path d="M-1.8 1h3.6" stroke="#fff" stroke-width="1.3"/></g></g>`;
+  /* treintje van de Andes op een spoor over de heuvel, rookpluimpjes */
+  const train = () => { let sl = ''; for (let x = -6; x < 406; x += 5) sl += `<path d="M${x} 169.6h2.6" stroke="#5a4030" stroke-width="1.4"/>`;
+    const car = x => `<rect x="${x}" y="-11" width="19" height="9" rx="1.6" fill="#1e3a6e"/><rect x="${x - .6}" y="-12.6" width="20.2" height="2.2" rx="1" fill="#c8ccd4"/>${[2.4, 7.6, 12.8].map(d => `<rect x="${x + d}" y="-9.4" width="3.6" height="3.2" rx=".6" fill="#ffe8a0"/>`).join('')}<path d="M${x} -4h19" stroke="#e0b440" stroke-width="1"/><circle cx="${x + 4}" cy="-1.4" r="1.6" fill="#2a2a32"/><circle cx="${x + 15}" cy="-1.4" r="1.6" fill="#2a2a32"/>`;
+    return `<g>${sl}<path d="M-10 168.4H410M-10 170.6H410" stroke="#7a7068" stroke-width=".7"/>
+      <g class="lv-train"><g transform="translate(120 168)">${car(0)}${car(21)}<path d="M42-6h2" stroke="#3a3a40" stroke-width="1.4"/>
+        <rect x="44" y="-12" width="9" height="10" fill="#1e3a6e"/><rect x="45.4" y="-10.4" width="4" height="3.4" fill="#ffe8a0"/><path d="M52-8.6H66C68-8.6 69-7 69-5V-2H52Z" fill="#c43a46"/><rect x="58" y="-14" width="3.4" height="6" fill="#2a2a32"/><path d="M57-14.6h5.4" stroke="#2a2a32" stroke-width="1.4"/><circle cx="68.2" cy="-6" r="1.2" fill="#fff6c8"/><path d="M69-2l2.4 1.6H66Z" fill="#2a2a32"/>
+        <circle cx="48" cy="-1.6" r="1.8" fill="#2a2a32"/><circle cx="56" cy="-1.6" r="2.4" fill="#2a2a32"/><circle cx="63" cy="-1.6" r="2.4" fill="#2a2a32"/><circle cx="56" cy="-1.6" r="1" fill="#c43a46"/><circle cx="63" cy="-1.6" r="1" fill="#c43a46"/>
+        ${[0, 1, 2].map(k => `<circle class="lv-smoke" style="animation-delay:${k * 1.1}s" cx="59.6" cy="-17" r="3" fill="#eeeae6"/>`).join('')}</g></g></g>`; };
+  /* lama met gekleurde kwastjes in de oren en een geweven dekje */
+  const llama = (x, y, s = 1, flip) => `<g transform="translate(${x} ${y}) scale(${flip ? -s : s} ${s})"><ellipse cx="3" cy="0" rx="18" ry="2.4" fill="#000" opacity=".16"/>
+    <path d="M9-2V-15M15-2V-15" stroke="#cdbfa6" stroke-width="3.4" stroke-linecap="round"/><path d="M9-.6h0M15-.6h0" stroke="#3a2a1e" stroke-width="3.6" stroke-linecap="round"/>
+    <path d="M20-25C25-26 26-21 23-18" stroke="#efe6d2" stroke-width="4.4" stroke-linecap="round" fill="none"/>
+    <ellipse cx="6" cy="-20" rx="15.5" ry="8.6" fill="#f2ead8"/>${[[-4, -24], [2, -26], [8, -25], [14, -24], [-6, -18], [0, -16], [10, -15], [16, -18]].map(([a, b]) => `<circle cx="${a}" cy="${b}" r="2.2" fill="#fbf6ea"/><path d="M${a - 1.4} ${b + .6}q1.4 1.2 2.8 0" stroke="#d8ccb4" stroke-width=".5" fill="none"/>`).join('')}
+    <path d="M-1-28.4H14.4V-17C11-15 2-15-1-17Z" fill="#c43a46"/><path d="M-1-25H14.4M-1-20H14.4" stroke="#e0b440" stroke-width="1.2"/><path d="M-1-22.6l2-1.6 2 1.6 2-1.6 2 1.6 2-1.6 2 1.6 2-1.6 2 1.6 1.4-1" stroke="#2e8a80" stroke-width=".9" fill="none"/><path d="M0-17v2.6M4-16.4v2.6M8-16.4v2.6M12-17v2.6" stroke="#e04a8a" stroke-width="1.2"/>
+    <path d="M-3-2V-15M2-2V-15" stroke="#e6dcc6" stroke-width="3.6" stroke-linecap="round"/><path d="M-3-.6h0M2-.6h0" stroke="#3a2a1e" stroke-width="3.8" stroke-linecap="round"/>
+    <path d="M-9-23C-11-31-11-41-10-48L-2-48C-2-40-2-31 1-24Z" fill="#f2ead8"/><path d="M-3-46C-3-38-3-31-.6-25" stroke="#d8ccb4" stroke-width="1" fill="none"/>
+    <ellipse cx="-9" cy="-50" rx="6.2" ry="4.8" fill="#f2ead8"/><ellipse cx="-14.6" cy="-48.4" rx="3.6" ry="3" fill="#e2d6be"/><path d="M-17.4-49.2q1 .8 0 1.6" stroke="#6a5a4a" stroke-width=".7" fill="none"/><path d="M-16.4-46.4q1.4.8 2.8 0" stroke="#6a5a4a" stroke-width=".6" fill="none"/>
+    <circle cx="-10.4" cy="-51.4" r="1.4" fill="#2a1a12"/><circle cx="-10.8" cy="-51.9" r=".5" fill="#fff"/><path d="M-12.4-53.4q1.6-1 3 0" stroke="#b8a88e" stroke-width=".5" fill="none"/>
+    <path d="M-7-53.6C-8-58-7-61-5-62.4C-4.4-59-4.6-56-5.4-53.4Z" fill="#efe6d2"/><path d="M-3.4-53C-3.6-57-2.4-60-.4-61C.4-58-.2-55-1.6-52.6Z" fill="#e6dcc6"/>
+    <circle cx="-5.2" cy="-62" r="1.8" fill="#e04a8a"/><circle cx="-.6" cy="-60.6" r="1.8" fill="#e0b440"/><path d="M-5.2-60.4v2.4M-.6-59v2.4" stroke="#2e8a80" stroke-width="1"/></g>`;
+  /* telescoop op een driepoot, messing buis */
+  const telescope = (x, y) => `<g transform="translate(${x} ${y})"><ellipse cx="0" cy="0" rx="12" ry="2" fill="#000" opacity=".18"/><path d="M0-24-10 0M0-24 10 0M0-24 1 0" stroke="#5a4a3a" stroke-width="1.6" stroke-linecap="round"/><circle cx="0" cy="-24" r="2.4" fill="#3a3a40"/>
+    <g transform="rotate(-30 0 -26)"><rect x="-16" y="-30" width="36" height="7.4" rx="1.6" fill="#c8a040"/><rect x="-16" y="-30" width="36" height="2.4" rx="1" fill="#f0d27a"/><path d="M-4-30v7.4M8-30v7.4" stroke="#8a6a2a" stroke-width="1"/><rect x="18" y="-31.6" width="7" height="10.6" rx="1.2" fill="#8a6a2a"/><ellipse cx="25" cy="-26.3" rx="1" ry="4.6" fill="#a8c8dc"/><rect x="-21" y="-28.4" width="5" height="3.6" fill="#3a3a40"/></g></g>`;
+  const shootingStar = () => `<g class="lv-shoot"><path d="M300 24 250 44" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".9"/><circle cx="300" cy="24" r="1.8" fill="#fff"/></g>`;
+  /* koffieplantjes met rode bessen en een gevlochten mand */
+  const cafetal = () => { let o = '';
+    [[203, .72], [215, .84], [228, 1]].forEach(([y, s], j) => { for (let x = 18 + j * 5; x < 100; x += 24) { const r = rng(x * 9 + y);
+      let berries = ''; for (let k = 0; k < 9; k++) { const a = r() * 6.28, d = 3 + r() * 6, bx = Math.cos(a) * d, by = -12 + Math.sin(a) * d * .8; berries += `<circle cx="${R(bx)}" cy="${R(by)}" r="1.3" fill="${r() > .3 ? '#c41e2a' : '#e8a020'}"/><circle cx="${R(bx - .4)}" cy="${R(by - .4)}" r=".4" fill="#fff" opacity=".6"/>`; }
+      o += `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="2" cy="1" rx="12" ry="2" fill="#1a2a10" opacity=".3"/><path d="M0 0V-6" stroke="#4a3424" stroke-width="1.6"/>${foliage(r, 0, -12, 11, 10, ['#123a1e', '#1e5a2a', '#2e7a36', '#5aa04a'], 64, .8)}${berries}</g>`; } });
+    return o + `<g transform="translate(98 234)"><ellipse cx="0" cy="0" rx="11" ry="2" fill="#000" opacity=".2"/><path d="M-9-12H9L7 0H-7Z" fill="#b8864a" ${tex('wood')}/>${[-9.6, -6, -2.4].map(y => `<path d="M-9 ${y}H9" stroke="#7a5228" stroke-width=".8"/>`).join('')}${[-6, -2, 2, 6].map(x => `<path d="M${x}-12l-.4 12" stroke="#7a5228" stroke-width=".6"/>`).join('')}<ellipse cx="0" cy="-12" rx="9" ry="2.4" fill="#8a5a2a"/>${[-5, -2, 1, 4, -3, 2].map((x, k) => `<circle cx="${x}" cy="${-12.6 - (k > 3 ? 1.4 : 0)}" r="1.5" fill="#c41e2a"/>`).join('')}<path d="M-9-12C-8-22 8-22 9-12" stroke="#7a5228" stroke-width="1.4" fill="none"/></g>`; };
+  /* kip (scharrelt, kopje gaat op en neer) */
+  const hen = (x, y, c, flip, delay = 0) => `<g transform="translate(${x} ${y})${flip ? ' scale(-1 1)' : ''}"><ellipse cx="0" cy="0" rx="7" ry="1.4" fill="#000" opacity=".16"/><path d="M-1 0v-4.4M2.4 0v-4.4" stroke="#e0a030" stroke-width="1"/><path d="M-2 0h2M1.4 0h2" stroke="#e0a030" stroke-width=".8"/>
+    <path d="M-5-7C-5-12 3-13 6-10C9-12 10-15 9-18C13-15 13-8 8-5C5-3-2-3-5-7Z" fill="${c}"/><path d="M9-18C11-16 12-13 11-10" stroke="${darker(c, .7)}" stroke-width="1" fill="none"/><path d="M-1-9C2-11 6-10 6.4-7C3-5.6 0-6-1-9Z" fill="${darker(c, .82)}"/><path d="M1-8.6q2 1 4 .4" stroke="${darker(c, .65)}" stroke-width=".5" fill="none"/>
+    <g class="lv-peck" style="animation-delay:${delay}s"><path d="M-4-8C-6-10-6-13-5-14" stroke="${c}" stroke-width="3" fill="none"/><circle cx="-6.4" cy="-14" r="3.2" fill="${c}"/><path d="M-8.4-17c0-1.8 1-2 1.6-.9.4-1.4 1.6-1.4 1.6 0 .6-1 1.8-.6 1.2.8Z" fill="#d42a2a"/><path d="M-9.4-14.4l-2.6 1 2.6 1Z" fill="#e8a020"/><ellipse cx="-8.6" cy="-11.6" rx="1" ry="1.5" fill="#d42a2a"/><circle cx="-7" cy="-14.6" r=".7" fill="#1a1a1a"/></g></g>`;
+  const hens = () => hen(116, 222, '#c8682a', false, 0) + hen(138, 228, '#f4ece0', true, .5) + hen(150, 216, '#8a4a22', false, 1.1) + [0, 1, 2, 3, 4, 5].map(k => `<circle cx="${110 + k * 8}" cy="${224 + (k % 2) * 4}" r=".7" fill="#e8c060"/>`).join('');
+  /* ara (papegaai Pepe) op een houten stok */
+  const parrot = (x, y) => `<g transform="translate(${x} ${y})"><ellipse cx="0" cy="0" rx="9" ry="1.8" fill="#000" opacity=".16"/><path d="M-6 0h12M0 0V-30M-10-30H10" stroke="#7a5228" stroke-width="2" stroke-linecap="round"/><rect x="-4" y="-27" width="8" height="3" rx="1" fill="#c8a040"/>
+    <g class="lv-tilt" style="transform-origin:${0}px ${-31}px"><path d="M2-36C5-28 6-20 4-10L1-10C1-18 0-26-1-33Z" fill="#2e6aa8"/><path d="M3-36C6-26 8-18 7-8" stroke="#c43a46" stroke-width="1.6" fill="none"/>
+    <ellipse cx="-1" cy="-40" rx="6" ry="9" fill="#d42a2a"/><path d="M-2-44C3-46 6-40 5-33C2-34 0-38-2-44Z" fill="#e0b440"/><path d="M0-38C4-38 6-34 6-30C3-30 1-33 0-38Z" fill="#2e6aa8"/><path d="M1-42c1.4 1 2.4 3 2.4 5" stroke="#4a9a56" stroke-width=".8" fill="none"/>
+    <circle cx="-3" cy="-49" r="5" fill="#d42a2a"/><path d="M-7.4-50C-8-48-8.6-46-6.6-43.6C-6-45-5.6-46-5.4-47Z" fill="#3a3a40"/><path d="M-7.6-50.4C-10-49-10.4-46-8.4-44.4C-8-46-7.4-47.6-6.6-48.4Z" fill="#f4ece0"/><circle cx="-3" cy="-50" r="2" fill="#fff"/><circle cx="-3.2" cy="-50" r="1" fill="#1a1a1a"/>
+    <path d="M-4-31h6" stroke="#5a5a62" stroke-width="1.4" stroke-linecap="round"/></g></g>`;
+  /* waterval rechts tegen een begroeide rotswand, met nevel en poel */
+  const falls = () => `<g><path d="M318 186C316 150 322 118 330 92C346 84 380 82 410 86V188Z" fill="#5a6a5a" ${tex('stucco')}/><path d="M318 186C316 150 322 118 330 92C334 120 332 160 336 188Z" fill="#000" opacity=".16"/>
+    ${foliage(rng(401), 368, 86, 40, 8, ['#1a4424', '#2a5e30', '#3e7a3a', '#6aa84a'], 90)}${foliage(rng(402), 326, 120, 6, 18, ['#1a4424', '#2a5e30', '#3e7a3a', '#6aa84a'], 40)}${foliage(rng(403), 396, 130, 8, 30, ['#1a4424', '#2a5e30', '#3e7a3a', '#6aa84a'], 50)}
+    <path d="M350 88C348 120 350 150 348 182H378C376 150 378 120 376 88Z" fill="url(#${U}fall)"/>
+    <g class="lv-fall">${[352, 356, 360, 364, 368, 372].map((x, k) => `<path d="M${x} 90V182" stroke="#fff" stroke-width="${k % 2 ? .8 : 1.4}" stroke-dasharray="${6 + k} ${4 + k % 3}" opacity=".85"/>`).join('')}</g>
+    <ellipse cx="363" cy="186" rx="34" ry="6" fill="#4aa0b4"/><ellipse cx="363" cy="186" rx="34" ry="6" fill="url(#${U}glint)" opacity=".7"/>
+    ${[0, 1, 2].map(k => `<ellipse class="lv-mist" style="animation-delay:${k}s" cx="${352 + k * 10}" cy="180" rx="12" ry="5" fill="#fff" opacity=".6"/>`).join('')}</g>`;
+  /* toekan op een bemoste stronk */
+  const toucan = (x, y) => `<g transform="translate(${x} ${y})"><ellipse cx="0" cy="0" rx="12" ry="2" fill="#000" opacity=".18"/><path d="M-8 0C-8-8-7-14-6-16H6C7-14 8-8 8 0Z" fill="#6a4a30" ${tex('wood')}/><ellipse cx="0" cy="-16" rx="6" ry="1.8" fill="#a8845a"/><path d="M-3-16a3 1 0 0 0 6 0" stroke="#7a5a3a" stroke-width=".5" fill="none"/>${foliage(rng(411), -6, -8, 4, 6, ['#2a5a26', '#3e7a36', '#5a9a44', '#7aba5a'], 18, .6)}
+    <g class="lv-tilt" style="transform-origin:0px -17px"><path d="M2-20 6-6 2-6Z" fill="#1a1a1e"/><ellipse cx="0" cy="-26" rx="5" ry="9" fill="#1a1a1e"/><ellipse cx="-2" cy="-30" rx="3.6" ry="4.4" fill="#fff4c8"/><path d="M-4-22C-3-20-1-19 1-20" stroke="#d42a2a" stroke-width="1.4" fill="none"/>
+    <circle cx="-1" cy="-34" r="4.4" fill="#1a1a1e"/><circle cx="-2.4" cy="-34.4" r="1.9" fill="#7ad8f0"/><circle cx="-2.6" cy="-34.4" r=".9" fill="#1a1a1e"/>
+    <path d="M-4-36C-10-38-16-36-20-31C-15-31-9-31-4-32Z" fill="#f08a1a"/><path d="M-4-36C-10-38-16-36-20-31C-16-34-10-35-4-35Z" fill="#7ac43a"/><path d="M-20-31C-15-31-9-31-4-32" stroke="#c43a1a" stroke-width=".8" fill="none"/><path d="M-19-31.4l1.4-1.6" stroke="#c43a1a" stroke-width="1.6"/></g></g>`;
+  /* hangbrug vanaf het plankier van de boomhut naar een boom rechts */
+  const bridge = () => { let o = '', rail = ''; const x0 = 300, y0 = 128, x1 = 404, y1 = 118;
+    for (let k = 0; k <= 22; k++) { const t = k / 22, x = x0 + (x1 - x0) * t, y = y0 + (y1 - y0) * t + Math.sin(t * Math.PI) * 9; o += `<path d="M${R(x)} ${R(y)}l1 2.4" stroke="#8a6a40" stroke-width="2.6"/>`; if (k % 2 === 0) rail += `<path d="M${R(x)} ${R(y)}V${R(y - 8 + Math.sin(t * Math.PI) * 2)}" stroke="#c8b08a" stroke-width=".6"/>`; }
+    return `<g><path d="M${x0} ${y0 - 8}Q352 ${y0 + 2} ${x1} ${y1 - 8}M${x0} ${y0}Q352 ${y0 + 18} ${x1} ${y1}" stroke="#c8b08a" stroke-width="1" fill="none"/>${rail}${o}<path d="M396 80V200" stroke="#5a4030" stroke-width="7"/><path d="M393 80V200" stroke="#7a6048" stroke-width="2"/>${foliage(rng(421), 396, 84, 18, 14, ['#1a4424', '#2a5e30', '#3e7a3a', '#6aa84a'], 70)}</g>`; };
+  /* luchtballon met gekleurde banen en een mandje */
+  const balloon = (x, y, s = 1, crew = '') => { const C = ['#c43a46', '#e0b440', '#2e8a80', '#e07a2a', '#2e6aa8', '#e04a8a'];
+    let gores = ''; for (let k = 0; k < 6; k++) { const a = -20 + k * 8, b = a + 8; gores += `<path d="M0-62C${a * 1.1}-60 ${a * 1.3}-36 ${a * .55}-14L${b * .55}-14C${b * 1.3}-36 ${b * 1.1}-60 0-62Z" fill="${C[k]}"/>`; }
+    return `<g transform="translate(${x} ${y}) scale(${s})"><path d="M0-62C-26-62-30-34-14-14C-10-10-8-8-7-4H7C8-8 10-10 14-14C30-34 26-62 0-62Z" fill="${C[0]}"/>${gores}<path d="M0-62C-26-62-30-34-14-14C-10-10-8-8-7-4H7C8-8 10-10 14-14C30-34 26-62 0-62Z" fill="url(#${U}rock)" opacity=".8" transform="translate(0 0) scale(-1 1)"/>
+      <path d="M-14-50C-12-56-6-59 0-59" stroke="#fff" stroke-width="2" opacity=".35" fill="none" stroke-linecap="round"/><path d="M-7-4-5 4M7-4 5 4M0-4V4" stroke="#5a4a3a" stroke-width=".6"/>${crew}<path d="M-6 4H6L5 12H-5Z" fill="#a8784a" ${tex('wood')}/><path d="M-6 4H6" stroke="#5a3a1a" stroke-width="1.4"/><path d="M-5.4 8H5.4" stroke="#7a5228" stroke-width=".6"/></g>`; };
+  /* houten steiger het meer in */
+  const dock = () => `<g><path d="M92 198 112 154H136L144 198Z" fill="#9a7048" ${tex('wood')}/>${Array.from({ length: 12 }, (_, k) => { const t = k / 11, y = 154 + t * 44; return `<path d="M${R(112 - t * 20)} ${R(y)}H${R(136 + t * 8)}" stroke="#5a3a22" stroke-width="${R(.4 + t * .6)}"/>`; }).join('')}
+    ${[[112, 154, 6], [136, 154, 6], [101, 176, 9], [140, 176, 9]].map(([x, y, h]) => `<rect x="${x - 1.4}" y="${y}" width="2.8" height="${h}" fill="#5a3a22"/>`).join('')}<path d="M112 154 92 198M136 154 144 198" stroke="#5a3a22" stroke-width="1"/><path d="M110 160h28" stroke="#fff" stroke-width=".6" opacity=".3"/></g>`;
+  /* kajak met peddel */
+  const kayak = (x, y, s = 1, crew = '', paddle = true) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="3" rx="30" ry="2.4" fill="#0a3a5a" opacity=".2"/><path d="M-30 0C-20-5 20-5 30 0C20 5-20 5-30 0Z" fill="#e8c020"/><path d="M-30 0C-20 5 20 5 30 0C20 2-20 2-30 0Z" fill="#c89a10"/><ellipse cx="0" cy="-1.4" rx="7" ry="2" fill="#2a2a32"/><path d="M-26-.6H26" stroke="#c43a46" stroke-width=".8"/>${crew}
+    ${paddle ? `<g class="lv-paddle" style="transform-origin:0px -6px"><path d="M-18 2 18-14" stroke="#5a4a3a" stroke-width="1.4"/><path d="M-18 2l-5 2.4 1.4-4.4Z" fill="#2e6aa8"/><path d="M18-14l5-2.4-1.4 4.4Z" fill="#2e6aa8"/></g>` : ''}</g>`;
+  /* pinguïns van Magellaan aan de oever */
+  const penguin = (x, y, s = 1, delay = 0) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="6" ry="1.4" fill="#000" opacity=".18"/><g class="lv-waddle" style="animation-delay:${delay}s"><path d="M-3 0h2.4M1 0h2.4" stroke="#e8a080" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M0-20C-6-20-7-12-6-6C-5-2-3 0 0 0S5-2 6-6C7-12 6-20 0-20Z" fill="#1c1c24"/><path d="M0-14C-3.6-14-4.4-8-4-5C-3.4-2-2-1 0-1S3.4-2 4-5C4.4-8 3.6-14 0-14Z" fill="#f4f2ee"/><path d="M-4.4-12C-2-11 2-11 4.4-12" stroke="#1c1c24" stroke-width="1.2" fill="none"/>
+    <path d="M-5.6-12-8-4M5.6-12 8-4" stroke="#1c1c24" stroke-width="2" stroke-linecap="round"/><path d="M-3.6-21C-4-17-2-15 0-15S4-17 3.6-21" stroke="#f4f2ee" stroke-width="1" fill="none"/><circle cx="-1.6" cy="-19" r=".8" fill="#fff"/><circle cx="1.6" cy="-19" r=".8" fill="#fff"/><path d="M-1-17.6 0-15.6 1-17.6Z" fill="#3a3a40"/></g></g>`;
+  const penguins = () => penguin(246, 212, 1, 0) + penguin(262, 216, .9, .4) + penguin(256, 206, .8, .8);
+  /* poesje Luna: zit, staartje zwiept */
+  const cat = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="1" cy="0" rx="8" ry="1.6" fill="#000" opacity=".18"/><g class="lv-wag" style="transform-origin:5px -2px"><path d="M5-2C11-2 12-8 10-12" stroke="#7a7a84" stroke-width="2.2" fill="none" stroke-linecap="round"/></g>
+    <path d="M-5 0C-6-6-5-11 0-12C5-11 6-6 5 0Z" fill="#8a8a94"/><path d="M-2-11C-1-7 1-7 2-11" stroke="#6a6a74" stroke-width="1" fill="none"/><path d="M-4 0V-4M4 0V-4" stroke="#6a6a74" stroke-width=".8"/><ellipse cx="0" cy="-3" rx="2.6" ry="3" fill="#e8e6e2"/>
+    <circle cx="0" cy="-15" r="5" fill="#8a8a94"/><path d="M-4.6-17-4-22-1.4-19.4ZM4.6-17 4-22 1.4-19.4Z" fill="#8a8a94"/><path d="M-3.8-18.6-3.6-20.8-2.4-19.4ZM3.8-18.6 3.6-20.8 2.4-19.4Z" fill="#f0a0b0"/><path d="M-3-16.6l1.6-.4M3-16.6l-1.6-.4" stroke="#5a5a64" stroke-width=".5"/>
+    <ellipse cx="-1.8" cy="-15" rx=".9" ry="1.2" fill="#3a8a3a"/><ellipse cx="1.8" cy="-15" rx=".9" ry="1.2" fill="#3a8a3a"/><path d="M-.6-13.2h1.2L0-12.4Z" fill="#e88a9a"/><path d="M-1.6-12.4Q0-11.4 1.6-12.4M-2-13l-4-.6M2-13l4-.6M-2-12.4l-4 .6M2-12.4l4 .6" stroke="#4a4a54" stroke-width=".35" fill="none"/>
+    <path d="M-4-11.6h8" stroke="#c43a46" stroke-width="1.2"/><circle cx="0" cy="-10.6" r="1" fill="#e0b440"/></g>`;
+  /* terrasje: tafeltje met parasol, stoeltjes, koffie en een krijtbord */
+  const terrace = () => `<g><g transform="translate(18 232)"><path d="M0 0V-26" stroke="#5a3a22" stroke-width="1.4"/><path d="M-2 0 0-4 2 0" stroke="#5a3a22" stroke-width="1" fill="none"/><path d="M-12-26H12V-52H-12Z" fill="#2a3a30"/><path d="M-12-26H12V-52H-12Z" fill="none" stroke="#a8784a" stroke-width="1.6"/>
+      <text x="0" y="-42" text-anchor="middle" font-family="Georgia, serif" font-size="6" fill="#f4ece0">Café</text><path d="M-6-37h12M-6-33h9M-6-29h11" stroke="#f4ece0" stroke-width=".6" opacity=".7"/></g>
+    <g transform="translate(66 230)"><ellipse cx="0" cy="1" rx="22" ry="3" fill="#000" opacity=".16"/><path d="M0 0V-54" stroke="#e8e6e2" stroke-width="1.4"/><path d="M-30-48C-20-60 20-60 30-48Z" fill="#2e8a56"/>${[-24, -12, 0, 12, 24].map((x, k) => `<path d="M0-58L${x - 6}-48H${x + 6}Z" fill="${k % 2 ? '#f4ece0' : '#2e8a56'}"/>`).join('')}<path d="M-30-48C-20-60 20-60 30-48" stroke="#1e6a40" stroke-width=".6" fill="none"/>${[-24, -12, 0, 12, 24].map(x => `<path d="M${x - 6}-48q6 3 12 0" stroke="#1e6a40" stroke-width=".6" fill="${'#2e8a56'}" opacity=".9"/>`).join('')}
+      <path d="M-12-16H12" stroke="#e8e6e2" stroke-width="2.4"/><path d="M0-16V0M-6 0H6" stroke="#3a3a40" stroke-width="1.4"/><path d="M-6-21h4v4h-4ZM4-20h4v3h-4Z" fill="#fff"/><path d="M-2-20.4a1.6 1.6 0 0 1 0 2.6M8-19.6a1.4 1.4 0 0 1 0 2" stroke="#fff" stroke-width=".7" fill="none"/><ellipse cx="-4" cy="-21" rx="1.6" ry=".5" fill="#6a3a1a"/><path d="M-1-17.4h-6" stroke="#e8e6e2" stroke-width=".8"/>
+      ${[[-20, 1], [20, -1]].map(([x, f]) => `<g transform="translate(${x} 0) scale(${f} 1)"><path d="M-4 0V-12M4 0V-6M-4-6H4" stroke="#3a3a40" stroke-width="1.2"/><path d="M-5-12H-3V-22" stroke="#3a3a40" stroke-width="1.2" fill="none"/><path d="M-5-6.6H5" stroke="#c43a46" stroke-width="2"/></g>`).join('')}</g>
+    <g class="lv-steam">${[0, 1, 2].map(k => `<path d="M${61 + k * 1.6} 208q-1.6-2 0-4t0-4" stroke="#fff" stroke-width=".7" fill="none" opacity=".7"/>`).join('')}</g></g>`;
+  /* papel picado: geknipte papieren vlaggetjes boven de straat */
+  const picado = () => { const C = ['#e04a8a', '#e0b440', '#2e8a80', '#9a6ad8', '#e07a2a', '#3a78d6', '#c43a46', '#6ab04a'];
+    const row = (y, sag, off) => { let o = `<path d="M-10 ${y}Q200 ${y + sag} 410 ${y}" stroke="#7a6a5a" stroke-width=".6" fill="none"/>`; for (let k = 0; k < 16; k++) { const x = 4 + k * 25.4 + off, t = (x + 10) / 420, yy = y + 4 * sag * t * (1 - t) * .5; o += `<g class="lv-flutter" style="animation-delay:${(k % 5) * .3}s;transform-origin:${R(x + 5.5)}px ${R(yy)}px"><path d="M${R(x)} ${R(yy)}h11v12l-2.2-1.6-1.6 1.6-1.6-1.6-1.6 1.6-1.6-1.6-1.6 1.6-.8-.8Z" fill="${C[(k + off) % 8]}" opacity=".95"/><path d="M${R(x + 3)} ${R(yy + 3)}h1.6v1.6h-1.6ZM${R(x + 6.4)} ${R(yy + 3)}h1.6v1.6h-1.6ZM${R(x + 4.6)} ${R(yy + 6.6)}h1.8v1.8h-1.8Z" fill="#fff" opacity=".55"/></g>`; } return o; };
+    return `<g>${row(98, 22, 0)}${row(118, 16, 3)}</g>`; };
+  /* muzikanten uit de cast, met trompet en gitaar */
+  const band = () => `<g>${castAt('mateo', 246, 214, 52, 'lv-bob')}<g transform="translate(252 186) rotate(-14)"><path d="M0 0H14" stroke="#e0b440" stroke-width="2"/><path d="M14 0l6-3.6V3.6Z" fill="#e0b440"/><circle cx="4" cy="-1.6" r="1" fill="#c8a040"/></g>${castAt('sofia', 282, 216, 52, 'lv-bob')}<g transform="translate(276 196) rotate(-30)"><path d="M0-1H22" stroke="#7a4a22" stroke-width="2.4" stroke-linecap="round"/><circle cx="-3" cy="-1" r="6" fill="#d98a3a"/><circle cx="-9" cy="-1" r="7.4" fill="#d98a3a"/><circle cx="-5" cy="-1" r="2" fill="#5a3418"/></g>${notes(262, 160)}</g>`;
+  /* leerlingen voor je school, met boeken en rugzakjes */
+  const pupils = () => `<g>${castAt('lucia', 120, 224, 40)}${castAt('juliana', 142, 230, 38)}${castAt('facundo', 248, 214, 40)}<g transform="translate(150 214) rotate(-12)"><rect x="-4" y="-5" width="8" height="6" fill="#c43a46"/><rect x="-3.4" y="-4.4" width="6.8" height="1" fill="#fff"/></g></g>`;
+  /* wereldfeest: vlaggenlijn met landen, confetti */
+  const worldFlags = () => { const F = [['#ae1c28', '#fff', '#21468b', 'h'], ['#006847', '#fff', '#ce1126', 'v'], ['#fcd116', '#003893', '#ce1126', 'co'], ['#d91023', '#fff', '#d91023', 'v'], ['#0055a4', '#fff', '#ef4135', 'v'], ['#1a1a1a', '#dd0000', '#ffce00', 'h'], ['#74acdf', '#fff', '#74acdf', 'h'], ['#c60b1e', '#ffc400', '#c60b1e', 'es'], ['#3c3b6e', '#fff', '#b22234', 'h'], ['#002b7f', '#fcd116', '#ce1126', 'v']];
+    let o = '';
+    [[-10, 140, 74], [270, 410, 74]].forEach(([x0, x1, y0]) => { o += `<path d="M${x0} ${y0}Q${(x0 + x1) / 2} ${y0 + 22} ${x1} ${y0}" stroke="#7a5a3a" stroke-width=".8" fill="none"/>`;
+      F.forEach(([a, b, c, t], k) => { const x = x0 + 6 + k * (x1 - x0 - 18) / F.length, y = y0 + 1 + Math.sin((x - x0) / (x1 - x0) * Math.PI) * 11; o += flagOf(a, b, c, t, x, y); }); });
+    return o + confetti(); };
+  const flagOf = (a, b, c, t, x, y) => {
+    return t === 'v' ? `<rect x="${R(x)}" y="${R(y)}" width="3.6" height="8" fill="${a}"/><rect x="${R(x + 3.6)}" y="${R(y)}" width="3.6" height="8" fill="${b}"/><rect x="${R(x + 7.2)}" y="${R(y)}" width="3.6" height="8" fill="${c}"/>`
+        : t === 'co' ? `<rect x="${R(x)}" y="${R(y)}" width="10.8" height="4" fill="${a}"/><rect x="${R(x)}" y="${R(y + 4)}" width="10.8" height="2" fill="${b}"/><rect x="${R(x)}" y="${R(y + 6)}" width="10.8" height="2" fill="${c}"/>`
+        : t === 'es' ? `<rect x="${R(x)}" y="${R(y)}" width="10.8" height="2" fill="${a}"/><rect x="${R(x)}" y="${R(y + 2)}" width="10.8" height="4" fill="${b}"/><rect x="${R(x)}" y="${R(y + 6)}" width="10.8" height="2" fill="${c}"/>`
+        : `<rect x="${R(x)}" y="${R(y)}" width="10.8" height="2.7" fill="${a}"/><rect x="${R(x)}" y="${R(y + 2.7)}" width="10.8" height="2.6" fill="${b}"/><rect x="${R(x)}" y="${R(y + 5.3)}" width="10.8" height="2.7" fill="${c}"/>`; };
+  const confetti = () => { let o = ''; const r = rng(501); for (let k = 0; k < 26; k++) o += `<rect class="lv-confetti" style="animation-delay:${R(r() * 4)}s;animation-duration:${R(3 + r() * 3)}s" x="${R(r() * 400)}" y="${R(r() * 60)}" width="2.4" height="1.4" fill="${['#e04a8a', '#e0b440', '#2e8a80', '#9a6ad8', '#3a78d6', '#e07a2a'][k % 6]}"/>`;
+    return o; };
+
   /* ---------- je personage ---------- */
   function me(cx, foot, hgt, opt = {}) {
     const st = S.Store && S.Store.state, c = st && st.me && S.Cast && S.Cast.get(st.me);
@@ -580,6 +930,31 @@
       draw: () => `${me(250, 232, 92, { cls: 'lv-bob' })}${grill(292, 224, true)}<path d="M266 198 284 190" stroke="#9a9aa6" stroke-width="2" stroke-linecap="round"/><rect x="282" y="187" width="7" height="5" rx="1" fill="#9a9aa6"/>` },
     { id: 'party', label: '🎆 Feest', sky: 'night', ok: w => w.items.has('fireworks'),
       draw: () => `${fireworks()}<g class="lv-hop">${me(80, 230, 92)}</g>` },
+    { id: 'stars', label: '🔭 Sterren kijken', sky: 'night', ok: w => w.items.has('telescope'),
+      draw: () => `${shootingStar()}${telescope(124, 228)}${me(86, 230, 90, { cls: 'lv-bob' })}` },
+    { id: 'llama', label: '🦙 Wandelen met de lama', sky: 'day', ok: w => w.items.has('llama'), hide: ['llama'],
+      draw: () => `<g class="lv-walk"><g class="lv-flip">${me(60, 230, 92, { cls: 'lv-step' })}${llama(112, 232, 1.05, true)}</g></g>` },
+    { id: 'coffee', label: '☕ Koffie plukken', sky: 'dawn', ok: w => w.items.has('coffee'),
+      draw: () => `${me(122, 232, 92, { cls: 'lv-bob' })}<g transform="translate(140 196)"><path d="M-6-8H6L5 0H-5Z" fill="#b8864a"/><path d="M-6-8C-5-14 5-14 6-8" stroke="#7a5228" stroke-width="1" fill="none"/>${[-3, 0, 3].map(x => `<circle cx="${x}" cy="-8.6" r="1.4" fill="#c41e2a"/>`).join('')}</g>${[0, 1].map(k => `<circle class="lv-drop" style="animation-delay:${k * .5}s" cx="${100 + k * 6}" cy="186" r="1.3" fill="#c41e2a"/>`).join('')}` },
+    { id: 'hens', label: '🐔 Kippen voeren', sky: 'dawn', ok: w => w.items.has('hens'),
+      draw: () => `${me(92, 232, 92, { cls: 'lv-bob' })}${[0, 1, 2, 3, 4].map(k => `<circle class="lv-drop" style="animation-delay:${k * .2}s" cx="${110 + k * 5}" cy="${196 + (k % 2) * 4}" r=".9" fill="#e8c060"/>`).join('')}` },
+    { id: 'parrot', label: '🦜 Praten met Pepe', sky: 'day', ok: w => w.items.has('parrot'),
+      draw: () => { const t = { es: '¡Hola!', en: 'Hello!', de: 'Hallo!', fr: 'Salut !', nl: 'Hallo!' }[(S.course && S.course.target) || 'es'] || '¡Hola!';
+        return `${me(222, 234, 88, { cls: 'lv-bob' })}<g class="lv-pop"><path d="M266 150H306A6 6 0 0 1 312 156V166A6 6 0 0 1 306 172H284L276 180 278 172H266A6 6 0 0 1 260 166V156A6 6 0 0 1 266 150Z" fill="#fff" stroke="#2a2a32" stroke-width=".8"/><text x="286" y="165" text-anchor="middle" font-family="Georgia, serif" font-size="10" font-weight="700" fill="#c43a46">${t}</text></g>`; } },
+    { id: 'kayak', label: '🛶 Kajakken', sky: 'day', ok: w => w.items.has('kayak'), hide: ['kayak'],
+      draw: () => `<g class="lv-glide">${kayak(110, 172, 1.1, me(0, 0, 30))}</g>` },
+    { id: 'balloon', label: '🎈 Ballonvaart', sky: 'day', ok: w => w.balloon,
+      draw: () => `<g class="lv-drift">${balloon(96, 132, 1.25, me(0, 9, 20))}</g>` },
+    { id: 'cat', label: '🐱 Knuffelen met Luna', sky: 'dusk', ok: w => w.items.has('cat'), hide: ['cat'],
+      draw: () => `${me(120, 232, 90, { cls: 'lv-bob' })}${cat(148, 232, 1.5)}<path class="lv-pop" d="M152 196c-2-3 2-5 3-2 1-3 5-1 3 2l-3 3Z" fill="#e8344e"/>` },
+    { id: 'terrace', label: '☕ Koffie op het terras', sky: 'dawn', ok: w => w.items.has('terrace'),
+      draw: () => `${me(112, 232, 88, { cls: 'lv-bob' })}<g transform="translate(124 194)"><path d="M-3-4h6v5h-6Z" fill="#fff"/><path d="M3-3a1.6 1.6 0 0 1 0 3" stroke="#fff" stroke-width=".8" fill="none"/><g class="lv-steam"><path d="M-1-6q-1.6-2 0-4t0-4M1.4-6q-1.6-2 0-4" stroke="#fff" stroke-width=".7" fill="none" opacity=".8"/></g></g>` },
+    { id: 'band', label: '🎺 Muziek op straat', sky: 'dusk', ok: w => w.items.has('band'),
+      draw: () => `<g class="lv-hop">${me(150, 230, 90)}</g>` },
+    { id: 'teach', label: '📚 Les geven', sky: 'day', ok: w => w.items.has('pupils'), hide: ['pupils'],
+      draw: () => `<g transform="translate(14 150)"><path d="M10 64 18 0M70 64 62 0M40 64V40" stroke="#7a5228" stroke-width="2"/><rect x="4" y="0" width="72" height="44" rx="2" fill="#2a3a30" stroke="#a8784a" stroke-width="2.4"/>
+        <text font-family="Georgia, serif" font-size="8" font-weight="700"><tspan x="12" y="13" fill="#f4ece0">¡Hola!</tspan><tspan x="44" y="13" fill="#ffd870">Hello!</tspan><tspan x="12" y="27" fill="#a8e0d0">Hallo!</tspan><tspan x="42" y="27" fill="#ffb0c8">Bonjour!</tspan></text><path d="M12 36h20M38 36h30" stroke="#f4ece0" stroke-width=".8" opacity=".6"/></g>
+        ${me(110, 232, 92, { cls: 'lv-bob' })}${castAt('lucia', 172, 236, 46, 'lv-bob')}${castAt('juliana', 206, 238, 44)}${castAt('facundo', 240, 236, 46, 'lv-bob')}` },
     { id: 'sleep', label: '😴 Slapen', sky: 'night', ok: () => true,
       draw: w => w.home === 'mochila' ? `<g transform="rotate(-88 70 214)">${me(70, 254, 70)}</g><path d="M42 222C40 208 50 204 70 206H98C108 208 110 222 98 226H48Z" fill="#2f6fb5"/><path d="M60 206V226" stroke="#1f4f8e" stroke-width="1.5"/>${zzz(56, 196)}`
         : zzz(224, 150) }
@@ -589,7 +964,8 @@
   function pick(w, hour) {
     const av = acts(w).map(a => a.id), has = id => av.includes(id), last = list => list.filter(has).pop();
     if (hour >= 22 || hour < 6) return 'sleep';
-    if (hour >= 18) return w.items.has('fireworks') && hour >= 20 ? 'party' : last(['fire', 'guitar', 'grill']) || 'evening';
+    if (hour >= 21 && has('stars')) return 'stars';
+    if (hour >= 18) return w.items.has('fireworks') && hour >= 20 ? 'party' : last(['fire', 'guitar', 'grill', 'cat', 'band']) || 'evening';
     return hour < 10 ? 'morning' : 'walk';
   }
 
@@ -600,18 +976,23 @@
     const sky = act.sky, night = sky === 'night', hide = new Set(act.hide || []);
     const home = HOMES[w.home]();
     const it = k => w.items.has(k) && !hide.has(k);
-    const back = (it('hammock') ? hammockTrees(w.biome) + hammockCloth : '')
+    const back = (it('picado') ? picado() : '') + (w.items.has('world') ? worldFlags() : '') + (it('falls') ? falls() : '') + (it('train') ? train() : '') + (it('dock') ? dock() : '') + (it('kayak') ? kayak(362, 172, .7, '', false) : '')
+      + (it('hammock') ? hammockTrees(w.biome) + hammockCloth : '')
       + (it('boat') ? boat(84, w.biome === 'isla' ? 176 : 170, .9) : '')
       + (it('horse') ? horse(318, 214) : '') + (w.items.has('lighthouse') ? lighthouse(372, 176, night) : '');
-    const smoke = w.home === 'jardin' && sky !== 'day' ? puffs(255, 66) : '';
-    const front = (it('garden') ? garden() : '') + (it('fountain') ? fountain(120, 214) : '') + (it('fire') ? fire(126, 214) : '')
+    const sky2 = (it('condor') && !night ? condor(120, 66) + condor(232, 48, .7) : '') + (w.balloon && act.id !== 'balloon' && !night ? `<g class="lv-drift">${balloon(64, 92, .5)}</g>` : '');
+    const smoke = sky === 'day' ? '' : w.home === 'jardin' ? puffs(255, 66) : w.home === 'andes' ? puffs(264, 82) : w.home === 'lodge' ? puffs(267, 90) : '';
+    const mid = it('bridge') ? bridge() : '';
+    const front = (it('garden') ? garden() : '') + (it('coffee') ? cafetal() : '') + (it('terrace') ? terrace() : '') + (it('fountain') ? fountain(120, 214) : '') + (it('fire') ? fire(126, 214) : '')
+      + (it('toucan') ? toucan(124, 222) : '') + (it('hens') ? hens() : '') + (it('llama') ? llama(254, 214, .85) : '') + (it('parrot') ? parrot(258, 212) : '') + (it('penguins') ? penguins() : '') + (it('band') ? band() : '') + (it('pupils') ? pupils() : '')
       + (it('grill') ? grill(290, 224, false) : '') + (it('surf') ? surfboard(352, 196) : '') + (act.hideRide ? '' : ride(w.ride))
+      + (it('cat') ? cat(234, 200) : '')
       + (it('dog') ? (sky === 'night' ? dog(162, 234, 'lv-idle') : dog(162, 234, 'lv-jump') + `<circle class="lv-ball" cx="140" cy="200" r="4.5" fill="#e8344e"/>`) : '');
     const shade = night ? `<rect width="400" height="240" fill="#0a1238" opacity=".42"/>` : sky === 'dusk' ? `<rect width="400" height="240" fill="#c8506a" opacity=".14"/>` : sky === 'dawn' ? `<rect width="400" height="240" fill="#ffb080" opacity=".08"/>` : '';
     const finish = `<rect width="400" height="240" fill="url(#${u}vig)"/><rect width="400" height="240" filter="url(#${u}grain)"/>`;
     return `<svg class="life-svg" viewBox="0 0 400 240" ${opt.w ? `width="${opt.w}" height="${Math.round(opt.w * .6)}"` : ''} role="img" aria-label="${STEPS[i].name}: ${act.label.replace(/^\S+\s/, '')}" xmlns="http://www.w3.org/2000/svg">
   ${defs(u, w.biome, sky)}
-  ${skyLayer(u, sky)}${w.plane && !night ? flyingPlane() : ''}${land(u, w.biome)}${back}<g transform="translate(82 26) scale(1.3)">${home}</g>${smoke}${w.items.has('fireworks') ? bunting() : ''}${front}${shade}${night && w.items.has('lighthouse') ? lighthouse(372, 176, true) : ''}${act.draw(w)}${finish}</svg>`;
+  ${skyLayer(u, sky)}${w.plane && !night ? flyingPlane() : ''}${sky2}${land(u, w.biome)}${back}<g transform="translate(82 26) scale(1.3)">${home}</g>${smoke}${w.items.has('fireworks') && w.biome === 'isla' ? bunting() : ''}${mid}${front}${shade}${night && w.items.has('lighthouse') ? lighthouse(372, 176, true) : ''}${act.draw(w)}${finish}</svg>`;
   }
 
   /* Je personage is van jou, niet van één taal: nog niets gekozen in deze cursus? Neem het over uit een andere cursus van je profiel. */
@@ -632,5 +1013,12 @@
     return seen != null && +seen < i ? STEPS.slice(+seen + 1, i + 1) : [];
   }
 
-  S.Life = { STEPS, ACTS, score, total, now, stepAt, world, acts, pick, scene, word, adoptMe, fresh };
+  /* Voorproefje: laat zien wat er bij die stap bijkomt, in gebruik (gitaar spelen, kajakken, les geven ...). */
+  const USE = { hammock: 'hammock', guitar: 'guitar', bike: 'bike', dog: 'dog', surf: 'surf', boat: 'sail', horse: 'horse', fire: 'fire', grill: 'grill', fireworks: 'party', garden: 'garden',
+    llama: 'llama', telescope: 'stars', coffee: 'coffee', hens: 'hens', parrot: 'parrot', kayak: 'kayak', balloon: 'balloon', cat: 'cat', terrace: 'terrace', band: 'band', pupils: 'teach', world: 'party' };
+  function showAct(i) { const st = STEPS[i], id = USE[st.add || st.ride], w = world(i); return id && ACTS.some(a => a.id === id && a.ok(w)) ? id : 'walk'; }
+  /* Hoofdstuk (landschap) van stap i, en of daar een nieuw hoofdstuk begint. */
+  const chapter = i => { const b = world(i).biome; return { id: b, name: LANDS[b] || b, first: i === 0 || world(i - 1).biome !== b }; };
+
+  S.Life = { STEPS, ACTS, score, total, now, stepAt, world, acts, pick, scene, word, adoptMe, fresh, showAct, chapter };
 })(window.SPT = window.SPT || {});
