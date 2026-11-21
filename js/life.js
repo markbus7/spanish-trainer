@@ -90,13 +90,16 @@
   function total() {
     const P = S.Profiles, cur = S.course && S.course.id;
     const ids = ((P && P.active() && P.active().courses) || [cur]).filter(c => base(c) === base(cur));
-    const sum = { learning: 0, known: 0, mastered: 0, points: 0, langs: 0 };
+    const sum = { learning: 0, known: 0, mastered: 0, points: 0, langs: 0, list: [] };
     ids.forEach(c => {
       let srs = null;
       if (c === cur) srs = S.Store.state.srs;
       else try { const d = JSON.parse(localStorage.getItem(P.storeKey(P.activeId(), c)) || 'null'); srs = d && d.srs; } catch (e) { srs = null; }
       if (!srs) return;
       const o = score(srs); if (o.points) sum.langs++;
+      // per taal één vlag (Engels vanuit twee cursussen = één vlag)
+      const tg = (S.COURSES && S.COURSES[c] && S.COURSES[c].target) || 'es', had = sum.list.find(x => x.target === tg);
+      if (had) had.points += o.points; else if (o.points) sum.list.push({ target: tg, course: c, points: o.points });
       ['learning', 'known', 'mastered', 'points'].forEach(k => { sum[k] += o[k]; });
     });
     return sum;
@@ -891,6 +894,30 @@
   const confetti = () => { let o = ''; const r = rng(501); for (let k = 0; k < 26; k++) o += `<rect class="lv-confetti" style="animation-delay:${R(r() * 4)}s;animation-duration:${R(3 + r() * 3)}s" x="${R(r() * 400)}" y="${R(r() * 60)}" width="2.4" height="1.4" fill="${['#e04a8a', '#e0b440', '#2e8a80', '#9a6ad8', '#3a78d6', '#e07a2a'][k % 6]}"/>`;
     return o; };
 
+  /* ---------- vlaggen van je talen (nov 2026) ----------
+     Per taal waar je mee bezig bent een vlag naast je huis. Hoe beter je de taal kent, hoe hoger en groter hij wappert;
+     beheers je hem, dan krijgt de mast een gouden ster. Werkt voor elke taal die erbij komt (onbekende taal: vlag met letters). */
+  const LANG_STAGES = [{ at: 1, name: 'net begonnen' }, { at: 150, name: 'op weg' }, { at: 1000, name: 'goed bezig' }, { at: 3000, name: 'gevorderd' }, { at: 6000, name: 'beheerst' }];
+  const langStage = p => { let n = 0; LANG_STAGES.forEach((s, k) => { if (p >= s.at) n = k + 1; }); return n; };
+  const H3 = (a, b, c) => (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${R(h / 3)}" fill="${a}"/><rect x="${x}" y="${R(y + h / 3)}" width="${w}" height="${R(h / 3)}" fill="${b}"/><rect x="${x}" y="${R(y + h * 2 / 3)}" width="${w}" height="${R(h / 3)}" fill="${c}"/>`;
+  const V3 = (a, b, c) => (x, y, w, h) => `<rect x="${x}" y="${y}" width="${R(w / 3)}" height="${h}" fill="${a}"/><rect x="${R(x + w / 3)}" y="${y}" width="${R(w / 3)}" height="${h}" fill="${b}"/><rect x="${R(x + w * 2 / 3)}" y="${y}" width="${R(w / 3)}" height="${h}" fill="${c}"/>`;
+  const FLAGS = {
+    es: (x, y, w, h) => V3('#006847', '#fff', '#ce1126')(x, y, w, h) + `<circle cx="${R(x + w / 2)}" cy="${R(y + h / 2)}" r="${R(h * .14)}" fill="#8a5a2a"/>`,
+    en: (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff"/>${[0, 2, 4, 6].map(k => `<rect x="${x}" y="${R(y + k * h / 7)}" width="${w}" height="${R(h / 7)}" fill="#b22234"/>`).join('')}<rect x="${x}" y="${y}" width="${R(w * .44)}" height="${R(h * 4 / 7)}" fill="#3c3b6e"/>`,
+    de: H3('#1a1a1a', '#dd0000', '#ffce00'), fr: V3('#0055a4', '#fff', '#ef4135'), nl: H3('#ae1c28', '#fff', '#21468b'), it: V3('#009246', '#fff', '#ce2b37'),
+    pt: (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#009c3b"/><path d="M${R(x + w / 2)} ${R(y + h * .12)}L${R(x + w * .9)} ${R(y + h / 2)}L${R(x + w / 2)} ${R(y + h * .88)}L${R(x + w * .1)} ${R(y + h / 2)}Z" fill="#ffdf00"/><circle cx="${R(x + w / 2)}" cy="${R(y + h / 2)}" r="${R(h * .2)}" fill="#002776"/>`
+  };
+  function langFlags(list) {
+    return (list || []).filter(l => l.points > 0).slice(0, 5).map((l, k) => {
+      const st = langStage(l.points), x = 300 + k * 24, foot = 194 - k * 2, top = foot - 74;
+      const w = R(11 + st * 2.6), h = R(w * .64), fy = R(top + 3 + (5 - st) * 10);
+      const draw = FLAGS[l.target] || ((xx, yy, ww, hh) => `<rect x="${xx}" y="${yy}" width="${ww}" height="${hh}" fill="#fff" stroke="#8a8a90" stroke-width=".4"/><text x="${R(xx + ww / 2)}" y="${R(yy + hh * .72)}" text-anchor="middle" font-size="${R(hh * .6)}" font-family="sans-serif" font-weight="700" fill="#2a2a32">${String(l.target).toUpperCase()}</text>`);
+      return `<g class="life-flag"><path d="M${x} ${foot}V${top}" stroke="#6a6a72" stroke-width="1.6"/><path d="M${x + .5} ${foot}V${top}" stroke="#c8ccd4" stroke-width=".5"/><ellipse cx="${x}" cy="${foot}" rx="3.4" ry="1" fill="#000" opacity=".2"/>
+        ${st >= 5 ? `<path d="M${x} ${top - 7}l1.6 3.4 3.6.4-2.7 2.4.8 3.6-3.3-1.9-3.3 1.9.8-3.6-2.7-2.4 3.6-.4Z" fill="#f4c430" stroke="#b8860b" stroke-width=".4"/>` : `<circle cx="${x}" cy="${top - 1}" r="1.6" fill="#d8b040"/>`}
+        <g class="lv-flag" style="animation-delay:${k * .4}s;transform-origin:${x}px ${fy}px"><path d="M${x} ${fy}h${w}" stroke="#000" stroke-width=".3" opacity=".3"/>${draw(x + .8, fy, w, h)}<path d="M${x + .8} ${fy}h${w}v${h}h${-w}Z" fill="url(#${U}eave)" opacity=".25"/></g></g>`;
+    }).join('');
+  }
+
   /* ---------- je personage ---------- */
   function me(cx, foot, hgt, opt = {}) {
     const st = S.Store && S.Store.state, c = st && st.me && S.Cast && S.Cast.get(st.me);
@@ -982,7 +1009,7 @@
       + (it('horse') ? horse(318, 214) : '') + (w.items.has('lighthouse') ? lighthouse(372, 176, night) : '');
     const sky2 = (it('condor') && !night ? condor(120, 66) + condor(232, 48, .7) : '') + (w.balloon && act.id !== 'balloon' && !night ? `<g class="lv-drift">${balloon(64, 92, .5)}</g>` : '');
     const smoke = sky === 'day' ? '' : w.home === 'jardin' ? puffs(255, 66) : w.home === 'andes' ? puffs(264, 82) : w.home === 'lodge' ? puffs(267, 90) : '';
-    const mid = it('bridge') ? bridge() : '';
+    const mid = (it('bridge') ? bridge() : '') + langFlags(opt.langs);
     const front = (it('garden') ? garden() : '') + (it('coffee') ? cafetal() : '') + (it('terrace') ? terrace() : '') + (it('fountain') ? fountain(120, 214) : '') + (it('fire') ? fire(126, 214) : '')
       + (it('toucan') ? toucan(124, 222) : '') + (it('hens') ? hens() : '') + (it('llama') ? llama(254, 214, .85) : '') + (it('parrot') ? parrot(258, 212) : '') + (it('penguins') ? penguins() : '') + (it('band') ? band() : '') + (it('pupils') ? pupils() : '')
       + (it('grill') ? grill(290, 224, false) : '') + (it('surf') ? surfboard(352, 196) : '') + (act.hideRide ? '' : ride(w.ride))
@@ -1020,5 +1047,5 @@
   /* Hoofdstuk (landschap) van stap i, en of daar een nieuw hoofdstuk begint. */
   const chapter = i => { const b = world(i).biome; return { id: b, name: LANDS[b] || b, first: i === 0 || world(i - 1).biome !== b }; };
 
-  S.Life = { STEPS, ACTS, score, total, now, stepAt, world, acts, pick, scene, word, adoptMe, fresh, showAct, chapter };
+  S.Life = { LANG_STAGES, langStage, langFlags, STEPS, ACTS, score, total, now, stepAt, world, acts, pick, scene, word, adoptMe, fresh, showAct, chapter };
 })(window.SPT = window.SPT || {});

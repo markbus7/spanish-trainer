@@ -442,7 +442,7 @@
     const L = S.Life.now(), W = L.world, fresh = S.Life.fresh(L.i);
     const stage = h('div', { class: 'life-scene' });
     // één levend beeld: de lucht volgt het uur van de dag, je personage loopt rond en alles om hem heen beweegt
-    stage.innerHTML = S.Life.scene(L.i, { act: S.Life.pick(W, new Date().getHours()) });
+    stage.innerHTML = S.Life.scene(L.i, { act: S.Life.pick(W, new Date().getHours()), langs: L.list });
     const langs = (S.Profiles && S.Profiles.active() && S.Profiles.active().courses.length) || 1;
     // elke stap is aan te tikken: een voorproefje van hoe je wereld er dan uitziet (ook om aan anderen te laten zien)
     // de weg in hoofdstukken (landschappen), zodat je ook bij veel stappen ziet waar je bent
@@ -458,6 +458,8 @@
       L.next ? h('div', { class: 'life-next' }, h('div', { class: 'bar' }, h('i', { style: { width: Math.round(L.pct * 100) + '%' } })),
         h('p', { class: 'small' }, `Nog ${L.left.toLocaleString('nl-NL')} ${L.left === 1 ? 'punt' : 'punten'} tot de volgende stap: ${L.next.icon} ${L.next.name}.`))
         : h('p', { class: 'small' }, '🎉 Je hebt de hele weg afgelegd. ¡Felicidades!'),
+      L.list.length ? h('div', { class: 'life-flags' }, L.list.map(l => { const n = S.Life.langStage(l.points), C = S.COURSES[l.course] || {};
+        return h('span', { class: 'life-flag-chip', title: l.points.toLocaleString('nl-NL') + ' punten' }, (l.target === 'es' ? '🇲🇽' : C.flag || '🏳️') + ' ' + ((C.name && C.name.nl) || l.target) + ' · ', h('b', null, S.Life.LANG_STAGES[n - 1].name), ' ' + '●'.repeat(n) + '○'.repeat(5 - n)); })) : null,
       h('p', { class: 'muted small life-pts' }, `🌱 ${L.learning} × 1 + 🌳 ${L.known} × 2 + ⭐ ${L.mastered} × 3 = ${L.points.toLocaleString('nl-NL')} punten`),
       h('details', { class: 'life-road-wrap', open: L.i === 0 ? true : null }, h('summary', null, `De hele weg (${S.Life.STEPS.length} stappen)`), h('p', { class: 'muted small life-road-tip' }, '👀 Tik op een stap om te zien hoe je wereld er dan uitziet.'), road));
   }
@@ -469,7 +471,7 @@
     const box = h('div', { class: 'modal life-prev', role: 'dialog', 'aria-modal': 'true' });
     function show(n) {
       i = n; const st = S.Life.STEPS[i], reached = i <= L.i;
-      const stage = h('div', { class: 'life-scene' }); stage.innerHTML = S.Life.scene(i, { act: S.Life.showAct(i) });
+      const stage = h('div', { class: 'life-scene' }); stage.innerHTML = S.Life.scene(i, { act: S.Life.showAct(i), langs: L.list });
       box.innerHTML = '';
       box.append(
         h('div', { class: 'row gap between' }, h('span', { class: 'dp-count' }, `Stap ${i + 1} van ${N}`), h('button', { class: 'btn link update-x', type: 'button', 'aria-label': 'Sluiten', onclick: close }, '✕')),

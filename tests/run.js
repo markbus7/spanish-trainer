@@ -657,6 +657,11 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   ok(!badPrev.length, 'leven: voorproefje toont het nieuwe ding in gebruik' + (badPrev.length ? ' (' + badPrev.join(' ') + ')' : ''));
   ok(LF.showAct(LF.STEPS.findIndex(s => s.add === 'kayak')) === 'kayak' && LF.showAct(LF.STEPS.findIndex(s => s.add === 'pupils')) === 'teach', 'leven: voorproefje kajak en les geven');
   ok(LF.chapter(0).first && LF.STEPS.filter((s, i) => LF.chapter(i).first).length >= 10 && LF.STEPS.every((s, i) => !/undefined/.test(LF.chapter(i).name)), 'leven: de weg is ingedeeld in hoofdstukken (landschappen)');
+  {
+    const fl = LF.scene(10, { act: 'walk', langs: [{ target: 'es', points: 7000 }, { target: 'en', points: 40 }, { target: 'xx', points: 5 }] });
+    ok((fl.match(/class="life-flag"/g) || []).length === 3 && /XX<\/text>/.test(fl) && !/NaN|undefined/.test(fl), 'leven: een vlag per taal, ook voor een taal die er later bijkomt');
+    ok(LF.langStage(0) === 0 && LF.langStage(1) === 1 && LF.langStage(7000) === 5 && LF.scene(10, { act: 'walk' }).indexOf('life-flag') < 0, 'leven: vlag groeit mee met hoe goed je de taal kent');
+  }
   ok(!LF.world(LF.STEPS.length - 1).items.has('llama') && LF.world(LF.STEPS.findIndex(s => s.add === 'train')).items.has('llama'), 'leven: Andes-dieren blijven in de Andes');
   const sc = LF.score({ a: { i: 1 }, b: { i: 10 }, c: { i: 30 } });
   ok(sc.points === 6 && LF.stepAt(0) === 0 && LF.stepAt(1e6) === LF.STEPS.length - 1, 'leven: 🌱 1, 🌳 2, ⭐ 3 punten');
