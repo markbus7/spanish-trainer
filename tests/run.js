@@ -1025,6 +1025,17 @@ await micTests();
   ok(K.C.LEVELS.find(L => L.id === 'B2').can.every(t => !/subjuntivo|voseo/.test(t)), w + 'eigen can-do-teksten');
   for (const L of K.C.LEVELS) { const b = K.Gen.levelTestBand(L.id); ok(b.items.length >= 8 && b.items.every(it => it.options.includes(it.answer)), w + 'niveautest ' + L.id); }
   ok(K.Gen.levelTestResult({ A1: { ok: 8, n: 8 }, A2: { ok: 8, n: 8 }, B1: { ok: 8, n: 8 }, B2: { ok: 8, n: 8 }, C1: { ok: 7, n: 8 }, C2: { ok: 2, n: 8 } }).level === 'C1', w + 'niveautest tot C1/C2');
+  // Britse spelling telt goed (alleen als de Amerikaanse vorm in het antwoord staat)
+  const ck = (u, a) => K.check.check(u, [a]);
+  ok(ck('My favourite colour is grey.', 'My favorite color is gray.').warn === 'british' && ck('We travelled to the centre.', 'We traveled to the center.').ok
+    && ck('She organised the programme.', 'She organized the program.').ok && ck('I analysed the catalogue.', 'I analyzed the catalog.').ok, w + 'Britse spelling wordt goedgerekend');
+  ok(!ck('our', 'or').ok && !ck('four', 'for').ok && ck('My favorite color.', 'My favorite color.').exact, w + 'Britse spelling: geen valse treffers');
+  ok(K.check.parts('My favourite colour is blue', 'My favorite color is gray').k.join() === '0,1,2,3', w + 'Britse spelling telt per woord als goed');
+  // Lupe praat Engels in deze cursus
+  ok(K.Tutor.lineLang === 'en' && K.Tutor.loc({ es: '¡Una tarea menos! Sigue así.', nl: 'x' }).es === 'One task down! Keep it up.' && K.Tutor.loc({ es: '¡Llevas 12 días seguidos! ¡Qué padre!' }).lang === 'en', w + 'Lupe zegt haar zinnen in het Engels');
+  const lupeLines = K.Tutor.lines.every(us);
+  ok(lupeLines.every(t => !/[¡¿ñ]|\b(Hoy|tienes|Llevas|Ya conoces|seguidas)\b/.test(t)), w + 'geen Spaanse Lupe-zinnen meer: ' + lupeLines.filter(t => /[¡¿ñ]/.test(t)).slice(0, 3).join(' | '));
+  ok(lupeLines.every(t => have.has(K.Speech.clipKey(t, 'lupe-girl')) && have.has(K.Speech.clipKey(t, 'lupe-woman'))), w + 'alle Engelse Lupe-zinnen worden ingesproken');
   const ids = new Set();
   for (const u of us) {
     const where = w + u.id;

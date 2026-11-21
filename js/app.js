@@ -966,7 +966,7 @@
     const on = () => !!st().settings.tutorVoice;
     const tg = h('button', { class: 'chip toggle voice-tg' + (on() ? ' on' : ''), type: 'button', 'aria-pressed': on() ? 'true' : 'false' });
     const paint = () => { tg.textContent = on() ? '🔊 Ze praat hardop' : '🔇 Alleen tekst'; tg.classList.toggle('on', on()); tg.setAttribute('aria-pressed', on() ? 'true' : 'false'); };
-    tg.onclick = () => { st().settings.tutorVoice = !on(); save(); paint(); if (on()) { Speech.unlock(); S.Tutor.say(S.Tutor.lines.voiceOn, 'es'); } else Speech.stop(); };
+    tg.onclick = () => { st().settings.tutorVoice = !on(); save(); paint(); if (on()) { Speech.unlock(); S.Tutor.sayLine(S.Tutor.lines.voiceOn); } else Speech.stop(); };
     paint();
     // Lupe praat met de stem van het apparaat. Is dat een eenvoudige (robotachtige) stem, wijs dan de weg naar een betere.
     const voiceHint = h('a', { class: 'small voice-hint', href: '#/ajustes' }, '🎙️ Klinkt Lupe robotachtig? Zo krijgt ze een natuurlijke stem ›');
@@ -1636,7 +1636,7 @@
       toggle('Dialogen eerst alleen beluisteren', 'De tekst is wazig tot je hem zelf zichtbaar maakt. Goed voor je luistervaardigheid.', s.listenFirst !== false, v => set('listenFirst', v)),
       toggle('Vraag-het-Lupe-knop rechts', 'Een knopje met Lupe aan de rechterkant. Tik erop om haar iets te vragen over wat je op dat moment ziet (dialoog, vraag, je antwoord). Werkt met je API-sleutel van de AI-docent. Je kunt het knopje omhoog of omlaag schuiven.', st().settings.lupeAsk !== false, v => { set('lupeAsk', v); S.Ask && S.Ask.sync(); }),
       toggle('Profe Lupe als begeleider', 'Lupe begroet je op Hoy, reageert op je antwoorden, vat de grammatica samen en feliciteert je na een les. Tik op haar om haar te horen.', S.Tutor.coachOn(), v => set('lupeCoach', v)),
-      label('Stem van Lupe (docente)', h('select', { class: 'input', onchange: e => { set('lupeVoice', e.target.value); S.Tutor.say(S.Tutor.lines.voiceTest, 'es'); } },
+      label('Stem van Lupe (docente)', h('select', { class: 'input', onchange: e => { set('lupeVoice', e.target.value); S.Tutor.sayLine(S.Tutor.lines.voiceTest); } },
         [['girl', 'Meisje (hoge stem)'], ['woman', 'Vrouw']].map(([v, l]) => h('option', { value: v, selected: (s.lupeVoice || 'girl') === v ? true : null }, l)))),
       h('button', { class: 'btn ghost', type: 'button', onclick: runTest }, '🔊 Test de stemmen'), voiceOut,
       voiceTip,

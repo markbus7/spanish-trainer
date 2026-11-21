@@ -170,6 +170,7 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   const daily = (list, salt = 0) => list[(S.U.dayIndex() + salt) % list.length];
   function coach(line, opt = {}) {
     if (!line || !coachOn()) return null;
+    line = loc(line);
     const h = S.U.h;
     const canTalk = S.Speech.canSpeak();
     const el = h('div', { class: 'lupe-coach' + (opt.cls ? ' ' + opt.cls : '') + (canTalk ? ' can-talk' : ''), role: canTalk ? 'button' : null, tabindex: canTalk ? 0 : null,
@@ -221,7 +222,8 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
         { es: '¡Hola! Te preparé un plan para hoy. ¡Vamos!', nl: 'Ik heb een plan voor vandaag voor je klaargezet.' }]);
     },
     welcome: { es: '¡Hola! Soy Lupe, tu profe de ' + ((S.course && S.course.name.es) || 'español') + '.', nl: 'Ik ben Lupe, een axolotl uit Xochimilco in Mexico-Stad. Ik help je stap voor stap. Tik op mij om me te horen!' },
-    streak(n) {
+    streak(n) { return loc(L._streak(n)); },
+    _streak(n) {
       if (n === 5) return '¡Cinco seguidas! ¡Órale!';
       if (n === 10) return '¡Diez seguidas! ¡Qué padre!';
       if (n === 15 || n === 20 || n === 30) return `¡${n} seguidas! ¡Imparable!`;
@@ -270,7 +272,7 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     voiceTest: '¡Hola! Soy Lupe. ¿Te gusta mi voz?',
     /* Alle vaste zinnen die Lupe kan zeggen, voor het inspreken (tools/tts-texts.js). units: [{ title, level, grammar }] */
     every(units = []) {
-      const out = new Set(), add = x => { if (x && x.es) out.add(x.es); else if (typeof x === 'string') out.add(x); };
+      const out = new Set(), add = x => { x = loc(x); if (x && x.es) out.add(x.es); else if (typeof x === 'string') out.add(x); };
       // daily() kiest per dag een variant: loop een paar 'dagen' door om ze allemaal te krijgen
       const U = S.U, pickAll = fn => { const keep = U.dayIndex; for (let d = 0; d < 6; d++) { U.dayIndex = () => d; try { add(fn()); } finally { U.dayIndex = keep; } } };
       [{ paused: 1 }, { lapsed: 1 }, { step: 'test' }, { min: 1 }, { chestReady: 1 }, { planLeft: 1 }, { planLeft: 2, planN: 1 }].forEach(c => add(L.hello(c)));
@@ -307,5 +309,81 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     return r === n ? `¡Ya conoces ${r} palabras! Estoy muy orgullosa de ti.` : `¡Ya conoces más de ${r} palabras! Estoy muy orgullosa de ti.`;
   }
 
-  S.Tutor = Object.assign(LUPE, { svg, avatar, say, spoken, setTalking, hookSpeech, coach, hero, coachOn, lines: L });
+  /* ---------- Engelse cursus voor Nederlandstaligen: Lupe praat Engels ----------
+     Haar vaste zinnen staan hierboven in het Spaans; in de cursus en-nl zet loc() ze om naar Engels (lang 'en').
+     Zinnen met een getal of unit gaan via de patronen; de rest via de lijst. */
+  const EN_MODE = !!(S.course && S.course.target === 'en' && S.course.ui === 'nl');
+  const EN = {
+    '¡Hola! Te quedaste a mitad de una lección. ¿Seguimos donde ibas?': 'Hi! You stopped halfway through a lesson. Shall we pick up where you left off?',
+    '¡Plan cumplido! Lo que hagas ahora es extra.': 'Plan done! Anything you do now is a bonus.',
+    '¡Plan cumplido! ¿Seguimos con la próxima lección?': 'Plan done! Shall we move on to the next lesson?',
+    '¡Meta del día cumplida! Estoy muy orgullosa de ti.': 'Daily goal reached! I’m so proud of you.',
+    '¡Órale! Ya cumpliste tu meta. Todo lo que hagas ahora es extra.': 'Way to go! You hit your goal. Everything from here is extra.',
+    '¡Qué gusto verte otra vez! Empecemos con algo cortito.': 'So good to see you again! Let’s start with something short.',
+    '¡Ya casi! Solo te falta una tarea.': 'Almost there! Just one more task.',
+    '¡Una tarea menos! Sigue así.': 'One task down! Keep it up.',
+    '¡Hoy toca la prueba de la unidad! Tú puedes.': 'Today it’s time for the unit test! You’ve got this.',
+    '¡Vas muy bien hoy! Un poquito más y llegas a tu meta.': 'You’re doing great today! A little more and you’ll hit your goal.',
+    'Un ratito cada día hace la diferencia. ¡Vamos!': 'A little every day makes all the difference. Let’s go!',
+    '¡Hola! Te preparé un plan para hoy. ¡Vamos!': 'Hi! I made you a plan for today. Let’s go!',
+    'Casi lo logras. Repasamos un poco y lo intentamos otra vez, ¿va?': 'So close! Let’s review a bit and try again, okay?',
+    '¡Felicidades! Terminaste la unidad. ¡Qué orgullo!': 'Congratulations! You finished the unit. I’m so proud!',
+    '¡Listo! Buen trabajo.': 'All done! Nice work.',
+    '¡Perfecto! Sin ningún error. ¡Eres una estrella!': 'Perfect! Not a single mistake. You’re a star!',
+    '¡Excelente trabajo! Casi sin errores.': 'Excellent work! Almost no mistakes.',
+    '¡Muy bien! Vas avanzando.': 'Very good! You’re making progress.',
+    'Cada error te enseña algo. ¡Ánimo, vamos bien!': 'Every mistake teaches you something. Hang in there, we’re doing fine!',
+    '¡Subiste de nivel! ¡Qué padre! Se nota que practicas.': 'You leveled up! Awesome! I can tell you’ve been practicing.',
+    'No te preocupes, a veces pasa. Repasamos juntos y lo intentas otra vez.': 'Don’t worry, it happens. We’ll review together and you can try again.',
+    '¡Gracias por hacer la prueba! Ahora sé por dónde empezar contigo.': 'Thanks for taking the test! Now I know where to start with you.',
+    'Aquí vas a ver todo lo que aprendes. ¡Empecemos hoy!': 'This is where you’ll see everything you learn. Let’s start today!',
+    'Cada palabra nueva cuenta. ¡Qué padre!': 'Every new word counts. Awesome!',
+    '¡Buen comienzo! Poco a poco se llega lejos.': 'Great start! Little by little, you’ll go far.',
+    '¡Perfecto! ¡Qué buena memoria!': 'Perfect! What a great memory!',
+    '¡Muy bien jugado!': 'Nicely played!',
+    '¡Sigue así! Las palabras difíciles vuelven pronto.': 'Keep it up! The tricky words will come back soon.',
+    '¡Todo repasado! Nos vemos mañana.': 'All reviewed! See you tomorrow.',
+    '¡Terminaste tu plan de hoy! Abre tu cofre.': 'You finished today’s plan! Open your reward.',
+    '¡Plan del día completado! ¡Qué padre!': 'Daily plan complete! Awesome!',
+    '¡Lo lograste! Estoy muy orgullosa de ti.': 'You did it! I’m so proud of you.',
+    '¡Perfecto! Ahora te hablo en voz alta.': 'Perfect! Now I’ll talk to you out loud.',
+    '¡Hola! Soy Lupe. ¿Te gusta mi voz?': 'Hi! I’m Lupe. Do you like my voice?',
+    '¡Platiquemos! Así veo en qué te puedo ayudar.': 'Let’s chat! That way I can see how I can help you.',
+    '¡Vas mejorando! Cometes menos errores que antes.': 'You’re getting better! You make fewer mistakes than before.',
+    'Mira, esto es lo que más practicaría yo.': 'Look, this is what I’d practice most.',
+    'Hoy tienes más de cien repasos. Empecemos por ahí, así no se te olvida nada.': 'You have more than a hundred reviews today. Let’s start there, so you don’t forget anything.',
+    '¡Llevas más de cien días seguidos! ¡Qué padre!': 'More than a hundred days in a row! Awesome!',
+    'Más de cien días seguidos. ¡No rompas la racha!': 'More than a hundred days in a row. Don’t break your streak!',
+    '¡Cinco seguidas! ¡Órale!': 'Five in a row! Way to go!',
+    '¡Diez seguidas! ¡Qué padre!': 'Ten in a row! Awesome!'
+  };
+  const EN_RE = [
+    [/^¡Hola! Soy Lupe, tu profe de .+\.$/, () => 'Hi! I’m Lupe, your English teacher.'],
+    [/^¿Empezamos\? Hoy vemos: (.+)\.$/, (m, u) => 'Shall we start? Today: ' + u + '.'],
+    [/^Hoy tienes (\d+) repasos\./, (m, n) => `You have ${n} reviews today. Let’s start there, so you don’t forget anything.`],
+    [/^¡Llevas (\d+) días seguidos! ¡Qué padre!$/, (m, n) => `${n} days in a row! Awesome!`],
+    [/^(\d+) días seguidos\. ¡No rompas la racha!$/, (m, n) => `${n} days in a row. Don’t break your streak!`],
+    [/^¡(\d+) seguidas! ¡Imparable!$/, (m, n) => `${n} in a row! Unstoppable!`],
+    [/^¡Plan del día completado! Llevas (\d+) días seguidos\.$/, (m, n) => `Daily plan complete! That’s ${n} days in a row.`],
+    [/^¡Bien hecho! Tu nivel es (\w+)\./, (m, l) => `Well done! Your level is ${l}. Let’s keep practicing together.`],
+    [/^¡Ya conoces (más de )?(\d+) palabras!/, (m, more, n) => `You already know ${more ? 'more than ' : ''}${n} words! I’m so proud of you.`]
+  ];
+  function enText(es) {
+    if (EN[es]) return EN[es];
+    for (const [re, fn] of EN_RE) { const m = String(es).match(re); if (m) return fn(...m); }
+    return null;
+  }
+  /* Een zin van Lupe in de taal van de cursus: { es, nl, lang } of een losse tekst. */
+  function loc(line) {
+    if (!EN_MODE || !line) return line;
+    if (typeof line === 'string') return enText(line) || line;
+    if (line.lang && line.lang !== 'es') return line;
+    const en = enText(line.es);
+    return en ? Object.assign({}, line, { es: en, lang: 'en' }) : line;
+  }
+  const lineLang = EN_MODE ? 'en' : 'es';
+  /* Een losse vaste zin hardop (stemtest, stem aan). */
+  const sayLine = text => say(loc(text), lineLang);
+
+  S.Tutor = Object.assign(LUPE, { svg, avatar, say, sayLine, loc, lineLang, spoken, setTalking, hookSpeech, coach, hero, coachOn, lines: L });
 })(window.SPT);

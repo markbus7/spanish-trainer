@@ -441,6 +441,33 @@
       .replace(/[.,!?¡¿;:…()\-–—]/g, ' ').replace(/\s+/g, ' ').trim();
   }
   function bare(s) { return norm(s).normalize('NFD').replace(/[́̈̃]/g, '').normalize('NFC'); }
+  /* Britse spelling (colour, realise, travelled …) goedrekenen in de Engelse cursus.
+     Een Brits woord telt alleen als de Amerikaanse vorm ook echt in het goede antwoord staat. */
+  const EN_GB = { grey: 'gray', greys: 'grays', programme: 'program', programmes: 'programs', tyre: 'tire', tyres: 'tires', cheque: 'check', cheques: 'checks', kerb: 'curb',
+    mum: 'mom', mummy: 'mommy', aluminium: 'aluminum', jewellery: 'jewelry', plough: 'plow', pyjamas: 'pajamas', manoeuvre: 'maneuver', enrol: 'enroll', enrolment: 'enrollment',
+    fulfil: 'fulfill', fulfilment: 'fulfillment', skilful: 'skillful', practise: 'practice', practised: 'practiced', practising: 'practicing', storey: 'story', storeys: 'stories',
+    sceptical: 'skeptical', ageing: 'aging', judgement: 'judgment', aeroplane: 'airplane', aeroplanes: 'airplanes', mould: 'mold', moustache: 'mustache', cosy: 'cozy',
+    draught: 'draft', doughnut: 'donut', doughnuts: 'donuts', learnt: 'learned', spelt: 'spelled', dreamt: 'dreamed', burnt: 'burned', spoilt: 'spoiled', smelt: 'smelled',
+    leant: 'leaned', leapt: 'leaped', licence: 'license', defence: 'defense', offence: 'offense', pretence: 'pretense', analyse: 'analyze', paralyse: 'paralyze',
+    catalogue: 'catalog', dialogue: 'dialog', analogue: 'analog', towards: 'toward', whilst: 'while', amongst: 'among', got: 'gotten', maths: 'math' };
+  function americanize(w) {
+    const out = new Set();
+    if (EN_GB[w]) out.add(EN_GB[w]);
+    let v = (/^(flour|detour|contour|devour)/.test(w) ? w : w.replace(/^(\w{3,})our(s|ed|ing|ite|ites|ful|less|able|er|ers|hood)?$/, '$1or$2'))
+      .replace(/is(e|es|ed|ing|ation|ations|er|ers)$/, 'iz$1')
+      .replace(/ys(e|es|ed|ing)$/, 'yz$1')
+      .replace(/([^aeiou])tre(s)?$/, '$1ter$2')
+      .replace(/ogue(s)?$/, 'og$1')
+      .replace(/^(\w{4,}[aeiou])ll(ed|ing|er|ers)$/, '$1l$2');
+    if (v !== w) out.add(v);
+    return [...out];
+  }
+  /** Vervangt Britse woorden in het antwoord door de Amerikaanse vorm die in het goede antwoord staat. */
+  function british(u, c) {
+    if (!(S.course && S.course.target === 'en')) return u;
+    const want = new Set(c.split(' '));
+    return u.split(' ').map(w => want.has(w) ? w : (americanize(w).find(x => want.has(x)) || w)).join(' ');
+  }
   function expand(ans) {
     // "(yo) me llamo" → met en zonder; "a/b" niet ondersteund bewust (gebruik array)
     const out = new Set();
@@ -470,6 +497,10 @@
     const u = norm(user), uNoPron = u.replace(PRON, '');
     const cands = []; list.forEach(a => expand(a).forEach(x => cands.push([x, a])));
     for (const [c, orig] of cands) if (c === u || c === uNoPron) return { ok: true, exact: true, best: orig };
+    for (const [c, orig] of cands) {
+      const b = british(u, c);
+      if (b !== u && (b === c || b.replace(PRON, '') === c)) return { ok: true, exact: false, warn: 'british', best: orig };
+    }
     for (const [c, orig] of cands) {
       if (bare(c) === bare(u) || bare(c) === bare(uNoPron)) {
         const missN = /ñ/.test(c) && !/ñ/.test(u);
@@ -515,12 +546,13 @@
     let best = null;
     (Array.isArray(answers) ? answers : [answers]).filter(Boolean).forEach(ans => rawVariants(ans).forEach(a => {
       const ew = words(a).filter((_, i) => i % 2), eb = ew.map(w => bare(w));
+      const ubA = ub.map(w => { const x = british(w, eb.join(' ')); return x; });
       // langste gemeenschappelijke rij woorden (zonder accenten), zodat de volgorde telt
       const n = eb.length, m = ub.length, L = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
-      for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = eb[i] === ub[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+      for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = eb[i] === ubA[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
       const st = new Array(n).fill('bad');
       for (let i = 0, j = 0; i < n && j < m;) {
-        if (eb[i] === ub[j]) { st[i] = norm(ew[i]) === uw[j] ? 'ok' : 'accent'; i++; j++; }
+        if (eb[i] === ubA[j]) { st[i] = norm(ew[i]) === uw[j] || ub[j] !== ubA[j] ? 'ok' : 'accent'; i++; j++; }
         else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++;
       }
       const good = L[0][0], score = good * 100 - (n - good) * 10 - Math.abs(n - m);
@@ -531,7 +563,7 @@
   }
   /** Bruikbaar om bij de herhaling de goede woorden al in te vullen: minstens één goed en één fout woord. */
   function partsUsable(p) { return !!(p && p.a && p.k && p.k.length && p.k.length < (words(p.a).length - 1) / 2); }
-  S.check = { check, norm, bare, similarity, lev, words, parts, partsUsable };
+  S.check = { check, norm, bare, similarity, lev, words, parts, partsUsable, british };
 
   /* ================= Spraak ================= */
   const Speech = {

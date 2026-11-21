@@ -997,6 +997,7 @@
       if (r.ok && r.warn === 'article') fb.append(h('div', null, '📌 Vergeet het lidwoord niet: ', h('b', { lang: 'es' }, r.expected)));
       if (r.ok && r.warn === 'lupe') fb.append(h('div', null, '🤖 Lupe keurde dit antwoord eerder goed. In de les staat: ', h('b', { lang: 'es' }, (r.alts || it.answers)[0]), speakBtn((r.alts || it.answers)[0])),
         h('div', { class: 'small' }, it.translate ? '🔁 Leer ook de zin uit de les: je krijgt hem straks nog een keer.' : '🔁 Leer ook het woord uit de les: je krijgt het straks nog een keer.'));
+      if (r.ok && r.warn === 'british') fb.append(h('div', null, '🇬🇧 Britse spelling, ook goed! Amerikaans: ', h('b', { lang: 'en' }, r.expected)));
       if (r.ok && r.warn === 'synonym') fb.append(h('div', null, '👍 Ook goed! In de les staat: ', h('b', { lang: 'es' }, r.main)));
       if (!r.ok && r.expected && r.matchMistakes == null) {
         fb.append(h('div', { class: 'fb-exp' }, T('correct') + ': ', h('b', { lang: 'es' }, r.expected), (it.speakAnswer || it.kind === 'listen' || it.sentence) ? speakBtn(it.sentence ? it.sentence.replace('___', r.expected) : r.expected) : null));
