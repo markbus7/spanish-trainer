@@ -192,7 +192,12 @@
 11 once · 12 doce · 13 trece · 14 catorce · 15 quince · 16 dieciséis · 17 diecisiete · 18 dieciocho · 19 diecinueve<br>
 20 veinte · 21 veintiuno · 22 veintidós · 23 veintitrés … 29 veintinueve<br>
 30 treinta · 31 treinta y uno · 40 cuarenta · 50 cincuenta · 60 sesenta · 70 setenta · 80 ochenta · 90 noventa · 100 cien</p>
-<p>Tot en met 29 schrijf je het getal als één woord. Vanaf 31 gebruik je <b>y</b>: <i>cuarenta y cinco</i>. Vóór een mannelijk woord wordt uno <b>un</b>: <i>un año, veintiún años</i>.</p>` }
+<p>Wanneer zet je <b>y</b> (en) tussen de getallen?</p>
+<ul><li><b>16 t/m 29: één woord, geen losse y.</b> <i>dieciséis, veinticinco</i> (25). <s>veinte y cinco</s> zie je soms in oude teksten, maar geldt nu als fout.</li>
+<li><b>Ronde tientallen: geen y.</b> <i>treinta, cuarenta, noventa</i>.</li>
+<li><b>31 t/m 99: wel y</b>, in drie losse woorden: <i>treinta y uno, cuarenta y cinco, noventa y nueve</i>.</li>
+<li><b>Na honderd of duizend nooit y:</b> <i>ciento cinco</i> (105), <i>doscientos treinta y dos</i> (232). De y staat alleen tussen tiental en eenheid.</li></ul>
+<p>💡 Let op de accenten: <i>dieciséis, veintidós, veintitrés, veintiséis</i>. Vóór een mannelijk woord wordt uno <b>un</b>: <i>un año, veintiún años, treinta y un años</i>.</p>` }
     ],
     verbs: ['tener'], tenses: ['pres'],
     dialogue: {
@@ -229,6 +234,7 @@
       { t: 'mc', q: '«Su hijo» kan betekenen:', o: ['zijn, haar, uw of hun zoon', 'alleen: zijn zoon', 'jouw zoon'], tag: 'possessive' },
       { t: 'mc', q: 'Hoe schrijf je 47?', o: ['cuarenta y siete', 'cuatro y siete', 'cuarentisiete'], tag: 'numbers' },
       { t: 'mc', q: 'Hoe schrijf je 16?', o: ['dieciséis', 'diez y seis', 'seisdiez'], tag: 'numbers' },
+      { t: 'mc', q: 'Hoe schrijf je 25?', o: ['veinticinco', 'veinte y cinco', 'veinticinca'], x: '16 t/m 29 schrijf je als één woord, zonder y. Pas vanaf 31 komt er y tussen: treinta y uno.', tag: 'numbers' },
       { t: 'mc', q: 'El hijo de mi hermano es mi…', o: ['sobrino', 'primo', 'tío'], tag: 'vocab' },
       { t: 'tr', nl: 'Mijn moeder heet Ana.', a: ['Mi madre se llama Ana.', 'Mi mamá se llama Ana.'], tag: 'possessive' },
       { t: 'tr', nl: 'Heb je kinderen?', a: ['¿Tienes hijos?', '¿Tiene hijos?', '¿Usted tiene hijos?', '¿Tú tienes hijos?'], tag: 'tener' },
@@ -628,6 +634,7 @@ y cuarto (kwart over) · y media (half … later!) · menos cuarto (kwart voor)<
         html: `<p>Kleuren zijn bijvoeglijke naamwoorden en komen <b>achter</b> het woord: <i>una camisa roja, unos zapatos negros</i>. Kleuren op <b>-o</b> veranderen mee (rojo/roja/rojos/rojas). Kleuren op <b>-e</b> of een medeklinker veranderen alleen in getal: <i>verde → verdes, azul → azules, gris → grises</i>.</p>` },
       { t: 'Getallen vanaf 100', es: 'Números grandes',
         html: `<p>100 <b>cien</b> (precies honderd) · 101 <b>ciento</b> uno · 200 doscientos · 300 trescientos · 400 cuatrocientos · <b>500 quinientos</b> · 600 seiscientos · <b>700 setecientos</b> · 800 ochocientos · <b>900 novecientos</b> · 1.000 <b>mil</b> · 2.000 dos mil · 1.000.000 un millón (de)</p>
+<p>⚠️ Na <i>ciento</i>, de honderdtallen en <i>mil</i> komt <b>geen y</b>: <i>ciento cinco</i> (105, niet <s>ciento y cinco</s>), <i>trescientos cuarenta y dos</i> (342), <i>mil veinte</i> (1.020). De y staat alleen tussen tiental en eenheid (31–99).</p>
 <p>Honderdtallen worden vrouwelijk vóór een vrouwelijk woord: <i>doscient<b>as</b> personas</i>. Je zegt <b>mil</b>, niet <s>un mil</s>.</p>
 <p>💡 Een punt in een getal scheidt duizendtallen: 1.500 = <i>mil quinientos</i>.</p>` }
     ],
@@ -663,6 +670,7 @@ y cuarto (kwart over) · y media (half … later!) · menos cuarto (kwart voor)<
       { t: 'cloze', s: 'Quiero los pantalones ___.', h: 'negro', a: ['negros'], nl: 'Ik wil de zwarte broek.', tag: 'adj-agree' },
       { t: 'cloze', s: 'Busco una falda ___.', h: 'azul', a: ['azul'], nl: 'Ik zoek een blauwe rok.', x: 'Azul blijft gelijk voor mannelijk en vrouwelijk.', tag: 'adj-agree' },
       { t: 'mc', q: '500 =', o: ['quinientos', 'cincocientos', 'cinco cientos'], tag: 'numbers' },
+      { t: 'mc', q: '105 =', o: ['ciento cinco', 'ciento y cinco', 'cien y cinco'], x: 'Na honderd komt geen y. De y staat alleen tussen tiental en eenheid: ciento cuarenta y cinco (145).', tag: 'numbers' },
       { t: 'mc', q: '100 camisetas =', o: ['cien camisetas', 'ciento camisetas', 'un cien camisetas'], tag: 'numbers' },
       { t: 'mc', q: '1.200 pesos =', o: ['mil doscientos pesos', 'un mil doscientos pesos', 'doce cientos pesos'], tag: 'numbers' },
       { t: 'mc', q: '«Het is me te groot.»', o: ['Me queda grande.', 'Soy grande.', 'Tengo grande.'], tag: 'vocab' },
