@@ -319,7 +319,7 @@
     ex: [
       { t: 'cloze', s: '¿Cuánto cuesta ___ camisa de aquí?', a: ['esta'], o: ['esta', 'este', 'estos'], nl: 'Hoeveel kost dit overhemd hier?', tag: 'demonstratives' },
       { t: 'cloze', s: '¿Me puedo probar ___ zapatos de allá?', a: ['aquellos'], o: ['aquellos', 'aquel', 'estas'], nl: 'Mag ik die schoenen daarginds passen?', tag: 'demonstratives' },
-      { t: 'mc', q: 'Hoe zeg je 550?', o: ['quinientos cincuenta', 'cincocientos cincuenta', 'quinientos y cincuenta'], tag: 'numbers' },
+      { t: 'mc', q: 'Hoe zeg je 550?', o: ['quinientos cincuenta', 'cincocientos cincuenta', 'quinientos y cincuenta'], x: 'Na honderdtallen komt geen y.', tag: 'numbers' },
       { t: 'mc', q: 'Het jasje is je te klein. Je zegt:', o: ['Me queda pequeña.', 'Me queda grande.', 'Me queda bien.'], tag: 'vocab' },
       { t: 'tr', nl: 'Kan ik met de kaart betalen?', a: ['¿Puedo pagar con tarjeta?', '¿Se puede pagar con tarjeta?'], tag: 'vocab' }
     ],
