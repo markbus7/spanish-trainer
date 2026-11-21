@@ -143,6 +143,7 @@ add('¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.');
 /* Profe Lupe: al haar vaste zinnen (begroeting, feedback, eindschermen, grammaticasamenvatting), in twee varianten
    (instelling 'Stem van Lupe': meisje of vrouw). Mexicaanse vrouwenstem; het meisje iets hoger en vlotter.
    Eigen sleutel (naamruimte lupe-…), zodat dezelfde zin in de lesstof zijn gewone stem houdt. */
+const LUPE_EN = { girl: { voice: 'en-US-JennyNeural', pitch: '+30Hz', rate: '+6%' }, woman: { voice: 'en-US-JennyNeural', pitch: '+0Hz', rate: '+0%' } };
 const LUPE = { girl: { voice: 'es-MX-DaliaNeural', pitch: '+30Hz', rate: '+6%' }, woman: { voice: 'es-MX-DaliaNeural', pitch: '+0Hz', rate: '+0%' } };
 for (const es of S.Tutor.lines.every(S.C.all())) for (const [v, o] of Object.entries(LUPE)) {
   const ns = 'lupe-' + v, k = S.Speech.clipKey(es, ns);
@@ -184,8 +185,10 @@ for (const [course, [vf, vm_]] of Object.entries(OTHER)) {
   lv = 'X';
   (S.phrases || []).forEach(p => put(p[0]));
   put(S.course.hello);
-  // Lupes eigen Spaanse zinnen in deze cursus (bijv. «tu profe de inglés»), met haar Mexicaanse stem
-  for (const es of S.Tutor.lines.every([])) for (const [v, o] of Object.entries(LUPE)) {
+  // Lupes vaste zinnen in deze cursus: in en-nl praat ze Engels (Amerikaanse stem, met unit-titels en grammaticasamenvattingen),
+  // anders haar Spaanse zinnen (bijv. «tu profe de inglés») met haar Mexicaanse stem
+  const lupeV = S.Tutor.lineLang === 'en' ? LUPE_EN : LUPE;
+  for (const es of S.Tutor.lines.every(S.Tutor.lineLang === 'en' ? S.C.all() : [])) for (const [v, o] of Object.entries(lupeV)) {
     const lns = 'lupe-' + v, k = S.Speech.clipKey(es, lns);
     if (!out.has(k)) out.set(k, { k, ns: lns, text: S.Speech.clean(es), voice: o.voice, pitch: o.pitch, rate: o.rate, lv: ['X'] });
   }
