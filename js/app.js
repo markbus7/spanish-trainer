@@ -1704,7 +1704,7 @@
       const pk = Pr.peek(p.id), me = p.id === Pr.activeId();
       return h('button', { class: 'prof-pick' + (me ? ' on' : ''), type: 'button', onclick: () => { if (me) { close(); try { sessionStorage.setItem('spt.picked', '1'); } catch (e) { /* negeer */ } } else Pr.switchTo(p.id); } },
         h('span', { class: 'prof-av', 'aria-hidden': 'true' }, p.avatar || '🙂'),
-        h('span', { class: 'grow' }, h('b', null, Pr.label(p.id)), h('small', { class: 'muted' }, CNAME(p.course) + ' · ' + (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
+        h('span', { class: 'grow' }, h('b', null, Pr.label(p.id)), h('small', { class: 'muted' }, NOTR(CNAME(p.course)), ' · ' + (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
         me ? h('span', { class: 'small muted' }, 'nu actief') : null);
     });
     root.append(h('div', { class: 'modal-bg', onclick: e => { if (!opts.start && e.target.classList.contains('modal-bg')) close(); } },
@@ -1775,6 +1775,7 @@
     if (local) what.push(h('li', null, '📱 De voortgang van deze cursus op dit apparaat' + (pk && (pk.xp || pk.level) ? ' (' + (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP)' : '')));
     if (remote) what.push(h('li', null, '☁️ Het bestand van deze cursus in je GitHub-gist, zodat hij niet terugkomt bij synchroniseren.'));
     const keep = localId ? Pr.get(localId).courses.filter(c => c !== course).map(CNAME).join(', ') : '';
+    const es = S.course.ui === 'es';
     const ok = h('button', { class: 'btn danger', type: 'button', onclick: async () => {
       ok.disabled = true; out.textContent = '🗑 Bezig met verwijderen…';
       try {
@@ -1783,21 +1784,27 @@
         try { if (remote) await Sync.removeCourse(base, course, token || undefined, localId); }
         catch (e) { S.Store.frozen = false; throw e; }
         if (local) Pr.removeCourse(localId, course);
-        close(); S.toast('🗑 ' + CNAME(course) + ' is verwijderd');
+        close(); S.toast('🗑 ' + CNAME(course) + (es ? ' fue eliminado' : ' is verwijderd'));
         if (activeCourse) { Pr.switchTo(localId); return; }
         updateProfileChip(); if (done) done();
       } catch (e) { ok.disabled = false; out.textContent = '⚠️ Niet gelukt: ' + e.message + '. Er is niets verwijderd van dit apparaat.'; }
     } }, '🗑 Cursus verwijderen');
     root.append(h('div', { class: 'modal-bg', onclick: e => { if (e.target.classList.contains('modal-bg') && !ok.disabled) close(); } },
       h('div', { class: 'modal del-modal', role: 'dialog', 'aria-modal': 'true' },
-        h('h3', null, '⚠️ ' + CNAME(course) + ' verwijderen?'),
+        h('h3', { 'data-notr': '' }, es ? '⚠️ ¿Eliminar el curso ' + CNAME(course) + '?' : '⚠️ Cursus ' + CNAME(course) + ' verwijderen?'),
         h('p', null, 'Alleen deze cursus van ' + name + ' gaat weg. Dit wordt gewist:'), h('ul', { class: 'small del-list' }, what),
-        keep ? h('p', { class: 'small' }, '✅ Blijft gewoon bewaard: ' + keep + '.') : null,
+        keep ? h('p', { class: 'small' }, '✅ Blijft gewoon bewaard: ', NOTR(keep), '.') : null,
         h('p', { class: 'del-warn' }, h('b', null, 'Dit kan niet ongedaan worden gemaakt.'), ' De woorden, units, reeks en XP van deze cursus zijn daarna weg. Je kunt hem later wel opnieuw beginnen, met een lege voortgang.'),
         out,
         h('div', { class: 'row gap end wrap' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => { if (!ok.disabled) close(); } }, 'Annuleren'), ok))));
   }
-  const CNAME = c => { const x = S.COURSES[c]; return x ? x.flag + ' ' + (S.course.ui === 'es' ? x.name.es.replace(/^./, m => m.toUpperCase()) : x.name.nl) : c; };
+  /* Cursusnaam met richting: van de taal die je spreekt naar de taal die je leert, bijv. «🇳🇱 Nederlands → 🌎 Spaans».
+     Al in de taal van het scherm; zet hem in een element met data-notr (zie NOTR), anders maakt de vertaallaag er iets anders van. */
+  const LANGS = { nl: ['🇳🇱', 'Nederlands', 'Neerlandés'], es: ['🌎', 'Spaans', 'Español'], en: ['🇺🇸', 'Engels', 'Inglés'] };
+  const LNAME = l => { const x = LANGS[l]; return x ? x[0] + ' ' + (S.course.ui === 'es' ? x[2] : x[1]) : l; };
+  const CNAME = c => { const x = S.COURSES[c]; return x ? LNAME(x.ui) + ' → ' + LNAME(x.target) : c; };
+  const NOTR = (text, tag) => h(tag || 'span', { 'data-notr': '' }, text);
+  const CDESC = c => ({ 'es-nl': 'uitleg in het Nederlands', 'en-nl': 'A1–C2 · uitleg in het Nederlands', 'en-es': 'explicaciones en español', 'nl-es': 'explicaciones en español' })[c] || '';
   const CLONG = { 'es-nl': 'Spaans leren · uitleg in het Nederlands', 'en-nl': 'Engels leren (A1–C2) · uitleg in het Nederlands', 'en-es': 'Inglés · explicaciones en español', 'nl-es': 'Neerlandés · explicaciones en español' };
   function profilesCard() {
     const Pr = P_(); const card = h('div', { class: 'card form prof-card' });
@@ -1809,14 +1816,14 @@
         const pk = Pr.peek(p.id), me = p.id === Pr.activeId();
         list.append(h('div', { class: 'prof-row' + (me ? ' on' : '') },
           h('span', { class: 'prof-av', 'aria-hidden': 'true' }, p.avatar || '🙂'),
-          h('div', { class: 'grow' }, h('b', null, Pr.label(p.id)), h('small', { class: 'muted', style: { display: 'block' } }, (me ? 'Actief · ' : '') + p.courses.map(CNAME).join(' · ')), h('small', { class: 'muted', style: { display: 'block' } }, (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
+          h('div', { class: 'grow' }, h('b', null, Pr.label(p.id)), h('small', { class: 'muted', style: { display: 'block' } }, me ? 'Actief · ' : '', NOTR(p.courses.map(CNAME).join(' · '))), h('small', { class: 'muted', style: { display: 'block' } }, (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
           me ? null : h('button', { class: 'btn ghost small', type: 'button', onclick: () => Pr.switchTo(p.id) }, 'Wissel'),
           p.id === Pr.MAIN ? null : h('button', { class: 'btn link small del-btn', type: 'button', title: 'Verwijder ' + Pr.label(p.id), 'aria-label': 'Verwijder ' + Pr.label(p.id), onclick: () => guard(() => deleteAccount({ name: Pr.label(p.id), localId: p.id, courses: p.courses.map(CNAME), done: draw })) }, '🗑 Verwijderen')));
       });
       card.append(list);
       // cursus van dit profiel: wisselen of er een bij nemen
       const me = Pr.active();
-      const csel = h('select', { class: 'input', 'aria-label': 'Cursus', 'data-notr': '' }, Object.keys(S.COURSES).map(c => h('option', { value: c, selected: c === me.course ? true : null }, CLONG[c] + (me.courses.includes(c) ? '' : ' (nieuw)'))));
+      const csel = h('select', { class: 'input', 'aria-label': 'Cursus', 'data-notr': '' }, Object.keys(S.COURSES).map(c => h('option', { value: c, selected: c === me.course ? true : null }, CNAME(c) + ' · ' + CDESC(c) + (me.courses.includes(c) ? '' : (S.course.ui === 'es' ? ' (nuevo)' : ' (nieuw)')))));
       csel.onchange = () => {
         const c = csel.value; if (c === me.course) return;
         if (me.courses.includes(c)) { Pr.switchCourse(me.id, c); return; }
@@ -1826,14 +1833,14 @@
       // cursussen van dit profiel: een extra cursus die je niet gebruikt, kun je weghalen; de hoofdcursus blijft altijd
       if (me.courses.length > 1) card.append(h('div', { class: 'course-list' }, h('b', { class: 'small' }, 'Cursussen van ' + Pr.label(me.id)),
         me.courses.map((c, i) => { const pk = Pr.peek(me.id, c); return h('div', { class: 'course-row' },
-          h('div', { class: 'grow' }, h('span', null, CNAME(c)), h('small', { class: 'muted', style: { display: 'block' } }, (c === me.course ? 'Actief · ' : '') + (i === 0 ? 'hoofdcursus · ' : '') + (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
+          h('div', { class: 'grow' }, NOTR(CNAME(c)), h('small', { class: 'muted', style: { display: 'block' } }, (c === me.course ? 'Actief · ' : '') + (i === 0 ? 'hoofdcursus · ' : '') + (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
           i === 0 ? h('small', { class: 'muted' }, 'blijft altijd') : h('button', { class: 'btn link small del-btn', type: 'button', 'aria-label': 'Verwijder cursus ' + CNAME(c), onclick: () => guard(() => deleteCourse({ name: Pr.label(me.id), localId: me.id, course: c, done: () => { draw(); render(); } })) }, '🗑 Verwijderen')); })));
       // nieuw profiel
       let av = Pr.AVATARS[1];
       const nameIn = h('input', { class: 'input', placeholder: 'Naam', maxlength: '30' });
       const avs = h('div', { class: 'chips prof-avs' }, Pr.AVATARS.map(a => h('button', { class: 'chip toggle' + (a === av ? ' on' : ''), type: 'button', 'aria-label': 'Kies ' + a, onclick: e => { av = a; avs.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === e.currentTarget)); } }, a)));
       const out = h('p', { class: 'small warn', role: 'status' });
-      const ncs = h('select', { class: 'input', 'data-notr': '' }, Object.keys(S.COURSES).map(c => h('option', { value: c }, CLONG[c])));
+      const ncs = h('select', { class: 'input', 'data-notr': '' }, Object.keys(S.COURSES).map(c => h('option', { value: c }, CNAME(c) + ' · ' + CDESC(c))));
       const form = h('div', { class: 'prof-new', hidden: true }, label('Naam van het nieuwe profiel', nameIn), avs, label('Wat wil deze persoon leren?', ncs), out,
         h('div', { class: 'row gap wrap' },
           h('button', { class: 'btn primary', type: 'button', onclick: () => { try { const id = Pr.add(nameIn.value, av, ncs.value); S.confirm('Profiel gemaakt', 'Wil je nu naar het profiel van ' + Pr.label(id) + ' gaan? Daar begin je met een lege voortgang en de niveautest.', 'Ga naar ' + Pr.label(id), () => Pr.switchTo(id), 'Later', () => { draw(); updateProfileChip(); }); } catch (e) { out.textContent = '⚠️ ' + e.message; } } }, 'Profiel maken'),
@@ -1868,7 +1875,7 @@
     const box = h('div', { class: 'admin-list', 'data-notr': '' }, h('p', { class: 'muted' }, '🔄 Voortgangen ophalen…'));
     wrap.append(h('p', { class: 'small muted' }, 'Alle voortgangen op @' + S.Sync.status().login + ', de nieuwste bovenaan. Een profiel dat je niet meer gebruikt, haal je weg met 🗑 Verwijderen.'), box);
     const fmtDay = k => { if (!k) return 'nog nooit'; const t = U.todayKey(), y = U.todayKey(new Date(Date.now() - 864e5)); if (k === t) return 'vandaag'; if (k === y) return 'gisteren'; const d = new Date(k + 'T12:00:00'); return d.toLocaleDateString(S.LOC, { weekday: 'short', day: 'numeric', month: 'short' }); };
-    const courseOf = f => { const m = /--([a-z]{2}-[a-z]{2})\.json$/.exec(f); const c = S.COURSES && S.COURSES[m ? m[1] : 'es-nl']; return c ? c.flag + ' ' + c.name.nl : '🌎 Spaans'; };
+    const courseOf = f => { const m = /--([a-z]{2}-[a-z]{2})\.json$/.exec(f); return CNAME(m ? m[1] : 'es-nl'); };
     // welke voortgang hoort bij welk profiel op dit apparaat (dat profiel gaat bij verwijderen ook hier weg)
     const Pr = S.Profiles, local = {};
     if (Pr) Pr.list().forEach(p => { const b = S.Sync.localBase(p.id) || (p.id === Pr.activeId() ? S.Sync.baseOf(S.Sync.status().file) : ''); if (b) local[b] = p.id; });

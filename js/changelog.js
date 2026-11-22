@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.50.1', date: '2026-11-22',
+    nl: ['Cursussen staan nu overal met richting, bijv. 🇳🇱 Nederlands → 🌎 Spaans of 🇳🇱 Nederlands → 🇺🇸 Engels.'],
+    es: [] },
   { v: '1.50.0', date: '2026-11-22',
     nl: ['Een extra cursus die je niet gebruikt (bijv. Spaans → Nederlands) kun je nu verwijderen in Instellingen › Profielen of in het overzicht. Je hoofdcursus blijft altijd bewaard.'],
     es: [] },

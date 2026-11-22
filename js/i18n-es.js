@@ -1052,6 +1052,7 @@
     "Hoofdcursus van het hoofdprofiel, blijft altijd": "Curso principal del perfil principal, se queda siempre",
     "🗑 Cursus verwijderen": "🗑 Eliminar curso",
     "Verwijder cursus {0}": "Eliminar el curso {0}",
+    "✅ Blijft gewoon bewaard:": "✅ Se queda guardado:",
     "Verwijder cursus {0} van {1}": "Eliminar el curso {0} de {1}",
     "Cursussen van {0}": "Cursos de {0}",
     "blijft altijd": "se queda siempre",
