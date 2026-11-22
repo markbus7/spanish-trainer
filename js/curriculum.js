@@ -35,7 +35,8 @@
     'subj-time': 'cuando + subjuntivo', 'subj-purpose': 'para que / antes de que', 'conditional': 'condicional', 'pluperfect': 'pluscuamperfecto',
     'neg-imperative': 'ontkennende imperativo', 'reported': 'indirecte rede', 'si-clause': 'si-zinnen', 'become': 'worden (ponerse, volverse…)', 'argument': 'argumenteren',
     'impsubj': 'imperfecto de subjuntivo', 'si-irreal': 'si tuviera…, haría', 'subj-past': 'subjuntivo in het verleden', 'voseo': 'voseo (vos sos, vos tenés)', 'si-past': 'si hubiera…, habría',
-    'passive': 'passief (fue construido)', 'se-accidental': 'se me olvidó (per ongeluk)', 'caribe': 'Caribisch Spaans'
+    'passive': 'passief (fue construido)', 'se-accidental': 'se me olvidó (per ongeluk)', 'caribe': 'Caribisch Spaans',
+    'register': 'formeel register (e-mails)', 'concession': 'aunque + subjuntivo'
   };
 
   const units = [];

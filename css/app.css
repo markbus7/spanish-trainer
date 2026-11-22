@@ -1412,3 +1412,12 @@ button.life-stop:hover { background: var(--card); }
 .df-legend { margin-top: .25rem; line-height: 1.8; }
 .df-legend .df-bad, .df-legend .df-new, .df-legend .df-ok { font-size: .82rem; }
 .correction > .df-box + div { margin-top: .1rem; }
+
+/* Eigen tekening per unit (js/unit-art.js) */
+.u-icon .u-art { width: 2.15rem; height: 2.15rem; display: inline-block; vertical-align: middle; }
+.u-icon:has(.u-art) { width: 2.4rem; }
+.unit-mini .u-icon .u-art { width: 1.9rem; height: 1.9rem; }
+.u-big .u-art { width: 54px; height: 54px; display: block; }
+.unit-row:not(.locked):hover .u-art .ic-art, .unit-row:not(.locked):active .u-art .ic-art { transform: rotate(-6deg) scale(1.06); }
+.u-art .ic-art { transition: transform .2s; }
+.unit-row.locked .u-art { filter: grayscale(.5); }
