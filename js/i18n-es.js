@@ -1263,6 +1263,20 @@
     "🗺️ Naar de kaart": "🗺️ Al mapa",
     "Bijna!": "¡Casi!",
     "Je had {0}%. Voor een stempel heb je {1}% nodig. Oefen de woorden nog eens en probeer het opnieuw.": "Sacaste {0}%. Para el sello necesitas {1}%. Practica las palabras otra vez y vuelve a intentarlo.",
-    "Woorden oefenen": "Practicar palabras"
+    "Woorden oefenen": "Practicar palabras",
+    "Je niveautest zegt dat je het best bij {0} begint, en daar staan je lessen ook. Ga zo door!": "Según tu prueba de nivel, lo mejor es empezar en {0}, y ahí están tus lecciones. ¡Sigue así!",
+    "Volgens je niveautest beheers je {0}. Je lessen staan op {1}, het niveau erna: daar leer je nieuwe stof die net iets moeilijker is dan wat je al kunt. Ga zo door!": "Según tu prueba de nivel dominas {0}. Tus lecciones están en {1}, el nivel siguiente: ahí aprendes cosas nuevas, un poco más difíciles que lo que ya sabes. ¡Sigue así!",
+    "ⓘ Hoe bepaalt de app dit?": "ⓘ ¿Cómo lo decide la app?",
+    "Je niveautest": "Tu prueba de nivel",
+    "Per niveau krijg je een blok van ±10 vragen: grammatica, woordbetekenis en luisteren. Heb je 70% of meer goed, dan beheers je dat niveau en krijg je het volgende blok. Het hoogste blok dat je haalt, is je testniveau.": "Por cada nivel recibes un bloque de ±10 preguntas: gramática, significado de palabras y comprensión auditiva. Si aciertas 70% o más, dominas ese nivel y pasas al bloque siguiente. El bloque más alto que apruebas es tu nivel de la prueba.",
+    "Jouw laatste test: {0}.": "Tu última prueba: {0}.",
+    "Je lessen": "Tus lecciones",
+    "Dit is het niveau van de eerste unit die je nog niet hebt afgerond of overgeslagen. Nu is dat {0} ({1}).": "Es el nivel de la primera unidad que todavía no terminaste ni saltaste. Ahora es {0} ({1}).",
+    "Wanneer het past": "Cuándo encaja",
+    "Je lessen passen als ze één niveau hoger staan dan wat je beheerst: dan leer je nieuwe dingen zonder dat het te zwaar wordt. Beheers je bijvoorbeeld A2, dan horen je lessen op B1. Staan ze lager, dan stelt de app voor om hoger in te stappen. Staan ze hoger, dan raadt de app aan je basis te herhalen.": "Tus lecciones encajan cuando están un nivel por encima de lo que dominas: así aprendes cosas nuevas sin que sea demasiado. Por ejemplo, si dominas A2, tus lecciones van en B1. Si están más abajo, la app te propone subir. Si están más arriba, la app te aconseja repasar tu base.",
+    "Jij beslist": "Tú decides",
+    "Alleen je allereerste test zet je lessen vanzelf op hun plek. Daarna verplaatst de app je lessen nooit zelf: je krijgt een voorstel en kiest zelf. Doe de test elke paar weken opnieuw, dan klopt het advies met hoe je nu bent.": "Solo tu primera prueba coloca tus lecciones automáticamente. Después la app nunca las mueve sola: recibes una propuesta y tú eliges. Repite la prueba cada pocas semanas para que el consejo refleje tu nivel actual.",
+    "Tijdens het leren": "Mientras aprendes",
+    "De herhaling brengt woorden en zinnen terug net voordat je ze vergeet. Wat vaak fout gaat, komt vaker en telt als moeilijker. Moeilijke en makkelijke vragen wisselen elkaar af, en na 2 fouten op rij krijg je eerst een makkelijkere vraag. Gaat een stap snel en 90% of meer goed, dan mag je meteen de unittoets doen. Na 3 unittoetsen op rij met 90% of meer stelt de app het niveau-examen voor.": "El repaso te trae palabras y frases justo antes de que las olvides. Lo que fallas seguido vuelve más y cuenta como más difícil. Las preguntas difíciles y fáciles se alternan, y después de 2 errores seguidos primero recibes una más fácil. Si haces un paso rápido y con 90% o más, puedes hacer de inmediato la prueba de la unidad. Después de 3 pruebas de unidad seguidas con 90% o más, la app te propone el examen de nivel."
   });
 })(window.SPT);

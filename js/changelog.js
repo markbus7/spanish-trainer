@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.56.2', date: '2026-11-22',
+    nl: ['Perfil legt nu uit hoe de app bepaalt of je lessen bij je niveau passen: tik op «ⓘ Hoe bepaalt de app dit?» onder het advies. Je ziet ook je eigen testscores per niveau.'],
+    es: [] },
   { v: '1.56.1', date: '2026-11-22',
     nl: ['In Instellingen › Profielen tik je nu op een cursus in «Cursussen van …» om ernaar te wisselen; de actieve cursus is gemarkeerd met een vinkje.'],
     es: ['En Ajustes › Perfiles ahora tocas un curso en «Cursos de …» para cambiar a él; el curso activo lleva una palomita.'] },

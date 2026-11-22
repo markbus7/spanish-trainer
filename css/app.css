@@ -1447,3 +1447,12 @@ button.course-pick:focus-visible { outline: 2px solid var(--accent); outline-off
 /* Niveaubadge: iets meer diepte */
 .lv-badge { background-image: linear-gradient(160deg, rgba(255,255,255,.28), rgba(255,255,255,0) 55%), linear-gradient(0deg, rgba(0,0,0,.12), rgba(0,0,0,0) 45%); box-shadow: inset 0 -3px 0 rgba(0,0,0,.14), 0 2px 6px rgba(0,0,0,.12); text-shadow: 0 1px 1px rgba(0,0,0,.18); }
 .scen .qi .u-art { width: 2.1rem; height: 2.1rem; display: inline-block; }
+/* ⓘ Hoe bepaalt de app dit? (advieskaart in Perfil en na de niveautest) */
+.advice-how { margin-top: .5rem; border-top: 1px solid var(--line); padding-top: .2rem; }
+.advice-how summary { font-size: .95rem; }
+.how-list { list-style: none; margin: .3rem 0 0; padding: 0; display: grid; gap: .55rem; }
+.how-list li { display: flex; gap: .6rem; align-items: flex-start; }
+.how-ic { font-size: 1.15rem; line-height: 1.4; flex: none; width: 1.6rem; text-align: center; }
+.how-list b { font-size: .95rem; }
+.how-list p { margin: .1rem 0 0; }
+.how-nums { font-weight: 600; }

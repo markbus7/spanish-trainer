@@ -1502,7 +1502,24 @@
     if (li < fi) return { kind: 'higher', les, fit, text: `Je beheerst ${t.level} volgens de test, maar je lessen staan nog op ${les}. Je kunt je lessen verplaatsen naar ${fit}. De units ervoor blijven open om te herhalen.` };
     if (li > fi) return { kind: 'lower', les, fit, text: `Je lessen (${les}) lopen voor op je testuitslag. Geen probleem: herhaal je zwakke punten en doe de test over een paar weken opnieuw.` };
     if (maxed) return { kind: 'top', les, fit, text: `Je beheerst ook ${t.level}. Hogere lessen komen later. Rond de ${fit}-units tot die tijd snel af met «Ik ken dit al», dan vind je je laatste gaten.` };
-    return { kind: 'fit', les, fit, text: `Je lessen (${les}) passen bij je niveau. Ga zo door!` };
+    if (!t.level) return { kind: 'fit', les, fit, t, text: `Je niveautest zegt dat je het best bij ${les} begint, en daar staan je lessen ook. Ga zo door!` };
+    return { kind: 'fit', les, fit, t, text: `Volgens je niveautest beheers je ${t.level}. Je lessen staan op ${les}, het niveau erna: daar leer je nieuwe stof die net iets moeilijker is dan wat je al kunt. Ga zo door!` };
+  }
+  /* ⓘ Hoe bepaalt de app dit? Uitleg in gewone woorden, met de cijfers van de laatste test. */
+  function adviceHow(adv) {
+    const t = adv.t || lastTest(); const cur = P.current();
+    const bands = t && t.bands ? TEST_ORDER.filter(l => t.bands[l] && t.bands[l].n).map(l => {
+      const b = t.bands[l]; return l + ' ' + b.ok + '/' + b.n + (b.ok / b.n >= Gen.TEST_PASS ? ' ✓' : '');
+    }).join(' · ') : '';
+    const li = (icon, title, ...body) => h('li', null, h('span', { class: 'how-ic', 'aria-hidden': 'true' }, icon), h('div', null, h('b', null, title), h('p', { class: 'small' }, ...body)));
+    return h('details', { class: 'advice-how' }, h('summary', null, 'ⓘ Hoe bepaalt de app dit?'),
+      h('ul', { class: 'how-list' },
+        li('🧭', 'Je niveautest', 'Per niveau krijg je een blok van ±10 vragen: grammatica, woordbetekenis en luisteren. Heb je 70% of meer goed, dan beheers je dat niveau en krijg je het volgende blok. Het hoogste blok dat je haalt, is je testniveau.',
+          bands ? h('span', { class: 'how-nums' }, ' Jouw laatste test: ' + bands + '.') : null),
+        li('📚', 'Je lessen', 'Dit is het niveau van de eerste unit die je nog niet hebt afgerond of overgeslagen. Nu is dat ' + cur.icon + ' ' + cur.title + ' (' + adv.les + ').'),
+        li('⚖️', 'Wanneer het past', 'Je lessen passen als ze één niveau hoger staan dan wat je beheerst: dan leer je nieuwe dingen zonder dat het te zwaar wordt. Beheers je bijvoorbeeld A2, dan horen je lessen op B1. Staan ze lager, dan stelt de app voor om hoger in te stappen. Staan ze hoger, dan raadt de app aan je basis te herhalen.'),
+        li('✋', 'Jij beslist', 'Alleen je allereerste test zet je lessen vanzelf op hun plek. Daarna verplaatst de app je lessen nooit zelf: je krijgt een voorstel en kiest zelf. Doe de test elke paar weken opnieuw, dan klopt het advies met hoe je nu bent.'),
+        li('🎯', 'Tijdens het leren', 'De herhaling brengt woorden en zinnen terug net voordat je ze vergeet. Wat vaak fout gaat, komt vaker en telt als moeilijker. Moeilijke en makkelijke vragen wisselen elkaar af, en na 2 fouten op rij krijg je eerst een makkelijkere vraag. Gaat een stap snel en 90% of meer goed, dan mag je meteen de unittoets doen. Na 3 unittoetsen op rij met 90% of meer stelt de app het niveau-examen voor.')));
   }
   function moveLessonsTo(lvl) {
     const first = C.unitsOf(lvl)[0]; if (!first) return;
@@ -1611,7 +1628,8 @@
       adv.kind === 'higher' ? h('div', { class: 'row gap wrap' },
         h('button', { class: 'btn primary', type: 'button', onclick: () => confirmMove(adv.fit) }, 'Lessen naar ' + adv.fit + ' verplaatsen'),
         h('button', { class: 'btn ghost', type: 'button', onclick: () => startLevelExam(adv.les) }, '🎓 Eerst examen ' + adv.les)) : null,
-      adv.kind === 'higher' ? h('p', { class: 'small muted' }, 'Twijfel je? Met het niveau-examen ' + adv.les + ' zie je of je de stof echt beheerst (80% nodig).') : null);
+      adv.kind === 'higher' ? h('p', { class: 'small muted' }, 'Twijfel je? Met het niveau-examen ' + adv.les + ' zie je of je de stof echt beheerst (80% nodig).') : null,
+      adviceHow(adv));
   }
 
   /* ================= AJUSTES ================= */
