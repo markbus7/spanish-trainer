@@ -425,7 +425,7 @@
   }
   function placementBand(lvl) {
     const qs = S.placement.filter(q => q.lv === lvl);
-    return { title: 'Plaatsingstoets · ' + lvl, items: qs.map(q => ({ kind: 'mc', q: q.q.includes('___') ? null : q.q, sentence: q.q.includes('___') ? q.q : null, options: U.shuffle(q.o), answer: q.o[0], tag: null, fill: q.q.includes('___') })), mode: 'exam' };
+    return { title: 'Plaatsingstoets · ' + lvl, items: qs.map(q => ({ kind: 'mc', q: q.q.includes('___') ? null : q.q, sentence: q.q.includes('___') ? q.q : null, nl: q.nl, options: U.shuffle(q.o), answer: q.o[0], tag: null, fill: q.q.includes('___') })), mode: 'exam' };
   }
 
   /* Herhaalbare niveautest: per niveau een blok met grammatica uit de vragenbank, woordbetekenis en een luistervraag.
@@ -433,7 +433,7 @@
   const TEST_PASS = 0.7;
   function placementQ(q) {
     const fill = q.q.includes('___');
-    return { kind: 'mc', q: fill ? null : q.q, sentence: fill ? q.q : null, options: U.shuffle(q.o), answer: q.o[0], fill, part: 'grammar' };
+    return { kind: 'mc', q: fill ? null : q.q, sentence: fill ? q.q : null, nl: fill ? q.nl : undefined, options: U.shuffle(q.o), answer: q.o[0], fill, part: 'grammar' };
   }
   function levelTestBand(lvl) {
     const bank = S.placement.filter(q => q.lv === lvl);

@@ -73,6 +73,21 @@
         input.focus(); input.setSelectionRange(s + 1, s + 1); input.dispatchEvent(new Event('input'));
       } }, c)));
   }
+  /* Invulzin met 🔊: de zin wordt voorgelezen met een stilte op de plek van het gat (Speech.sayGap).
+     Is het gat al ingevuld, dan hoor je de hele zin. Zet hem ook meteen aan bij een nieuwe vraag (als voorlezen aan staat). */
+  function gapSpeak(it, sent, ctx) {
+    if (!Speech.canSpeak() || !it.sentence) return null;
+    const play = slow => {
+      const bl = sent.querySelector('.blank.filled');
+      if (bl) Speech.say(it.sentence.replace('___', bl.textContent), { slow }); else Speech.sayGap(it.sentence, { slow });
+    };
+    if (S.Store.state.settings.autoSpeak) { const t = setTimeout(() => { if (!ctx.answered()) Speech.sayGap(it.sentence); }, 300); ctx.onLeave(() => clearTimeout(t)); }
+    ctx.onLeave(() => Speech.stop());
+    let level = 1;
+    const slow = h('button', { class: 'icon-btn speak slow', type: 'button', title: 'Langzaam', 'aria-label': 'Langzaam beluisteren', onclick: e => { e.stopPropagation(); play(level); if (level === 1) { level = 2; slow.textContent = '🐌'; } } }, '🐢');
+    return h('div', { class: 'row gap gap-say' },
+      h('button', { class: 'icon-btn speak', type: 'button', title: 'Beluister de zin', 'aria-label': 'Beluister de zin', onclick: e => { e.stopPropagation(); play(0); } }, '🔊'), slow);
+  }
   function sentenceEl(s, fillWith) {
     const el = h('div', { class: 'sentence' });
     const partsArr = String(s).split('___');
@@ -480,7 +495,7 @@
     if (it.prompt) wrap.append(h('div', { class: 'prompt' + (it.speakPrompt ? ' es' : '') }, it.prompt, it.speakPrompt ? speakBtn(it.prompt) : null));
     if (it.speakPrompt) setTimeout(() => Speech.say(it.prompt), 250);
     let sent = null;
-    if (it.sentence) { sent = sentenceEl(it.sentence); wrap.append(sent); }
+    if (it.sentence) { sent = sentenceEl(it.sentence); wrap.append(h('div', { class: 'sent-row' }, sent, gapSpeak(it, sent, ctx))); }
     if (it.h) wrap.append(h('div', { class: 'hint' }, '(' + it.h + ')'));
     if (it.nl && it.sentence) wrap.append(h('div', { class: 'nl-hint' }, it.nl));
     const opts = h('div', { class: 'options' + (it.options.some(o => o.length > 28) ? ' one-col' : '') });
@@ -510,7 +525,7 @@
     if (it.conj) { const c = conjCard(it, ctx); sent = c.frame; wrap.append(c.el); }
     else if (it.prompt) wrap.append(h('div', { class: 'prompt' }, it.prompt));
     if (it.mainOnly) wrap.append(h('div', { class: 'p-note' }, it.translate ? '🔁 Je eigen zin was ook goed. Typ nu de zin zoals hij in de les staat.' : '🔁 Je eigen antwoord was ook goed. Typ nu het woord zoals het in de les staat.'));
-    if (it.sentence) { sent = sentenceEl(it.sentence); wrap.append(sent); }
+    if (it.sentence) { sent = sentenceEl(it.sentence); wrap.append(h('div', { class: 'sent-row' }, sent, gapSpeak(it, sent, ctx))); }
     if (it.h) wrap.append(h('div', { class: 'hint' }, '(' + it.h + ')'));
     if (it.nl && it.sentence) wrap.append(h('div', { class: 'nl-hint' }, it.nl));
     // Herhaling van een zin met fouten: de goede woorden staan er al, alleen de foute zijn vakjes
@@ -1018,7 +1033,9 @@
         const other = it.alts.filter(a => S.check.norm(a) !== S.check.norm(r.user)).slice(0, 1);
         if (other.length) fb.append(h('div', { class: 'small muted' }, 'Ook goed: ' + other[0]));
       }
-      if (r.nl) fb.append(h('div', { class: 'small muted' }, '🇳🇱 ' + r.nl));
+      if (r.nl) fb.append(h('div', { class: 'small muted' }, (S.course.ui === 'es' ? '🌎 ' : '🇳🇱 ') + r.nl));
+      // Luistervraag met een woord («Wat hoor je?»): ook bij een goed antwoord zien wat het betekent
+      else if (it.word && it.audio && it.word.nl) fb.append(h('div', { class: 'small muted fb-tr' }, (S.course.ui === 'es' ? '🌎 ' : '🇳🇱 '), h('b', { lang: S.course.target }, it.word.es), ' = ' + it.word.nl));
       if (r.x) fb.append(h('div', { class: 'fb-x' }, '💡 ' + r.x));
       const notes = feedbackNotes(it, r);
       if (notes.length) {

@@ -60,6 +60,8 @@ function add(text, voice = DEF) {
   if (!out.has(k)) out.set(k, { k, text: S.Speech.clean(text), voice, lv: [LV] });
   else if (!out.get(k).lv.includes(LV)) out.get(k).lv.push(LV);
 }
+/* Invulzinnen worden voorgelezen met een stilte op het gat: elk stuk («Did you …», «… the email?») een eigen opname. */
+const gap = (sentence, fn) => (S.Speech.gapParts(sentence) || []).forEach(p => p && fn(p));
 const ES = /[¿¡áéíóúñ]|\b(el|la|los|las|un|una|de|que|y|es|en|yo|tú|usted|no)\b/i;
 
 for (const u of S.C.all()) {
@@ -94,7 +96,7 @@ for (const u of S.C.all()) {
   u.ex.forEach(e => {
     if (e.t === 'order') add(e.s);
     if (e.t === 'tr') add(e.a[0]);
-    if (e.t === 'cloze') { const a = (e.o || e.a)[0]; add(e.s.replace('___', a)); add(a); }
+    if (e.t === 'cloze') { const a = (e.o || e.a)[0]; add(e.s.replace('___', a)); add(a); gap(e.s, add); }
     if (e.t === 'match') e.p.forEach(([es]) => add(es));
     if (e.t === 'mc' && e.o.every(o => ES.test(o))) add(e.o[0]);
   });
@@ -109,7 +111,7 @@ for (const u of S.C.all()) {
 // niveautest: de ingevulde zin wordt na het antwoord voorgelezen
 (S.placement || []).forEach(q => {
   LV = q.lv;
-  if (q.q.includes('___')) add(q.q.replace('___', q.o[0]));
+  if (q.q.includes('___')) { add(q.q.replace('___', q.o[0])); gap(q.q, add); }
 });
 // woordspellen lezen de eerste vorm van een woord voor (zonder '…' en zonder alternatief na '/')
 for (const u of S.C.all()) {
@@ -176,12 +178,12 @@ for (const [course, [vf, vm_]] of Object.entries(OTHER)) {
     u.ex.forEach(e => {
       if (e.t === 'order') put(e.s);
       if (e.t === 'tr') put(e.a[0]);
-      if (e.t === 'cloze') { const a = (e.o || e.a)[0]; put(e.s.replace('___', a)); put(a); }
+      if (e.t === 'cloze') { const a = (e.o || e.a)[0]; put(e.s.replace('___', a)); put(a); gap(e.s, put); }
       if (e.t === 'match') e.p.forEach(([t]) => put(t));
     });
     S.C.words(u).forEach(w => put(String(w.es).split(/\s*\/\s*/)[0].replace(/…|\.\.\./g, '').trim()));
   }
-  (S.placement || []).forEach(q => { lv = q.lv; if (q.q.includes('___')) put(q.q.replace('___', q.o[0])); });
+  (S.placement || []).forEach(q => { lv = q.lv; if (q.q.includes('___')) { put(q.q.replace('___', q.o[0])); gap(q.q, put); } });
   lv = 'X';
   (S.phrases || []).forEach(p => put(p[0]));
   put(S.course.hello);

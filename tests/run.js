@@ -227,6 +227,11 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
   const list = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/tts-texts.js')], { maxBuffer: 64 << 20 }).toString());
   const have = new Set(list.map(x => x.k));
   ok(list.every(x => x.k === S.Speech.clipKey(x.text, x.ns) && /^(es-[A-Z]{2}|en-US|nl-NL)-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
+  // invulzinnen: voorgelezen met een stilte op het gat, hints tussen haakjes niet
+  ok(JSON.stringify(S.Speech.gapParts('Did you ___ the email?')) === JSON.stringify(['Did you …', null, '… the email?']), 'invulzin: stukken rond het gat');
+  ok(JSON.stringify(S.Speech.gapParts('¡___ la verdad! (decir, tú)')) === JSON.stringify([null, '… la verdad!']), 'invulzin: gat vooraan, hint weg');
+  ok(S.Speech.gapParts('Hola') === null, 'invulzin: zonder gat');
+  ok((S.placement || []).every(q => !q.q.includes('___') || q.nl), 'niveautest: elke invulzin heeft een vertaling');
   ok(S.Speech.key('¿Cómo  está usted?') === S.Speech.key('¿cómo está usted?'), 'opnames: sleutel negeert hoofdletters en spaties');
   const miss = new Set();
   const want = t => { if (t && !have.has(S.Speech.key(t))) miss.add(t); };
