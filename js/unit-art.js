@@ -159,7 +159,17 @@
       <path d="M2 42 17 16l8 12-4 14z" fill="#fff" opacity=".1"/>
       <path d="M24 12a6 5.5 0 0 1 6-5.5 7.5 7.5 0 0 1 13 1.5A5 5 0 0 1 42 17H27a4.5 4.5 0 0 1-3-5z" fill="${C.cream}"/><path d="M24 12a6 5.5 0 0 1 6-5.5 7.5 7.5 0 0 1 13 1.5A5 5 0 0 1 42 17H27a4.5 4.5 0 0 1-3-5z" fill="none" stroke="${C.b2}" stroke-width="1.6"/>
       <path d="M30 20l-1 3M36 20l-1 3" stroke="${C.b}" stroke-width="2" stroke-linecap="round"/>
-      <path d="M8 42l3-4 2.4 2.4L17 34l4 8z" fill="${C.green}"/><path d="M2 42h44" stroke="${C.green}" stroke-width="3" stroke-linecap="round"/>`
+      <path d="M8 42l3-4 2.4 2.4L17 34l4 8z" fill="${C.green}"/><path d="M2 42h44" stroke="${C.green}" stroke-width="3" stroke-linecap="round"/>`,
+    'b2-09': `<rect x="9" y="4" width="22" height="38" rx="5" fill="${C.ink}" opacity=".85"/><rect x="11.5" y="8" width="17" height="27" rx="2" fill="${C.b2}"/><circle cx="20" cy="38.5" r="1.8" fill="${C.grey}"/>
+      ${txt(20, 26, '?', 14, C.o, 900)}
+      <path d="M33 8a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v3a5 5 0 0 1-5 5h-1l-3 3v-3a5 5 0 0 1-5-5z" fill="${C.g}"/><circle cx="37.6" cy="9.5" r="1.1" fill="${C.ink}"/><circle cx="40.6" cy="9.5" r="1.1" fill="${C.ink}"/><circle cx="43.6" cy="9.5" r="1.1" fill="${C.ink}"/>
+      <circle cx="35" cy="31" r="7.5" fill="${C.cream}" fill-opacity=".6" stroke="${C.o}" stroke-width="3"/><path d="M40.4 36.4 45.5 41.5" stroke="${C.o}" stroke-width="4.2" stroke-linecap="round"/>${txt(35, 34.5, '?', 9, C.o, 900)}`,
+    'b2-10': `<circle cx="39" cy="8" r="4.6" fill="${C.g}"/>
+      <path d="M2 30c3-8 9-13 16-13 3.4 0 4.6-4 7.6-4 2.8 0 3.6 3.6 5.6 5 3 2 8 3.4 9.4 12z" fill="${C.green2}"/><path d="M22 14.4c1.6-1.2 4-1.2 5.6 0l-1 2.2c-1.2-.6-2.4-.6-3.6 0z" fill="${C.brown}"/>
+      <path d="M2 32c4 2 7 2 11 0s7-2 11 0 7 2 11 0 7-2 11 0v14H2z" fill="${C.b}"/><path d="M2 32c4 2 7 2 11 0s7-2 11 0 7 2 11 0 7-2 11 0" stroke="#fff" stroke-width="1.4" fill="none" opacity=".5"/>
+      <path d="M8 44c0-9 6.4-15 15-15s15 6 15 15z" fill="#5a4630"/><path d="M8 44c0-9 6.4-15 15-15s15 6 15 15" fill="none" stroke="#3e2f1f" stroke-width="1.6"/>
+      <path d="M17 31.5l2.2 5.4h7.6l2.2-5.4M19.2 36.9 15 43.5M26.8 36.9 31 43.5M13 36.4l6.2.5M33 36.4l-6.2.5" stroke="#8a6d46" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+      <path d="M36.5 40c1.6-4.4 4.6-7.6 7.4-7.2 2.2.3 2.6 2.8.8 4.2-1.4 1.1-3.4 1.4-4.6 4.4z" fill="#8c8466"/><circle cx="43" cy="35" r=".9" fill="${C.ink}"/>`
   };
 
   function svg(id) { const b = ART[id]; return b ? `<svg class="ic-art" viewBox="0 0 48 48" aria-hidden="true">${b}</svg>` : ''; }
@@ -169,8 +179,24 @@
     const a = u && svg(u.id); if (a) { s.innerHTML = a; s.setAttribute('role', 'img'); s.setAttribute('aria-label', u.title || ''); } else s.textContent = (u && u.icon) || '';
     return s;
   }
+
+  /* Status van een unit in Ruta (klaar, overgeslagen via toets, op slot, nu bezig, begonnen), getekend i.p.v. emoji. */
+  const STATUS = {
+    done: `<circle cx="12" cy="12" r="10" fill="#2e9b62"/><path d="M7.2 12.4l3.2 3.2 6.4-7" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`,
+    tested: `<circle cx="12" cy="12" r="10" fill="${C.b}"/><path d="M7.5 8l4 4-4 4M12.5 8l4 4-4 4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+    locked: `<path d="M8 11V8.2a4 4 0 0 1 8 0V11" fill="none" stroke="#9a8b80" stroke-width="2.2"/><rect x="5.5" y="10.5" width="13" height="10" rx="2.6" fill="${C.g}"/><circle cx="12" cy="14.8" r="1.5" fill="${C.ink}" opacity=".6"/><path d="M12 15.5v2.2" stroke="${C.ink}" stroke-width="1.4" stroke-linecap="round" opacity=".6"/>`,
+    current: `<circle cx="12" cy="12" r="10" fill="${C.o}"/><path d="M9.6 7.6v8.8l7-4.4z" fill="#fff"/>`,
+    started: `<circle cx="12" cy="12" r="8.6" fill="none" stroke="${C.o}" stroke-width="2.2"/><path d="M12 12V3.4A8.6 8.6 0 0 1 20.6 12z" fill="${C.o}"/>`
+  };
+  function status(kind, title) {
+    const s = document.createElement('span'); s.className = 'st-mark st-' + kind;
+    if (STATUS[kind]) { s.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${STATUS[kind]}</svg>`; if (title) { s.title = title; s.setAttribute('role', 'img'); s.setAttribute('aria-label', title); } }
+    return s;
+  }
   if (!S.Icons) S.Icons = {};
   S.Icons.unit = unit;
   S.Icons.unitSvg = svg;
   S.Icons.UNIT_ART = ART;
+  S.Icons.status = status;
+  S.Icons.STATUS = STATUS;
 })(window.SPT);

@@ -501,6 +501,7 @@
   }
   /* Oefentegel: titel, één zin wat je er doet (x) en daaronder kort hoe lang/hoeveel (s). */
   /* Eigen tekening van de unit (js/unit-art.js); zonder tekening de emoji. */
+  const STATUS_NL = { done: 'Klaar', tested: 'Overgeslagen met de toets', locked: 'Op slot', current: 'Hier ben je nu', started: 'Begonnen' };
   function uIcon(u) { return S.Icons && S.Icons.unit ? S.Icons.unit(u) : u.icon; }
   function quick(icon, t, s, fn, done, x) { return h('button', { class: 'quick-btn' + (done ? ' did' : ''), type: 'button', onclick: fn }, h('span', { class: 'qi' }, S.Icons && S.Icons.has(icon) ? S.Icons.el(icon) : icon), done ? h('span', { class: 'qd', title: 'Vandaag gedaan' }, '✓') : null, h('b', null, t), x ? h('span', { class: 'qx' }, x) : null, h('small', null, s)); }
 
@@ -665,7 +666,8 @@
         const list = h('div', { class: 'unit-list' });
         us.forEach((u, i) => {
           const s = P.unitState(u.id); const unlocked = P.isUnlocked(u);
-          const status = s.done ? '✅' : s.tested ? '⏭️' : !unlocked ? '🔒' : u.id === cur.id ? '▶️' : '';
+          const kind = s.done ? 'done' : s.tested ? 'tested' : !unlocked ? 'locked' : u.id === cur.id ? 'current' : Object.keys(s.steps || {}).length ? 'started' : '';
+          const status = !kind ? '' : S.Icons && S.Icons.status ? S.Icons.status(kind, STATUS_NL[kind]) : { done: '✅', tested: '⏭️', locked: '🔒', current: '▶️', started: '◔' }[kind];
           list.append(h('a', { class: 'unit-row' + (unlocked ? '' : ' locked') + (u.id === cur.id ? ' current' : ''), href: unlocked ? '#/unit/' + u.id : null, onclick: unlocked ? null : (e) => { e.preventDefault(); S.toast('Rond eerst de vorige unit af (of gebruik «Ik ken dit al»).'); } },
             h('span', { class: 'u-icon' }, uIcon(u)),
             h('div', { class: 'grow' }, h('b', null, (i + 1) + '. ' + u.title), h('small', null, u.nl), stepDots(u)),
@@ -857,7 +859,7 @@
 
   /* ================= DOCENTE (AI) ================= */
   const chat = { mode: 'roleplay', scenario: null, messages: [], busy: false, ctrl: null };
-  function unitScenario(u) { return { id: 'unit-' + u.id, icon: u.icon, title: u.title, place: u.dialogue && u.dialogue.place, role: u.scenario.role, goal: u.scenario.goal, nl: u.scenario.nl }; }
+  function unitScenario(u) { return { id: 'unit-' + u.id, unit: u, icon: u.icon, title: u.title, place: u.dialogue && u.dialogue.place, role: u.scenario.role, goal: u.scenario.goal, nl: u.scenario.nl }; }
   function startRoleplay(sc) { chat.mode = 'roleplay'; chat.scenario = sc; chat.messages = []; chat.autostart = true; chat.turns = 0; }
   S.startRoleplay = startRoleplay;
 
@@ -884,7 +886,7 @@
       const list = h('div', { class: 'scen-list' });
       const scs = (cur.scenario ? [unitScenario(cur)] : []).concat(S.scenarios);
       scs.forEach(sc => list.append(h('button', { class: 'scen', type: 'button', onclick: () => { startRoleplay(sc); render(); } },
-        h('span', { class: 'qi' }, sc.icon), h('div', { class: 'grow' }, h('b', null, sc.title || sc.nl), h('small', null, (sc.place || '') + (sc.lv ? ' · ' + sc.lv : ' · huidige unit')), h('small', { class: 'muted' }, '🎯 ' + sc.goal)))));
+        h('span', { class: 'qi' }, sc.unit && S.Icons && S.Icons.unit ? S.Icons.unit(sc.unit) : sc.icon), h('div', { class: 'grow' }, h('b', null, sc.title || sc.nl), h('small', null, (sc.place || '') + (sc.lv ? ' · ' + sc.lv : ' · huidige unit')), h('small', { class: 'muted' }, '🎯 ' + sc.goal)))));
       wrap.append(section('Kies een situatie', h('div', null, h('p', { class: 'small muted privacy-note' }, '🔒 Je speelt altijd een verzonnen rol: Lupe vraagt niet naar je echte familie of privézaken, en geeft je zo nodig een rolkaartje met namen. Van gesprekken bewaart de app alleen je fouten (het foute stukje met de verbetering), niet wat je schreef.'), list)));
       return wrap;
     }
@@ -1321,7 +1323,8 @@
           h('small', { class: 'muted' }, done + '/' + us.length + ' klaar' + (skipped ? ' · ' + skipped + ' ⏭️' : '') + (lv && lv.passed ? ' · 🎓' : ''))),
         us.map((u, i) => {
           const us2 = P.unitState(u.id); const ws = wordStats([u]);
-          const stt = us2.done ? '✅' : us2.tested ? '⏭️' : u.id === cur.id ? '▶️' : Object.keys(us2.steps || {}).length ? '◔' : '';
+          const k2 = us2.done ? 'done' : us2.tested ? 'tested' : u.id === cur.id ? 'current' : Object.keys(us2.steps || {}).length ? 'started' : '';
+          const stt = !k2 ? '' : S.Icons && S.Icons.status ? S.Icons.status(k2, STATUS_NL[k2]) : { done: '✅', tested: '⏭️', current: '▶️', started: '◔' }[k2];
           return h('a', { class: 'unit-mini', href: '#/unit/' + u.id },
             h('span', { class: 'u-icon' }, uIcon(u)), h('div', { class: 'grow' }, h('b', null, (i + 1) + '. ' + u.title), h('small', { class: 'muted' }, Gen.STEPS.filter(x => (us2.steps || {})[x.id] || us2.done).length + '/' + Gen.STEPS.length + ' stappen · ' + ws.seen + '/' + ws.total + ' woorden' + (us2.best ? ' · toets ' + Math.round(us2.best * 100) + '%' : ''))),
             h('span', { class: 'u-status' }, stt));

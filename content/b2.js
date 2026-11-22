@@ -874,4 +874,221 @@
       ]
     }
   });
+
+  /* ───────────────────────── B2 · 9 ───────────────────────── */
+  U({
+    id: 'b2-09', level: 'B2', icon: '🕵️', title: '¿Dónde estará?', nl: 'Gissen en vermoeden: futuro en condicional van waarschijnlijkheid',
+    goals: ['Vermoedens over nu uitdrukken met de futuro (¿Dónde estará? Serán las ocho.)', 'Vermoedens over het verleden uitdrukken met de condicional (Serían las diez.) en de futuro perfecto (Se habrá dormido.)', 'Voorzichtig formuleren met al parecer, se supone que, a lo mejor, quizás en deber de'],
+    vocab: [
+      ['¿dónde estará?', 'waar zou hij/zij zijn?'], ['serán las ocho', 'het zal zo\'n acht uur zijn'], ['tendrá unos treinta años', 'hij/zij is zo\'n jaar of dertig'], ['habrá tráfico', 'er zal wel file zijn'],
+      ['se habrá dormido', 'hij/zij heeft zich zeker verslapen'], ['serían las diez', 'het was zo\'n uur of tien'], ['al parecer', 'blijkbaar, naar het schijnt'], ['se supone que', 'het is de bedoeling dat; naar verluidt'],
+      ['a lo mejor', 'misschien (+ indicativo)'], ['quizás / tal vez', 'misschien (meestal + subjuntivo)'], ['deber de + infinitivo', 'moeten (vermoeden): debe de estar cansado'], ['seguramente', 'vast, waarschijnlijk'],
+      ['probablemente', 'waarschijnlijk'], ['me imagino que', 'ik neem aan dat'], ['sospechar', 'vermoeden, verdenken'], ['la sospecha', 'het vermoeden'], ['el rumor', 'het gerucht'],
+      ['estar preocupado / preocupada', 'ongerust zijn'], ['no contestar', 'niet opnemen'], ['el celular', 'de mobiele telefoon', 'LatAm; ES: el móvil'], ['quedarse sin batería', 'een lege batterij hebben'],
+      ['el tráfico', 'het verkeer, de file'], ['el combi', 'het busje (openbaar vervoer)', 'PE'], ['el jato', 'het huis', 'PE (informeel)'], ['el pata', 'de maat, vriend', 'PE (informeel)'],
+      ['la chamba', 'het werk', 'PE · MX (informeel)'], ['al toque', 'meteen', 'PE (informeel)'], ['¡qué roche!', 'wat gênant!', 'PE (informeel)'], ['¿ya?', 'oké?, goed?', 'PE (informeel)'],
+      ['la causa', 'de causa (Peruaans aardappelgerecht); ook: maat', 'PE'], ['de hecho', 'sterker nog, eigenlijk'], ['quién sabe', 'wie weet']
+    ],
+    grammar: [
+      { t: 'De futuro van waarschijnlijkheid', es: 'El futuro de probabilidad',
+        html: `<p>In het Spaans gebruik je de <b>futuro</b> niet alleen voor de toekomst, maar ook voor een <b>vermoeden over nu</b>. In het Nederlands zeg je dan «zal wel», «zou» of «zo'n».</p>
+<p>📌 <i>¿Dónde <b>estará</b> Andrés?</i> = Waar zou Andrés zijn?</p>
+<p>📌 <i><b>Serán</b> las ocho.</i> = Het zal zo'n acht uur zijn. (Zeker weten: <i>Son las ocho.</i>)</p>
+<p>📌 <i><b>Tendrá</b> unos cuarenta años.</i> = Hij is zo'n jaar of veertig.</p>
+<p>📌 <i>No contesta. <b>Estará</b> en el combi.</i> = Hij neemt niet op. Hij zit zeker in het busje.</p>
+<p>Je vraagt jezelf ook vaak iets af met de futuro: <i>¿Qué <b>querrá</b> decir eso?</i> (Wat zou dat betekenen?)</p>`,
+        table: [['zeker (nu)', 'vermoeden (nu)', 'betekenis'], ['Son las ocho.', 'Serán las ocho.', 'het zal zo\'n acht uur zijn'], ['Está en casa.', 'Estará en casa.', 'hij is zeker thuis'], ['Tiene treinta años.', 'Tendrá treinta años.', 'hij is zo\'n dertig'], ['Hay tráfico.', 'Habrá tráfico.', 'er zal wel file zijn']],
+        ex: [['No contesta el celular. Se habrá quedado sin batería.', 'Hij neemt zijn telefoon niet op. Zijn batterij zal wel leeg zijn.'], ['¿Quién será esa señora? Será la nueva vecina.', 'Wie zou die mevrouw zijn? Dat zal de nieuwe buurvrouw wel zijn.']],
+        sum: 'Futuro de probabilidad: suposición sobre el presente. «¿Dónde estará?», «Serán las ocho».' },
+      { t: 'Vermoedens over het verleden', es: 'Condicional y futuro perfecto de probabilidad',
+        html: `<p>Gaat je vermoeden over het <b>verleden</b>, dan schuift alles een tijd op:</p>
+<p>📌 Een vermoeden over een <b>afgeronde handeling</b> (vandaag, net) → <b>futuro perfecto</b>: <i>habrá + participio</i>. <i>Se <b>habrá dormido</b>.</i> (Hij heeft zich zeker verslapen.)</p>
+<p>📌 Een vermoeden over <b>toen</b> (indefinido of imperfecto) → <b>condicional</b>: <i>Cuando llegué, <b>serían</b> las diez.</i> (Toen ik aankwam, was het zo'n uur of tien.) · <i>¿Por qué no <b>vendría</b> ayer?</i> (Waarom zou hij gisteren niet gekomen zijn?)</p>
+<p>⚠️ Verwar dit niet met de gewone condicional (zou + doen). De context maakt duidelijk wat bedoeld is.</p>`,
+        table: [['zeker', 'vermoeden', 'vorm'], ['Son las ocho.', 'Serán las ocho.', 'futuro'], ['Se ha dormido.', 'Se habrá dormido.', 'futuro perfecto'], ['Eran las diez.', 'Serían las diez.', 'condicional'], ['No vino porque estaba enfermo.', 'No vendría porque estaría enfermo.', 'condicional']],
+        ex: [['Ya habrá llegado a su jato.', 'Hij zal inmiddels wel thuis zijn aangekomen.'], ['Anoche había mucha gente; serían unas doscientas personas.', 'Gisteravond waren er veel mensen; het waren er zo\'n tweehonderd.']],
+        sum: 'Suposición sobre el pasado: futuro perfecto (se habrá dormido) o condicional (serían las diez).' },
+      { t: 'Voorzichtig formuleren', es: 'Expresar duda e hipótesis',
+        html: `<p>📌 <b>A lo mejor</b> + <b>indicativo</b>: <i>A lo mejor <b>está</b> en la chamba.</i> Heel gewoon in gesprekken.</p>
+<p>📌 <b>Quizás / tal vez</b> + meestal <b>subjuntivo</b>: <i>Quizás <b>esté</b> enfermo.</i> Met indicativo klink je zekerder.</p>
+<p>📌 <b>Deber de</b> + infinitief = vermoeden: <i>Debe de estar cansado.</i> (Hij zal wel moe zijn.) Zonder <i>de</i> is het een plicht: <i>Debe estudiar.</i> (Hij moet studeren.) In gesprekken lopen ze door elkaar.</p>
+<p>📌 <b>Al parecer</b> en <b>se supone que</b> geven door wat je gehoord hebt: <i>Al parecer, cancelaron el concierto.</i> · <i>Se supone que el combi pasa cada diez minutos.</i> (Het busje hoort elke tien minuten te komen.)</p>`,
+        table: [['uitdrukking', 'daarna', 'voorbeeld'], ['a lo mejor', 'indicativo', 'A lo mejor viene.'], ['quizás / tal vez', 'meestal subjuntivo', 'Quizás venga.'], ['deber de', 'infinitief', 'Debe de estar ocupado.'], ['al parecer', 'indicativo', 'Al parecer, ya se fue.']],
+        ex: [['A lo mejor se quedó sin batería.', 'Misschien was zijn batterij leeg.'], ['Tal vez no le guste la sorpresa.', 'Misschien vindt hij de verrassing niet leuk.']],
+        sum: 'A lo mejor + indicativo; quizás / tal vez + subjuntivo; deber de + infinitivo = suposición.' }
+    ],
+    verbs: ['estar', 'ser', 'tener', 'haber', 'querer', 'venir', 'saber', 'poder', 'hacer', 'decir', 'salir', 'llegar'], tenses: ['fut', 'cond'],
+    dialogue: {
+      t: 'La sorpresa de Andrés', place: 'Lima 🇵🇪',
+      lines: [
+        ['Lucía', 'Mark, ya son las ocho y media y Andrés no llega. ¿Dónde estará?', 'Mark, het is al half negen en Andrés komt niet. Waar zou hij zijn?'],
+        ['Mark', 'Habrá tráfico en la Javier Prado. A esta hora siempre hay.', 'Er zal wel file zijn op de Javier Prado. Op dit uur is die er altijd.'],
+        ['Lucía', 'Pero tampoco contesta el celular. Se habrá quedado sin batería, como siempre.', 'Maar hij neemt ook zijn telefoon niet op. Zijn batterij zal wel leeg zijn, zoals altijd.'],
+        ['Mark', 'A lo mejor está en el combi y no oye nada. ¿Le dijiste que la fiesta es sorpresa?', 'Misschien zit hij in het busje en hoort hij niets. Heb je hem gezegd dat het feest een verrassing is?'],
+        ['Lucía', 'No, se supone que solo viene a cenar conmigo. ¡Ay, qué roche si llega y no hay nadie escondido!', 'Nee, het is de bedoeling dat hij alleen met mij komt eten. Oei, wat gênant als hij komt en er niemand verstopt zit!'],
+        ['Mark', 'Tranquila. Sus patas ya están en la cocina. ¿Quién será esa que acaba de tocar la puerta?', 'Rustig. Zijn vrienden zitten al in de keuken. Wie zou dat zijn die net aanbelde?'],
+        ['Lucía', 'Será la vecina. Ayer vino a quejarse de la música; serían las once de la noche.', 'Dat zal de buurvrouw zijn. Gisteren kwam ze klagen over de muziek; het was zo\'n uur of elf \'s avonds.'],
+        ['Mark', 'Al parecer no le gustan mucho las fiestas. Quizás debamos invitarla.', 'Blijkbaar houdt ze niet zo van feestjes. Misschien moeten we haar uitnodigen.'],
+        ['Lucía', '¡Buena idea! Ábrele tú, ¿ya? Yo apago las luces al toque.', 'Goed idee! Doe jij open, oké? Ik doe meteen de lichten uit.'],
+        ['Mark', 'Espera… no es la vecina. ¡Es Andrés! Debe de haber venido en taxi. ¡Todos, escóndanse!', 'Wacht… het is de buurvrouw niet. Het is Andrés! Hij is zeker met de taxi gekomen. Iedereen, verstop je!']
+      ],
+      q: [
+        { t: 'mc', q: '¿Por qué cree Mark que Andrés llega tarde?', o: ['Porque habrá tráfico en la Javier Prado', 'Porque está enfermo', 'Porque se olvidó de la cena'] },
+        { t: 'mc', q: '¿Qué sabe Andrés de la fiesta?', o: ['Nada: cree que solo va a cenar con Lucía', 'Que es una fiesta sorpresa', 'Que la vecina va a venir'] },
+        { t: 'mc', q: '¿Quién toca la puerta al final?', o: ['Andrés', 'La vecina', 'Un taxista'] }
+      ]
+    },
+    culture: { t: 'Lima: combis, causa en «¿ya?»', html: `<p>🚌 In <b>Lima</b> rijden duizenden <i>combis</i>: kleine busjes waarin een <i>cobrador</i> uit de deur hangt en de route roept. Ze stoppen overal waar je je hand opsteekt. De stad heeft ook de snelbus <i>Metropolitano</i> en een metrolijn, maar het verkeer op lanen als de <i>Javier Prado</i> staat vaak vast.</p>
+<p>🥔 Peru heeft duizenden soorten aardappels. De <b>causa limeña</b> is een koud laagjesgerecht van gele aardappel met limoen en ají amarillo, gevuld met kip of tonijn. <i>Causa</i> is in Lima ook een woord voor een goede vriend.</p>
+<p>🗣️ Limeños sluiten een vraag of afspraak vaak af met <b>¿ya?</b> (oké?) en antwoorden met <i>ya</i> (goed). Een vriend is een <i>pata</i>, je huis is je <i>jato</i>, en iets gênants is <i>un roche</i>.</p>` },
+    ex: [
+      { t: 'cloze', s: 'No sé qué hora es. ___ las ocho.', a: ['Serán'], o: ['Serán', 'Son', 'Sean'], nl: 'Ik weet niet hoe laat het is. Het zal zo\'n acht uur zijn.', tag: 'probability' },
+      { t: 'cloze', s: '¿Dónde ___ mis llaves?', h: 'estar', a: ['estarán'], nl: 'Waar zouden mijn sleutels zijn?', x: 'Een vermoeden over nu → futuro.', tag: 'probability' },
+      { t: 'cloze', s: 'Ese señor ___ unos sesenta años.', h: 'tener', a: ['tendrá'], nl: 'Die meneer is zo\'n jaar of zestig.', tag: 'probability' },
+      { t: 'cloze', s: 'No contesta. Se ___ dormido.', a: ['habrá'], o: ['habrá', 'ha', 'haya'], nl: 'Hij neemt niet op. Hij heeft zich zeker verslapen.', tag: 'probability' },
+      { t: 'cloze', s: 'Cuando llegamos a la fiesta, ___ las once.', h: 'ser', a: ['serían'], nl: 'Toen we op het feest aankwamen, was het zo\'n uur of elf.', x: 'Vermoeden over toen → condicional.', tag: 'probability' },
+      { t: 'cloze', s: 'A lo mejor ___ en la chamba todavía.', a: ['está'], o: ['está', 'esté', 'estuviera'], nl: 'Misschien is hij nog op het werk.', x: 'A lo mejor + indicativo.', tag: 'probability' },
+      { t: 'cloze', s: 'Quizás ___ enferma; no vino a clase.', h: 'estar', a: ['esté', 'está'], nl: 'Misschien is ze ziek; ze kwam niet naar de les.', tag: 'probability' },
+      { t: 'cloze', s: 'Debe ___ estar cansado después del viaje.', a: ['de'], o: ['de', 'que', 'a'], nl: 'Hij zal wel moe zijn na de reis.', x: 'Deber de + infinitief = vermoeden.', tag: 'probability' },
+      { t: 'mc', q: '«Serán las diez.» betekent:', o: ['Het zal zo\'n uur of tien zijn.', 'Het wordt straks tien uur.', 'Het is precies tien uur.'], tag: 'probability' },
+      { t: 'mc', q: '«Se habrá quedado sin batería.» betekent:', o: ['Zijn batterij zal wel leeg zijn.', 'Zijn batterij gaat straks leeg.', 'Zijn batterij was leeg geweest.'], tag: 'probability' },
+      { t: 'mc', q: 'Wat betekent «debe de estar en casa»?', o: ['Hij zal wel thuis zijn.', 'Hij moet thuisblijven.', 'Hij was thuis.'], tag: 'probability' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['A lo mejor viene mañana.', 'A lo mejor venga mañana.', 'A lo mejor vendría mañana.'], x: 'A lo mejor + indicativo.', tag: 'probability' },
+      { t: 'mc', q: 'Een «jato» in Lima is:', o: ['een huis', 'een busje', 'een vriend'], tag: 'vocab' },
+      { t: 'order', s: '¿Dónde estará Andrés a esta hora?', nl: 'Waar zou Andrés op dit uur zijn?', tag: 'probability' },
+      { t: 'tr', nl: 'Er zal wel file zijn.', a: ['Habrá tráfico.', 'Habrá mucho tráfico.', 'Seguramente hay tráfico.'], tag: 'probability' },
+      { t: 'tr', nl: 'Waar zou mijn telefoon zijn?', a: ['¿Dónde estará mi celular?', '¿Dónde estará mi teléfono?', '¿Dónde estará mi móvil?'], tag: 'probability' },
+      { t: 'match', p: [['al parecer', 'blijkbaar'], ['se supone que', 'het is de bedoeling dat'], ['a lo mejor', 'misschien'], ['al toque', 'meteen'], ['¡qué roche!', 'wat gênant!']], tag: 'vocab' }
+    ],
+    say: [['¿Dónde estará? No contesta el celular.', 'Waar zou hij zijn? Hij neemt zijn telefoon niet op.'], ['Serán las ocho, más o menos.', 'Het zal zo\'n acht uur zijn, ongeveer.'], ['Se habrá quedado dormido.', 'Hij heeft zich zeker verslapen.'], ['A lo mejor hay tráfico.', 'Misschien is er file.']],
+    task: { nl: 'Je vriend(in) is een uur te laat voor een afspraak en neemt niet op. Schrijf 6 tot 8 zinnen waarin je gist wat er aan de hand is. Gebruik de futuro van waarschijnlijkheid (minstens 2×), één keer habrá + participio, een vermoeden over gisteren met de condicional, en a lo mejor of quizás.', model: '¡Qué raro! Valeria no llega y ya son las nueve. ¿Dónde estará? A lo mejor está en el combi y no oye el celular. O se habrá quedado sin batería, porque nunca la carga. Ayer trabajó hasta muy tarde; serían las doce cuando salió de la oficina. Estará cansadísima. Quizás se haya dormido en el sofá. Le voy a mandar un mensaje y, si no contesta, voy a su jato.' },
+    scenario: { nl: 'Je wacht in Lima met een Peruaanse vriendin op iemand die niet komt opdagen. Samen bedenken jullie wat er gebeurd kan zijn.', role: 'Eres Lucía, una limeña de 26 años, alegre y un poco nerviosa. Estás organizando una fiesta sorpresa para tu amigo Andrés en tu casa de Miraflores, pero Andrés no llega y no contesta. Haces suposiciones con el futuro de probabilidad («¿Dónde estará?», «Habrá tráfico») y le preguntas al estudiante qué cree que pasó. Usas palabras peruanas como «pata», «jato», «al toque», «¡qué roche!» y «¿ya?», y las explicas si el estudiante no entiende.', goal: 'Geef minstens drie vermoedens met de futuro of habrá + participio, en één met a lo mejor.' },
+    reading: {
+      t: 'El misterio de las Líneas de Nasca', type: 'Populairwetenschappelijk artikel',
+      p: [
+        ['En el desierto del sur del Perú hay cientos de dibujos gigantes: un mono, un colibrí, una araña y muchas líneas rectas de varios kilómetros. Solo se ven bien desde el aire. Se supone que los hizo la cultura Nasca hace unos dos mil años.',
+          'In de woestijn in het zuiden van Peru liggen honderden reusachtige tekeningen: een aap, een kolibrie, een spin en veel rechte lijnen van een paar kilometer. Je ziet ze alleen goed vanuit de lucht. Naar verluidt maakte de Nasca-cultuur ze zo\'n tweeduizend jaar geleden.'],
+        ['Pero ¿para qué servirían? Durante años hubo teorías de todo tipo. Algunas personas decían que serían pistas para extraterrestres, algo que ningún científico serio cree. La matemática alemana María Reiche, que vivió cuarenta años en el desierto, pensaba que sería un enorme calendario astronómico.',
+          'Maar waar zouden ze voor gediend hebben? Jarenlang waren er allerlei theorieën. Sommige mensen zeiden dat het landingsbanen voor buitenaardsen zouden zijn, iets wat geen serieuze wetenschapper gelooft. De Duitse wiskundige María Reiche, die veertig jaar in de woestijn woonde, dacht dat het een enorme sterrenkalender zou zijn.'],
+        ['Hoy muchos arqueólogos creen que las líneas tendrían que ver con el agua, que en esa zona es escasa. A lo mejor eran caminos para ceremonias en las que la gente pedía lluvia. Al parecer, algunas líneas apuntan hacia lugares donde había agua subterránea.',
+          'Tegenwoordig denken veel archeologen dat de lijnen met water te maken zouden hebben, dat in dat gebied schaars is. Misschien waren het paden voor ceremonies waarbij mensen om regen vroegen. Blijkbaar wijzen sommige lijnen naar plekken waar grondwater was.'],
+        ['¿Tendrán razón? Quizás nunca lo sepamos con seguridad. Lo que sí sabemos es que en 2022 se descubrieron con drones e inteligencia artificial más de ciento sesenta figuras nuevas. Y seguramente habrá muchas más esperando bajo la arena.',
+          'Zouden ze gelijk hebben? Misschien weten we het nooit zeker. Wat we wel weten, is dat in 2022 met drones en kunstmatige intelligentie meer dan honderdzestig nieuwe figuren zijn ontdekt. En er liggen er vast nog veel meer onder het zand te wachten.']
+      ],
+      gl: [['el colibrí', 'de kolibrie'], ['la pista', 'de landingsbaan; het spoor'], ['escaso / escasa', 'schaars'], ['subterráneo / subterránea', 'ondergronds'], ['la arena', 'het zand']],
+      q: [
+        { t: 'mc', q: '¿Desde dónde se ven bien las líneas?', o: ['Desde el aire', 'Desde la carretera', 'Desde el mar'] },
+        { t: 'mc', q: '¿Qué pensaba María Reiche?', o: ['Que serían un calendario astronómico', 'Que serían pistas para extraterrestres', 'Que serían caminos comerciales'] },
+        { t: 'mc', q: '¿Con qué tendrían que ver las líneas, según muchos arqueólogos?', o: ['Con el agua', 'Con la guerra', 'Con el comercio de oro'] },
+        { t: 'mc', q: '¿Qué pasó en 2022?', o: ['Se descubrieron más de 160 figuras nuevas', 'Se destruyeron algunas líneas', 'Se probó la teoría de María Reiche'] }
+      ]
+    }
+  });
+
+  /* ───────────────────────── B2 · 10 ───────────────────────── */
+  U({
+    id: 'b2-10', level: 'B2', icon: '🐢', title: 'La isla en la que…', nl: 'Betrekkelijke voornaamwoorden: el que, el cual, lo cual, quien en cuyo',
+    goals: ['Na een voorzetsel het juiste betrekkelijk voornaamwoord kiezen (la isla en la que…, el guía con quien…)', 'Lo que en lo cual gebruiken om naar een hele zin te verwijzen', 'Bezit uitdrukken met cuyo / cuya / cuyos / cuyas'],
+    vocab: [
+      ['el que / la que', 'die, dat (na een voorzetsel)'], ['el cual / la cual', 'die, dat (formeler)'], ['lo que', 'wat (naar een hele zin)'], ['lo cual', 'wat (formeler, naar een hele zin)'],
+      ['quien / quienes', 'die (voor personen)'], ['cuyo / cuya', 'wiens, wier, waarvan'], ['la isla', 'het eiland'], ['el archipiélago', 'de archipel, eilandengroep'],
+      ['la tortuga gigante', 'de reuzenschildpad'], ['la iguana marina', 'de zeeleguaan'], ['el piquero de patas azules', 'de blauwvoetgent'], ['el lobo marino', 'de zeeleeuw'],
+      ['la especie', 'de soort'], ['en peligro de extinción', 'met uitsterven bedreigd'], ['el parque nacional', 'het nationaal park'], ['el guardaparques', 'de parkwachter', 'LatAm'],
+      ['la evolución', 'de evolutie'], ['el volcán', 'de vulkaan'], ['hacer esnórquel', 'snorkelen'], ['el muelle', 'de pier, steiger'], ['la lancha', 'de motorboot'],
+      ['proteger', 'beschermen'], ['la basura plástica', 'het plastic afval'], ['el voluntariado', 'het vrijwilligerswerk'], ['ñaño / ñaña', 'broer / zus; ook: maat', 'EC (informeel)'],
+      ['¡chuta!', 'jeetje!, verdorie!', 'EC (informeel)'], ['¡achachay!', 'brr, wat koud!', 'EC (uit het Kichwa)'], ['¡arrarray!', 'au, wat heet!', 'EC (uit het Kichwa)'],
+      ['de ley', 'zeker, absoluut', 'EC (informeel)'], ['chévere', 'tof, gaaf', 'EC · CO · VE'], ['¿mande?', 'wat zegt u?, pardon?', 'EC · MX']
+    ],
+    grammar: [
+      { t: 'Voorzetsel + el que / la que', es: 'Preposición + artículo + que',
+        html: `<p>Na een <b>voorzetsel</b> (en, con, de, para, por, a…) zeg je in het Spaans meestal niet alleen <i>que</i>, maar <b>lidwoord + que</b>. Het lidwoord past zich aan het woord aan waar je naar verwijst:</p>
+<p>📌 <i>la isla <b>en la que</b> vivo</i> (het eiland waarop ik woon) · <i>el barco <b>con el que</b> llegamos</i> (de boot waarmee we aankwamen) · <i>las playas <b>de las que</b> te hablé</i> (de stranden waarover ik je vertelde) · <i>los turistas <b>para los que</b> trabajo</i>.</p>
+<p>📌 In het Nederlands staat het voorzetsel vaak achteraan (<i>waar ik <b>op</b> woon</i>). In het Spaans <b>nooit</b>: het staat altijd vóór het betrekkelijk voornaamwoord.</p>
+<p>📌 Bij <b>personen</b> kan ook <b>quien / quienes</b>: <i>el guía <b>con quien</b> hablé</i> = <i>el guía <b>con el que</b> hablé</i>.</p>`,
+        table: [['', 'enkelvoud', 'meervoud'], ['mannelijk', 'el que / el cual', 'los que / los cuales'], ['vrouwelijk', 'la que / la cual', 'las que / las cuales'], ['personen', 'quien', 'quienes'], ['hele zin', 'lo que / lo cual', '—']],
+        ex: [['Esta es la isla en la que viven las tortugas gigantes.', 'Dit is het eiland waarop de reuzenschildpadden leven.'], ['La guía con quien hicimos el tour es de Quito.', 'De gids met wie we de tour deden komt uit Quito.']],
+        sum: 'Preposición + el/la/los/las + que (o + quien para personas): la isla en la que vivo, el guía con quien hablé.' },
+      { t: 'El cual en lo cual', es: 'El cual · Lo que · Lo cual',
+        html: `<p>📌 <b>El cual / la cual / los cuales / las cuales</b> betekent hetzelfde als <i>el que</i>, maar klinkt <b>formeler</b>. Je ziet het vooral in teksten en na langere voorzetsels: <i>el volcán <b>desde el cual</b> se ve todo el archipiélago</i>, <i>la razón <b>por la cual</b> vine</i>.</p>
+<p>📌 Wil je naar een <b>hele zin</b> verwijzen, dan gebruik je <b>lo que</b> of <b>lo cual</b> (onzijdig): <i>No había basura en la playa, <b>lo cual</b> me sorprendió.</i> (…wat me verbaasde.)</p>
+<p>📌 <b>Lo que</b> zonder woord ervoor = «wat», «datgene wat»: <i><b>Lo que</b> más me gustó fue hacer esnórquel.</i> Hier kun je <i>lo cual</i> <b>niet</b> gebruiken.</p>`,
+        table: [['', 'voorbeeld', 'betekenis'], ['na een zin', '…, lo que / lo cual me encantó.', '…, wat ik geweldig vond.'], ['aan het begin', 'Lo que más me gustó…', 'Wat ik het leukst vond…'], ['formeel', 'la razón por la cual…', 'de reden waarom…']],
+        ex: [['El guardaparques nos dejó nadar con lobos marinos, lo cual fue increíble.', 'De parkwachter liet ons met zeeleeuwen zwemmen, wat ongelooflijk was.'], ['Lo que más me impresionó fue el tamaño de las tortugas.', 'Wat de meeste indruk op me maakte, was de grootte van de schildpadden.']],
+        sum: 'El cual = el que (más formal). Lo que / lo cual remiten a toda una frase; al inicio solo «lo que».' },
+      { t: 'Cuyo: wiens, waarvan', es: 'El relativo «cuyo»',
+        html: `<p><b>Cuyo</b> drukt <b>bezit</b> uit (wiens, wier, waarvan). Het past zich aan het <b>bezeten ding</b> aan, niet aan de bezitter:</p>
+<p>📌 <i>el pájaro <b>cuyas</b> patas son azules</i> (de vogel <b>wiens</b> poten blauw zijn) → <i>cuyas</i> omdat <i>patas</i> vrouwelijk meervoud is.</p>
+<p>📌 <i>la científica <b>cuyo</b> libro leí</i> (de wetenschapster <b>van wie</b> ik het boek las) → <i>cuyo</i> omdat <i>libro</i> mannelijk is.</p>
+<p>📌 <i>Cuyo</i> is vrij formeel. In gesprekken hoor je vaker een omschrijving: <i>el pájaro que tiene las patas azules</i>.</p>`,
+        table: [['bezeten ding', 'vorm', 'voorbeeld'], ['mannelijk enkelvoud', 'cuyo', 'la isla cuyo volcán…'], ['vrouwelijk enkelvoud', 'cuya', 'el pueblo cuya playa…'], ['mannelijk meervoud', 'cuyos', 'la tortuga cuyos huevos…'], ['vrouwelijk meervoud', 'cuyas', 'el ave cuyas patas…']],
+        ex: [['Darwin, cuyas ideas cambiaron la ciencia, visitó las islas en 1835.', 'Darwin, wiens ideeën de wetenschap veranderden, bezocht de eilanden in 1835.'], ['Es una especie cuyo hábitat está en peligro.', 'Het is een soort waarvan de leefomgeving in gevaar is.']],
+        sum: 'Cuyo/a/os/as = posesión; concuerda con lo poseído: el ave cuyas patas son azules.' }
+    ],
+    verbs: ['vivir', 'hablar', 'llegar', 'ver', 'ser', 'estar', 'tener', 'nadar', 'proteger', 'visitar', 'decir', 'hacer'], tenses: ['pret', 'imp'],
+    dialogue: {
+      t: 'Un día en Santa Cruz', place: 'Galápagos 🇪🇨',
+      lines: [
+        ['Daniela', '¡Bienvenido a Santa Cruz, Mark! Esta es la isla en la que trabajo como voluntaria desde hace un año.', 'Welkom op Santa Cruz, Mark! Dit is het eiland waarop ik al een jaar als vrijwilligster werk.'],
+        ['Mark', '¡Chuta, qué calor! Pensé que en Ecuador haría más frío.', 'Jeetje, wat warm! Ik dacht dat het in Ecuador kouder zou zijn.'],
+        ['Daniela', 'Jaja, eso es en Quito, donde siempre decimos «¡achachay!». Aquí, en cambio, es «¡arrarray!». Mira, ese es el centro en el que cuidamos a las tortugas gigantes.', 'Haha, dat is in Quito, waar we altijd «brr!» zeggen. Hier is het juist «au, heet!». Kijk, dat is het centrum waar we voor de reuzenschildpadden zorgen.'],
+        ['Mark', '¿Esa tortuga enorme es la famosa de la que me hablaste?', 'Is die enorme schildpad de beroemde waarover je me vertelde?'],
+        ['Daniela', 'No, esa murió en 2012. Aquí también vivió Diego, un macho cuyos hijos ayudaron a salvar su especie. En 2020 volvió a su isla, Española, con más de cien años.', 'Nee, die is in 2012 gestorven. Hier woonde ook Diego, een mannetje wiens jongen hielpen zijn soort te redden. In 2020 ging hij terug naar zijn eiland, Española, toen hij al meer dan honderd was.'],
+        ['Mark', 'Increíble. ¿Y la guía con quien vamos a bucear mañana también es voluntaria?', 'Ongelooflijk. En de gids met wie we morgen gaan duiken, is die ook vrijwilligster?'],
+        ['Daniela', 'No, es guardaparques. Es mi ñaña, de hecho. Mañana vamos a una bahía en la cual nadan lobos marinos y tiburones pequeños.', 'Nee, ze is parkwachter. Ze is eigenlijk mijn zus. Morgen gaan we naar een baai waarin zeeleeuwen en kleine haaien zwemmen.'],
+        ['Mark', '¿Tiburones? Lo que me estás diciendo me da un poco de miedo.', 'Haaien? Wat je me nu vertelt, maakt me een beetje bang.'],
+        ['Daniela', 'Tranquilo, no hacen nada. Lo que sí me preocupa es la basura plástica que llega del mar, lo cual es un problema serio.', 'Rustig, ze doen niets. Waar ik me wel zorgen over maak, is het plastic afval dat uit zee aanspoelt, wat een serieus probleem is.'],
+        ['Mark', 'Entonces mañana, después de bucear, te ayudo a limpiar la playa. ¡De ley!', 'Dan help ik je morgen na het duiken het strand op te ruimen. Zeker weten!']
+      ],
+      q: [
+        { t: 'mc', q: '¿Qué hace Daniela en Santa Cruz?', o: ['Trabaja como voluntaria con tortugas gigantes', 'Es guardaparques', 'Vende excursiones de buceo'] },
+        { t: 'mc', q: '¿Quién es la guía con quien van a bucear?', o: ['La hermana de Daniela', 'Una amiga de Quito', 'Una turista argentina'] },
+        { t: 'mc', q: '¿Qué le preocupa a Daniela?', o: ['La basura plástica que llega del mar', 'Los tiburones', 'El calor'] }
+      ]
+    },
+    culture: { t: 'De Galápagos en het Spaans van Ecuador', html: `<p>🐢 De <b>Galápagos</b> liggen 1.000 km uit de kust van Ecuador. Veel dieren komen nergens anders voor: reuzenschildpadden, zeeleguanen en de <i>piquero de patas azules</i>. Charles Darwin kwam er in 1835 en zijn ideeën over evolutie zijn mede hier ontstaan. Bijna het hele gebied is nationaal park; je bezoekt veel plekken alleen met een gids.</p>
+<p>🐢 De schildpad <b>Diego</b> uit de dialoog bestaat echt: hij was met honderden jongen een van de redders van zijn soort en ging in 2020 met «pensioen» naar zijn eigen eiland Española.</p>
+<p>🗣️ In Ecuador hoor je veel woorden uit het <b>Kichwa</b>: <i>¡achachay!</i> (wat koud!), <i>¡arrarray!</i> (wat heet!) en <i>ñaño/ñaña</i> (broer/zus). Ecuadorianen zeggen beleefd <i>¿mande?</i> als ze iets niet verstaan, en <i>de ley</i> betekent «zeker».</p>` },
+    ex: [
+      { t: 'cloze', s: 'Esta es la isla en ___ que viven las tortugas.', a: ['la'], o: ['la', 'el', 'lo'], nl: 'Dit is het eiland waarop de schildpadden leven.', tag: 'relative-adv' },
+      { t: 'cloze', s: 'El barco con ___ que llegamos era muy pequeño.', a: ['el'], o: ['el', 'la', 'lo'], nl: 'De boot waarmee we aankwamen was heel klein.', tag: 'relative-adv' },
+      { t: 'cloze', s: 'Las playas de ___ que te hablé están en Isabela.', a: ['las'], o: ['las', 'los', 'lo'], nl: 'De stranden waarover ik je vertelde liggen op Isabela.', tag: 'relative-adv' },
+      { t: 'cloze', s: 'La guía con ___ hicimos el tour es de Quito.', a: ['quien', 'la que', 'la cual'], o: ['quien', 'que', 'cual'], nl: 'De gids met wie we de tour deden komt uit Quito.', tag: 'relative-adv' },
+      { t: 'cloze', s: 'No había basura en la playa, lo ___ me sorprendió.', a: ['cual', 'que'], o: ['cual', 'cuyo', 'quien'], nl: 'Er lag geen afval op het strand, wat me verbaasde.', tag: 'relative-adv' },
+      { t: 'cloze', s: '___ más me gustó fue nadar con los lobos marinos.', a: ['Lo que'], o: ['Lo que', 'Lo cual', 'El que'], nl: 'Wat ik het leukst vond, was zwemmen met de zeeleeuwen.', x: 'Aan het begin van de zin alleen «lo que».', tag: 'relative-adv' },
+      { t: 'cloze', s: 'Es un pájaro ___ patas son azules.', a: ['cuyas'], o: ['cuyas', 'cuyo', 'cuyos'], nl: 'Het is een vogel waarvan de poten blauw zijn.', x: 'Cuyo past zich aan «patas» aan (vrouwelijk meervoud).', tag: 'relative-adv' },
+      { t: 'cloze', s: 'Darwin, ___ libro leí en la universidad, visitó estas islas.', a: ['cuyo'], o: ['cuyo', 'cuya', 'quien'], nl: 'Darwin, van wie ik het boek op de universiteit las, bezocht deze eilanden.', tag: 'relative-adv' },
+      { t: 'cloze', s: 'Esa es la razón por ___ cual vine a Ecuador.', a: ['la'], o: ['la', 'el', 'lo'], nl: 'Dat is de reden waarom ik naar Ecuador kwam.', tag: 'relative-adv' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['Es el amigo con quien viajé.', 'Es el amigo quien viajé con.', 'Es el amigo que viajé con.'], x: 'Het voorzetsel staat in het Spaans altijd vóór het betrekkelijk voornaamwoord.', tag: 'relative-adv' },
+      { t: 'mc', q: '«la tortuga cuyos huevos protegemos» betekent:', o: ['de schildpad waarvan we de eieren beschermen', 'de schildpad die onze eieren beschermt', 'de schildpad die we beschermen'], tag: 'relative-adv' },
+      { t: 'mc', q: 'Wat zegt een Ecuadoriaan als het heel koud is?', o: ['¡Achachay!', '¡Arrarray!', '¡De ley!'], tag: 'vocab' },
+      { t: 'mc', q: 'Wat betekent «ñaña» in Ecuador?', o: ['zus', 'oma', 'buurvrouw'], tag: 'vocab' },
+      { t: 'order', s: 'Esta es la isla en la que trabajo.', nl: 'Dit is het eiland waarop ik werk.', tag: 'relative-adv' },
+      { t: 'tr', nl: 'Wat ik het leukst vond, was snorkelen.', a: ['Lo que más me gustó fue hacer esnórquel.', 'Lo que más me gustó fue el esnórquel.', 'Lo que más me gustó fue hacer snorkel.', 'Lo que más me gustó fue bucear.'], tag: 'relative-adv' },
+      { t: 'tr', nl: 'De gids met wie ik sprak is parkwachter.', a: ['La guía con quien hablé es guardaparques.', 'La guía con la que hablé es guardaparques.', 'El guía con quien hablé es guardaparques.', 'El guía con el que hablé es guardaparques.', 'La guía con la cual hablé es guardaparques.', 'El guía con el cual hablé es guardaparques.'], tag: 'relative-adv' },
+      { t: 'match', p: [['en la que', 'waarin, waarop'], ['con quien', 'met wie'], ['lo cual', 'wat (naar een hele zin)'], ['cuyo', 'wiens, waarvan'], ['¡chuta!', 'jeetje!']], tag: 'vocab' }
+    ],
+    say: [['Esta es la isla en la que trabajo.', 'Dit is het eiland waarop ik werk.'], ['Lo que más me gustó fue nadar con los lobos marinos.', 'Wat ik het leukst vond, was zwemmen met de zeeleeuwen.'], ['Es un pájaro cuyas patas son azules.', 'Het is een vogel waarvan de poten blauw zijn.'], ['No había basura, lo cual me sorprendió.', 'Er lag geen afval, wat me verbaasde.']],
+    task: { nl: 'Beschrijf in 6 tot 8 zinnen een bijzondere plek die je bezocht hebt (of graag wilt bezoeken). Gebruik minstens twee keer voorzetsel + el/la que of quien, één keer lo que of lo cual, en één keer cuyo/cuya.', model: 'El lugar del que más me acuerdo es el lago de Atitlán, en Guatemala. Es un lago enorme cuyas orillas están rodeadas de volcanes. Me quedé en un pueblo pequeño en el que no había carros, lo cual me encantó. La señora con quien me alojé me enseñó a hacer tortillas. Lo que más me impresionó fue el silencio por la mañana. Es un sitio al que quiero volver de ley.' },
+    scenario: { nl: 'Je bent op de Galápagos en krijgt een rondleiding van een Ecuadoriaanse vrijwilligster. Stel vragen over de dieren en de eilanden.', role: 'Eres Daniela, una quiteña de 27 años que trabaja como voluntaria en un centro de tortugas gigantes en la isla Santa Cruz (Galápagos). Eres simpática, apasionada por la naturaleza y explicas todo con detalle. Usas mucho oraciones de relativo («la isla en la que…», «el guardaparques con quien…», «una especie cuyo hábitat…», «lo cual…»). Usas palabras ecuatorianas como «chuta», «ñaño/ñaña», «achachay», «arrarray», «de ley» y «¿mande?», y las explicas si el estudiante no las entiende.', goal: 'Stel drie vragen over de dieren en gebruik zelf minstens twee keer voorzetsel + el/la que of quien.' },
+    reading: {
+      t: 'Las islas que cambiaron la ciencia', type: 'Reisgids',
+      p: [
+        ['Las Galápagos son un archipiélago volcánico cuyas islas aparecieron en medio del océano Pacífico hace millones de años. Los animales que llegaron a ellas lo hicieron flotando sobre troncos, volando o nadando, lo cual explica por qué no hay casi mamíferos grandes.',
+          'De Galápagos zijn een vulkanische archipel waarvan de eilanden miljoenen jaren geleden midden in de Grote Oceaan verschenen. De dieren die er kwamen, deden dat drijvend op boomstammen, vliegend of zwemmend, wat verklaart waarom er bijna geen grote zoogdieren zijn.'],
+        ['En 1835 llegó el barco en el que viajaba un joven naturalista inglés llamado Charles Darwin. Lo que más le llamó la atención fueron los pinzones, unos pájaros pequeños cuyos picos eran diferentes en cada isla. Años después, esas observaciones lo ayudaron a desarrollar su teoría de la evolución.',
+          'In 1835 kwam het schip aan waarop een jonge Engelse natuurkenner reisde die Charles Darwin heette. Wat hem het meest opviel, waren de vinken, kleine vogels waarvan de snavels op elk eiland anders waren. Jaren later hielpen die waarnemingen hem zijn evolutietheorie te ontwikkelen.'],
+        ['Hoy el 97 % del territorio es parque nacional. Los visitantes, cuyo número ha crecido mucho, deben ir con guías autorizados, con quienes recorren senderos marcados. No se puede tocar a los animales ni darles comida, algo que muchos turistas no saben.',
+          'Tegenwoordig is 97 % van het gebied nationaal park. De bezoekers, van wie het aantal sterk gegroeid is, moeten met erkende gidsen gaan, met wie ze gemarkeerde paden volgen. Je mag de dieren niet aanraken of voeren, iets wat veel toeristen niet weten.'],
+        ['El mayor peligro actual son las especies invasoras, como las cabras y las ratas, y la basura plástica que trae el mar. Por eso existen programas de voluntariado en los que cualquiera puede participar, lo cual es una buena forma de conocer las islas y, al mismo tiempo, protegerlas.',
+          'Het grootste gevaar nu zijn invasieve soorten, zoals geiten en ratten, en het plastic afval dat de zee aanvoert. Daarom bestaan er vrijwilligersprogramma\'s waaraan iedereen kan meedoen, wat een goede manier is om de eilanden te leren kennen en ze tegelijk te beschermen.']
+      ],
+      gl: [['flotar', 'drijven'], ['el tronco', 'de boomstam'], ['el pinzón', 'de vink'], ['el pico', 'de snavel'], ['la especie invasora', 'de invasieve (uitheemse) soort']],
+      q: [
+        { t: 'mc', q: '¿Por qué casi no hay mamíferos grandes en las Galápagos?', o: ['Porque los animales tuvieron que llegar flotando, volando o nadando', 'Porque hace demasiado calor', 'Porque los cazaron los turistas'] },
+        { t: 'mc', q: '¿Qué le llamó más la atención a Darwin?', o: ['Los pinzones, cuyos picos eran diferentes en cada isla', 'Las tortugas gigantes', 'Los volcanes'] },
+        { t: 'mc', q: '¿Qué está prohibido para los visitantes?', o: ['Tocar a los animales o darles comida', 'Ir con guías', 'Caminar por los senderos'] },
+        { t: 'mc', q: '¿Cuál es el mayor peligro actual según el texto?', o: ['Las especies invasoras y la basura plástica', 'Los volcanes activos', 'Los tiburones'] }
+      ]
+    }
+  });
 })(window.SPT);
