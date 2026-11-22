@@ -995,6 +995,26 @@ await micTests();
   P3.Profiles.get('main').course = 'nl-es';
   ok(P3.Profiles.removeCourse('main', 'nl-es') && !('spt.p.main.nl-es' in mem) && P3.Profiles.get('main').courses.join() === 'es-nl' && P3.Profiles.get('main').course === 'es-nl' && mem['spt.v1'] === old, 'cursus weg: extra cursus weg, terug naar de hoofdcursus, Spaanse voortgang onaangeroerd');
   ok(!P3.Profiles.canRemoveCourse('main', 'es-nl') && !P3.Profiles.removeCourse('main', 'nl-es'), 'cursus weg: een profiel houdt altijd minstens één cursus');
+  { // AI-sleutel hoort bij het profiel: bij wisselen van cursus/taal blijft hij, oude sleutel gaat vanzelf mee over
+    ok(!('spt.aikey' in mem) || mem['spt.aikey'] === 'sk-geheim', 'AI-sleutel: vooraf alleen in spt.v1 (of al overgezet)');
+    delete mem['spt.aikey'];
+    const PA = mk(); PA.Store.load();
+    ok(PA.Store.state.settings.aiKey === 'sk-geheim' && mem['spt.aikey'] === 'sk-geheim' && mem['spt.v1'] === old, 'AI-sleutel: bestaande sleutel uit de Spaanse cursus naar het profiel, spt.v1 onaangeroerd');
+    PA.Profiles.addCourse('main', 'en-nl'); PA.Profiles.get('main').course = 'en-nl'; PA.Profiles.write();
+    const PB = mk(); PB.Store.load();
+    ok(PB.course.id === 'en-nl' && PB.Store.state.settings.aiKey === 'sk-geheim', 'AI-sleutel: werkt ook in een andere cursus (Engels)');
+    PB.Store.save();
+    ok(!mem['spt.p.main.en-nl'].includes('sk-geheim'), 'AI-sleutel: staat niet in het cursusbestand');
+    PB.Store.state.settings.aiKey = 'sk-nieuw'; PB.Store.save();
+    ok(mem['spt.aikey'] === 'sk-nieuw' && !mem['spt.v1'].includes('sk-geheim'), 'AI-sleutel: nieuwe sleutel geldt voor het profiel, oude kopie weg');
+    PA.Profiles.get('main').course = 'es-nl'; PA.Profiles.write();
+    const PC = mk(); PC.Store.load();
+    ok(PC.Store.state.settings.aiKey === 'sk-nieuw', 'AI-sleutel: terug in Spaans dezelfde nieuwe sleutel');
+    PC.Store.state.settings.aiKey = ''; PC.Store.save();
+    const PD = mk(); PD.Store.load();
+    ok(PD.Store.state.settings.aiKey === '' && mem['spt.aikey'] === '', 'AI-sleutel: verwijderen blijft verwijderd (komt niet terug uit oude kopie)');
+    PD.Profiles.removeCourse('main', 'en-nl');
+  }
   ok(P3.Sync.courseFile('espanol-latino-voortgang.json', 'nl-es') === 'espanol-latino-voortgang--nl-es.json' && P3.Sync.courseFile('espanol-latino-voortgang--en-es.json', 'nl-es') === 'espanol-latino-voortgang--nl-es.json', 'cursus weg: juist gist-bestand per cursus');
   { // alleen het cursusbestand gaat uit de gist, het hoofdbestand blijft
     const calls = [];
