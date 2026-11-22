@@ -12,6 +12,42 @@
     [/Latijns-Amerikaans(?:e)? Spaans/g, N], [/Spaans \(Mexico\)/g, N + ' (VS)'], [/\bSpaanse\b/g, N + 'e'], [/\bSpaans\b/g, N], [/🇪🇸/g, course.flag]
   ] : null;
   const sub = s => { let r = s; for (const [re, v] of SUBS) r = r.replace(re, v); return r; };
+
+  /* Namen met een Spaanse «smaak»: de tabbladen (Hoy, Ruta…), de woordspellen (Sopa de letras…) en uitroepen.
+     In de Spaanse cursus zijn ze Spaans, in elke andere cursus komen ze in de doeltaal (Engels leren = Engelse namen).
+     Een nieuwe doeltaal krijgt hier een eigen lijst; zonder lijst valt een cursus met Nederlandse uitleg terug op Nederlands. */
+  const FLAVORS = {
+    en: {
+      'Hoy': 'Today', 'Ruta': 'Path', 'Práctica': 'Practice', 'Docente': 'Teacher', 'Perfil': 'Profile',
+      'Tu ruta': 'Your path', 'Juegos de palabras': 'Word games',
+      'Sopa de letras': 'Word search', 'Crucigrama': 'Crossword', 'Revoltijo': 'Word scramble', 'El volcán': 'The volcano', 'Parejas': 'Pairs',
+      '¡Perfecto!': 'Perfect!', '¡Muy bien!': 'Very good!', '¡Sigue así!': 'Keep it up!', '¡Excelente!': 'Excellent!', '¡Buen trabajo!': 'Good job!'
+    },
+    nl: {
+      'Hoy': 'Vandaag', 'Ruta': 'Route', 'Práctica': 'Oefenen', 'Docente': 'Docent', 'Perfil': 'Profiel',
+      'Tu ruta': 'Jouw route', 'Juegos de palabras': 'Woordspellen',
+      'Sopa de letras': 'Woordzoeker', 'Crucigrama': 'Kruiswoord', 'Revoltijo': 'Letterhusselaar', 'El volcán': 'De vulkaan', 'Parejas': 'Memory',
+      '¡Perfecto!': 'Perfect!', '¡Muy bien!': 'Heel goed!', '¡Sigue así!': 'Ga zo door!', '¡Excelente!': 'Uitstekend!', '¡Buen trabajo!': 'Goed gedaan!'
+    }
+  };
+  const FLAV = course.target === 'es' ? null : FLAVORS[course.target] || (course.ui === 'nl' ? FLAVORS.nl : null);
+  const TABS = ['Hoy', 'Ruta', 'Práctica', 'Docente', 'Perfil'];
+  /* Eén naam in de doeltaal: S.tl('Práctica') = 'Practice' in de Engelse cursus, 'Práctica' in de Spaanse. */
+  // Alleen via S.tl (niet op het scherm vervangen, want in een cursus met Spaanse uitleg is «Gramática» gewoon het woord).
+  const TL_ONLY = { en: { 'Gramática': 'Grammar' }, nl: { 'Gramática': 'Grammatica' } }[course.target] || (FLAV ? { 'Gramática': 'Grammatica' } : {});
+  const tl = s => (FLAV && s != null && (FLAV[s] || TL_ONLY[s])) || s;
+  // Hele tekst = één naam, eventueel met een pijltje of emoji ervoor («← Práctica», «🔎 Sopa de letras»).
+  function flavWhole(core) {
+    if (!FLAV) return null;
+    if (FLAV[core]) return FLAV[core];
+    const m = /^([^A-Za-zÀ-ÿ¡¿]+)(.+)$/.exec(core);
+    return m && FLAV[m[2]] ? m[1] + FLAV[m[2]] : null;
+  }
+  // Tabnamen midden in een zin. Nederlandse uitleg: elke tabnaam als heel woord («op Hoy», «(Perfil)»).
+  // Spaanse uitleg: alleen waar duidelijk het tabblad bedoeld is («en Hoy», «A Hoy», «(Perfil)»), want «Hoy» is daar ook gewoon «vandaag».
+  const TAB_RE = FLAV && (course.ui === 'nl' ? new RegExp('(^|[^A-Za-zÀ-ÿ])(' + TABS.join('|') + ')(?![A-Za-zÀ-ÿ])', 'g')
+    : new RegExp('((?:^|\\s)(?:en|En|a|A) |\\(|← )(' + TABS.join('|') + ')(?![A-Za-zÀ-ÿ])', 'g'));
+  const flavTabs = s => (TAB_RE ? s.replace(TAB_RE, (x, pre, w) => pre + FLAV[w]) : s);
   const LANG = course.name.es;
   const dict = Object.create(null), pats = [];
   const fill = v => String(v).replace(/\{L\}/g, LANG);
@@ -30,9 +66,12 @@
   }
   /* Eén tekst vertalen; spaties aan begin en eind blijven staan. Onbekend = ongewijzigd. */
   function t(text) {
-    if (SUBS && text != null) return /Spaans|🇪🇸/.test(text) ? sub(String(text)) : text;
-    if (!on || text == null) return text;
+    if (text == null) return text;
     const s = String(text), m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s), core = m[2];
+    const fw = core && flavWhole(core);
+    if (fw) return m[1] + fw + m[3];
+    if (SUBS) return flavTabs(/Spaans|🇪🇸/.test(s) ? sub(s) : s);
+    if (!on) return text;
     if (!core || !/[a-zA-Zë]/.test(core)) return s;
     let r = dict[core.replace(/\s+/g, ' ')];
     if (r == null) {
@@ -44,7 +83,7 @@
         break;
       }
     }
-    return r == null ? s : m[1] + r + m[3];
+    return r == null ? s : flavTabs(m[1] + r + m[3]);
   }
 
   const SKIP = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'CODE']);
@@ -55,14 +94,21 @@
     if (el.closest('.prose, .gtable')) return true; // uitleg en tabellen uit de lesstof zijn al in het Spaans
     const c = el.closest('[lang]'); return !!(c && c !== document.documentElement);
   };
+  // Wat we zelf al vertaald hebben, niet nog eens vertalen: in de cursus Nederlands wordt «Hoy» → «Vandaag», en «Vandaag» is ook een Nederlandse schermtekst (→ «Hoy»).
+  const mine = new WeakMap();
   function doText(n) {
     const p = n.parentElement; if (!p || SKIP.has(p.tagName) || isContent(p) || p.closest('[data-notr]')) return;
-    const v = n.nodeValue, r = t(v); if (r !== v) n.nodeValue = r;
+    const v = n.nodeValue; if (mine.get(n) === v) return;
+    const r = t(v); if (r !== v) { n.nodeValue = r; mine.set(n, r); }
   }
   function doEl(el) {
     if (course.target !== 'es' && el.getAttribute('lang') === 'es') el.setAttribute('lang', course.target);
     if (el.closest('[data-notr]')) return;
-    for (const a of ATTRS) { const v = el.getAttribute(a); if (v) { const r = t(v); if (r !== v) el.setAttribute(a, r); } }
+    for (const a of ATTRS) {
+      const v = el.getAttribute(a); if (!v) continue;
+      const m = mine.get(el); if (m && m[a] === v) continue;
+      const r = t(v); if (r !== v) { el.setAttribute(a, r); mine.set(el, Object.assign(m || {}, { [a]: r })); }
+    }
   }
   function walk(root) {
     if (root.nodeType === 3) return doText(root);
@@ -73,7 +119,7 @@
     for (let n = w.nextNode(); n; n = w.nextNode()) doText(n);
   }
   function start() {
-    if (!(on || SUBS) || typeof MutationObserver !== 'function') return;
+    if (!(on || SUBS || FLAV) || typeof MutationObserver !== 'function') return;
     document.documentElement.lang = on ? 'es' : 'nl';
     walk(document.body);
     new MutationObserver(list => {
@@ -87,6 +133,8 @@
 
   S.i18n = { on, sub: !!SUBS, add, t, start, dict, pats, LOC: on ? 'es-PA' : 'nl-NL' };
   S.t = t;
+  S.tl = tl;
+  S.i18n.flavor = FLAV;
   // meervouden die de code zelf samenstelt (U.plural) gaan ook door de vertaling
   if (on && S.U) { const plural = S.U.plural; S.U.plural = (n, one, many) => plural(n, t(one), t(many)); }
 })(window.SPT);

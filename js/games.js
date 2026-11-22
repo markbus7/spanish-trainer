@@ -244,7 +244,7 @@
     if (score >= 0.8 && n) { S.Sound.win(); S.confetti(); }
     g.body.append(h('div', { class: 'gm-result' },
       (n && S.Tutor.hero(S.Tutor.lines.game(score), score >= 0.95 ? '🏆' : score >= 0.7 ? '🎉' : '💪')) || h('div', { class: 'gm-result-emoji' }, score >= 0.95 ? '🏆' : score >= 0.7 ? '🎉' : '💪'),
-      h('h2', null, title || (score >= 0.95 ? '¡Perfecto!' : score >= 0.7 ? '¡Muy bien!' : '¡Sigue así!')),
+      h('h2', null, title || S.tl(score >= 0.95 ? '¡Perfecto!' : score >= 0.7 ? '¡Muy bien!' : '¡Sigue así!')),
       h('p', { class: 'muted' }, (typeof text === 'function' ? text() : text) || (good + ' van ' + n + ' woorden in één keer goed · +' + g.xp + ' XP')),
       h('div', { class: 'gm-words' }, list.map(({ w, ok }) => h('div', { class: 'gm-wrow ' + (ok ? 'ok' : 'no') },
         h('span', { class: 'gm-wmark' }, ok ? '✓' : '✗'),
@@ -660,7 +660,7 @@
     wrap.append(h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, 'Kies een spel'), h('div', { class: 'gm-cards' },
       GAMES.map(gm => h('button', { class: 'gm-card', type: 'button', onclick: () => start(gm.id, src) },
         h('span', { class: 'gm-icon' }, S.Icons ? S.Icons.el(gm.id) : gm.icon),
-        h('div', { class: 'grow' }, h('b', null, gm.es), h('small', { class: 'gm-nl' }, gm.nl + ' · ±' + gm.min + ' min'), h('span', { class: 'gm-desc' }, gm.desc)),
+        h('div', { class: 'grow' }, h('b', null, S.tl(gm.es)), h('small', { class: 'gm-nl' }, gm.nl + ' · ±' + gm.min + ' min'), h('span', { class: 'gm-desc' }, gm.desc)),
         h('span', { class: 'gm-go', 'aria-hidden': 'true' }, '›'))))));
     return wrap;
   }

@@ -6,9 +6,15 @@
 
   // Engels voor Nederlanders: lof en instructies in het Engels (de doeltaal); anders in het Spaans.
   const EN = S.course.target === 'en' && S.course.ui === 'nl';
-  const PRAISE = EN ? ['Well done!', 'Excellent!', 'Spot on!', 'Perfect!', 'Nice one!', 'Great!', 'Correct!', 'Brilliant!']
-    : ['¡Muy bien!', '¡Excelente!', '¡Eso es!', '¡Perfecto!', '¡Bien hecho!', '¡Genial!', '¡Correcto!', '¡Así se hace!'];
-  const OOPS = EN ? ['Almost…', 'Not quite', 'Oops…', 'Not yet'] : ['Casi…', 'No exactamente', 'Ups…', 'Todavía no'];
+  // Lof en «bijna» in de doeltaal (net als de tabnamen): Spaans in de Spaanse cursus, Engels bij Engels, Nederlands bij Nederlands.
+  const PRAISES = {
+    es: ['¡Muy bien!', '¡Excelente!', '¡Eso es!', '¡Perfecto!', '¡Bien hecho!', '¡Genial!', '¡Correcto!', '¡Así se hace!'],
+    en: ['Well done!', 'Excellent!', 'Spot on!', 'Perfect!', 'Nice one!', 'Great!', 'Correct!', 'Brilliant!'],
+    nl: ['Heel goed!', 'Uitstekend!', 'Precies!', 'Perfect!', 'Goed gedaan!', 'Top!', 'Klopt!', 'Zo doe je dat!']
+  };
+  const OOPSES = { es: ['Casi…', 'No exactamente', 'Ups…', 'Todavía no'], en: ['Almost…', 'Not quite', 'Oops…', 'Not yet'], nl: ['Bijna…', 'Niet helemaal', 'Oeps…', 'Nog niet'] };
+  const PRAISE = PRAISES[S.course.target] || (S.course.ui === 'nl' ? PRAISES.nl : PRAISES.es);
+  const OOPS = OOPSES[S.course.target] || (S.course.ui === 'nl' ? OOPSES.nl : OOPSES.es);
   const T_EN = {
     check: 'Check', next: 'Continue', skip: 'Skip', gotit: 'Got it', choose: 'Choose the right answer', fill: 'Fill in the gap', translate: 'Translate into English',
     aslesson: 'Translate as in the lesson', order: 'Put the sentence in order', match: 'Match the pairs', listen: 'Listen and type what you hear', speak: 'Say it out loud',
@@ -63,8 +69,11 @@
   }
   const findNotes = (text, opt) => (S.Uitleg ? S.Uitleg.find(text, opt) : []);
 
+  // Speciale tekens van de doeltaal. Engels heeft ze niet nodig: dan blijft de balk leeg en verborgen.
+  const ACCENTS = { es: ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü', '¿', '¡'], en: [], nl: ['é', 'ë', 'ï', 'ö', 'ü', 'è'] };
   function accentBar(target) {
-    const chars = ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü', '¿', '¡'];
+    const chars = ACCENTS[S.course.target] || [];
+    if (!chars.length) return h('div', { class: 'accent-bar', hidden: true });
     return h('div', { class: 'accent-bar', role: 'toolbar', 'aria-label': 'Speciale tekens' },
       chars.map(c => h('button', { type: 'button', tabindex: '-1', onmousedown: e => e.preventDefault(), onclick: () => {
         const input = typeof target === 'function' ? target() : target; if (!input) return;
@@ -265,7 +274,7 @@
   function grammarBlock(g) {
     const es = esMode();
     const wrap = h('div', { class: 'grammar' },
-      h('div', { class: 'eyebrow' }, '🧩 ' + (g.es || 'Gramática')),
+      h('div', { class: 'eyebrow' }, '🧩 ' + (g.es || S.tl('Gramática'))),
       h('h2', null, g.t));
     const sumEl = () => S.Tutor.coach({ es: g.sum, lang: S.course.target, nl: es ? '' : 'Kort samengevat, in het Spaans. Tik om het te horen.' }, { size: 54, label: 'Profe Lupe vat samen', cls: 'lc-sum' }) || h('div', { class: 'sum', lang: S.course.target }, (S.course.target === 'es' ? '🇪🇸 ' : S.course.flag + ' ') + g.sum);
     if (g.sum && es) wrap.append(sumEl());

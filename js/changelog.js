@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.56.0', date: '2026-11-22',
+    nl: ['Engelse en Nederlandse cursus: tabbladen, woordspellen, speltegels, lof en Lupe in de taal die je leert in plaats van Spaans (bijv. Today, Practice, Word search). De Spaanse cursus blijft hetzelfde.'],
+    es: [] },
   { v: '1.55.0', date: '2026-11-22',
     nl: ['Op reis voor elke taal: Engels heeft nu een eigen wereldkaart met 13 landen (VS, Canada, Jamaica, VK, Ierland, Nigeria, Kenia, Zuid-Afrika, India, Singapore, Filipijnen, Australië, Nieuw-Zeeland), elk met eigen stem, accent en slang. De Nederlandse cursus kreeg een kaart met Nederland, Vlaanderen, Suriname, Curaçao en Aruba en Zuid-Afrika (Afrikaans).'],
     es: [] },

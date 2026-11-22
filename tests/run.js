@@ -1133,6 +1133,25 @@ await micTests();
     ok(list.filter(x => String(x.ns || '').startsWith(Mu.nsFor(tg, ''))).every(x => !/^es-MX/.test(x.voice) || tg === 'es'), w + 'geen Mexicaanse stem in een ander land');
   }
 }
+{ // Spaanse «smaaknamen» (tabbladen, spellen, uitroepen, tegelletters) staan in elke cursus in de doeltaal
+  const src = f => fs.readFileSync(path.join(root, f), 'utf8');
+  const TERMS = ['Hoy', 'Ruta', 'Práctica', 'Docente', 'Perfil', 'Tu ruta', 'Juegos de palabras', 'Sopa de letras', 'Crucigrama', 'Revoltijo', 'El volcán', 'Parejas', '¡Perfecto!', '¡Muy bien!', '¡Sigue así!'];
+  for (const course of Object.keys(S.COURSES)) {
+    const w = 'doeltaalnamen ' + course + ': ';
+    const c = vm.createContext({ console, setTimeout, clearTimeout }); c.window = c; c.globalThis = c; c.self = c; c.SPT_COURSE = course;
+    for (const f of ['js/core.js', 'js/i18n.js', 'js/i18n-es.js']) vm.runInContext(src(f), c, { filename: f });
+    const K = c.SPT, tg = K.course.target;
+    if (tg === 'es') { ok(TERMS.every(x => K.tl(x) === x && K.t(x) === x), w + 'Spaanse cursus houdt de Spaanse namen'); continue; }
+    ok(TERMS.every(x => K.tl(x) !== x), w + 'alle namen vertaald: ' + TERMS.filter(x => K.tl(x) === x).join(', '));
+    ok(TERMS.every(x => !/[¡¿áéíóúñ]/.test(K.tl(x))), w + 'geen Spaanse tekens in de namen');
+    ok(K.t('← Práctica') === '← ' + K.tl('Práctica') && K.t('🔎 Sopa de letras') === '🔎 ' + K.tl('Sopa de letras'), w + 'met pijltje of emoji ervoor');
+    if (K.course.ui === 'nl') ok(K.t('Lupe begroet je op Hoy en in Perfil.') === 'Lupe begroet je op ' + K.tl('Hoy') + ' en in ' + K.tl('Perfil') + '.', w + 'tabnamen midden in een zin');
+    else ok(K.t('Vandaag niets te herhalen') === 'Hoy no hay nada que repasar', w + '«Hoy» als gewoon woord blijft Spaans');
+    ok(new RegExp('\\b' + tg + ': \\{ grid: \'[A-Z]{9}\'').test(src('js/icons.js')), w + 'eigen letters op de speltegels');
+    ok(new RegExp('\\b' + tg + ': \\[').test(src('js/lesson.js').slice(src('js/lesson.js').indexOf('const PRAISES'))), w + 'eigen lof in de les');
+  }
+  ok(/target !== 'es' && S\.course\.ui === 'nl'/.test(src('js/app.js')) && /if \(!ES\) \{ location\.hash = '#\/practica'/.test(src('js/app.js')), 'doeltaalnamen: Docente en vervoegingstabellen per cursus');
+}
 { // Engels voor Nederlandstaligen (en-nl): A1–C2, uitleg in het Nederlands
   const list = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/tts-texts.js')], { maxBuffer: 64 << 20 }).toString());
   const have = new Set(list.map(x => x.k));

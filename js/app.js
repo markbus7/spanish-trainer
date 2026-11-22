@@ -4,6 +4,9 @@
   const { U, C, Store, SRS, Speech, Gen } = S;
   const h = U.h;
   const st = () => Store.state;
+  // Andere doeltaal dan Spaans met Nederlandse uitleg (bijv. Engels): geen Spaanse resten uit de Spaanse cursus.
+  const NLX = S.course.target !== 'es' && S.course.ui === 'nl';
+  const ES = S.course.target === 'es';
   const save = U.debounce(() => Store.save(), 300);
 
   /* ================= kleine UI-helpers ================= */
@@ -829,6 +832,7 @@
   }
 
   routes.tablas = function () {
+    if (!ES) { location.hash = '#/practica'; return h('div'); } // vervoegingstabellen zijn Spaans
     const wrap = h('div', { class: 'page' });
     wrap.append(h('a', { class: 'back', href: '#/practica' }, '← Práctica'), h('h1', null, 'Vervoegingstabellen'));
     const verbs = Object.keys(S.conj.VERBS).sort((a, b) => a.localeCompare(b, 'es'));
@@ -868,9 +872,11 @@
     if (!S.AI.enabled()) {
       wrap.append(h('h1', null, 'Docente'));
       wrap.append(h('div', { class: 'card tutor-intro' },
-        h('div', { class: 'row gap' }, S.Tutor.avatar(150, 'big', { full: true, wave: true }), h('div', null, h('h3', null, '¡Hola! Soy Lupe 👋'), h('p', { class: 'small muted' }, S.Tutor.tagline))),
-        h('p', null, 'Ik ben een ajolote uit de kanalen van Xochimilco (Mexico-Stad) en ik wil graag je persoonlijke docente zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.'),
-        h('p', null, 'Voer echte gesprekken (rollenspellen in Mexico, Colombia, Argentinië…). Je krijgt direct correcties in het Nederlands, kunt alles over grammatica vragen en krijgt feedback op je teksten.'),
+        h('div', { class: 'row gap' }, S.Tutor.avatar(150, 'big', { full: true, wave: true }), h('div', null, h('h3', null, NLX ? (S.Tutor.lineLang === 'en' ? 'Hi! I’m Lupe 👋' : 'Hallo! Ik ben Lupe 👋') : '¡Hola! Soy Lupe 👋'), h('p', { class: 'small muted' }, S.Tutor.tagline))),
+        h('p', null, NLX ? 'Ik ben een axolotl uit de kanalen van Xochimilco (Mexico-Stad) en ik wil graag je persoonlijke docent zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.'
+          : 'Ik ben een ajolote uit de kanalen van Xochimilco (Mexico-Stad) en ik wil graag je persoonlijke docente zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.'),
+        h('p', null, !NLX ? 'Voer echte gesprekken (rollenspellen in Mexico, Colombia, Argentinië…). Je krijgt direct correcties in het Nederlands, kunt alles over grammatica vragen en krijgt feedback op je teksten.'
+          : 'Voer echte gesprekken (rollenspellen in alledaagse situaties). Je krijgt direct correcties in het Nederlands, kunt alles over grammatica vragen en krijgt feedback op je teksten.'),
         h('p', { class: 'small muted' }, 'Hiervoor heb je een eigen API-sleutel van Anthropic (Claude) nodig. Die maak je aan op platform.claude.com (uitleg in Instellingen). Je betaalt per gebruik, meestal een paar cent per gesprek. De sleutel wordt alleen op dit apparaat bewaard.'),
         h('a', { class: 'btn primary', href: '#/ajustes' }, 'Sleutel instellen'),
         h('p', { class: 'small muted' }, 'Zonder AI werkt de rest van de app gewoon: lessen, herhaling, luisteren en spreken.')));
@@ -892,14 +898,16 @@
     }
     if (chat.mode === 'roleplay') wrap.append(h('div', { class: 'scen-head' }, h('span', null, (chat.scenario.icon || '🎭') + ' ' + (chat.scenario.title || chat.scenario.nl) + (chat.scenario.place ? ' · ' + chat.scenario.place : '')), h('small', null, '🎯 ' + chat.scenario.goal),
       h('button', { class: 'btn link small', type: 'button', onclick: () => { chat.scenario = null; chat.messages = []; render(); } }, 'Andere situatie')));
-    if (chat.mode === 'ask') wrap.append(h('p', { class: 'muted small' }, 'Stel elke vraag over Spaans, bijvoorbeeld: «Wanneer gebruik ik por en wanneer para?» of «Wat betekent “¿qué onda?”»'));
+    if (chat.mode === 'ask') wrap.append(h('p', { class: 'muted small' }, !NLX || !ASK_EX[S.course.target] ? 'Stel elke vraag over Spaans, bijvoorbeeld: «Wanneer gebruik ik por en wanneer para?» of «Wat betekent “¿qué onda?”»'
+      : 'Stel elke vraag over Spaans, bijvoorbeeld: ' + ASK_EX[S.course.target]));
     if (chat.mode === 'write') wrap.append(h('p', { class: 'muted small' }, 'Plak of schrijf een Spaanse tekst (e-mail, appje, dagboek). Je krijgt een verbeterde versie met uitleg.'));
 
     const log = h('div', { class: 'chat-log', 'aria-live': 'polite' });
     chat.messages.forEach((m, i) => { if (!(i === 0 && m.hidden)) log.append(bubble(m)); });
     if (!chat.messages.length && LUPE_HELLO[chat.mode]) log.append(bubble({ role: 'assistant', content: LUPE_HELLO[chat.mode], mode: chat.mode, local: true }));
-    const inp = h('textarea', { class: 'chat-input', rows: chat.mode === 'write' ? 5 : 2, lang: 'es', placeholder: chat.mode === 'write' ? 'Escribe tu texto aquí…' : 'Escribe en español… (Nederlands mag ook)' });
-    const send = h('button', { class: 'btn primary', type: 'button' }, 'Enviar');
+    const CH = NLX && CHAT[S.course.target] || CHAT.es;
+    const inp = h('textarea', { class: 'chat-input', rows: chat.mode === 'write' ? 5 : 2, lang: 'es', placeholder: chat.mode === 'write' ? CH.write : CH.type });
+    const send = h('button', { class: 'btn primary', type: 'button' }, CH.send);
     const micBtn = Speech.canListen() ? h('button', { class: 'icon-btn mic-sm', type: 'button', title: 'Inspreken' }, '🎙️') : null;
     const doSend = async (text, hidden) => {
       text = (text || '').trim(); if (!text || chat.busy) return;
@@ -954,22 +962,31 @@
         const said = alts[0];
         inp.value = (before ? before + ' ' : '') + said;
         const auto = chat.mode !== 'write' && st().settings.micAutoSend !== false && !chat.busy;
-        micLive.done(said, auto ? '✅ Verstaan, ik stuur het naar Lupe' : '✅ Verstaan. Pas het aan als het nodig is en tik op Enviar');
+        micLive.done(said, auto ? '✅ Verstaan, ik stuur het naar Lupe' : '✅ Verstaan. Pas het aan als het nodig is en tik op ' + CH.send);
         if (auto) { doSend(inp.value); setTimeout(() => micLive.hide(), 2500); } else inp.focus();
       } catch (e) { inp.value = before; micLive.fail(e); }
       micBtn.classList.remove('rec'); micBtn.title = 'Inspreken';
     };
     wrap.append(log, micLive.el, h('div', { class: 'chat-bar' }, inp, h('div', { class: 'chat-actions' }, micBtn, send)), S.Lesson.accentBar(inp),
       h('div', { class: 'row gap between' }, h('span'), h('button', { class: 'btn link small', type: 'button', onclick: () => { chat.messages = []; if (chat.mode === 'roleplay') chat.autostart = true; render(); } }, '🗑 Nieuw gesprek')));
-    if (chat.mode === 'roleplay' && chat.autostart && !chat.messages.length) { chat.autostart = false; setTimeout(() => doSend('(Empecemos el juego de rol. / Laten we beginnen.)', true), 50); }
+    if (chat.mode === 'roleplay' && chat.autostart && !chat.messages.length) { chat.autostart = false; setTimeout(() => doSend(CH.start, true), 50); }
     setTimeout(scrollLog, 30);
     return wrap;
   };
   /* ---- Lupe, de docente ---- */
-  const LUPE_HELLO = {
-    ask: '**¡Hola! Soy Lupe, tu profe de español. ¿Qué quieres saber hoy?**\n\n*Vraag me alles over grammatica, woorden, uitspraak of cultuur. Nederlands mag ook.*',
+  const LUPE_HELLO = S.Tutor.lineLang === 'en' && NLX ? {
+    ask: '**Hi! I’m Lupe, your English teacher. What would you like to know today?**\n\n*Vraag me alles over grammatica, woorden, uitspraak of cultuur. Nederlands mag ook.*',
+    write: '**Let’s write! Type your text and I’ll help you polish it.**\n\n*Schrijf een e-mail, appje of dagboekstukje. Ik verbeter het en leg uit waarom.*'
+  } : {
+    ask: '**¡Hola! Soy Lupe, tu profe de ' + S.course.name.es + '. ¿Qué quieres saber hoy?**\n\n*Vraag me alles over grammatica, woorden, uitspraak of cultuur. Nederlands mag ook.*',
     write: '**¡Órale, a escribir! Escribe tu texto y yo te ayudo a corregirlo.**\n\n*Schrijf een e-mail, appje of dagboekstukje. Ik verbeter het en leg uit waarom.*'
   };
+  // Teksten in het chatvenster per doeltaal (de Spaanse cursus en de cursussen met Spaanse uitleg gebruiken CHAT.es).
+  const CHAT = {
+    es: { type: 'Escribe en español… (Nederlands mag ook)', write: 'Escribe tu texto aquí…', send: 'Enviar', start: '(Empecemos el juego de rol. / Laten we beginnen.)' },
+    en: { type: 'Write in English… (Nederlands mag ook)', write: 'Write your text here…', send: 'Send', start: '(Let’s start the role-play. / Laten we beginnen.)' }
+  };
+  const ASK_EX = { en: '«Wanneer gebruik ik since en wanneer for?» of «Wat betekent “to touch base”?»' };
   function lupeAv(size, cls) { return S.Tutor.avatar(size, cls); }
   function tutorHead() {
     const on = () => !!st().settings.tutorVoice;
@@ -1216,7 +1233,7 @@
           ? h('button', { class: 'me-swatch' + ((eff[k] || '') === v ? ' on' : ''), type: 'button', title: v, 'aria-label': 'Shirtkleur ' + v, 'aria-pressed': String((eff[k] || '') === v), style: { background: c1 }, onclick: () => setLook(k, v) })
           : h('button', { class: 'chip toggle' + ((eff[k] || '') === v ? ' on' : ''), type: 'button', 'aria-pressed': String((eff[k] || '') === v), onclick: () => setLook(k, v) }, lab))));
       picker.append(h('b', null, cur ? 'Jouw personage' : 'Kies je personage'),
-        h('p', { class: 'muted small' }, 'Je personage staat in de dialogen bij jouw zinnen, naast Mateo, Sofía en de anderen.'),
+        h('p', { class: 'muted small' }, !NLX ? 'Je personage staat in de dialogen bij jouw zinnen, naast Mateo, Sofía en de anderen.' : 'Je personage staat in de dialogen bij jouw zinnen, naast de andere personages.'),
         h('div', { class: 'me-studio' },
           cur ? h('div', { class: 'me-preview' }, S.Cast.avatar(cur.id, 230, 'me-big', { full: true, look: L })) : null,
           h('div', { class: 'me-side' },
@@ -1617,8 +1634,9 @@
       label('Thema', h('select', { class: 'input', onchange: e => { set('theme', e.target.value); applyTheme(); } }, [['auto', 'Automatisch'], ['light', 'Licht'], ['dark', 'Donker']].map(([v, l]) => h('option', { value: v, selected: s.theme === v ? true : null }, l)))))));
     // stem
     const voiceSel = h('select', { class: 'input', onchange: e => set('voice', e.target.value) });
+    const VOICE_TIP = { es: 'Paulina of Juan (Mexico)', en: 'bijvoorbeeld Ava of Evan (Verenigde Staten)', nl: 'bijvoorbeeld Ellen of Xander (Nederland)' };
     const fillVoices = () => {
-      voiceSel.innerHTML = ''; voiceSel.append(h('option', { value: '' }, 'Automatisch (beste Latijns-Amerikaanse stem)'));
+      voiceSel.innerHTML = ''; voiceSel.append(h('option', { value: '' }, !NLX ? 'Automatisch (beste Latijns-Amerikaanse stem)' : 'Automatisch (beste ' + S.course.name.nl + 'e stem)'));
       Speech.voices.slice().sort((a, b) => Speech.rank(b) - Speech.rank(a)).forEach(v => voiceSel.append(h('option', { value: v.voiceURI, selected: s.voice === v.voiceURI ? true : null }, v.name + ' (' + v.lang + ')' + (/es-es/i.test(v.lang) ? ' — Spanje' : '') + (Speech.qualityLabel(v) ? ' · ' + Speech.qualityLabel(v) : ''))));
     };
     fillVoices(); setTimeout(fillVoices, 700);
@@ -1631,7 +1649,7 @@
       voiceTip.innerHTML = '';
       voiceTip.append(h('p', null, v ? 'Apparaatstem nu: ' + v.name + ' (' + v.lang + ')' + (q >= 2 ? ' ✅ ' + Speech.qualityLabel(v) : ' — eenvoudige stem, klinkt wat robotachtig') : 'Geen Spaanse apparaatstem gevonden.'));
       if (q < 2) voiceTip.append(h('p', null, h('b', null, 'Natuurlijker voorlezen op iPad of iPhone: '),
-        'open Instellingen › Toegankelijkheid › Gesproken materiaal › Stemmen › Spaans. Kies Paulina of Juan (Mexico) en download de versie ',
+        'open Instellingen › Toegankelijkheid › Gesproken materiaal › Stemmen › Spaans. Kies ' + (NLX ? VOICE_TIP[S.course.target] || 'een stem' : VOICE_TIP.es) + ' en download de versie ',
         h('b', null, 'Verbeterd'), ' of ', h('b', null, 'Premium'), ' (±100–400 MB, via wifi). Sluit daarna de app helemaal af en open hem opnieuw; de nieuwe stem wordt dan vanzelf gekozen. Op een Mac: Systeeminstellingen › Toegankelijkheid › Gesproken materiaal › Systeemstem › Beheer stemmen.'));
     };
     drawTip(); setTimeout(drawTip, 700);
@@ -1649,13 +1667,13 @@
       voiceOut.textContent = msg.join(' ');
     };
     wrap.append(section('Stem & uitspraak', h('div', { class: 'card form' },
-      Speech.clips ? toggle('Ingesproken opnames gebruiken', '🎧 ' + Speech.clips.size.toLocaleString(S.LOC) + ' woorden en zinnen zijn ingesproken met natuurlijke Latijns-Amerikaanse stemmen. Wat niet is ingesproken, leest je apparaat zelf voor.', s.clips !== false, v => set('clips', v)) : null,
+      Speech.clips ? toggle('Ingesproken opnames gebruiken', '🎧 ' + Speech.clips.size.toLocaleString(S.LOC) + (!NLX ? ' woorden en zinnen zijn ingesproken met natuurlijke Latijns-Amerikaanse stemmen. Wat niet is ingesproken, leest je apparaat zelf voor.' : ' woorden en zinnen zijn ingesproken met natuurlijke stemmen. Wat niet is ingesproken, leest je apparaat zelf voor.'), s.clips !== false, v => set('clips', v)) : null,
       Speech.canSpeak() ? label(Speech.clips ? 'Stem van het apparaat (voor de rest)' : 'Voorleesstem', voiceSel) : h('p', { class: 'warn' }, 'Je browser ondersteunt geen voorlezen.'),
       label('Spreeksnelheid apparaatstem', rate),
       toggle('Dialogen eerst alleen beluisteren', 'De tekst is wazig tot je hem zelf zichtbaar maakt. Goed voor je luistervaardigheid.', s.listenFirst !== false, v => set('listenFirst', v)),
       toggle('Vraag-het-Lupe-knop rechts', 'Een knopje met Lupe aan de rechterkant. Tik erop om haar iets te vragen over wat je op dat moment ziet (dialoog, vraag, je antwoord). Werkt met je API-sleutel van de AI-docent. Je kunt het knopje omhoog of omlaag schuiven.', st().settings.lupeAsk !== false, v => { set('lupeAsk', v); S.Ask && S.Ask.sync(); }),
       toggle('Profe Lupe als begeleider', 'Lupe begroet je op Hoy, reageert op je antwoorden, vat de grammatica samen en feliciteert je na een les. Tik op haar om haar te horen.', S.Tutor.coachOn(), v => set('lupeCoach', v)),
-      label('Stem van Lupe (docente)', h('select', { class: 'input', onchange: e => { set('lupeVoice', e.target.value); S.Tutor.sayLine(S.Tutor.lines.voiceTest); } },
+      label(NLX ? 'Stem van Lupe (docent)' : 'Stem van Lupe (docente)', h('select', { class: 'input', onchange: e => { set('lupeVoice', e.target.value); S.Tutor.sayLine(S.Tutor.lines.voiceTest); } },
         [['girl', 'Meisje (hoge stem)'], ['woman', 'Vrouw']].map(([v, l]) => h('option', { value: v, selected: (s.lupeVoice || 'girl') === v ? true : null }, l)))),
       h('button', { class: 'btn ghost', type: 'button', onclick: runTest }, '🔊 Test de stemmen'), voiceOut,
       voiceTip,
@@ -1674,7 +1692,7 @@
       h('ol', { class: 'small steps-list' },
         h('li', null, 'Open ', h('a', { href: 'https://platform.claude.com/settings/keys', target: '_blank', rel: 'noopener' }, 'deze link naar Anthropic'), ' en log in (of maak een account aan).'),
         h('li', null, 'Tik op "Create Key". Vraagt de site "Where does your code run?", kies dan ', h('b', null, 'Somewhere else'), ' (API-sleutel).'),
-        h('li', null, 'Geef de sleutel een naam (bijv. Español Latino) en ', h('b', null, 'kopieer hem meteen'), ': hij wordt maar één keer getoond.'),
+        h('li', null, 'Geef de sleutel een naam (bijv. ' + (NLX ? S.course.title : 'Español Latino') + ') en ', h('b', null, 'kopieer hem meteen'), ': hij wordt maar één keer getoond.'),
         h('li', null, 'Plak de sleutel hieronder en tik op "Test verbinding". Tegoed zet je op dezelfde site onder Billing.')),
       h('p', { class: 'small' }, '🔒 Deel je sleutel met niemand: wie hem heeft, gebruikt jouw tegoed. Kwijt of gelekt? Verwijder hem op de site en maak een nieuwe.'),
       h('p', { class: 'small muted' }, 'De sleutel wordt alleen in deze browser bewaard en rechtstreeks naar Anthropic gestuurd. Hij komt nooit in back-ups of de gist terecht. Gebruik dit alleen op je eigen apparaat.'),
