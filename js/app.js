@@ -1869,8 +1869,13 @@
       card.append(label('Cursus van ' + Pr.label(me.id), csel));
       // cursussen van dit profiel: een extra cursus die je niet gebruikt, kun je weghalen; de hoofdcursus blijft altijd
       if (me.courses.length > 1) card.append(h('div', { class: 'course-list' }, h('b', { class: 'small' }, 'Cursussen van ' + Pr.label(me.id)),
-        me.courses.map((c, i) => { const pk = Pr.peek(me.id, c); return h('div', { class: 'course-row' },
-          h('div', { class: 'grow' }, NOTR(CNAME(c)), h('small', { class: 'muted', style: { display: 'block' } }, (c === me.course ? 'Actief · ' : '') + (i === 0 ? 'hoofdcursus · ' : '') + (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
+        h('small', { class: 'muted' }, 'Tik op een cursus om ernaar te wisselen.'),
+        me.courses.map((c, i) => { const pk = Pr.peek(me.id, c), on = c === me.course; return h('div', { class: 'course-row' + (on ? ' on' : '') },
+          // tik op de cursus = wisselen; de verwijderknop staat er los naast
+          h('button', { class: 'course-pick grow', type: 'button', 'aria-current': on ? 'true' : null, 'aria-label': on ? CNAME(c) + ' (actief)' : 'Wissel naar ' + CNAME(c), 'data-notr': '', onclick: () => { if (!on) Pr.switchCourse(me.id, c); } },
+            h('span', { class: 'course-pick-mark', 'aria-hidden': 'true' }, on ? '✓' : ''),
+            h('span', { class: 'course-pick-txt' }, h('b', null, CNAME(c)), h('small', { class: 'muted' }, on ? h('b', { class: 'course-pick-on' }, (S.course.ui === 'es' ? 'Activo' : 'Actief') + ' · ') : null, (i === 0 ? (S.course.ui === 'es' ? 'curso principal · ' : 'hoofdcursus · ') : '') + (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
+            on ? null : h('span', { class: 'course-pick-go' }, S.course.ui === 'es' ? 'Cambiar ›' : 'Wissel ›')),
           i === 0 ? h('small', { class: 'muted' }, 'blijft altijd') : h('button', { class: 'btn link small del-btn', type: 'button', 'aria-label': 'Verwijder cursus ' + CNAME(c), onclick: () => guard(() => deleteCourse({ name: Pr.label(me.id), localId: me.id, course: c, done: () => { draw(); render(); } })) }, '🗑 Verwijderen')); })));
       // nieuw profiel
       let av = Pr.AVATARS[1];

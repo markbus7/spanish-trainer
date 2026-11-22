@@ -1385,7 +1385,18 @@ button.life-stop:hover { background: var(--card); }
 .modal.life-prev .life-scene { position: relative; border-radius: 16px; overflow: hidden; margin: .5rem 0; box-shadow: var(--shadow); }
 .modal.life-prev h3 { margin: .3rem 0 .2rem; font-family: var(--serif); }
 .course-list { display: flex; flex-direction: column; gap: .4rem; margin: .2rem 0 .6rem; }
-.course-row { display: flex; align-items: center; gap: .6rem; padding: .45rem .7rem; border: 1px dashed var(--line); border-radius: 12px; }
+.course-row { display: flex; align-items: center; gap: .6rem; padding: .3rem .5rem .3rem .3rem; border: 1px dashed var(--line); border-radius: 12px; }
+.course-row.on { border: 2px solid var(--accent); background: var(--accent-soft); }
+button.course-pick { display: flex; align-items: center; gap: .55rem; min-width: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; padding: .4rem; border-radius: 9px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.course-row:not(.on) button.course-pick:hover { background: var(--bg2); }
+.course-row.on button.course-pick { cursor: default; }
+button.course-pick:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.course-pick-mark { flex: none; width: 1.5rem; height: 1.5rem; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: .85rem; font-weight: 700; line-height: 1; }
+.course-row.on .course-pick-mark { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.course-pick-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.course-pick-txt small { display: block; }
+.course-pick-go { flex: none; font-size: .85rem; font-weight: 600; color: var(--accent); white-space: nowrap; }
+.course-pick-on { color: var(--accent); font-weight: 700; }
 
 /* rollenspel: tik op een woord van Lupe voor de vertaling in deze zin (js/gloss.js) */
 .reply.tw-on .tw { cursor: pointer; border-radius: 5px; text-decoration: underline dotted color-mix(in srgb, var(--ink2) 45%, transparent); text-underline-offset: 4px; text-decoration-thickness: 1.5px; transition: background .15s; -webkit-tap-highlight-color: transparent; }

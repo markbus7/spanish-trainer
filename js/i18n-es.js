@@ -1056,6 +1056,7 @@
     "Verwijder cursus {0} van {1}": "Eliminar el curso {0} de {1}",
     "Cursussen van {0}": "Cursos de {0}",
     "blijft altijd": "se queda siempre",
+    "Tik op een cursus om ernaar te wisselen.": "Toca un curso para cambiar a él.",
     "Actief · hoofdcursus · {0}": "Activo · curso principal · {0}",
     "hoofdcursus · {0}": "curso principal · {0}",
     "Actief · {0} XP": "Activo · {0} XP",
