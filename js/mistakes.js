@@ -23,6 +23,7 @@
 - "tag" is ONE key from this list: ${tags}, or "vocab" for a wrong, invented or misspelled word, or "other".
 - For "vocab" mistakes, also fill "es" with the correct ${TLn} word in its dictionary form (${es ? 'base form' : 'infinitive / singular, with article for nouns, e.g. "el carro"'}) and "nl" with its ${NLn} meaning. Leave them empty otherwise.
 - If the learner wrote ${NLn}, asked a question, or made no mistakes: <log>[]</log>
+- Never put real personal names or private details in "w" or "c": replace a person's name with "X".
 - Never mention this log in your visible text.`;
   }
 
@@ -47,7 +48,7 @@
   }
 
   /* ---------- opslaan ---------- */
-  function db() { const s = st(); if (!s.lupe || typeof s.lupe !== 'object') s.lupe = { log: [], n: 0 }; if (!Array.isArray(s.lupe.log)) s.lupe.log = []; return s.lupe; }
+  function db() { const s = st(); if (!s.lupe || typeof s.lupe !== 'object') s.lupe = { log: [], n: 0 }; if (!Array.isArray(s.lupe.log)) s.lupe.log = []; scrubAll(s.lupe); return s.lupe; }
 
   /** Een woord uit de lessen zoeken (zonder lidwoord, zonder accenten). */
   function findWord(es) {
@@ -74,7 +75,8 @@
     const L = db(), t0 = Date.now();
     L.n = (L.n || 0) + 1;
     const out = list.map((x, i) => {
-      const e = Object.assign({ t: t0 + i, m: mode, u: String(userText || '').slice(0, 240) }, x);
+      // je eigen bericht zelf bewaren we niet (privacy): alleen het foute stukje, de verbetering en de uitleg
+      const e = Object.assign({ t: t0 + i, m: mode }, x);
       if (extra.sc) e.sc = String(extra.sc).slice(0, 60);
       if (x.tag !== 'other') S.Store.mark(x.tag, false);
       if (x.tag === 'vocab') { const id = toReview(x.es, x.nl); if (id) e.srs = id; }
@@ -110,11 +112,15 @@
     return L.fix.find(x => x.q === q && S.check.bare(x.u) === k) || null;
   }
 
+  /* Oude fouten (vóór v1.51.1) hadden ook je hele bericht (u). Dat halen we weg, lokaal en in de sync. */
+  function scrub(e) { if (e && typeof e === 'object') delete e.u; return e; }
+  function scrubAll(L) { (L && Array.isArray(L.log) ? L.log : []).forEach(scrub); return L; }
+
   /* ---------- samenvoegen bij synchroniseren (idempotent) ---------- */
   function merge(a, b) {
     const A = (a && a.log) || [], B = (b && b.log) || [];
     const seen = new Set(), log = [];
-    A.concat(B).filter(e => e && e.t).sort((x, y) => x.t - y.t).forEach(e => { const k = e.t + '|' + e.w; if (!seen.has(k)) { seen.add(k); log.push(JSON.parse(JSON.stringify(e))); } });
+    A.concat(B).filter(e => e && e.t).sort((x, y) => x.t - y.t).forEach(e => { const k = e.t + '|' + e.w; if (!seen.has(k)) { seen.add(k); log.push(scrub(JSON.parse(JSON.stringify(e)))); } });
     const adv = [a && a.advice, b && b.advice].filter(Boolean).sort((x, y) => (y.t || 0) - (x.t || 0))[0];
     const out = { log: log.slice(-MAX), n: Math.max((a && a.n) || 0, (b && b.n) || 0) };
     if (adv) out.advice = JSON.parse(JSON.stringify(adv));
@@ -251,5 +257,5 @@ Write in Dutch, max ~120 words, no headings, no tables. Based on the learner's m
     return db().advice;
   }
 
-  S.Mistakes = { promptRule, strip, parse, record, merge, report, focus, practice, asText, updateText, advise, proposeUpdate, regrade, accepted, findWord, unitsFor, MAX };
+  S.Mistakes = { scrubAll, promptRule, strip, parse, record, merge, report, focus, practice, asText, updateText, advise, proposeUpdate, regrade, accepted, findWord, unitsFor, MAX };
 })(window.SPT);

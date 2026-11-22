@@ -134,6 +134,10 @@
     C2: 'Speak as to an educated native speaker: idiomatic, nuanced, with humor and irony where it fits. Point out anything that sounds slightly unnatural or non-native, including word choice, register, rhythm and collocations.'
   };
 
+
+  /* Privacy: Lupe vraagt nooit naar echte persoonlijke dingen (Mark, nov 2026). In rollenspellen speel je een verzonnen rol. */
+  const PRIVACY = () => `PRIVACY (important): never ask for the learner's real personal information: no real names of family members, partner or friends, no address, phone number, email, workplace, health, money, relationships, religion or other private matters. When a topic is personal (family, home, work, plans, feelings), treat it as fiction: talk about an invented character or invented details. If the learner shares real private details anyway, do not ask follow-up questions about them and do not repeat them.`;
+
   function baseRules(p) {
     if (CO().target !== 'es' && CO().ui === 'nl') {
       return `You are an expert, warm and encouraging ${CO().ai.target} teacher, working inside a learning app for a native Dutch speaker from the Netherlands${p.name ? ' named ' + p.name : ''}.
@@ -142,6 +146,7 @@ Grammar the learner has studied so far: ${p.grammar.join('; ') || 'basics'}.
 ${p.weak.length ? 'Known weak points to watch for: ' + p.weak.join(', ') + '.' : ''}
 Teach ${CO().ai.target}${CO().target === 'en' ? ' (US spelling and vocabulary; mention the British variant when it differs and it matters)' : ''}. Pay close attention to typical mistakes of Dutch speakers (false friends such as eventually/actually/sensible, since vs. for, present perfect vs. past simple, word order, make vs. do, too literal translations, "Dunglish").
 Whenever you explain or translate, write in natural Dutch as spoken in the Netherlands.
+${PRIVACY()}
 Do not use Markdown headings or tables. Keep formatting minimal.`;
     }
     if (CO().target !== 'es') {
@@ -151,6 +156,7 @@ Grammar the learner has studied so far: ${p.grammar.join('; ') || 'basics'}.
 ${p.weak.length ? 'Known weak points to watch for: ' + p.weak.join(', ') + '.' : ''}
 Teach ${CO().ai.target}${CO().target === 'en' ? ' (US spelling and vocabulary: color, apartment, cell phone)' : ''}. Pay attention to typical mistakes of Spanish speakers.
 Whenever you write Spanish (explanations, translations), use Latin American Spanish: "ustedes" (never "vosotros"), and Latin American words such as celular, carro, computadora, jugo. Never use Spain-only forms.
+${PRIVACY()}
 Do not use Markdown headings or tables. Keep formatting minimal.`;
     }
     return `You are an expert, warm and encouraging Spanish teacher specialised in LATIN AMERICAN Spanish, working inside a learning app for a native Dutch speaker${p.name ? ' named ' + p.name : ''}.
@@ -158,6 +164,7 @@ Learner level: ${p.level} (CEFR). ${LEVEL_GUIDE[p.level] || LEVEL_GUIDE.B1}
 Grammar the learner has studied so far: ${p.grammar.join('; ') || 'basics'}.
 ${p.weak.length ? 'Known weak points to watch for: ' + p.weak.join(', ') + '.' : ''}
 Always use Latin American norms: "ustedes" (never "vosotros"), seseo, Latin American vocabulary (carro, celular, computadora, jugo, manejar, etc.). Unless the scenario sets a country, use neutral Latin American Spanish.
+${PRIVACY()}
 Do not use Markdown headings or tables. Keep formatting minimal.`;
   }
 
@@ -184,6 +191,7 @@ Rules for every reply:
    Ignore missing accents and punctuation unless they change meaning; mention them once at most.
    The app also shows the learner's own message with your corrections marked in it, so keep these lines short.
 4. For your very first message (when the learner says they want to start), greet them in character, set the scene and ask the first question, then "---" and "💡" one useful phrase for this situation.
+5. The learner plays an INVENTED character, never themselves. If the conversation will touch anything personal (family, names, age, home, work, partner, plans), add to your very first message, after the "💡" line, one short role card: "🎭 ${CO().ui === 'nl' ? 'Jouw rol' : 'Tu papel'}: …" in ${NL() === 'Spanish' ? 'Latin American Spanish' : NL()} with made-up details the learner can use (for family: a few invented relatives with first names and ages; otherwise a name, job, city and so on), and say they may also invent their own. In character, ask about this invented character (e.g. "¿Cómo se llama tu hermano?" refers to the role card), never about the learner's real life.
 ${glossRule('roleplay')}${logRule()}`;
   }
 

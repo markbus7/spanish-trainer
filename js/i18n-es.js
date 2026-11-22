@@ -257,7 +257,7 @@
     "Kopieer het rapport als tekst en plak het in je chat met je coach. Dan kunnen de lessen daarop worden aangepast.": "Copia el reporte como texto y pégalo en tu chat con tu coach. Así se pueden ajustar las lecciones.",
     "Tekst bekijken": "Ver texto",
     "Laatste fouten": "Últimos errores",
-    "Jij schreef: «": "Escribiste: «",
+    "🔒 Je speelt altijd een verzonnen rol: Lupe vraagt niet naar je echte familie of privézaken, en geeft je zo nodig een rolkaartje met namen. Van gesprekken bewaart de app alleen je fouten (het foute stukje met de verbetering), niet wat je schreef.": "🔒 Siempre juegas un papel inventado: Lupe no te pregunta por tu familia real ni por cosas privadas, y si hace falta te da una tarjeta de rol con nombres. De las conversaciones, la app solo guarda tus errores (el fragmento incorrecto con la corrección), no lo que escribiste.",
     "Mijn profiel": "Mi perfil",
     "nog niet gedaan": "todavía no",
     "Je lessen": "Tus lecciones",

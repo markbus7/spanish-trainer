@@ -822,6 +822,15 @@ await micTests();
   ok(Mi.parse('geen blok') === null && Mi.parse('<log>kapot</log>') === null && Mi.parse('<log>[]</log>').length === 0, 'lupe-log: zonder of met kapot blok');
   const rec = Mi.record(reply, 'roleplay', 'Soy cansado y tengo un coche', { sc: 'En el café' });
   ok(rec.length === 3 && St.state.lupe.log.length === 3 && St.state.lupe.n === 1, 'lupe-log: fouten bewaard');
+  ok(St.state.lupe.log.every(e => !('u' in e)), 'privacy: je eigen bericht wordt niet bewaard');
+  {
+    const old = { log: [{ t: 1, w: 'a', c: 'b', tag: 'other', u: 'Mi hermana se llama Femke' }], n: 1 };
+    const m = Mi.merge(old, { log: [], n: 0 });
+    ok(m.log.length === 1 && !('u' in m.log[0]) && Mi.scrubAll(JSON.parse(JSON.stringify(old))).log[0].u === undefined, 'privacy: oude berichten weg bij sync en laden');
+    const rp = S.AI.roleplaySystem({ role: 'Eres doña Rosa. Haces preguntas sobre la familia del estudiante.', goal: 'familia' });
+    ok(rp.includes('PRIVACY') && rp.includes('INVENTED character') && rp.includes('Jouw rol') && S.AI.askSystem().includes('PRIVACY') && S.AI.writingSystem().includes('PRIVACY'), 'privacy: Lupe vraagt niet naar echte persoonlijke dingen, rolkaartje in rollenspel');
+    ok(Mi.promptRule().includes('replace a person\'s name'), 'privacy: geen namen in het foutenlog');
+  }
   ok(St.state.tags['ser-estar'] && St.state.tags['ser-estar'].no === 1, 'lupe-log: telt mee in zwakke punten');
   const w = Mi.findWord('el carro');
   ok(w && rec[1].srs === w.id && St.state.srs[w.id] && St.state.srs[w.id].d <= S.U.dayIndex(), 'lupe-log: fout woord staat vandaag in de herhaling');

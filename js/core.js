@@ -211,6 +211,7 @@
           const saved = JSON.parse(raw), ss = saved.settings || {};
           migrateSettings(ss);
           this.state = merge(defaults(), saved);
+          if (S.Mistakes && this.state.lupe) S.Mistakes.scrubAll(this.state.lupe); // privacy: oude berichten weg
         }
       } catch (e) { this.ok = false; }
       return this.state;
