@@ -1756,6 +1756,47 @@
         out,
         h('div', { class: 'row gap end wrap' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => { if (!ok.disabled) close(); } }, 'Annuleren'), ok))));
   }
+  /* Eén cursus van een profiel weghalen (bv. een cursus die je ooit hebt aangezet maar nooit gebruikt), de rest van het profiel blijft.
+     De hoofdcursus (eerste cursus) kan niet los weg: zo blijft er altijd minstens één cursus en raakt Marks Spaanse voortgang (spt.v1) nooit weg.
+     localId: profiel op dit apparaat (of null); base: hoofdbestand in de gist (of ''). */
+  function deleteCourse({ name, localId, base, course, done }) {
+    const Pr = P_(), Sync = S.Sync;
+    const local = !!(localId && Pr.canRemoveCourse(localId, course));
+    let token = '';
+    if (localId) { try { const c = JSON.parse(localStorage.getItem(Pr.syncKey(localId)) || 'null'); token = (c && c.token) || ''; } catch (e) { /* negeer */ } }
+    if (localId && !base && token && Sync) base = Sync.localBase(localId);
+    const remote = !!(base && Sync && (token || Sync.enabled()));
+    if (!local && !remote) return;
+    const pk = local ? Pr.peek(localId, course) : null;
+    const root = document.getElementById('modal-root');
+    const close = () => { root.innerHTML = ''; };
+    const out = h('p', { class: 'small warn', role: 'status' });
+    const what = [];
+    if (local) what.push(h('li', null, '📱 De voortgang van deze cursus op dit apparaat' + (pk && (pk.xp || pk.level) ? ' (' + (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP)' : '')));
+    if (remote) what.push(h('li', null, '☁️ Het bestand van deze cursus in je GitHub-gist, zodat hij niet terugkomt bij synchroniseren.'));
+    const keep = localId ? Pr.get(localId).courses.filter(c => c !== course).map(CNAME).join(', ') : '';
+    const ok = h('button', { class: 'btn danger', type: 'button', onclick: async () => {
+      ok.disabled = true; out.textContent = '🗑 Bezig met verwijderen…';
+      try {
+        const activeCourse = local && localId === Pr.activeId() && course === S.course.id;
+        if (activeCourse) { S.Store.frozen = true; if (Sync) Sync.hold(); }
+        try { if (remote) await Sync.removeCourse(base, course, token || undefined, localId); }
+        catch (e) { S.Store.frozen = false; throw e; }
+        if (local) Pr.removeCourse(localId, course);
+        close(); S.toast('🗑 ' + CNAME(course) + ' is verwijderd');
+        if (activeCourse) { Pr.switchTo(localId); return; }
+        updateProfileChip(); if (done) done();
+      } catch (e) { ok.disabled = false; out.textContent = '⚠️ Niet gelukt: ' + e.message + '. Er is niets verwijderd van dit apparaat.'; }
+    } }, '🗑 Cursus verwijderen');
+    root.append(h('div', { class: 'modal-bg', onclick: e => { if (e.target.classList.contains('modal-bg') && !ok.disabled) close(); } },
+      h('div', { class: 'modal del-modal', role: 'dialog', 'aria-modal': 'true' },
+        h('h3', null, '⚠️ ' + CNAME(course) + ' verwijderen?'),
+        h('p', null, 'Alleen deze cursus van ' + name + ' gaat weg. Dit wordt gewist:'), h('ul', { class: 'small del-list' }, what),
+        keep ? h('p', { class: 'small' }, '✅ Blijft gewoon bewaard: ' + keep + '.') : null,
+        h('p', { class: 'del-warn' }, h('b', null, 'Dit kan niet ongedaan worden gemaakt.'), ' De woorden, units, reeks en XP van deze cursus zijn daarna weg. Je kunt hem later wel opnieuw beginnen, met een lege voortgang.'),
+        out,
+        h('div', { class: 'row gap end wrap' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => { if (!ok.disabled) close(); } }, 'Annuleren'), ok))));
+  }
   const CNAME = c => { const x = S.COURSES[c]; return x ? x.flag + ' ' + (S.course.ui === 'es' ? x.name.es.replace(/^./, m => m.toUpperCase()) : x.name.nl) : c; };
   const CLONG = { 'es-nl': 'Spaans leren · uitleg in het Nederlands', 'en-nl': 'Engels leren (A1–C2) · uitleg in het Nederlands', 'en-es': 'Inglés · explicaciones en español', 'nl-es': 'Neerlandés · explicaciones en español' };
   function profilesCard() {
@@ -1782,6 +1823,11 @@
         S.confirm('Nieuwe cursus?', Pr.label(me.id) + ' begint met ' + CLONG[c] + ', met een eigen, lege voortgang. De voortgang van de andere cursus blijft bewaard; je kunt altijd terugwisselen.', 'Begin', () => Pr.switchCourse(me.id, c), 'Annuleren', () => { csel.value = me.course; });
       };
       card.append(label('Cursus van ' + Pr.label(me.id), csel));
+      // cursussen van dit profiel: een extra cursus die je niet gebruikt, kun je weghalen; de hoofdcursus blijft altijd
+      if (me.courses.length > 1) card.append(h('div', { class: 'course-list' }, h('b', { class: 'small' }, 'Cursussen van ' + Pr.label(me.id)),
+        me.courses.map((c, i) => { const pk = Pr.peek(me.id, c); return h('div', { class: 'course-row' },
+          h('div', { class: 'grow' }, h('span', null, CNAME(c)), h('small', { class: 'muted', style: { display: 'block' } }, (c === me.course ? 'Actief · ' : '') + (i === 0 ? 'hoofdcursus · ' : '') + (pk.level ? pk.level + ' · ' : '') + pk.xp + ' XP')),
+          i === 0 ? h('small', { class: 'muted' }, 'blijft altijd') : h('button', { class: 'btn link small del-btn', type: 'button', 'aria-label': 'Verwijder cursus ' + CNAME(c), onclick: () => guard(() => deleteCourse({ name: Pr.label(me.id), localId: me.id, course: c, done: () => { draw(); render(); } })) }, '🗑 Verwijderen')); })));
       // nieuw profiel
       let av = Pr.AVATARS[1];
       const nameIn = h('input', { class: 'input', placeholder: 'Naam', maxlength: '30' });
@@ -1831,8 +1877,11 @@
       if (!list.length) { box.append(h('p', { class: 'muted' }, 'Nog geen voortgangen gevonden.')); return; }
       const delBtn = r => {
         const lid = local[r.base] || null;
-        if (r.base === S.Sync.FILE || (Pr && lid === Pr.MAIN)) return h('small', { class: 'muted admin-main' }, 'Hoofdprofiel, kan niet weg');
         const who = r.name || (lid && Pr ? Pr.label(lid) : '') || 'Zonder naam';
+        const cm = /--([a-z]{2}-[a-z]{2})\.json$/.exec(r.file || '');
+        // extra cursus (bestand <hoofd>--xx-yy.json): alleen die cursus weg, ook bij het hoofdprofiel
+        if (cm) return h('button', { class: 'btn link small del-btn', type: 'button', 'aria-label': 'Verwijder cursus ' + courseOf(r.file) + ' van ' + who, onclick: () => guard(() => deleteCourse({ name: who, localId: lid, base: r.base, course: cm[1], done: () => { box.innerHTML = ''; box.append(h('p', { class: 'muted' }, '🔄 Voortgangen ophalen…')); load(); } })) }, '🗑 Cursus verwijderen');
+        if (r.base === S.Sync.FILE || (Pr && lid === Pr.MAIN)) return h('small', { class: 'muted admin-main' }, 'Hoofdcursus van het hoofdprofiel, blijft altijd');
         const courses = list.filter(x => x.base === r.base).map(x => courseOf(x.file));
         return h('button', { class: 'btn link small del-btn', type: 'button', 'aria-label': 'Verwijder ' + who, onclick: () => guard(() => deleteAccount({ name: who, localId: lid, base: r.base, courses, done: () => { box.innerHTML = ''; box.append(h('p', { class: 'muted' }, '🔄 Voortgangen ophalen…')); load(); } })) }, '🗑 Verwijderen');
       };

@@ -1379,3 +1379,5 @@ button.life-stop:hover { background: var(--card); }
 .modal.life-prev { max-width: 640px; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; }
 .modal.life-prev .life-scene { position: relative; border-radius: 16px; overflow: hidden; margin: .5rem 0; box-shadow: var(--shadow); }
 .modal.life-prev h3 { margin: .3rem 0 .2rem; font-family: var(--serif); }
+.course-list { display: flex; flex-direction: column; gap: .4rem; margin: .2rem 0 .6rem; }
+.course-row { display: flex; align-items: center; gap: .6rem; padding: .45rem .7rem; border: 1px dashed var(--line); border-radius: 12px; }

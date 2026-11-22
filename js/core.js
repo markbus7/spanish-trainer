@@ -124,6 +124,17 @@
       if (this.reg.active === id) this.reg.active = MAIN;
       this.write(); return true;
     },
+    /* Eén cursus van een profiel weghalen (alleen op dit apparaat). De eerste cursus van een profiel is zijn hoofdcursus:
+       die staat in het hoofdbestand van de sync en kan niet los weg, dus een profiel houdt altijd minstens één cursus. */
+    canRemoveCourse(id, course) { const p = this.get(id); return !!(p && p.courses.length > 1 && p.courses.indexOf(course) > 0); },
+    removeCourse(id, course) {
+      if (!this.canRemoveCourse(id, course)) return false;
+      const p = this.get(id);
+      try { localStorage.removeItem(this.storeKey(id, course)); } catch (e) { /* negeer */ }
+      p.courses = p.courses.filter(c => c !== course);
+      if (p.course === course) p.course = p.courses[0];
+      this.write(); return true;
+    },
     /* Wisselen = actief profiel opslaan en de app opnieuw laden, zodat alles schoon met de nieuwe voortgang begint. */
     switchTo(id) {
       if (!this.get(id)) return;
@@ -205,6 +216,7 @@
       return this.state;
     },
     save(opts) {
+      if (this.frozen) return; // gegevens van deze cursus worden net verwijderd: niets meer terugschrijven
       if (!(opts && opts.quiet)) this.state.updated = Date.now();
       try { localStorage.setItem(KEY, JSON.stringify(this.state)); this.ok = true; } catch (e) { this.ok = false; }
       if (!(opts && opts.quiet) && S.Sync) S.Sync.changed();
