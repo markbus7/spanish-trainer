@@ -903,14 +903,19 @@
       const um = { role: 'user', content: text, hidden };
       chat.messages.push(um); if (!hidden) log.append(bubble(um));
       inp.value = '';
-      const am = { role: 'assistant', content: '', mode: chat.mode }; chat.messages.push(am);
+      // je eigen tekst bewaren bij Lupe's antwoord: daarmee laat de app zien wat goed en fout was (js/gloss.js)
+      const am = { role: 'assistant', content: '', mode: chat.mode, user: hidden || chat.mode === 'ask' ? '' : text, streaming: true }; chat.messages.push(am);
       const b = bubble(am, true); log.append(b); scrollLog();
       chat.busy = true; send.disabled = true;
       const sys = chat.mode === 'roleplay' ? S.AI.roleplaySystem(chat.scenario) : chat.mode === 'ask' ? S.AI.askSystem() : S.AI.writingSystem();
-      const msgs = chat.messages.filter(m => m !== am).map(m => ({ role: m.role, content: m.content }));
+      // de woordenlijst en verbeterde versie van eerdere beurten hoeven niet opnieuw mee (scheelt tokens)
+      const msgs = chat.messages.filter(m => m !== am).map(m => ({ role: m.role, content: m.role === 'assistant' ? m.content.replace(/\s*<(gloss|fix)>[\s\S]*?<\/\1>/g, '') : m.content }));
+      // in een rollenspel praat Lupe al zodra haar antwoord binnen is, niet pas na de onzichtbare lijstjes
+      let said = false;
+      const sayEarly = t => { if (said || chat.mode !== 'roleplay' || !st().settings.tutorVoice || !/\n\s*---\s*\n/.test(t)) return; said = true; S.Tutor.say(S.Tutor.spoken(t, 'roleplay')); };
       try {
-        const full = await S.AI.stream({ system: sys, messages: msgs, maxTokens: chat.mode === 'roleplay' ? 1500 : 3000, effort: chat.mode === 'write' ? 'medium' : 'low', onText: t => { am.content = t; fillBubble(b, am); scrollLog(); } });
-        am.content = full;
+        const full = await S.AI.stream({ system: sys, messages: msgs, maxTokens: chat.mode === 'roleplay' ? 1500 : 3000, effort: chat.mode === 'write' ? 'medium' : 'low', onText: t => { am.content = t; fillBubble(b, am); scrollLog(); sayEarly(t); } });
+        am.content = full; am.streaming = false;
         // fouten uit je bericht noteren voor je rapport (rollenspel en correctie)
         let found = null;
         if (!hidden && chat.mode !== 'ask') found = S.Mistakes.record(full, chat.mode, text, { sc: chat.mode === 'roleplay' && chat.scenario ? (chat.scenario.title || chat.scenario.nl) : '' });
@@ -922,7 +927,7 @@
           Store.today().done.speak = true; S.Sound.good(); S.toast('🗣️ Gesprek gevoerd: spreken is afgevinkt in je dagplan ✓', 3200);
         }
         save();
-        if (st().settings.tutorVoice) S.Tutor.say(S.Tutor.spoken(full, am.mode));
+        if (st().settings.tutorVoice && !said) S.Tutor.say(S.Tutor.spoken(full, am.mode));
       } catch (e) {
         chat.messages.pop(); if (!hidden) { /* laat de vraag staan */ }
         b.querySelector('.bubble-body').innerHTML = '<span class="warn">⚠️ ' + U.esc(e.message) + '</span>';
@@ -988,11 +993,21 @@
     const body = b.querySelector('.bubble-body'); body.innerHTML = '';
     if (m.role === 'user') { body.textContent = m.content; return; }
     const [reply, ...rest] = S.Mistakes.strip(m.content).split(/\n\s*---\s*\n/);
-    const r = h('div', { class: 'reply', lang: m.mode === 'roleplay' ? 'es' : null, html: S.md(reply) });
+    const r = h('div', { class: 'reply', lang: m.mode === 'roleplay' ? S.course.target : null, html: S.md(reply) });
+    // je eigen zin met de verbeteringen erin (groen goed, rood doorgestreept fout, verbetering ernaast)
+    const fix = !m.streaming && m.user ? S.Gloss.parseFix(m.content) : '';
+    const dv = fix ? S.Gloss.diffView(m.user, fix, { title: m.mode === 'write' ? 'Jouw tekst, verbeterd' : 'Jouw zin, verbeterd' }) : null;
+    if (dv && m.mode === 'write') body.append(dv);
     body.append(r);
-    if (rest.length) body.append(h('div', { class: 'correction', html: S.md(rest.join('\n')) }));
-    // Spaanse (vetgedrukte) stukken: tik om ze te horen
-    body.querySelectorAll('b').forEach(x => { if (/[a-záéíóúñ]/i.test(x.textContent) && !/:\s*$/.test(x.textContent)) { x.classList.add('say-es'); x.lang = 'es'; x.title = 'Tik om te horen'; x.onclick = () => S.Tutor.say(S.Tutor.spoken('**' + x.textContent + '**', 'ask')); } });
+    if (rest.length || (dv && m.mode !== 'write')) body.append(h('div', { class: 'correction' }, m.mode !== 'write' ? dv : null, rest.length ? h('div', { html: S.md(rest.join('\n')) }) : null));
+    // rollenspel: tik op elk woord van Lupe voor de betekenis in deze zin
+    if (m.mode === 'roleplay' && !m.streaming) {
+      S.Gloss.decorate(r, S.Gloss.parseGloss(m.content), { scroller: b.closest('.chat-log') || document.querySelector('.chat-log') });
+      if (!m.tipShown && !st().settings.glossTipSeen) { st().settings.glossTipSeen = true; m.tipShown = true; save(); }
+      if (m.tipShown) r.after(h('div', { class: 'gloss-tip small muted' }, '👆 Tik op een woord van Lupe voor de vertaling in deze zin'));
+    }
+    // Spaanse (vetgedrukte) stukken: tik om ze te horen (in een rollenspel tik je per woord, zie hierboven)
+    body.querySelectorAll(m.mode === 'roleplay' ? '.correction b' : 'b').forEach(x => { if (!x.closest('.df-box') && /[a-záéíóúñ]/i.test(x.textContent) && !/:\s*$/.test(x.textContent)) { x.classList.add('say-es'); x.lang = 'es'; x.title = 'Tik om te horen'; x.onclick = () => S.Tutor.say(S.Tutor.spoken('**' + x.textContent + '**', 'ask')); } });
     const sp = S.Tutor.spoken(m.content, m.mode);
     if (m.logged) body.append(h('a', { class: 'logged small', href: '#/rapport', title: 'Bekijk je rapport' }, '📋 ' + U.plural(m.logged, 'fout', 'fouten') + ' genoteerd in je rapport'));
     if (sp && Speech.canSpeak()) body.append(h('button', { class: 'btn link small replay', type: 'button', title: 'Laat Lupe het nog eens zeggen' , onclick: e => { e.stopPropagation(); S.Tutor.say(sp); } }, '🔊 Nog eens'));

@@ -1381,3 +1381,34 @@ button.life-stop:hover { background: var(--card); }
 .modal.life-prev h3 { margin: .3rem 0 .2rem; font-family: var(--serif); }
 .course-list { display: flex; flex-direction: column; gap: .4rem; margin: .2rem 0 .6rem; }
 .course-row { display: flex; align-items: center; gap: .6rem; padding: .45rem .7rem; border: 1px dashed var(--line); border-radius: 12px; }
+
+/* rollenspel: tik op een woord van Lupe voor de vertaling in deze zin (js/gloss.js) */
+.reply.tw-on .tw { cursor: pointer; border-radius: 5px; text-decoration: underline dotted color-mix(in srgb, var(--ink2) 45%, transparent); text-underline-offset: 4px; text-decoration-thickness: 1.5px; transition: background .15s; -webkit-tap-highlight-color: transparent; }
+.reply.tw-on .tw:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.reply.tw-on .tw.lit { background: var(--accent-soft); color: var(--ink); text-decoration-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.reply.tw-on .tw:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.gloss-tip { margin-top: .35rem; }
+.gloss-pop { position: fixed; z-index: 120; min-width: 160px; max-width: min(300px, calc(100vw - 20px)); padding: .65rem .8rem .55rem; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.08); animation: gp-in .14s ease-out; }
+.gloss-pop::before { content: ''; position: absolute; top: -7px; left: calc(var(--ax, 50%) - 7px); width: 12px; height: 12px; background: var(--card); border-left: 1px solid var(--line); border-top: 1px solid var(--line); transform: rotate(45deg); }
+.gloss-pop.up::before { top: auto; bottom: -7px; transform: rotate(225deg); }
+@keyframes gp-in { from { opacity: 0; transform: translateY(4px); } }
+.gp-top { display: flex; align-items: center; gap: .4rem; justify-content: space-between; }
+.gp-top b { font-size: 1.05rem; color: var(--accent); }
+.gp-say { width: 34px; height: 34px; font-size: 1rem; flex: none; }
+.gp-m { font-size: 1.02rem; font-weight: 600; margin-top: .15rem; }
+.gp-w { margin-top: .2rem; }
+.gp-foot { display: flex; align-items: center; justify-content: space-between; gap: .6rem; margin-top: .35rem; border-top: 1px solid var(--line); padding-top: .35rem; }
+.gp-add { padding: 0; white-space: nowrap; }
+
+/* je eigen zin met de verbeteringen erin: groen goed, rood doorgestreept fout, verbetering ernaast */
+.df-box { margin: 0 0 .55rem; padding: .55rem .7rem; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); color: var(--ink); }
+.df-head { margin-bottom: .2rem; }
+.df-line { font-size: 1.02rem; line-height: 1.9; }
+.df-ok { color: var(--ok); font-weight: 600; }
+.df-ok.df-acc { text-decoration: underline wavy var(--gold); text-underline-offset: 4px; }
+.df-bad { color: var(--bad); text-decoration: line-through 2px; text-decoration-color: var(--bad); background: var(--bad-soft); border-radius: 5px; padding: 0 .2em; }
+.df-new { text-decoration: none; color: var(--ok); font-weight: 700; background: var(--ok-soft); border: 1px solid color-mix(in srgb, var(--ok) 45%, transparent); border-radius: 6px; padding: 0 .3em; }
+.df-new.repl::before { content: '→ '; font-weight: 600; opacity: .7; }
+.df-legend { margin-top: .25rem; line-height: 1.8; }
+.df-legend .df-bad, .df-legend .df-new, .df-legend .df-ok { font-size: .82rem; }
+.correction > .df-box + div { margin-top: .1rem; }
