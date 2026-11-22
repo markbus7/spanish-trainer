@@ -226,7 +226,7 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
 {
   const list = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/tts-texts.js')], { maxBuffer: 64 << 20 }).toString());
   const have = new Set(list.map(x => x.k));
-  ok(list.every(x => x.k === S.Speech.clipKey(x.text, x.ns) && /^(es-[A-Z]{2}|en-US|nl-NL)-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
+  ok(list.every(x => x.k === S.Speech.clipKey(x.text, x.ns) && /^(es-[A-Z]{2}|en-[A-Z]{2}|nl-(NL|BE)|af-ZA)-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
   // invulzinnen: voorgelezen met een stilte op het gat, hints tussen haakjes niet
   ok(JSON.stringify(S.Speech.gapParts('Did you ___ the email?')) === JSON.stringify(['Did you …', null, '… the email?']), 'invulzin: stukken rond het gat');
   ok(JSON.stringify(S.Speech.gapParts('¡___ la verdad! (decir, tú)')) === JSON.stringify([null, '… la verdad!']), 'invulzin: gat vooraan, hint weg');
@@ -1094,6 +1094,43 @@ await micTests();
     ok(K.t('Vandaag') !== 'Vandaag' && K.t('Instellingen') !== 'Instellingen', w + 'schermteksten vertaald');
     ok(K.t(K.U.plural(3, 'dag', 'dagen')) === '3 días', w + 'meervoud vertaald: ' + K.U.plural(3, 'dag', 'dagen'));
     ok(Object.values(K.i18n.dict).every(v => !latam.test(v)), w + 'vertaling Latijns-Amerikaans');
+  }
+}
+{ // Op reis in elke taal: elke cursus met een landenlijst heeft een eigen kaart, vlaggen en opnames per land
+  const list = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/tts-texts.js')], { maxBuffer: 64 << 20 }).toString());
+  const have = new Set(list.map(x => x.k));
+  const files = [...fs.readFileSync(path.join(root, 'index.html'), 'utf8').matchAll(/src="((?:js|content)\/[^"?]+\.js)(?:\?[^"]*)?"/g)].map(m => m[1])
+    .filter(f => !/(app|lesson|ai|sync|ask)\.js$/.test(f));
+  const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  const want = { 'es-nl': ['es', 21], 'en-nl': ['en', 12], 'nl-es': ['nl', 5] };
+  for (const course of Object.keys(S.COURSES)) {
+    const w = 'op reis ' + course + ': ';
+    const c = vm.createContext({ console, setTimeout, clearTimeout }); c.window = c; c.globalThis = c; c.self = c; c.SPT_COURSE = course;
+    for (const f of files) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), c, { filename: f });
+    const K = c.SPT, Mu = K.Mundo, ps = Mu.list(), meta = Mu.meta();
+    ok(Object.keys(K.MAPS || {}).every(t => t === K.course.target), w + 'alleen de kaart van de eigen doeltaal');
+    if (!want[course]) { ok(!ps.length, w + 'geen landen van een andere cursus'); continue; }
+    const [tg, min] = want[course], M = K.MAPS[tg], k = M && (M.k || 1);
+    ok(meta.target === tg && K.course.target === tg && M, w + 'kaart ' + tg + ' geladen');
+    ok(ps.length >= min && new Set(ps.map(p => p.id)).size === ps.length, w + ps.length + ' landen, unieke codes');
+    ok(meta.intro && ps.some(p => p.voice === meta.base), w + 'inleiding en basisstem');
+    ps.forEach(p => {
+      const v = w + p.id + ' ';
+      ok(fs.existsSync(path.join(root, 'icons/vlaggen/' + (p.flagImg || p.id) + '.png')) && files.some(f => f.includes('kaarten/' + tg)) && sw.includes('content/kaarten/' + tg + '.js'), v + 'vlag en kaartbestand');
+      ok(p.noShape || (M.c[p.id] && M.c[p.id].d.length > 20), v + 'staat op de kaart');
+      ok(p.pin && p.pin[0] >= 15 * k && p.pin[0] <= M.w - 15 * k && p.pin[1] >= 15 * k && p.pin[1] <= M.h - 15 * k, v + 'vlagknop binnen de kaart');
+      ok(K.placeGroups.some(g => g.id === p.group), v + 'heeft een groep');
+      ok(p.hello && p.hello.length >= 2 && p.intro && p.sounds.length >= 2 && p.sounds.every(x => (x.length === 4 || x.length === 5) && x.every(Boolean) && x[4] !== x[2]), v + 'begroeting, intro en klanken');
+      ok(p.words.length >= 8 && p.words.every(w2 => w2[0] && w2[1] && (!w2[2] || ['i', 'g'].includes(w2[2]))) && new Set(p.words.map(x => x[0])).size === p.words.length, v + 'woorden en labels, geen dubbele');
+      const pr = Mu.practice(p), qz = Mu.quiz(p);
+      ok(pr.items.length >= p.words.length * 2 && qz.items.length === Math.min(10, p.words.length) && [...pr.items, ...qz.items].every(it => it.kind !== 'mc' || (it.options.includes(it.answer) && new Set(it.options).size === it.options.length)), v + 'oefening en toets');
+      // alles wat de landpagina voorleest, is ingesproken met de stem van dat land
+      const ns = Mu.ns(p), clip = (t, n) => have.has(K.Speech.clipKey(t, n));
+      ok(ns === (tg === 'es' ? 'pl-' + p.id : 'pl-' + tg + '-' + p.id), v + 'eigen naamruimte voor opnames');
+      ok(clip(p.hello[0], ns) && p.sounds.every(x => clip(x[2], ns)) && p.words.every(x => clip(x[0], ns)), v + 'opnames per land');
+      ok(p.voice === meta.base || p.sounds.every(x => have.has(K.Speech.clipKey(x[4] || x[2], K.course.ns))), v + 'neutrale versie ingesproken');
+    });
+    ok(list.filter(x => String(x.ns || '').startsWith(Mu.nsFor(tg, ''))).every(x => !/^es-MX/.test(x.voice) || tg === 'es'), w + 'geen Mexicaanse stem in een ander land');
   }
 }
 { // Engels voor Nederlandstaligen (en-nl): A1–C2, uitleg in het Nederlands

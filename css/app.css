@@ -433,6 +433,8 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .me-icon { font-size: 2.2rem; } .me-flags { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .2rem; } .me-flags .flag-img { width: 1.35em; height: 1em; }
 .mundo-card { padding: .6rem; }
 .mundo-map { display: block; width: 100%; max-width: 620px; height: auto; max-height: 78vh; margin: 0 auto; touch-action: manipulation; }
+.mundo-map.wide { max-width: 980px; max-height: none; } /* wereldkaart (Engels) */
+.pl-note { margin: 0 0 .4rem; }
 .mundo-map .sea { fill: var(--sea); }
 .mundo-map .land { fill: var(--land0); stroke: var(--card); stroke-width: .6; }
 .mundo-map .inset { fill: var(--sea); stroke: var(--line); stroke-width: 1.2; }

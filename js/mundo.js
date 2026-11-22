@@ -1,8 +1,11 @@
 /* Uitbreiding «Op reis» (#/mundo, #/pais/<id>): een kaart met de landen van de doeltaal; per land klank, woorden en slang,
    oefenen en een paspoortstempel. Los van de basiscursus: geen SRS, geen dagplan, geen route.
-   Lesstof: S.places + S.placeGroups (content/landen.js), kaart: S.MAPS[doeltaal] (content/kaarten/*.js).
+   Werkt voor elke doeltaal: elke cursus heeft een eigen landenlijst (S.places + S.placeGroups + S.placeMeta, bijv.
+   content/landen.js voor Spaans, content/en-nl/landen.js voor Engels) en een kaart S.MAPS[doeltaal] (content/kaarten/<taal>.js,
+   gemaakt met tools/kaart-maken.mjs). Nieuwe taal = die twee bestanden plus stemmen per land in tools/tts-texts.js (PLACE_VOICES).
    Voortgang: Store.state.places[id] = { v: eerste bezoek, n: keer geoefend, best: beste toetsscore 0–1, stamp: datum stempel }.
-   Opnames per land in naamruimte 'pl-<id>' (tools/tts-texts.js); Speech.placeNs zet die tijdens een oefening. */
+   Opnames per land in naamruimte 'pl-<id>' (Spaans) of 'pl-<taal>-<id>' (andere talen), zie tools/tts-texts.js;
+   Speech.placeNs zet die tijdens een oefening. */
 (function (S) {
   'use strict';
   const { U } = S;
@@ -14,7 +17,11 @@
   /* ---------- gegevens (zonder DOM, getest in tests/run.js) ---------- */
   const list = () => S.places || [];
   const get = id => list().find(p => p.id === id) || null;
-  const ns = p => 'pl-' + p.id;
+  /* Gegevens van de landenset van deze cursus: doeltaal, basisstem (de stem van de basiscursus) en de inleiding. */
+  const meta = () => Object.assign({ target: 'es', base: 'MX', suffix: ' Spaanssprekers',
+    intro: 'Je basiscursus blijft neutraal Latijns-Amerikaans Spaans. Hier ga je zelf op bezoek: tik op een land en hoor hoe het Spaans daar klinkt, met de typische woorden en slang. Wat je hier oefent, komt niet in je gewone herhaling.' }, S.placeMeta || {});
+  const nsFor = (target, id) => target === 'es' ? 'pl-' + id : 'pl-' + target + '-' + id;
+  const ns = p => nsFor(meta().target, p.id);
   const prog = id => (st().places || {})[id] || null;
   function progOf(id) { const s = st(); s.places = s.places || {}; return s.places[id] || (s.places[id] = {}); }
   function status(id) { const p = prog(id); return !p ? 'new' : p.stamp ? 'stamp' : p.v ? 'seen' : 'new'; }
@@ -81,11 +88,12 @@
     return h('button', { class: 'btn small pl-say', type: 'button', onclick: e => { e.stopPropagation(); say(p, text); } }, '🔊 ' + (label || p.name));
   }
   function svgMap() {
-    const M = S.MAPS && S.MAPS[S.course.target]; if (!M) return null;
+    const M = S.MAPS && S.MAPS[meta().target]; if (!M) return null;
+    const k = M.k || 1, fw = 20 * k, fh = 15 * k; // grotere vlagknoppen op een brede (wereld)kaart
     const NS = 'http://www.w3.org/2000/svg';
     const el = (tag, attrs, kids) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); (kids || []).forEach(c => c && e.append(c)); return e; };
     const go = id => { location.hash = '#/pais/' + id; };
-    const svg = el('svg', { viewBox: `0 0 ${M.w} ${M.h}`, class: 'mundo-map', role: 'img', 'aria-label': 'Kaart van de Spaanstalige landen' });
+    const svg = el('svg', { viewBox: `0 0 ${M.w} ${M.h}`, class: 'mundo-map' + (M.w > M.h ? ' wide' : ''), role: 'img', 'aria-label': 'Kaart van de landen waar je deze taal spreekt' });
     svg.append(el('rect', { x: 0, y: 0, width: M.w, height: M.h, class: 'sea', rx: 18 }));
     svg.append(el('path', { d: M.bg, class: 'land' }));
     const shapes = el('g'), lines = el('g'), pins = el('g');
@@ -95,10 +103,10 @@
       if (c) { const sh = el('path', { d: c.d, class: 'cty ' + s }); sh.addEventListener('click', () => go(p.id)); shapes.append(sh); }
       const [x, y] = p.pin || (c ? c.p : [0, 0]);
       if (p.line && c) lines.append(el('line', { x1: x, y1: y, x2: c.p[0], y2: c.p[1], class: 'lead' }));
-      const im = el('image', { x: x - 10, y: y - 7.5, width: 20, height: 15, href: flagSrc(p), preserveAspectRatio: 'xMidYMid slice', class: 'pin-flag' });
+      const im = el('image', { x: x - fw / 2, y: y - fh / 2, width: fw, height: fh, href: flagSrc(p), preserveAspectRatio: 'xMidYMid slice', class: 'pin-flag' });
       im.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', flagSrc(p));
-      const g = el('g', { class: 'pin ' + s, tabindex: 0, role: 'link', 'aria-label': p.name }, [el('circle', { cx: x, cy: y, r: 15 }), im, el('rect', { x: x - 10, y: y - 7.5, width: 20, height: 15, rx: 2, class: 'pin-edge' })]);
-      if (s === 'stamp') { const ok = el('text', { x: x + 11, y: y - 10, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'pin-ok' }); ok.textContent = '✓'; g.append(el('circle', { cx: x + 11, cy: y - 10, r: 7, class: 'pin-okbg' }), ok); }
+      const g = el('g', { class: 'pin ' + s, tabindex: 0, role: 'link', 'aria-label': p.name }, [el('circle', { cx: x, cy: y, r: 15 * k }), im, el('rect', { x: x - fw / 2, y: y - fh / 2, width: fw, height: fh, rx: 2, class: 'pin-edge' })]);
+      if (s === 'stamp') { const ok = el('text', { x: x + 11 * k, y: y - 10 * k, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'pin-ok', style: 'font-size:' + 9 * k + 'px' }); ok.textContent = '✓'; g.append(el('circle', { cx: x + 11 * k, cy: y - 10 * k, r: 7 * k, class: 'pin-okbg' }), ok); }
       g.addEventListener('click', () => go(p.id));
       g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(p.id); } });
       pins.append(g);
@@ -116,7 +124,7 @@
     wrap.append(h('a', { class: 'back', href: '#/ruta' }, '← Ruta'),
       h('div', { class: 'eyebrow' }, 'Uitbreiding · los van je cursus'),
       h('h1', null, '🗺️ Op reis'),
-      h('p', { class: 'muted' }, 'Je basiscursus blijft neutraal Latijns-Amerikaans Spaans. Hier ga je zelf op bezoek: tik op een land en hoor hoe het Spaans daar klinkt, met de typische woorden en slang. Wat je hier oefent, komt niet in je gewone herhaling.'));
+      h('p', { class: 'muted' }, meta().intro));
     wrap.append(h('div', { class: 'card passport' },
       h('div', { class: 'pp-head' }, h('b', null, '🛂 Mijn paspoort'), h('span', { class: 'muted small' }, got + ' van ' + n + ' stempels')),
       h('div', { class: 'pbar' }, h('i', { style: { width: Math.round(got / Math.max(1, n) * 100) + '%' } })),
@@ -137,23 +145,24 @@
     const p = get(id); if (!p) { location.hash = '#/mundo'; return h('div'); }
     const g = progOf(p.id); if (!g.v) { g.v = Date.now(); S.Store.save({ quiet: true }); }
     const wrap = h('div', { class: 'page mundo-pais' });
-    const neutral = p.voice !== 'MX';
+    const neutral = p.voice !== meta().base;
     wrap.append(h('a', { class: 'back', href: '#/mundo' }, '← Kaart'),
       h('div', { class: 'pl-hero card' },
         h('div', { class: 'pl-flag' }, flagImg(p)),
         h('div', { class: 'grow' },
           h('div', { class: 'eyebrow' }, 'Op reis · ' + p.city),
           h('h1', null, p.name),
-          h('p', { class: 'muted small' }, p.speakers + ' Spaanssprekers'),
+          h('p', { class: 'muted small' }, p.speakers + meta().suffix),
           h('p', null, p.intro),
           h('div', { class: 'pl-hello' }, hereBtn(p, p.hello[0], 'Luister'), h('span', null, h('b', { lang: 'es' }, p.hello[0]), h('small', { class: 'muted' }, p.hello[1]))))));
     wrap.append(h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, '👂 Hoe klinkt het?'),
+      p.voiceNote ? h('p', { class: 'small muted pl-note' }, 'ℹ️ ' + p.voiceNote) : null,
       neutral ? h('p', { class: 'small muted' }, 'Vergelijk: ', h('b', null, '🔊 ' + p.name), ' is een stem van hier, ', h('b', null, '🔊 Neutraal'), ' is de stem van je basiscursus.') : null,
       (p.sounds || []).map(([t, x, es, nl, neu]) => h('div', { class: 'card pl-sound' },
         h('b', null, t), h('p', { class: 'small' }, x),
         h('div', { class: 'pl-ex' }, h('div', { class: 'grow' }, h('div', { class: 'es', lang: 'es' }, es), h('div', { class: 'small muted' }, nl))),
         neutral && neu && neu !== es ? h('div', { class: 'pl-ex neutral' }, h('div', { class: 'grow' }, h('div', { class: 'small muted' }, 'Neutraal, zoals in je basiscursus:'), h('div', { class: 'es', lang: 'es' }, neu))) : null,
-        h('div', { class: 'row gap wrap' }, hereBtn(p, es), neutral ? h('button', { class: 'btn small ghost', type: 'button', onclick: () => S.Speech.say(neu || es, { clipNs: null }) }, '🔊 Neutraal') : null)))));
+        h('div', { class: 'row gap wrap' }, hereBtn(p, es), neutral ? h('button', { class: 'btn small ghost', type: 'button', onclick: () => S.Speech.say(neu || es, { clipNs: S.course.ns }) }, '🔊 Neutraal') : null)))));
     const ws = words(p);
     const row = (pl, i) => { const [es, nl, lab] = pl.words[i]; return h('div', { class: 'word-row' },
       h('button', { class: 'icon-btn speak', type: 'button', 'aria-label': 'Beluister', onclick: e => { e.stopPropagation(); say(pl, pl.words[i][0]); } }, '🔊'),
@@ -191,7 +200,7 @@
         h('button', { class: 'btn wide', type: 'button', onclick: () => run(p, 'quiz') }, g.stamp ? '🛂 Toets opnieuw doen' : '🛂 Haal je stempel (' + QUIZ_N + ' vragen)'),
         h('p', { class: 'small muted' }, g.stamp ? 'Stempel gehaald op ' + new Date(g.stamp).toLocaleDateString(S.LOC, { day: 'numeric', month: 'long' }) + '. Beste score: ' + Math.round((g.best || 0) * 100) + '%.'
           : 'Haal ' + Math.round(PASS * 100) + '% of meer voor een stempel in je paspoort.' + (g.best ? ' Je beste score tot nu toe: ' + Math.round(g.best * 100) + '%.' : '')),
-        unit ? h('a', { class: 'btn ghost wide', href: '#/unit/' + unit.id }, unit.icon + ' Meer in de route: B2 · ' + unit.title) : null)));
+        unit ? h('a', { class: 'btn ghost wide', href: '#/unit/' + unit.id }, unit.icon + ' Meer in de route: ' + unit.level + ' · ' + unit.title) : null)));
     return wrap;
   }
   function run(p, kind, resumed) {
@@ -213,5 +222,5 @@
   /* Onderbroken oefening van een land hervatten (vanuit «Verder waar je was»). */
   function resume(session, d) { const p = get(d.id); if (p) run(p, d.what, session); else S.runSession(session, { desc: d }); }
 
-  S.Mundo = { flagImg, search, list, get, status, stamps, words, practice, quiz, finish, page, placePage, resume, PASS };
+  S.Mundo = { flagImg, search, list, get, meta, ns, nsFor, status, stamps, words, practice, quiz, finish, page, placePage, resume, PASS };
 })(window.SPT);

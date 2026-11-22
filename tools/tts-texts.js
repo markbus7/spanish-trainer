@@ -130,7 +130,7 @@ LV = 'X';
    Woorden met een uitspraakhint (4e veld) houden hun sleutel, maar de stem leest de hint. De klankzinnen
    komen ook zonder naamruimte (Mexicaanse stem) voor de knop «Neutraal». */
 for (const p of S.places || []) {
-  const [vf, vm_] = VOICES[p.voice] || VOICES.MX, ns = 'pl-' + p.id;
+  const [vf, vm_] = VOICES[p.voice] || VOICES.MX, ns = S.Mundo.ns(p);
   const put = (text, voice, said) => {
     if (!text) return;
     const k = S.Speech.clipKey(text, ns);
@@ -193,6 +193,38 @@ for (const [course, [vf, vm_]] of Object.entries(OTHER)) {
   for (const es of S.Tutor.lines.every(S.Tutor.lineLang === 'en' ? S.C.all() : [])) for (const [v, o] of Object.entries(lupeV)) {
     const lns = 'lupe-' + v, k = S.Speech.clipKey(es, lns);
     if (!out.has(k)) out.set(k, { k, ns: lns, text: S.Speech.clean(es), voice: o.voice, pitch: o.pitch, rate: o.rate, lv: ['X'] });
+  }
+}
+/* Op reis in andere talen (content/<cursus>/landen.js): stemmen per land, [vrouw, man]. Geen eigen stem (Jamaica,
+   Suriname, Curaçao)? Dan een verwante stem; de app zegt dat erbij (voiceNote). Nieuwe taal: hier een rij toevoegen. */
+const PLACE_VOICES = {
+  en: {
+    US: ['en-US-AriaNeural', 'en-US-GuyNeural'], CA: ['en-CA-ClaraNeural', 'en-CA-LiamNeural'], GB: ['en-GB-SoniaNeural', 'en-GB-RyanNeural'],
+    IE: ['en-IE-EmilyNeural', 'en-IE-ConnorNeural'], AU: ['en-AU-NatashaNeural', 'en-AU-WilliamNeural'], NZ: ['en-NZ-MollyNeural', 'en-NZ-MitchellNeural'],
+    ZA: ['en-ZA-LeahNeural', 'en-ZA-LukeNeural'], IN: ['en-IN-NeerjaNeural', 'en-IN-PrabhatNeural'], NG: ['en-NG-EzinneNeural', 'en-NG-AbeoNeural'],
+    KE: ['en-KE-AsiliaNeural', 'en-KE-ChilembaNeural'], SG: ['en-SG-LunaNeural', 'en-SG-WayneNeural'], PH: ['en-PH-RosaNeural', 'en-PH-JamesNeural'],
+    JM: ['en-GB-LibbyNeural', 'en-GB-ThomasNeural']
+  },
+  nl: {
+    NL: ['nl-NL-FennaNeural', 'nl-NL-MaartenNeural'], BE: ['nl-BE-DenaNeural', 'nl-BE-ArnaudNeural'], SR: ['nl-NL-ColetteNeural', 'nl-NL-MaartenNeural'],
+    CW: ['nl-NL-ColetteNeural', 'nl-NL-MaartenNeural'], AF: ['af-ZA-AdriNeural', 'af-ZA-WillemNeural']
+  }
+};
+for (const course of Object.keys(OTHER)) {
+  S = load(course);
+  if (!(S.places || []).length) continue;
+  const meta = S.Mundo.meta(), V = PLACE_VOICES[meta.target] || {}, base = V[meta.base] || OTHER[course];
+  for (const p of S.places) {
+    const [vf, vm_] = V[p.voice] || base, ns = S.Mundo.ns(p);
+    const put = (text, voice, said, n = ns) => {
+      if (!text) return;
+      const k = S.Speech.clipKey(text, n);
+      if (!out.has(k)) out.set(k, Object.assign({ k, ns: n, text: S.Speech.clean(text), voice, lv: [(n === ns ? ns : course) + ':X'] }, said ? { say: S.Speech.clean(said) } : {}));
+    };
+    put(p.hello[0], vm_, p.hello[2]);
+    // klankzin met de stem van het land; de neutrale versie (knop «Neutraal») in de naamruimte van de cursus, met de basisstem
+    (p.sounds || []).forEach(([, , t, , neu], i) => { put(t, i % 2 ? vm_ : vf); put(neu || t, base[0], null, S.course.ns); });
+    p.words.forEach(([t, , , said]) => put(t, vf, said));
   }
 }
 const list = [...out.values()];
