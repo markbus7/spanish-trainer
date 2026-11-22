@@ -83,6 +83,36 @@
       return 'spt.p.' + id + '.' + course;
     },
     syncKey: id => id === MAIN ? 'spt.sync' : 'spt.p.' + id + '.sync',
+    /* De AI-sleutel (Lupe) hoort bij het profiel, niet bij een cursus: wie van taal wisselt, houdt hem.
+       Hij blijft op dit apparaat (de sync stuurt hem nooit mee). */
+    aiKeyKey: id => id === MAIN ? 'spt.aikey' : 'spt.p.' + id + '.aikey',
+    aiKey(id) {
+      id = id || this.activeId();
+      try {
+        const k = localStorage.getItem(this.aiKeyKey(id));
+        if (k != null) return k;
+        // Eerste keer na de update: de sleutel staat nog in één (of meer) cursussen. Neem de nieuwste en zet hem bij het profiel.
+        const p = this.get(id); let best = '', when = -1;
+        ((p && p.courses) || ['es-nl']).forEach(c => {
+          try { const d = JSON.parse(localStorage.getItem(this.storeKey(id, c)) || 'null'); const v = d && d.settings && String(d.settings.aiKey || '').trim(); if (v && (d.updated || 0) > when) { best = v; when = d.updated || 0; } } catch (e) { /* negeer */ }
+        });
+        if (best) this.setAiKey(id, best);
+        return best;
+      } catch (e) { return ''; }
+    },
+    setAiKey(id, key, clean) {
+      key = String(key || '').trim();
+      try {
+        localStorage.setItem(this.aiKeyKey(id), key);
+        if (!clean) return; // bij het overzetten blijft de bestaande voortgang onaangeroerd
+        // Sleutel gewijzigd of verwijderd: geen oude kopieën in de cursussen laten staan.
+        const p = this.get(id);
+        ((p && p.courses) || ['es-nl']).forEach(c => {
+          const sk = this.storeKey(id, c);
+          try { const d = JSON.parse(localStorage.getItem(sk) || 'null'); if (d && d.settings && d.settings.aiKey) { d.settings.aiKey = ''; localStorage.setItem(sk, JSON.stringify(d)); } } catch (e) { /* negeer */ }
+        });
+      } catch (e) { /* opslag vol of geblokkeerd */ }
+    },
     /* Korte blik in de voortgang van een profiel, zonder het te laden (voor de profielkiezer). */
     peek(id, course) {
       try {
@@ -119,7 +149,7 @@
     /* Profiel en zijn gegevens van dit apparaat halen. Het eerste profiel kan niet weg. */
     remove(id) {
       if (id === MAIN || !this.get(id)) return false;
-      try { this.get(id).courses.forEach(c => localStorage.removeItem(this.storeKey(id, c))); localStorage.removeItem(this.syncKey(id)); } catch (e) { /* negeer */ }
+      try { this.get(id).courses.forEach(c => localStorage.removeItem(this.storeKey(id, c))); localStorage.removeItem(this.syncKey(id)); localStorage.removeItem(this.aiKeyKey(id)); } catch (e) { /* negeer */ }
       this.reg.list = this.reg.list.filter(p => p.id !== id);
       if (this.reg.active === id) this.reg.active = MAIN;
       this.write(); return true;
@@ -214,12 +244,16 @@
           if (S.Mistakes && this.state.lupe) S.Mistakes.scrubAll(this.state.lupe); // privacy: oude berichten weg
         }
       } catch (e) { this.ok = false; }
+      // AI-sleutel van het profiel (geldt voor alle cursussen); oude sleutels in de cursus gaan hier één keer mee over
+      { const k = Profiles.aiKey(Profiles.activeId()); this.state.settings.aiKey = k; this._aiKey = k; }
       return this.state;
     },
     save(opts) {
       if (this.frozen) return; // gegevens van deze cursus worden net verwijderd: niets meer terugschrijven
       if (!(opts && opts.quiet)) this.state.updated = Date.now();
-      try { localStorage.setItem(KEY, JSON.stringify(this.state)); this.ok = true; } catch (e) { this.ok = false; }
+      const ak = String(this.state.settings.aiKey || '').trim();
+      if (ak !== this._aiKey) { Profiles.setAiKey(Profiles.activeId(), ak, true); this._aiKey = ak; }
+      try { localStorage.setItem(KEY, JSON.stringify(this.state, (k, v) => k === 'aiKey' ? '' : v)); this.ok = true; } catch (e) { this.ok = false; }
       if (!(opts && opts.quiet) && S.Sync) S.Sync.changed();
     },
     export() { return JSON.stringify(this.state, null, 1); },

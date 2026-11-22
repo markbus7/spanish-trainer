@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.54.1', date: '2026-11-22',
+    nl: ['Je AI-sleutel voor Lupe hoort nu bij je profiel: hij blijft staan als je van taal of cursus wisselt.'],
+    es: [] },
   { v: '1.54.0', date: '2026-11-22',
     nl: ['Invulzinnen worden voorgelezen met een stilte op de plek van het gat (🔊 en 🐢 naast de zin). Niveautest: elke invulzin heeft nu een vertaling. Bij «Wat hoor je?» zie je na je antwoord ook wat het woord betekent.'],
     es: [] },
