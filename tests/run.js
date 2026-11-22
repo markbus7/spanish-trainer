@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js']) {
+for (const f of ['js/core.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -790,6 +790,32 @@ await micTests();
   const reply = '¡Claro! ¿Y tú?\n---\n❌ soy cansado → ✅ estoy cansado — toestand\n<log>[{"w":"soy cansado","c":"estoy cansado","why":"toestand = estar","tag":"ser-estar"},{"w":"el coche","c":"el carro","why":"in Latijns-Amerika","tag":"vocab","es":"el carro","nl":"de auto"},{"w":"x","c":"y","tag":"bestaat-niet"}]</log>';
   ok(!Mi.strip(reply).includes('<log') && Mi.strip(reply).endsWith('toestand'), 'lupe-log: blok wordt verborgen');
   ok(Mi.strip('Hola amigo\n<lo') === 'Hola amigo' && Mi.strip('Hola\n<log>[{"w":') === 'Hola', 'lupe-log: half binnengekomen blok ook verborgen');
+  {
+    const G = S.Gloss;
+    const full = 'Hola, ¿qué onda? Me gustaría un café.\n---\n✅ ¡Perfecto!\n<fix>Quiero un café, por favor.</fix>\n<gloss>[["Hola","Hoi"],["¿qué onda?","hoe is het?"],["Me gustaría","ik zou graag willen"],["un","een"],["café","koffie"]]</gloss>\n<log>[]</log>';
+    const vis = G.strip(full);
+    ok(!/<(fix|gloss|log)/.test(vis) && vis.endsWith('¡Perfecto!'), 'gloss: blokken verborgen');
+    ok(G.strip('Hola\n<gloss>[["Ho') === 'Hola' && G.strip('Hola\n<gl') === 'Hola' && G.strip('Hola\n<fix>Qui') === 'Hola', 'gloss: half binnengekomen blok verborgen');
+    ok(S.Mistakes.strip(full) === vis, 'gloss: Mistakes.strip haalt ook gloss/fix weg');
+    const gl = G.parseGloss(full);
+    ok(gl && gl.length === 5 && gl[2].m === 'ik zou graag willen', 'gloss: lijst gelezen');
+    ok(G.parseFix(full) === 'Quiero un café, por favor.', 'gloss: verbeterde versie gelezen');
+    const w = G.words('Hola, ¿qué onda? Me gustaría un café.');
+    const al = G.align(w, gl);
+    ok(w.length === 7 && al[1].g === 1 && al[2].g === 1 && al[3].g === 2 && al[4].g === 2 && al[6].m === 'koffie', 'gloss: woorden en uitdrukkingen gekoppeld');
+    ok(G.align(['Hola', 'amigo'], gl)[1] === null, 'gloss: onbekend woord blijft leeg');
+    const d = G.diff('yo quero un cafe por favor', 'Yo quiero un café, por favor.');
+    ok(d && d.map(o => o.t).join() === 'eq,del,ins,eq,eq,eq,eq', 'diff: fout woord vervangen');
+    ok(d[4].acc && !d[0].acc && d[4].f.s === 'café,', 'diff: accent apart herkend, hoofdletter niet');
+    const d2 = G.diff('ayer yo va a la playa', 'Ayer fui a la playa.');
+    ok(d2.filter(o => o.t === 'del').length === 2 && d2.filter(o => o.t === 'ins').length === 1 && G.summary(d2).ok === 4, 'diff: twee weg, één erbij');
+    const d3 = G.diff('Me gusta mucho', 'Me gusta mucho.');
+    ok(G.summary(d3).bad === 0, 'diff: alleen leesteken = goed');
+    ok(G.diff('', 'Hola') === null, 'diff: lege tekst');
+    const prompt = S.AI.roleplaySystem({ role: 'mesero', goal: 'pedir' });
+    ok(prompt.includes('<gloss>') && prompt.includes('<fix>') && prompt.indexOf('<fix>') < prompt.indexOf('LOGGING'), 'gloss: regels in rollenspelprompt, log blijft laatste');
+    ok(S.AI.writingSystem().includes('<fix>') && !S.AI.writingSystem().includes('<gloss>'), 'gloss: correctie vraagt alleen verbeterde versie');
+  }
   ok(!S.Tutor.spoken(reply, 'roleplay').includes('log') && !S.Tutor.spoken(reply, 'write').includes('carro"'), 'lupe-log: Lupe leest het blok niet voor');
   const p = Mi.parse(reply);
   ok(p && p.length === 3 && p[2].tag === 'other' && p[0].es === '', 'lupe-log: onbekend onderwerp wordt overig');

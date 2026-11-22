@@ -28,7 +28,9 @@
 
   /* ---------- blok uit de tekst halen ---------- */
   // ook een half binnengekomen blok (tijdens het streamen) verbergen
+  // (ook de blokken <gloss> en <fix> uit js/gloss.js)
   function strip(text) {
+    if (S.Gloss) return S.Gloss.strip(text);
     return String(text || '').replace(/\s*<log>[\s\S]*?(<\/log>|$)/g, '').replace(/\s*<(l(o(g>?)?)?)?$/, '').trimEnd();
   }
   function parse(text) {
