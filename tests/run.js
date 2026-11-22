@@ -938,6 +938,26 @@ await micTests();
   let bad = false; try { await P3.Profiles.setPin('12'); } catch (e) { bad = true; }
   ok(bad, 'pincode: te kort wordt geweigerd');
   ok(!P3.Profiles.remove('main') && P3.Profiles.remove(id) && !('spt.p.' + id in mem) && P3.Profiles.activeId() === 'main' && mem['spt.v1'] === old, 'profielen: main kan niet weg; ander profiel wel, en dan terug naar main');
+  // één cursus weghalen (bv. een ongebruikte Spaans→Nederlands-cursus in het hoofdprofiel)
+  P3.Profiles.addCourse('main', 'nl-es');
+  ok(P3.Profiles.get('main').courses.join() === 'es-nl,nl-es' && 'spt.p.main.nl-es' in mem, 'cursus weg: extra cursus aangezet');
+  ok(!P3.Profiles.canRemoveCourse('main', 'es-nl') && !P3.Profiles.removeCourse('main', 'es-nl') && mem['spt.v1'] === old, 'cursus weg: hoofdcursus (Spaans, spt.v1) kan niet weg');
+  P3.Profiles.get('main').course = 'nl-es';
+  ok(P3.Profiles.removeCourse('main', 'nl-es') && !('spt.p.main.nl-es' in mem) && P3.Profiles.get('main').courses.join() === 'es-nl' && P3.Profiles.get('main').course === 'es-nl' && mem['spt.v1'] === old, 'cursus weg: extra cursus weg, terug naar de hoofdcursus, Spaanse voortgang onaangeroerd');
+  ok(!P3.Profiles.canRemoveCourse('main', 'es-nl') && !P3.Profiles.removeCourse('main', 'nl-es'), 'cursus weg: een profiel houdt altijd minstens één cursus');
+  ok(P3.Sync.courseFile('espanol-latino-voortgang.json', 'nl-es') === 'espanol-latino-voortgang--nl-es.json' && P3.Sync.courseFile('espanol-latino-voortgang--en-es.json', 'nl-es') === 'espanol-latino-voortgang--nl-es.json', 'cursus weg: juist gist-bestand per cursus');
+  { // alleen het cursusbestand gaat uit de gist, het hoofdbestand blijft
+    const calls = [];
+    const c = vm.createContext({ console, setTimeout, clearTimeout, localStorage: ls, sessionStorage: ls, TextEncoder, crypto: globalThis.crypto,
+      fetch: async (u, o) => { calls.push([(o && o.method) || 'GET', u, o && o.body]); return { ok: true, status: 200, json: async () => /\/gists\?/.test(u) ? [{ id: 'g1', files: { 'espanol-latino-voortgang.json': {}, 'espanol-latino-voortgang--nl-es.json': {} } }] : {} }; } });
+    c.window = c; c.globalThis = c;
+    for (const f of ['js/core.js', 'js/sync.js']) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), c, { filename: f });
+    const n = await c.SPT.Sync.removeCourse('espanol-latino-voortgang.json', 'nl-es', undefined, 'main');
+    const patch = calls.find(x => x[0] === 'PATCH');
+    ok(n === 1 && patch && JSON.parse(patch[2]).files['espanol-latino-voortgang--nl-es.json'] === null && !('espanol-latino-voortgang.json' in JSON.parse(patch[2]).files) && !calls.some(x => x[0] === 'DELETE'), 'cursus weg: alleen het cursusbestand uit de gist, hoofdbestand blijft');
+    c.SPT.Store.load(); c.SPT.Store.frozen = true; const before = mem['spt.v1']; c.SPT.Store.state.xp = 1; c.SPT.Store.save();
+    ok(mem['spt.v1'] === before, 'cursus weg: bevroren opslag schrijft niets terug');
+  }
 }
 { // cursussen met uitleg in het Spaans: Engels (en-es) en Nederlands (nl-es)
   const list = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/tts-texts.js')], { maxBuffer: 64 << 20 }).toString());

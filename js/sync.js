@@ -19,7 +19,7 @@
   const API = 'https://api.github.com';
 
   let cfg = readCfg();
-  let busy = null, pushTimer = null, dirty = false, lastPull = 0;
+  let busy = null, pushTimer = null, dirty = false, lastPull = 0, held = false;
   const listeners = new Set();
 
   function readCfg() {
@@ -101,7 +101,7 @@
     return { changedLocal };
   }
   function syncNow() {
-    if (!cfg.token) return Promise.resolve(null);
+    if (!cfg.token || held) return Promise.resolve(null);
     if (busy) return busy;
     clearTimeout(pushTimer); pushTimer = null;
     emit();
@@ -111,6 +111,28 @@
     return busy;
   }
   const quiet = () => syncNow().catch(() => {});
+
+  /* Alle gist-bestanden waarvoor mine(naam) waar is weghalen; een gist die daarna leeg is, gaat helemaal weg. */
+  async function removeFiles(mine, token) {
+    const prev = cfg, tok = token || cfg.token;
+    if (!tok) throw new Error('Zet eerst synchroniseren aan');
+    cfg = Object.assign({}, prev, { token: tok });
+    let n = 0;
+    try {
+      const hits = [];
+      for (let page = 1; page <= 5; page++) {
+        const list = await gh('/gists?per_page=100&page=' + page);
+        for (const g of list) { const names = Object.keys(g.files || {}), del = names.filter(mine); if (del.length) hits.push({ id: g.id, all: del.length === names.length, del }); }
+        if (list.length < 100) break;
+      }
+      for (const g of hits) {
+        if (g.all) await gh('/gists/' + g.id, { method: 'DELETE' });
+        else await gh('/gists/' + g.id, { method: 'PATCH', body: JSON.stringify({ files: Object.fromEntries(g.del.map(f => [f, null])) }) });
+        n += g.del.length;
+      }
+    } finally { cfg = prev; }
+    return n;
+  }
 
   const Sync = {
     FILE,
@@ -209,31 +231,30 @@
        token: dat van een ander profiel op dit apparaat; zonder token dat van het actieve profiel. Geeft het aantal verwijderde bestanden. */
     async removeAccount(base, token) {
       base = Sync.baseOf(base);
-      const prev = cfg, tok = token || cfg.token;
-      if (!tok) throw new Error('Zet eerst synchroniseren aan');
-      const mine = f => f === base || f.startsWith(base.replace(/\.json$/, '') + '--');
-      cfg = Object.assign({}, prev, { token: tok });
-      let n = 0;
-      try {
-        const hits = [];
-        for (let page = 1; page <= 5; page++) {
-          const list = await gh('/gists?per_page=100&page=' + page);
-          for (const g of list) { const names = Object.keys(g.files || {}), del = names.filter(mine); if (del.length) hits.push({ id: g.id, all: del.length === names.length, del }); }
-          if (list.length < 100) break;
-        }
-        for (const g of hits) {
-          if (g.all) await gh('/gists/' + g.id, { method: 'DELETE' });
-          else await gh('/gists/' + g.id, { method: 'PATCH', body: JSON.stringify({ files: Object.fromEntries(g.del.map(f => [f, null])) }) });
-          n += g.del.length;
-        }
-      } finally { cfg = prev; }
+      return removeFiles(f => f === base || f.startsWith(base.replace(/\.json$/, '') + '--'), token);
+    },
+    /* Bestandsnaam van een extra cursus naast het hoofdbestand. */
+    courseFile: (base, course) => Sync.baseOf(base).replace(/\.json$/, '') + '--' + course + '.json',
+    /* Alleen één extra cursus uit de gists halen; het hoofdbestand (de hoofdcursus) blijft altijd staan.
+       localId: profiel op dit apparaat waarvan de gist-koppeling voor die cursus vergeten moet worden. */
+    async removeCourse(base, course, token, localId) {
+      const file = Sync.courseFile(base, course);
+      if (file === Sync.baseOf(base)) throw new Error('De hoofdcursus kan niet los weg');
+      const n = await removeFiles(f => f === file, token);
+      if (localId && Profiles) {
+        const k = Profiles.syncKey(localId);
+        if (k === CFG_KEY) { if (cfg.c && cfg.c[course]) { delete cfg.c[course]; writeCfg(); } }
+        else { try { const c = JSON.parse(localStorage.getItem(k) || 'null'); if (c && c.c && c.c[course]) { delete c.c[course]; localStorage.setItem(k, JSON.stringify(c)); } } catch (e) { /* negeer */ } }
+      }
       return n;
     },
+    /* Niets meer uploaden tot het herladen (bv. omdat de actieve cursus net is verwijderd). De koppeling zelf blijft bewaard. */
+    hold() { held = true; clearTimeout(pushTimer); pushTimer = null; },
     disconnect() { clearTimeout(pushTimer); pushTimer = null; cfg = { token: '', gistId: '', file: '', login: '', last: 0, error: '' }; try { localStorage.removeItem(CFG_KEY); } catch (e) { /* negeer */ } emit(); },
     syncNow,
     // aangeroepen door Store.save(): even wachten en dan in één keer uploaden
     changed() {
-      if (!cfg.token) return;
+      if (!cfg.token || held) return;
       dirty = true;
       clearTimeout(pushTimer);
       pushTimer = setTimeout(() => { pushTimer = null; quiet(); }, 8000);
