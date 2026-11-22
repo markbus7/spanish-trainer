@@ -29,6 +29,13 @@
 
   /* ---------- illustraties (48×48), vlak en zonder randen zodat ze in licht én donker werken ---------- */
   const C = { o: '#e2603a', o2: '#f08a5d', t: '#1b998b', t2: '#7fd3c7', g: '#f2b134', g2: '#f9d27a', p: '#f0789f', p2: '#f9b9cf', b: '#3b82d6', b2: '#9cc4f2', cream: '#fff8ee', ink: '#3a2c25', brown: '#8a5a3c', green: '#3a9d5d' };
+  // Letters op de speltegels in de doeltaal: rooster van 3×3 (middelste rij omcirkeld), kruiswoord, husselwoord.
+  const LETTERS = {
+    es: { grid: 'SOLMARPEZ', word: 'SOL', mix: 'LOS' },
+    en: { grid: 'SUNSEACAT', word: 'SUN', mix: 'NUS' },
+    nl: { grid: 'ZONZEEVIS', word: 'ZON', mix: 'NOZ' }
+  };
+  const LET = LETTERS[(window.SPT && window.SPT.course && window.SPT.course.target) || 'es'] || LETTERS.es;
   const ART = {
     // 🔁 herhaling: twee kaartjes met ronde pijlen
     review: `<rect x="7" y="9" width="23" height="29" rx="5" fill="${C.t2}" transform="rotate(-11 18.5 23.5)"/>
@@ -106,15 +113,15 @@
       <path d="M5 20a4 4 0 0 1 4-4h30a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" fill="${C.g2}"/><rect x="18" y="25" width="12" height="3" rx="1.5" fill="${C.o}" opacity=".8"/>`,
     // woordspellen
     sopa: `<rect x="5" y="5" width="30" height="30" rx="5" fill="${C.cream}"/>
-      ${[0, 1, 2].map(r => [0, 1, 2].map(c => `<text x="${12 + c * 8}" y="${16.5 + r * 8.5}" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="7" fill="${C.ink}" opacity=".55">${'SOLMARPEZ'[r * 3 + c]}</text>`).join('')).join('')}
+      ${[0, 1, 2].map(r => [0, 1, 2].map(c => `<text x="${12 + c * 8}" y="${16.5 + r * 8.5}" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="7" fill="${C.ink}" opacity=".55">${LET.grid[r * 3 + c]}</text>`).join('')).join('')}
       <rect x="7" y="18.5" width="26" height="9" rx="4.5" fill="none" stroke="${C.t}" stroke-width="2.4"/>
       <circle cx="31" cy="31" r="8" fill="${C.t2}" fill-opacity=".35" stroke="${C.o}" stroke-width="3.2"/><path d="M36.8 36.8 43 43" stroke="${C.o}" stroke-width="4.4" stroke-linecap="round"/>`,
     cruci: `${[[8, 8, 1], [17, 8, 1], [26, 8, 1], [26, 17, 1], [8, 17, 0], [17, 17, 0], [26, 26, 1], [17, 26, 1], [8, 26, 0], [8, 35, 0]].map(([x, y, on]) => `<rect x="${x}" y="${y}" width="8.2" height="8.2" rx="1.6" fill="${on ? C.cream : '#4b3b33'}"/>`).join('')}
-      <text x="12.1" y="14.9" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="6.5" fill="${C.o}">S</text><text x="21.1" y="14.9" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="6.5" fill="${C.o}">O</text><text x="30.1" y="14.9" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="6.5" fill="${C.o}">L</text>
+      <text x="12.1" y="14.9" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="6.5" fill="${C.o}">${LET.word[0]}</text><text x="21.1" y="14.9" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="6.5" fill="${C.o}">${LET.word[1]}</text><text x="30.1" y="14.9" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="6.5" fill="${C.o}">${LET.word[2]}</text>
       <g transform="rotate(40 36 30)"><rect x="32.5" y="14" width="7" height="24" rx="1.5" fill="${C.g}"/><rect x="32.5" y="14" width="7" height="4" rx="1.5" fill="${C.p}"/><path d="M32.5 38h7l-3.5 6z" fill="#f3d9b5"/><path d="M35 42.3 36 44l1-1.7z" fill="${C.ink}"/></g>`,
-    revoltijo: `<g transform="rotate(-12 13 27)"><rect x="5" y="19" width="16" height="16" rx="3.5" fill="${C.g}"/><text x="13" y="31.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="11" fill="${C.ink}">L</text></g>
-      <g transform="rotate(8 24 21)"><rect x="16" y="13" width="16" height="16" rx="3.5" fill="${C.o}"/><text x="24" y="25.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="11" fill="#fff">O</text></g>
-      <g transform="rotate(-6 35 30)"><rect x="27" y="22" width="16" height="16" rx="3.5" fill="${C.t}"/><text x="35" y="34.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="11" fill="#fff">S</text></g>
+    revoltijo: `<g transform="rotate(-12 13 27)"><rect x="5" y="19" width="16" height="16" rx="3.5" fill="${C.g}"/><text x="13" y="31.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="11" fill="${C.ink}">${LET.mix[0]}</text></g>
+      <g transform="rotate(8 24 21)"><rect x="16" y="13" width="16" height="16" rx="3.5" fill="${C.o}"/><text x="24" y="25.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="11" fill="#fff">${LET.mix[1]}</text></g>
+      <g transform="rotate(-6 35 30)"><rect x="27" y="22" width="16" height="16" rx="3.5" fill="${C.t}"/><text x="35" y="34.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="11" fill="#fff">${LET.mix[2]}</text></g>
       <path d="M9 43.5c8 2.5 22 2.5 30-1" fill="none" stroke="${C.p}" stroke-width="2.6" stroke-linecap="round"/><path d="M35.5 40.5l3.8 2-2 3.6" fill="none" stroke="${C.p}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`,
     volcan: `<circle cx="16" cy="10" r="4.5" fill="#cfc3b8"/><circle cx="22" cy="7.5" r="5" fill="#ddd2c8"/><circle cx="28" cy="10" r="4" fill="#cfc3b8"/>
       <path d="M4 42 18 17h12l14 25z" fill="${C.brown}"/><path d="M18 17h12l3.2 5.8c-2.6 1.8-4.2-.6-6 1.4-1.6 1.8-3.2-1.6-5 0-1.8 1.6-3.6-.2-4.6-1.2z" fill="${C.o}"/>

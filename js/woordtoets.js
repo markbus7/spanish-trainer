@@ -72,7 +72,7 @@
     if (known) parts.push(U.plural(known, 'woord of zin staat', 'woorden en zinnen staan') + ' nu als ' + S.SRS.ICON.known + ' bekend in je woordenschat. Die zie je pas over twee weken terug.');
     if (learning) parts.push(U.plural(learning, 'ding herkende je', 'dingen herkende je') + ' bij meerkeuze: die staan als ' + S.SRS.ICON.learning + ' aan het leren en komen over 3 dagen terug om te typen.');
     if (wrongNew) parts.push(U.plural(wrongNew, 'nieuw woord of nieuwe zin gaat', 'nieuwe woorden en zinnen gaan') + ' vanaf vandaag ' + S.SRS.ICON.learning + ' in je herhaling.');
-    const extra = { title: pct >= 90 ? '¡Excelente!' : pct >= 70 ? '¡Muy bien!' : '¡Buen trabajo!', emoji: '⚡', text: parts.join(' '),
+    const extra = { title: S.tl(pct >= 90 ? '¡Excelente!' : pct >= 70 ? '¡Muy bien!' : '¡Buen trabajo!'), emoji: '⚡', text: parts.join(' '),
       nextLabel: 'Klaar', next: () => { location.hash = '#/woordtoets'; } };
     if (wrong.length) extra.alt = { label: '🔁 Oefen de ' + Math.min(20, wrong.length) + ' foute nu', fn: () => {
       const ses = S.Gen.reviewSession(20, wrong.slice(0, 20)); ses.title = 'Foute woorden uit de sprint'; S.runSession(ses);

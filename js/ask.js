@@ -19,7 +19,8 @@
   }
   function pageName() {
     const hash = (location.hash.replace(/^#\/?/, '') || 'hoy').split('/')[0];
-    const names = { hoy: 'Hoy (startpagina)', ruta: 'Ruta (overzicht van de units)', unit: 'een unit-pagina', practica: 'Práctica', tablas: 'vervoegingstabellen', woorden: 'het woordenboek', woordenschat: 'Mijn woordenschat', juegos: 'woordspellen', perfil: 'het profiel', regios: 'regio’s van Latijns-Amerika', ajustes: 'Instellingen', toets: 'de niveautest' };
+    const tl = S.tl || (x => x);
+    const names = { hoy: tl('Hoy') + ' (startpagina)', ruta: tl('Ruta') + ' (overzicht van de units)', unit: 'een unit-pagina', practica: tl('Práctica'), tablas: 'vervoegingstabellen', woorden: 'het woordenboek', woordenschat: 'Mijn woordenschat', juegos: 'woordspellen', perfil: 'het profiel', regios: 'regio’s van Latijns-Amerika', ajustes: 'Instellingen', toets: 'de niveautest' };
     return names[hash] || hash;
   }
   /** { label, text }: korte omschrijving voor de kop van het paneel en de tekst voor Lupe. */

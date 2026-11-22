@@ -714,7 +714,7 @@
       art = `<clipPath id="${n}-hi"><rect x="-20" y="-20" width="160" height="${CUT + 20}"/><ellipse cx="60" cy="80" rx="40" ry="21"/></clipPath><clipPath id="${n}-lo"><path d="${body.sil}"/></clipPath>`
         + body.back + `<g clip-path="url(#${n}-lo)">${top}</g>` + body.mid + `<g clip-path="url(#${n}-hi)">${top}</g>` + body.front;
     }
-    return `<svg class="cast-svg${full ? ' cast-full' : ''}" viewBox="0 0 120 ${h}" width="${full ? w : size}" height="${size}" role="img" aria-label="${c.player ? 'Jij' : c.name}, ${c.animal}" xmlns="http://www.w3.org/2000/svg">
+    return `<svg class="cast-svg${full ? ' cast-full' : ''}" viewBox="0 0 120 ${h}" width="${full ? w : size}" height="${size}" role="img" aria-label="${c.player ? 'Jij' : c.name}, ${(S.course && S.course.target !== 'es' && S.course.ui === 'nl' ? c.nl : null) || c.animal}" xmlns="http://www.w3.org/2000/svg">
   <defs>${defs.replace(/ID-/g, n + '-')}</defs>${art}
 </svg>`;
   }

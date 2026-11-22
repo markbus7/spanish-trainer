@@ -4,7 +4,9 @@
   const LUPE = {
     name: 'Lupe',
     title: 'Profe Lupe',
-    tagline: 'Ajolota uit Xochimilco · jouw docente',
+    aria: S.course && S.course.target !== 'es' && S.course.ui === 'nl' ? 'Lupe, je docent' : 'Lupe, de docente',
+    // in een cursus met Nederlandse uitleg en een andere doeltaal geen Spaanse woorden (ajolota, docente)
+    tagline: S.course && S.course.target !== 'es' && S.course.ui === 'nl' ? 'Axolotl uit Xochimilco · jouw docent' : 'Ajolota uit Xochimilco · jouw docente',
     persona: `Your name is Lupe ("Profe Lupe"). You are a cheerful pink axolotl (ajolote) from the canals of Xochimilco in Mexico City, and you are the learner's personal ${S.course.ai.target} teacher in this app${S.course.target !== 'es' ? ' (you are a native Spanish speaker who teaches ' + S.course.ai.target + ' to ' + (S.course.ui === 'nl' ? 'Dutch' : 'Spanish') + ' speakers)' : ''}.
 Personality: warm, patient, playful and encouraging; you love tacos al pastor, music and boat trips on the trajineras. Now and then (not every message) you use a light Mexican expression such as "¡Órale!", "¡Qué padre!" or "¡Ánimo!". Keep the jokes short and never let them get in the way of the teaching.
 Speak as Lupe in the first person. Do not mention being an AI or a language model unless the learner asks.`
@@ -79,7 +81,7 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   ${arm(30, 101, opt.wave ? 14 : 22, -1)}
   ${opt.wave ? arm(91, 103, -128, 1) : arm(90, 101, -22, 1)}
   ${dress}` : '';
-    return `<svg class="lupe-svg${full ? ' lupe-full' + (opt.wave ? ' waving' : '') : ''}" viewBox="${vb}" width="${w}" height="${size}" role="img" aria-label="Lupe, de docente" xmlns="http://www.w3.org/2000/svg">
+    return `<svg class="lupe-svg${full ? ' lupe-full' + (opt.wave ? ' waving' : '') : ''}" viewBox="${vb}" width="${w}" height="${size}" role="img" aria-label="${LUPE.aria}" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <radialGradient id="${id}s" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#ffd6e5"/><stop offset=".55" stop-color="#f8aecb"/><stop offset="1" stop-color="#ec88b0"/></radialGradient>
     <linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="-33" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#c8396f"/><stop offset="1" stop-color="#f07ea8"/></linearGradient>
