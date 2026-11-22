@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.54.0', date: '2026-11-22',
+    nl: ['Invulzinnen worden voorgelezen met een stilte op de plek van het gat (🔊 en 🐢 naast de zin). Niveautest: elke invulzin heeft nu een vertaling. Bij «Wat hoor je?» zie je na je antwoord ook wat het woord betekent.'],
+    es: [] },
   { v: '1.53.0', date: '2026-11-22',
     nl: ['B2 uitgebreid: unit 9 over vermoedens (¿Dónde estará?, serán las ocho, se habrá dormido) in Lima en unit 10 over en la que, lo cual en cuyo op de Galápagos.', 'Ruta toont de status van elke unit nu met getekende tekentjes (klaar, nu bezig, begonnen, op slot) en de niveaubadges hebben meer diepte. Rollenspellen bij je unit krijgen de tekening van die unit.'],
     es: ['B2 ampliado: la unidad 9 sobre suposiciones (¿Dónde estará?, serán las ocho, se habrá dormido) en Lima y la unidad 10 sobre en la que, lo cual y cuyo en Galápagos.', 'La ruta muestra el estado de cada unidad con símbolos dibujados y las insignias de nivel tienen más relieve. Los juegos de rol de tu unidad llevan su dibujo.'] },

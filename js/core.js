@@ -706,6 +706,7 @@
     _talk(on, text) { try { this.onTalk && this.onTalk(on, text); } catch (e) { /* */ } },
     say(text, opt = {}) {
       if (!text) return Promise.resolve();
+      if (!opt.inGap) this._gapId = (this._gapId || 0) + 1; // iets anders voorlezen breekt een invulzin af
       const id = ++this._talkId;
       this._talk(true, text);
       // Is de lijst met opnames nog niet binnen (traag netwerk, net opgestart)? Probeer de opname dan toch:
@@ -716,9 +717,35 @@
       if (opt.clipNs === undefined && this.placeNs) opt = Object.assign({}, opt, { clipNs: this.placeNs });
       if (opt.clipNs && !pending && !this.hasClip(text, opt.clipNs)) opt = Object.assign({}, opt, { clipNs: undefined });
       const p = this.hasClip(text, opt.clipNs) || pending
-        ? (this.stop(), this.playClip(text, opt).then(() => { this.last = { src: 'clip' }; }, () => { if (!pending) this.clipFailed(); else this.last = { src: 'device' }; return this.speak(text, opt, true); }))
+        ? (this._halt(), this.playClip(text, opt).then(() => { this.last = { src: 'clip' }; }, () => { if (!pending) this.clipFailed(); else this.last = { src: 'device' }; return this.speak(text, opt, true); }))
         : this.speak(text, opt);
       return p.then(() => { if (this._talkId === id) this._talk(false); });
+    },
+    /* Invulzin («Did you ___ the email?») voorlezen met een stilte op de plek van het gat.
+       Losse stukken met '…' (zwevende intonatie), elk met een eigen opname (tools/tts-texts.js); tussen de stukken een pauze.
+       Hints tussen haakjes («(decir, tú)») worden niet voorgelezen. */
+    GAP_PAUSE: 900,
+    gapParts(s) {
+      const t = String(s || '').replace(/\s*\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
+      if (!t.includes('___')) return null;
+      const bits = t.split('___'), out = [];
+      bits.forEach((b, i) => {
+        b = b.trim();
+        if (/\p{L}/u.test(b)) out.push((i > 0 ? '… ' : '') + b.replace(/[\s,;:—–-]+$/, '') + (i < bits.length - 1 ? ' …' : ''));
+        if (i < bits.length - 1) out.push(null); // null = stilte op de plek van het gat
+      });
+      return out;
+    },
+    sayGap(s, opt = {}) {
+      const parts = this.gapParts(s);
+      if (!parts) return this.say(s, opt);
+      this.stop(); // breekt ook een vorige invulzin af
+      const id = this._gapId;
+      const pause = this.GAP_PAUSE * (opt.slow ? 1.5 : 1), o = Object.assign({}, opt, { inGap: true });
+      return parts.reduce((p, part) => p.then(() => {
+        if (this._gapId !== id) return;
+        return part === null ? new Promise(r => setTimeout(r, pause)) : this.say(part, o);
+      }), Promise.resolve());
     },
     /* Lange teksten in zinnen opdelen: sommige browsers stoppen anders na ±15 seconden. */
     chunks(text) {
@@ -761,7 +788,9 @@
         } catch (e) { res(); }
       });
     },
-    stop() { try { speechSynthesis.cancel(); } catch (e) { /* */ } try { this.el && this.el.pause(); } catch (e) { /* */ } if (this._end) this._end(true); },
+    /* stop(): alles stil, ook een invulzin die nog bezig is. _halt(): alleen het lopende geluid (intern, tussen stukken). */
+    stop() { this._gapId = (this._gapId || 0) + 1; this._halt(); },
+    _halt() { try { speechSynthesis.cancel(); } catch (e) { /* */ } try { this.el && this.el.pause(); } catch (e) { /* */ } if (this._end) this._end(true); },
     /* Spraakherkenning met terugkoppeling.
        opt.onInterim(tekst): wat er tot nu toe herkend is (live).
        opt.onState(s): 'starting' | 'listening' | 'sound' | 'speech' | 'stopping'.
