@@ -500,6 +500,8 @@
     return h('button', { class: 'hoy-me', type: 'button', title: 'Dit ben jij (' + c.nl + ')', 'aria-label': 'Jouw personage: ' + c.nl + '. Tik om te zwaaien.', onclick: wave }, av, h('span', { class: 'hm-name' }, s.name || 'Jij'));
   }
   /* Oefentegel: titel, één zin wat je er doet (x) en daaronder kort hoe lang/hoeveel (s). */
+  /* Eigen tekening van de unit (js/unit-art.js); zonder tekening de emoji. */
+  function uIcon(u) { return S.Icons && S.Icons.unit ? S.Icons.unit(u) : u.icon; }
   function quick(icon, t, s, fn, done, x) { return h('button', { class: 'quick-btn' + (done ? ' did' : ''), type: 'button', onclick: fn }, h('span', { class: 'qi' }, S.Icons && S.Icons.has(icon) ? S.Icons.el(icon) : icon), done ? h('span', { class: 'qd', title: 'Vandaag gedaan' }, '✓') : null, h('b', null, t), x ? h('span', { class: 'qx' }, x) : null, h('small', null, s)); }
 
   /* ================= Dagplan (Hoy) ================= */
@@ -665,7 +667,7 @@
           const s = P.unitState(u.id); const unlocked = P.isUnlocked(u);
           const status = s.done ? '✅' : s.tested ? '⏭️' : !unlocked ? '🔒' : u.id === cur.id ? '▶️' : '';
           list.append(h('a', { class: 'unit-row' + (unlocked ? '' : ' locked') + (u.id === cur.id ? ' current' : ''), href: unlocked ? '#/unit/' + u.id : null, onclick: unlocked ? null : (e) => { e.preventDefault(); S.toast('Rond eerst de vorige unit af (of gebruik «Ik ken dit al»).'); } },
-            h('span', { class: 'u-icon' }, u.icon),
+            h('span', { class: 'u-icon' }, uIcon(u)),
             h('div', { class: 'grow' }, h('b', null, (i + 1) + '. ' + u.title), h('small', null, u.nl), stepDots(u)),
             h('span', { class: 'u-status' }, status)));
         });
@@ -713,7 +715,7 @@
     const s = P.unitState(u.id); const L = C.level(u.level);
     const wrap = h('div', { class: 'page unit-page', style: { '--lc': L.color } });
     wrap.append(h('a', { class: 'back', href: '#/ruta' }, '← Ruta'),
-      h('div', { class: 'unit-hero' }, h('div', { class: 'u-big' }, u.icon), h('div', null, h('div', { class: 'eyebrow' }, u.level + ' · unit ' + (C.unitsOf(u.level).indexOf(u) + 1)), h('h1', null, u.title), h('p', { class: 'muted' }, u.nl))),
+      h('div', { class: 'unit-hero' }, h('div', { class: 'u-big' }, uIcon(u)), h('div', null, h('div', { class: 'eyebrow' }, u.level + ' · unit ' + (C.unitsOf(u.level).indexOf(u) + 1)), h('h1', null, u.title), h('p', { class: 'muted' }, u.nl))),
       h('ul', { class: 'goals' }, u.goals.map(g => h('li', null, '🎯 ' + g))));
     const steps = h('div', { class: 'steps' });
     const nxt = P.nextStep(u);
@@ -1321,7 +1323,7 @@
           const us2 = P.unitState(u.id); const ws = wordStats([u]);
           const stt = us2.done ? '✅' : us2.tested ? '⏭️' : u.id === cur.id ? '▶️' : Object.keys(us2.steps || {}).length ? '◔' : '';
           return h('a', { class: 'unit-mini', href: '#/unit/' + u.id },
-            h('span', { class: 'u-icon' }, u.icon), h('div', { class: 'grow' }, h('b', null, (i + 1) + '. ' + u.title), h('small', { class: 'muted' }, Gen.STEPS.filter(x => (us2.steps || {})[x.id] || us2.done).length + '/' + Gen.STEPS.length + ' stappen · ' + ws.seen + '/' + ws.total + ' woorden' + (us2.best ? ' · toets ' + Math.round(us2.best * 100) + '%' : ''))),
+            h('span', { class: 'u-icon' }, uIcon(u)), h('div', { class: 'grow' }, h('b', null, (i + 1) + '. ' + u.title), h('small', { class: 'muted' }, Gen.STEPS.filter(x => (us2.steps || {})[x.id] || us2.done).length + '/' + Gen.STEPS.length + ' stappen · ' + ws.seen + '/' + ws.total + ' woorden' + (us2.best ? ' · toets ' + Math.round(us2.best * 100) + '%' : ''))),
             h('span', { class: 'u-status' }, stt));
         }),
         h('button', { class: 'btn ghost small-btn', type: 'button', onclick: () => startLevelExam(L.id) }, '🎓 Niveau-examen ' + L.id + (lv && lv.best ? ' (beste: ' + Math.round(lv.best * 100) + '%)' : '')));

@@ -653,4 +653,225 @@
       ]
     }
   });
+
+  /* ───────────────────────── B2 · 7 ───────────────────────── */
+  U({
+    id: 'b2-07', level: 'B2', icon: '✉️', title: 'Le agradecería que…', nl: 'Formeel Spaans: e-mails, sollicitaties en beleefde verzoeken',
+    goals: ['Een formele e-mail openen en afsluiten (Estimada señora…, Quedo a la espera…)', 'Beleefd vragen met quisiera, podría en le agradecería que + imperfecto de subjuntivo', 'Formele verbindingswoorden gebruiken: en cuanto a, no obstante, por lo tanto, asimismo'],
+    vocab: [
+      ['estimado / estimada', 'geachte (aanhef)'], ['a quien corresponda', 'aan wie het aangaat'], ['le escribo para…', 'ik schrijf u om…'], ['quedo a la espera de su respuesta', 'ik zie uw antwoord graag tegemoet'],
+      ['atentamente', 'met vriendelijke groet (formeel)'], ['saludos cordiales', 'hartelijke groet (zakelijk)'], ['adjuntar', 'bijvoegen (bijlage)'], ['adjunto le envío…', 'bijgaand stuur ik u…'],
+      ['el archivo adjunto', 'de bijlage'], ['la hoja de vida', 'het cv', 'CO · Midden-Amerika; MX: el currículum'], ['el currículum', 'het cv'], ['la vacante', 'de vacature'],
+      ['postularse a', 'solliciteren naar', 'LatAm; ES: presentarse a'], ['la postulación', 'de sollicitatie', 'LatAm'], ['el puesto', 'de functie, baan'], ['la experiencia laboral', 'de werkervaring'],
+      ['disponible', 'beschikbaar'], ['la disponibilidad', 'de beschikbaarheid'], ['a la brevedad', 'zo spoedig mogelijk', 'LatAm (formeel)'], ['agradecer', 'bedanken, dankbaar zijn voor'],
+      ['le agradecería que…', 'ik zou het waarderen als u…'], ['quisiera', 'ik zou graag willen'], ['¿podría…?', 'zou u kunnen…?'], ['en cuanto a', 'wat betreft'],
+      ['no obstante', 'echter, niettemin'], ['por lo tanto', 'daarom, dus'], ['asimismo', 'eveneens, tevens'], ['cabe destacar que', 'het is goed om te vermelden dat'],
+      ['de antemano', 'bij voorbaat'], ['la entrevista', 'het sollicitatiegesprek, interview'], ['el licenciado / la licenciada', 'meneer/mevrouw (titel voor iemand met een universitaire studie)', 'MX · Midden-Amerika'],
+      ['la cita', 'de afspraak'], ['agendar una cita', 'een afspraak inplannen', 'LatAm'], ['el trámite', 'de formaliteit, procedure']
+    ],
+    grammar: [
+      { t: 'Een formele e-mail', es: 'El correo formal',
+        html: `<p>Een formele e-mail in het Spaans heeft vaste onderdelen. Je schrijft altijd met <b>usted</b> (of <b>ustedes</b>) en je gebruikt geen afkortingen.</p>
+<p>📌 <b>Aanhef</b>: <i>Estimada señora Ramírez:</i> · <i>Estimado licenciado Torres:</i> · <i>A quien corresponda:</i> (als je de naam niet weet). Let op: na de aanhef komt een <b>dubbele punt</b>, geen komma.</p>
+<p>📌 <b>Opening</b>: <i>Le escribo para…</i> (Ik schrijf u om…) · <i>Me pongo en contacto con usted para…</i></p>
+<p>📌 <b>Afsluiting</b>: <i>Quedo a la espera de su respuesta.</i> · <i>Agradezco de antemano su atención.</i> en dan <i>Atentamente,</i> of <i>Saludos cordiales,</i> met je naam.</p>
+<p>📌 In Mexico en Midden-Amerika spreek je iemand met een universitaire studie vaak aan met <b>licenciado / licenciada</b> (afgekort <i>Lic.</i>), een ingenieur met <b>ingeniero</b> (<i>Ing.</i>).</p>`,
+        table: [['onderdeel', 'formeel', 'informeel'], ['aanhef', 'Estimada señora López:', '¡Hola, Ana!'], ['opening', 'Le escribo para…', 'Te escribo porque…'], ['afsluiting', 'Quedo a la espera de su respuesta.', 'Espero tu respuesta.'], ['groet', 'Atentamente, / Saludos cordiales,', 'Un abrazo, / Besos,']],
+        ex: [['Estimada señora Ramírez: le escribo para postularme a la vacante de profesor.', 'Geachte mevrouw Ramírez, ik schrijf u om te solliciteren naar de vacature van docent.'], ['Adjunto le envío mi currículum. Quedo a la espera de su respuesta.', 'Bijgaand stuur ik u mijn cv. Ik zie uw antwoord graag tegemoet.']],
+        sum: 'Correo formal: «Estimado/a + nombre:», «Le escribo para…», «Quedo a la espera de su respuesta», «Atentamente,». Siempre usted.' },
+      { t: 'Beleefd vragen: quisiera, podría, le agradecería que', es: 'La cortesía: condicional e imperfecto de subjuntivo',
+        html: `<p>Een gewone vraag (<i>¿Me manda la información?</i>) klinkt in een formele brief snel te direct. Maak hem zachter met de <b>condicional</b> of de <b>imperfecto de subjuntivo</b>:</p>
+<p>📌 <b>¿Podría</b> + infinitief? → <i>¿Podría enviarme más información?</i> (Zou u me meer informatie kunnen sturen?)</p>
+<p>📌 <b>Quisiera</b> + infinitief → <i>Quisiera solicitar una cita.</i> (Ik zou graag een afspraak willen.) <i>Quisiera</i> is nog iets beleefder dan <i>querría</i> of <i>me gustaría</i>.</p>
+<p>📌 <b>Le agradecería que</b> + <b>imperfecto de subjuntivo</b> → <i>Le agradecería que me respondiera a la brevedad.</i> (Ik zou het waarderen als u zo spoedig mogelijk antwoordt.) De hoofdzin staat in de condicional, dus de bijzin krijgt de imperfecto de subjuntivo, net als in B2 · 2.</p>
+<p>⚠️ Fout: <s>Le agradecería que me responda</s>. Na <i>agradecería que</i> hoort <i>respondiera</i>.</p>`,
+        table: [['direct', 'beleefd'], ['Mándeme el formulario.', '¿Podría mandarme el formulario?'], ['Quiero una cita.', 'Quisiera agendar una cita.'], ['Respóndame pronto.', 'Le agradecería que me respondiera pronto.']],
+        ex: [['Le agradecería que me confirmara la fecha de la entrevista.', 'Ik zou het waarderen als u de datum van het gesprek bevestigt.'], ['¿Podría decirme qué documentos necesito?', 'Zou u me kunnen zeggen welke documenten ik nodig heb?']],
+        sum: 'Cortesía: ¿Podría…?, quisiera + infinitivo, le agradecería que + imperfecto de subjuntivo (que me respondiera).' },
+      { t: 'Formele verbindingswoorden', es: 'Conectores del registro formal',
+        html: `<p>In een formele tekst gebruik je andere verbindingswoorden dan in een gesprek. Ze maken je e-mail of brief helder en volwassen.</p>
+<p>📌 <b>En cuanto a</b> = wat betreft: <i>En cuanto a mi experiencia, trabajé cinco años en ventas.</i></p>
+<p>📌 <b>No obstante</b> = echter (formeler dan <i>pero</i> of <i>sin embargo</i>): <i>El puesto me interesa mucho. No obstante, solo estoy disponible a partir de marzo.</i></p>
+<p>📌 <b>Por lo tanto</b> = daarom, dus: <i>Hablo inglés y neerlandés; por lo tanto, puedo atender a clientes europeos.</i></p>
+<p>📌 <b>Asimismo</b> = eveneens, ook: <i>Asimismo, adjunto dos cartas de recomendación.</i></p>
+<p>📌 <b>Cabe destacar que</b> = het is goed om te vermelden dat: <i>Cabe destacar que tengo experiencia con grupos grandes.</i></p>`,
+        table: [['in een gesprek', 'formeel', 'betekenis'], ['pero', 'no obstante', 'maar, echter'], ['por eso', 'por lo tanto', 'daarom'], ['también', 'asimismo', 'ook, eveneens'], ['sobre…', 'en cuanto a…', 'wat betreft…']],
+        ex: [['En cuanto al horario, tengo disponibilidad por las mañanas.', 'Wat het rooster betreft, ben ik \'s ochtends beschikbaar.'], ['Me interesa el puesto; no obstante, quisiera saber más sobre el salario.', 'De functie interesseert me; ik zou echter graag meer weten over het salaris.']],
+        sum: 'Conectores formales: en cuanto a (sobre), no obstante (pero), por lo tanto (por eso), asimismo (también), cabe destacar que.' }
+    ],
+    verbs: ['poder', 'querer', 'responder', 'enviar', 'escribir', 'decir', 'tener', 'ser', 'estar', 'hablar', 'mandar', 'llamar'], tenses: ['cond', 'impsubj'],
+    dialogue: {
+      t: 'Una entrevista por videollamada', place: 'Ciudad de México 🇲🇽',
+      lines: [
+        ['Entrevistadora', 'Buenos días, señor Mark. Gracias por conectarse a tiempo. ¿Me escucha bien?', 'Goedemorgen, meneer Mark. Bedankt dat u op tijd bent ingelogd. Hoort u me goed?'],
+        ['Mark', 'Buenos días, licenciada. Sí, la escucho perfectamente. Gracias por la invitación.', 'Goedemorgen, mevrouw. Ja, ik hoor u perfect. Bedankt voor de uitnodiging.'],
+        ['Entrevistadora', 'Leí su currículum con mucho interés. ¿Por qué se postuló a esta vacante?', 'Ik heb uw cv met veel interesse gelezen. Waarom heeft u gesolliciteerd naar deze vacature?'],
+        ['Mark', 'Porque me encanta enseñar idiomas. En cuanto a mi experiencia, di clases de neerlandés durante tres años.', 'Omdat ik het geweldig vind om talen te geven. Wat mijn ervaring betreft: ik heb drie jaar Nederlandse les gegeven.'],
+        ['Entrevistadora', 'Muy bien. Cabe destacar que aquí la mayoría de los alumnos son adultos que trabajan. ¿Tiene disponibilidad por las tardes?', 'Heel goed. Het is goed om te weten dat de meeste leerlingen hier volwassenen zijn die werken. Bent u \'s middags en \'s avonds beschikbaar?'],
+        ['Mark', 'Sí, por las tardes no hay problema. No obstante, quisiera saber si también hay clases en línea.', 'Ja, \'s middags is geen probleem. Ik zou echter graag weten of er ook online lessen zijn.'],
+        ['Entrevistadora', 'Claro, la mitad de los cursos son en línea. Por lo tanto, podría trabajar algunos días desde casa.', 'Zeker, de helft van de cursussen is online. U zou dus een paar dagen thuis kunnen werken.'],
+        ['Mark', '¡Qué bien! ¿Podría decirme cuándo empezaría el contrato?', 'Wat fijn! Zou u me kunnen zeggen wanneer het contract zou beginnen?'],
+        ['Entrevistadora', 'En febrero. Le agradecería que me mandara dos cartas de recomendación antes del viernes.', 'In februari. Ik zou het waarderen als u me vóór vrijdag twee aanbevelingsbrieven stuurt.'],
+        ['Mark', 'Con mucho gusto. Se las envío a la brevedad. Muchas gracias por su tiempo.', 'Met plezier. Ik stuur ze u zo spoedig mogelijk. Hartelijk dank voor uw tijd.']
+      ],
+      q: [
+        { t: 'mc', q: '¿Qué experiencia tiene Mark?', o: ['Dio clases de neerlandés durante tres años', 'Trabajó en ventas en México', 'Nunca ha enseñado'] },
+        { t: 'mc', q: '¿Qué quería saber Mark?', o: ['Si también hay clases en línea', 'Cuánto es el salario', 'Dónde está la escuela'] },
+        { t: 'mc', q: '¿Qué le pide la entrevistadora a Mark?', o: ['Dos cartas de recomendación antes del viernes', 'Que empiece mañana', 'Que mande su currículum otra vez'] }
+      ]
+    },
+    culture: { t: 'Licenciado, ingeniero y «usted»', html: `<p>🎓 In <b>Mexico</b> en grote delen van Midden-Amerika zijn titels belangrijk. Wie gestudeerd heeft, is <i>licenciado</i> of <i>licenciada</i>, en in een e-mail schrijf je <i>Estimado Lic. Torres</i> of <i>Estimada Ing. Pérez</i>. Een titel weglaten kan onbeleefd overkomen.</p>
+<p>✉️ Formele e-mails zijn in Latijns-Amerika vaak <b>warmer en langer</b> dan in Nederland. Een korte zakelijke mail zonder groet of beleefdheidszin (<i>Espero que se encuentre bien</i>) kan bot klinken.</p>
+<p>🗣️ In een sollicitatiegesprek gebruik je <b>usted</b> tot de ander voorstelt om <i>tú</i> te zeggen (<i>Puedes tutearme</i>). In Colombia en Costa Rica blijft men zelfs onder collega's vaak bij <i>usted</i>.</p>
+<p>📄 Een cv heet in Mexico <i>currículum</i> of <i>CV</i>, in Colombia en Midden-Amerika vaak <i>hoja de vida</i>. Solliciteren is in Latijns-Amerika <i>postularse</i>.</p>` },
+    ex: [
+      { t: 'cloze', s: 'Le agradecería que me ___ la fecha de la entrevista.', h: 'confirmar, usted', a: ['confirmara'], nl: 'Ik zou het waarderen als u de datum van het gesprek bevestigt.', x: 'Na «le agradecería que» volgt de imperfecto de subjuntivo.', tag: 'register' },
+      { t: 'cloze', s: 'Le agradecería que me ___ a la brevedad.', h: 'responder, usted', a: ['respondiera', 'contestara'], nl: 'Ik zou het waarderen als u zo spoedig mogelijk antwoordt.', tag: 'register' },
+      { t: 'cloze', s: '¿___ enviarme más información sobre el puesto?', a: ['Podría'], o: ['Podría', 'Puede que', 'Pudiera que'], nl: 'Zou u me meer informatie over de functie kunnen sturen?', tag: 'register' },
+      { t: 'cloze', s: '___ agendar una cita para la próxima semana.', a: ['Quisiera'], o: ['Quisiera', 'Quiera', 'Quise'], nl: 'Ik zou graag een afspraak inplannen voor volgende week.', tag: 'register' },
+      { t: 'cloze', s: 'El puesto me interesa mucho; ___, solo puedo empezar en marzo.', a: ['no obstante'], o: ['no obstante', 'por lo tanto', 'asimismo'], nl: 'De functie interesseert me erg; ik kan echter pas in maart beginnen.', tag: 'connectors' },
+      { t: 'cloze', s: 'Hablo cuatro idiomas; ___, puedo atender a clientes de muchos países.', a: ['por lo tanto'], o: ['por lo tanto', 'no obstante', 'en cuanto a'], nl: 'Ik spreek vier talen; daarom kan ik klanten uit veel landen helpen.', tag: 'connectors' },
+      { t: 'cloze', s: '___ al horario, tengo disponibilidad por las mañanas.', a: ['En cuanto'], o: ['En cuanto', 'No obstante', 'Por lo tanto'], nl: 'Wat het rooster betreft, ben ik \'s ochtends beschikbaar.', tag: 'connectors' },
+      { t: 'cloze', s: '___ le envío mi hoja de vida.', a: ['Adjunto'], o: ['Adjunto', 'Atentamente', 'Estimado'], nl: 'Bijgaand stuur ik u mijn cv.', tag: 'register' },
+      { t: 'mc', q: 'Hoe begin je een formele e-mail als je de naam niet weet?', o: ['A quien corresponda:', 'Querido amigo:', '¡Hola a todos!'], tag: 'register' },
+      { t: 'mc', q: 'Welke afsluiting past bij een sollicitatiebrief?', o: ['Quedo a la espera de su respuesta. Atentamente,', 'Nos vemos, besos.', 'Chao, un abrazo.'], tag: 'register' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['Le agradecería que me llamara.', 'Le agradecería que me llame.', 'Le agradecería que me llamaría.'], x: 'Hoofdzin in de condicional → bijzin in de imperfecto de subjuntivo.', tag: 'register' },
+      { t: 'mc', q: '«Asimismo» betekent:', o: ['eveneens, ook', 'echter', 'daarom'], tag: 'connectors' },
+      { t: 'mc', q: 'Wat zet je in het Spaans na de aanhef «Estimada señora López»?', o: ['een dubbele punt (:)', 'een komma (,)', 'een uitroepteken (!)'], tag: 'register' },
+      { t: 'order', s: 'Quedo a la espera de su respuesta.', nl: 'Ik zie uw antwoord graag tegemoet.', tag: 'register' },
+      { t: 'tr', nl: 'Zou u me kunnen zeggen welke documenten ik nodig heb?', a: ['¿Podría decirme qué documentos necesito?', '¿Me podría decir qué documentos necesito?', '¿Podría usted decirme qué documentos necesito?'], tag: 'register' },
+      { t: 'tr', nl: 'Ik zou het waarderen als u me het formulier stuurt.', a: ['Le agradecería que me enviara el formulario.', 'Le agradecería que me mandara el formulario.', 'Le agradecería que me enviara el formulario', 'Le agradecería mucho que me enviara el formulario.'], tag: 'register' },
+      { t: 'match', p: [['no obstante', 'echter'], ['por lo tanto', 'daarom'], ['en cuanto a', 'wat betreft'], ['adjuntar', 'bijvoegen'], ['a la brevedad', 'zo spoedig mogelijk']], tag: 'vocab' }
+    ],
+    say: [['Le escribo para postularme a la vacante.', 'Ik schrijf u om te solliciteren naar de vacature.'], ['¿Podría enviarme más información, por favor?', 'Zou u me meer informatie kunnen sturen, alstublieft?'], ['Le agradecería que me respondiera a la brevedad.', 'Ik zou het waarderen als u zo spoedig mogelijk antwoordt.'], ['Quedo a la espera de su respuesta. Atentamente, Mark.', 'Ik zie uw antwoord graag tegemoet. Met vriendelijke groet, Mark.']],
+    task: { nl: 'Schrijf een formele e-mail van 7 tot 9 zinnen aan een taalschool in Mexico-Stad: je solliciteert naar een vacature als docent. Gebruik een formele aanhef en afsluiting, «le agradecería que + imperfecto de subjuntivo», «¿podría…?» en minstens drie formele verbindingswoorden (en cuanto a, no obstante, por lo tanto, asimismo).', model: 'Estimada licenciada Ramírez: Le escribo para postularme a la vacante de profesor de neerlandés que vi en su página web. En cuanto a mi experiencia, di clases a adultos durante tres años en Utrecht. Asimismo, hablo español, inglés y alemán; por lo tanto, puedo explicar la gramática en varios idiomas. Tengo disponibilidad por las tardes. No obstante, solo podría empezar a partir de febrero. ¿Podría decirme si también hay clases en línea? Adjunto le envío mi currículum. Le agradecería que me respondiera a la brevedad. Quedo a la espera de su respuesta. Atentamente, Mark.' },
+    scenario: { nl: 'Je hebt een sollicitatiegesprek (videobellen) bij een taalschool in Mexico-Stad. Blijf formeel en gebruik usted.', role: 'Eres la licenciada Gabriela Ramírez, directora de recursos humanos de una escuela de idiomas en la colonia Roma de Ciudad de México. Tienes 42 años, eres amable pero profesional y siempre hablas de usted. Haces una entrevista de trabajo por videollamada: preguntas por la experiencia, la disponibilidad y por qué quiere el puesto. Si el estudiante es demasiado informal (tú, «oye», «vale»), le das un pequeño consejo amable sobre el registro formal.', goal: 'Beantwoord drie vragen over jezelf en stel zelf twee beleefde vragen met ¿podría…? of quisiera.' },
+    reading: {
+      t: 'Cinco errores en un correo formal', type: 'Artikel op een vacaturesite',
+      p: [
+        ['Cada semana recibimos cientos de postulaciones. Muchas son de personas con buena experiencia, pero su primer correo no causa una buena impresión. Estos son los cinco errores más comunes y cómo evitarlos.',
+          'Elke week krijgen we honderden sollicitaties. Veel komen van mensen met goede ervaring, maar hun eerste e-mail maakt geen goede indruk. Dit zijn de vijf meest gemaakte fouten en hoe je ze voorkomt.'],
+        ['El primer error es el saludo. «Hola» o «Buenas» es demasiado informal; es mejor escribir «Estimada señora…» o, si no sabe el nombre, «A quien corresponda». El segundo es tutear al reclutador. Aunque la empresa sea joven y moderna, en el primer correo siempre se usa usted.',
+          'De eerste fout is de aanhef. «Hola» of «Buenas» is te informeel; beter is «Estimada señora…» of, als u de naam niet weet, «A quien corresponda». De tweede is de recruiter tutoyeren. Ook al is het bedrijf jong en modern, in de eerste e-mail gebruik je altijd usted.'],
+        ['El tercer error es olvidar el archivo adjunto. Parece mentira, pero muchas personas escriben «adjunto mi currículum» y no adjuntan nada. El cuarto es escribir un texto demasiado largo: cinco o seis frases claras son suficientes. Cabe destacar que el reclutador lee cada correo en menos de un minuto.',
+          'De derde fout is de bijlage vergeten. Het klinkt ongelooflijk, maar veel mensen schrijven «bijgaand mijn cv» en voegen niets toe. De vierde is een te lange tekst: vijf of zes heldere zinnen zijn genoeg. Het is goed om te weten dat de recruiter elke e-mail in minder dan een minuut leest.'],
+        ['Por último, no exija una respuesta. «Contésteme pronto» suena agresivo. En su lugar, escriba «Le agradecería que me respondiera a la brevedad» o simplemente «Quedo a la espera de su respuesta». Con estos pequeños cambios, su correo será mucho más profesional.',
+          'Ten slotte: eis geen antwoord. «Antwoord me snel» klinkt agressief. Schrijf in plaats daarvan «Ik zou het waarderen als u zo spoedig mogelijk antwoordt» of gewoon «Ik zie uw antwoord graag tegemoet». Met deze kleine veranderingen wordt uw e-mail veel professioneler.']
+      ],
+      gl: [['causar una buena impresión', 'een goede indruk maken'], ['el reclutador / la reclutadora', 'de recruiter'], ['tutear', 'met tú aanspreken, tutoyeren'], ['parece mentira', 'het is haast niet te geloven'], ['exigir', 'eisen']],
+      q: [
+        { t: 'mc', q: '¿Qué saludo recomienda el artículo si no sabe el nombre?', o: ['A quien corresponda', 'Hola a todos', 'Buenas'] },
+        { t: 'mc', q: '¿Cuánto tiempo lee el reclutador cada correo?', o: ['Menos de un minuto', 'Unos cinco minutos', 'Media hora'] },
+        { t: 'mc', q: '¿Qué error cometen muchas personas con el currículum?', o: ['Dicen que lo adjuntan, pero no lo adjuntan', 'Lo mandan dos veces', 'Lo escriben en inglés'] },
+        { t: 'mc', q: '¿Por qué no se debe escribir «Contésteme pronto»?', o: ['Porque suena agresivo', 'Porque es demasiado largo', 'Porque es incorrecto gramaticalmente'] }
+      ]
+    }
+  });
+
+  /* ───────────────────────── B2 · 8 ───────────────────────── */
+  U({
+    id: 'b2-08', level: 'B2', icon: '⛰️', title: 'Aunque llueva, vamos', nl: 'Toch doen: aunque, a pesar de que en por más que met subjuntivo',
+    goals: ['Het verschil kennen tussen aunque + indicativo (het is zo) en aunque + subjuntivo (misschien, of: maakt niet uit)', 'Tegenstellingen uitdrukken met a pesar de (que), por más que, aun así en sin embargo', 'Oorzaak en gevolg verbinden met ya que, puesto que en así que'],
+    vocab: [
+      ['aunque', 'hoewel, ook al'], ['a pesar de', 'ondanks'], ['a pesar de que', 'ondanks dat, hoewel'], ['por más que', 'hoe … ook'], ['aun así', 'toch, zelfs dan'],
+      ['sin embargo', 'toch, echter'], ['de todas formas', 'hoe dan ook'], ['igual', 'toch, evengoed', 'LatAm (informeel)'], ['ya que', 'aangezien, omdat'], ['puesto que', 'aangezien (formeler)'],
+      ['así que', 'dus, zodat'], ['el cerro', 'de heuvel, berg'], ['la cordillera', 'de bergketen'], ['el sendero', 'het wandelpad'], ['hacer trekking', 'een trektocht maken'],
+      ['la carpa', 'de tent', 'LatAm; ES: la tienda de campaña'], ['el saco de dormir', 'de slaapzak'], ['el pronóstico', 'de weersverwachting'], ['el chubasco', 'de stortbui'], ['la neblina', 'de mist, nevel'],
+      ['abrigarse', 'zich warm aankleden'], ['la parka', 'de (gewatteerde) jas', 'CL · AR'], ['el bloqueador', 'de zonnebrandcrème', 'LatAm; ES: la crema solar'], ['agotador / agotadora', 'uitputtend'], ['valer la pena', 'de moeite waard zijn'],
+      ['rendirse', 'opgeven'], ['el mirador', 'het uitzichtpunt'], ['la cumbre', 'de top'], ['el embalse', 'het stuwmeer'], ['bacán', 'tof, gaaf', 'CL (informeel)'],
+      ['fome', 'saai', 'CL (informeel)'], ['¿cachai?', 'snap je?', 'CL (informeel)'], ['po', 'nou, hoor (versterking: sí po, ya po)', 'CL (informeel)'], ['al tiro', 'meteen', 'CL (informeel)']
+    ],
+    grammar: [
+      { t: 'Aunque + indicativo of subjuntivo', es: 'Aunque llueve / aunque llueva',
+        html: `<p>Na <b>aunque</b> kun je twee wijzen gebruiken, en dat verandert de betekenis:</p>
+<p>📌 <b>Aunque + indicativo</b>: je weet dat het zo is. <i>Aunque <b>llueve</b>, vamos al cerro.</i> = Het regent (echt), maar we gaan toch.</p>
+<p>📌 <b>Aunque + subjuntivo</b>: je weet het niet, of het maakt niet uit. <i>Aunque <b>llueva</b>, vamos al cerro.</i> = Misschien gaat het regenen; ook al regent het, we gaan.</p>
+<p>📌 Ook bij een feit dat de ander al weet en dat jou niets uitmaakt, kies je vaak de subjuntivo: <i>Aunque <b>seas</b> mi hermano, no te presto la carpa.</i> (Ook al ben je mijn broer…)</p>
+<p>📌 In het verleden en bij onwerkelijke situaties gebruik je de <b>imperfecto de subjuntivo</b>: <i>Aunque <b>tuviera</b> plata, no me compraría ese auto.</i></p>`,
+        table: [['', 'betekenis', 'voorbeeld'], ['aunque + indicativo', 'het is zo (nieuwe info)', 'Aunque está nublado, salimos.'], ['aunque + presente de subjuntivo', 'misschien / maakt niet uit', 'Aunque esté nublado, salimos.'], ['aunque + imperfecto de subjuntivo', 'onwerkelijk', 'Aunque estuviera nublado, saldríamos.']],
+        ex: [['Aunque hace frío, vamos a hacer trekking.', 'Hoewel het koud is, gaan we een trektocht maken.'], ['Aunque haga frío mañana, vamos igual.', 'Ook al is het morgen koud, we gaan toch.']],
+        sum: 'Aunque + indicativo: un hecho. Aunque + subjuntivo: una posibilidad o algo que no importa.' },
+      { t: 'A pesar de (que) en por más que', es: 'A pesar de · Por más que',
+        html: `<p>📌 <b>A pesar de</b> + zelfstandig naamwoord of infinitief: <i>A pesar del frío, subimos a la cumbre.</i> · <i>A pesar de estar cansados, seguimos.</i></p>
+<p>📌 <b>A pesar de que</b> + zin. Het werkt als <i>aunque</i>: indicativo voor een feit, subjuntivo voor een mogelijkheid. <i>A pesar de que <b>llovió</b>, lo pasamos bacán.</i></p>
+<p>📌 <b>Por más que</b> = hoe … ook. Meestal met subjuntivo: <i>Por más que <b>corras</b>, no vas a llegar a tiempo.</i> (Hoe hard je ook rent…) Met indicativo als het echt gebeurt: <i>Por más que <b>estudio</b>, no me acuerdo.</i></p>
+<p>📌 <b>Aun así</b> (zonder accent!) en <b>sin embargo</b> beginnen een nieuwe zin: <i>Estaba agotada. Aun así, no se rindió.</i> Let op: <i>aún</i> mét accent betekent nog (steeds).</p>`,
+        table: [['woord', 'daarna', 'voorbeeld'], ['a pesar de', 'zelfst. nw. / infinitief', 'a pesar de la lluvia'], ['a pesar de que', 'zin (ind./subj.)', 'a pesar de que llovió'], ['por más que', 'zin (meestal subj.)', 'por más que insistas'], ['aun así / sin embargo', 'nieuwe zin', 'Aun así, fuimos.']],
+        ex: [['A pesar de la neblina, la vista desde el mirador era increíble.', 'Ondanks de mist was het uitzicht vanaf het uitzichtpunt ongelooflijk.'], ['Por más que me lo expliques, no lo voy a entender.', 'Hoe vaak je het me ook uitlegt, ik ga het niet begrijpen.']],
+        sum: 'A pesar de + sustantivo/infinitivo; a pesar de que + frase. Por más que + subjuntivo = hoe… ook. Aun así = toch.' },
+      { t: 'Oorzaak en gevolg: ya que, puesto que, así que', es: 'Causa y consecuencia',
+        html: `<p>📌 <b>Ya que</b> en <b>puesto que</b> = aangezien. Ze geven een reden die de ander vaak al kent, en staan graag aan het begin van de zin: <i>Ya que estás aquí, ayúdame con la carpa.</i> <i>Puesto que</i> is formeler.</p>
+<p>📌 <b>Así que</b> = dus. Het geeft een gevolg, na de reden: <i>Va a llover, así que lleva la parka.</i></p>
+<p>📌 Na deze woorden volgt gewoon de <b>indicativo</b>, want het zijn feiten.</p>`,
+        table: [['woord', 'betekenis', 'voorbeeld'], ['porque', 'omdat', 'No fui porque llovía.'], ['ya que', 'aangezien', 'Ya que llueve, nos quedamos.'], ['puesto que', 'aangezien (formeel)', 'Puesto que no hay buses, caminaremos.'], ['así que', 'dus', 'Llueve, así que nos quedamos.']],
+        ex: [['Ya que tenemos tiempo, subamos al mirador.', 'Aangezien we tijd hebben, laten we naar het uitzichtpunt gaan.'], ['El pronóstico dice chubascos, así que lleva la parka.', 'De verwachting zegt stortbuien, dus neem je jas mee.']],
+        sum: 'Ya que / puesto que = como (causa conocida). Así que = por eso (consecuencia). Con indicativo.' }
+    ],
+    verbs: ['llover', 'hacer', 'estar', 'ser', 'tener', 'ir', 'poder', 'querer', 'subir', 'decir', 'llegar', 'correr'], tenses: ['subj', 'impsubj'],
+    dialogue: {
+      t: 'Trekking en el Cajón del Maipo', place: 'Santiago de Chile 🇨🇱',
+      lines: [
+        ['Catalina', 'Mark, ¿viste el pronóstico? Dicen que mañana puede haber chubascos en la cordillera.', 'Mark, heb je de weersverwachting gezien? Ze zeggen dat er morgen stortbuien kunnen zijn in de bergen.'],
+        ['Mark', 'Sí, lo vi. Pero aunque llueva, yo quiero ir igual. Llevo semanas esperando este trekking.', 'Ja, ik heb het gezien. Maar ook al regent het, ik wil toch gaan. Ik wacht al weken op deze trektocht.'],
+        ['Catalina', '¡Bacán! Yo me apunto al tiro. A pesar de que el sendero es largo, la vista del embalse vale la pena.', 'Tof! Ik doe meteen mee. Hoewel het pad lang is, is het uitzicht op het stuwmeer de moeite waard.'],
+        ['Mark', '¿Y llevamos la carpa? Ya que vamos tan lejos, podríamos quedarnos una noche.', 'En nemen we de tent mee? Aangezien we zo ver gaan, kunnen we een nachtje blijven.'],
+        ['Catalina', 'Ya po, pero en la noche hace mucho frío allá arriba, así que abrígate bien. Lleva tu parka y el saco de dormir.', 'Goed hoor, maar \'s nachts is het daarboven heel koud, dus kleed je goed aan. Neem je jas en je slaapzak mee.'],
+        ['Mark', 'Mi parka es bastante fome, pero abriga harto. ¿Y el bloqueador? Aunque esté nublado, el sol de la cordillera quema.', 'Mijn jas is behoorlijk saai, maar hij is heel warm. En de zonnebrand? Ook al is het bewolkt, de zon in de bergen brandt.'],
+        ['Catalina', 'Exacto. Mi hermano nunca se echa bloqueador. Por más que le digo, no me hace caso.', 'Precies. Mijn broer smeert zich nooit in. Hoe vaak ik het hem ook zeg, hij luistert niet.'],
+        ['Mark', '¿Y si llegamos a la cumbre y hay neblina?', 'En als we op de top komen en het is mistig?'],
+        ['Catalina', 'Aunque no veamos nada, el camino es precioso. Y si estás agotado, no te rindas, ¿cachai?', 'Ook al zien we niets, de weg is prachtig. En als je uitgeput bent, geef niet op, snap je?'],
+        ['Mark', 'Te lo prometo. Mañana paso a buscarte a las seis, llueva o no llueva.', 'Beloofd. Ik kom je morgen om zes uur ophalen, regen of geen regen.']
+      ],
+      q: [
+        { t: 'mc', q: '¿Qué dice el pronóstico para mañana?', o: ['Que puede haber chubascos en la cordillera', 'Que va a hacer mucho calor', 'Que va a nevar en Santiago'] },
+        { t: 'mc', q: '¿Por qué Mark quiere llevar bloqueador?', o: ['Porque el sol de la cordillera quema aunque esté nublado', 'Porque van a la playa', 'Porque su hermano se lo pidió'] },
+        { t: 'mc', q: '¿Qué pasa con el hermano de Catalina?', o: ['Nunca se echa bloqueador aunque ella se lo dice', 'No quiere ir al trekking', 'Siempre llega tarde'] }
+      ]
+    },
+    culture: { t: 'Santiago en de Andes', html: `<p>🏔️ <b>Santiago de Chile</b> ligt aan de voet van de Andes. Op een heldere dag na de regen zie je vanuit de stad besneeuwde toppen van meer dan 5.000 meter. Binnen anderhalf uur rijden ben je in het <b>Cajón del Maipo</b>, een vallei met rivieren, hete bronnen en het turquoise stuwmeer <i>Embalse El Yeso</i>.</p>
+<p>🌦️ Het weer in de bergen verandert snel. Chilenen zeggen <i>«Aunque esté despejado, lleva parka»</i>: ook als het helder is, neem een jas mee.</p>
+<p>🗣️ Chileens Spaans staat bekend als snel en vol eigen woorden: <i>bacán</i> (tof), <i>fome</i> (saai), <i>al tiro</i> (meteen), <i>harto</i> (veel, heel) en <i>po</i> (van <i>pues</i>), zoals in <i>sí po</i> en <i>ya po</i>. Aan het eind van een zin hoor je vaak <i>¿cachai?</i> (snap je?, van het Engelse <i>to catch</i>).</p>` },
+    ex: [
+      { t: 'cloze', s: 'Aunque mañana ___, vamos a subir el cerro.', h: 'llover', a: ['llueva'], nl: 'Ook al regent het morgen, we gaan de berg op.', x: 'Je weet niet of het regent → subjuntivo.', tag: 'concession' },
+      { t: 'cloze', s: 'Aunque ahora ___ mucho frío, el paisaje es precioso.', a: ['hace'], o: ['hace', 'haga', 'hiciera'], nl: 'Hoewel het nu erg koud is, is het landschap prachtig.', x: 'Het is nu echt koud → indicativo.', tag: 'concession' },
+      { t: 'cloze', s: 'Aunque ___ nublado, lleva bloqueador.', a: ['esté'], o: ['esté', 'está', 'estaría'], nl: 'Ook al is het bewolkt, neem zonnebrand mee.', x: 'Een algemeen advies voor een mogelijke situatie → subjuntivo.', tag: 'concession' },
+      { t: 'cloze', s: 'Aunque ___ millonaria, no viviría en otra ciudad.', h: 'ser, yo', a: ['fuera'], nl: 'Ook al was ik miljonair, ik zou niet in een andere stad wonen.', tag: 'concession' },
+      { t: 'cloze', s: 'Por más que le ___, no me hace caso.', h: 'decir, yo', a: ['digo', 'diga'], nl: 'Hoe vaak ik het hem ook zeg, hij luistert niet naar me.', tag: 'concession' },
+      { t: 'cloze', s: 'A pesar ___ la lluvia, lo pasamos bacán.', a: ['de'], o: ['de', 'que', 'de que'], nl: 'Ondanks de regen hadden we het geweldig.', x: 'A pesar de + zelfstandig naamwoord.', tag: 'concession' },
+      { t: 'cloze', s: 'A pesar de ___ cansados, seguimos caminando.', h: 'estar', a: ['estar'], nl: 'Ondanks dat we moe waren, liepen we door.', x: 'A pesar de + infinitief.', tag: 'concession' },
+      { t: 'cloze', s: 'Va a hacer frío en la noche, ___ lleva el saco de dormir.', a: ['así que'], o: ['así que', 'ya que', 'aunque'], nl: '\'s Nachts wordt het koud, dus neem je slaapzak mee.', tag: 'connectors' },
+      { t: 'cloze', s: '___ estás aquí, ayúdame con la carpa.', a: ['Ya que'], o: ['Ya que', 'Así que', 'Aunque'], nl: 'Aangezien je hier bent, help me met de tent.', tag: 'connectors' },
+      { t: 'mc', q: '«Aunque llueva, vamos.» betekent:', o: ['Ook al zou het regenen, we gaan.', 'Het regent, maar we gaan.', 'Omdat het regent, gaan we.'], tag: 'concession' },
+      { t: 'mc', q: '«Aunque llueve, vamos.» betekent:', o: ['Het regent (echt), maar we gaan toch.', 'Misschien gaat het regenen; we gaan toch.', 'Als het regent, gaan we niet.'], tag: 'concession' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['Estaba agotada. Aun así, no se rindió.', 'Estaba agotada. Aún así, no se rindió.', 'Estaba agotada. Aunque así, no se rindió.'], x: 'Aun así (toch) heeft geen accent; aún = nog.', tag: 'concession' },
+      { t: 'mc', q: 'Wat betekent «fome» in Chili?', o: ['saai', 'tof', 'meteen'], tag: 'vocab' },
+      { t: 'order', s: 'Aunque no veamos nada, el camino es precioso.', nl: 'Ook al zien we niets, de weg is prachtig.', tag: 'concession' },
+      { t: 'tr', nl: 'Ook al is het morgen koud, we gaan toch.', a: ['Aunque haga frío mañana, vamos igual.', 'Aunque mañana haga frío, vamos igual.', 'Aunque haga frío mañana, vamos de todas formas.', 'Aunque mañana haga frío, vamos de todas formas.', 'Aunque haga frío mañana, igual vamos.', 'Aunque mañana haga frío, igual vamos.', 'Aunque haga frío mañana, vamos a ir igual.', 'Aunque mañana haga frío, vamos a ir igual.'], tag: 'concession' },
+      { t: 'tr', nl: 'Ondanks de mist was het uitzicht prachtig.', a: ['A pesar de la neblina, la vista era preciosa.', 'A pesar de la neblina, la vista era increíble.', 'A pesar de la niebla, la vista era preciosa.', 'A pesar de la neblina la vista era preciosa.'], tag: 'concession' },
+      { t: 'match', p: [['aunque', 'hoewel, ook al'], ['a pesar de', 'ondanks'], ['por más que', 'hoe … ook'], ['así que', 'dus'], ['ya que', 'aangezien']], tag: 'connectors' }
+    ],
+    say: [['Aunque llueva, vamos igual.', 'Ook al regent het, we gaan toch.'], ['A pesar del frío, subimos a la cumbre.', 'Ondanks de kou gingen we naar de top.'], ['Por más que lo intente, no me sale.', 'Hoe ik het ook probeer, het lukt me niet.'], ['Va a llover, así que lleva la parka.', 'Het gaat regenen, dus neem je jas mee.']],
+    task: { nl: 'Schrijf 6 tot 8 zinnen over een plan dat je doorzet, ook al zit niet alles mee (een reis, een sport, Spaans leren…). Gebruik aunque één keer met indicativo en één keer met subjuntivo, en verder a pesar de, por más que en así que.', model: 'Este año quiero hacer el trekking de las Torres del Paine. Aunque es caro, llevo meses ahorrando. Mis amigos dicen que hace mucho viento allá, pero aunque haga mal tiempo, voy a ir igual. A pesar de mi miedo a las alturas, quiero llegar al mirador. Por más que me canse, no me voy a rendir. El viaje es en marzo, así que todavía tengo tiempo para entrenar. ¡Va a ser bacán!' },
+    scenario: { nl: 'Je plant met een Chileense vriendin een trektocht in de Andes, maar zij twijfelt door het weer. Overtuig haar om toch te gaan.', role: 'Eres Catalina, una santiaguina de 27 años que trabaja en una oficina y ama la montaña. Hablas con el estudiante sobre un trekking en el Cajón del Maipo, pero tienes dudas: el pronóstico dice lluvia, el sendero es largo y tienes miedo del frío. Pones objeciones con «¿y si…?» y «pero…», y te dejas convencer cuando el estudiante usa bien «aunque», «a pesar de» o «por más que». Usas chilenismos como «po», «bacán», «fome», «al tiro» y «¿cachai?», y si el estudiante no entiende uno, lo explicas.', goal: 'Overtuig Catalina met minstens twee zinnen met aunque + subjuntivo en één met a pesar de.' },
+    reading: {
+      t: 'El día que casi me rendí', type: 'Reisblog',
+      p: [
+        ['Siempre había soñado con ver las Torres del Paine, en la Patagonia chilena. Por eso, aunque el viaje era caro y largo, ahorré durante un año entero. Cuando por fin llegué a Puerto Natales, el pronóstico era terrible: viento, lluvia y nieve en las alturas.',
+          'Ik had er altijd van gedroomd de Torres del Paine in Chileens Patagonië te zien. Daarom spaarde ik een heel jaar, hoewel de reis duur en lang was. Toen ik eindelijk in Puerto Natales aankwam, was de weersverwachting vreselijk: wind, regen en sneeuw op de hoogte.'],
+        ['El guía del hostal me dijo: «Aunque llueva, la subida es posible, pero tiene que ir con cuidado». Así que a la mañana siguiente salí a las seis, con mi parka, dos pares de calcetines y un montón de chocolate.',
+          'De gids van het hostel zei tegen me: «Ook al regent het, de klim is mogelijk, maar u moet voorzichtig zijn». Dus de volgende ochtend vertrok ik om zes uur, met mijn jas, twee paar sokken en een hoop chocola.'],
+        ['El sendero era agotador. A pesar de que llevaba buenos zapatos, tenía los pies mojados y fríos. Después de cuatro horas, el viento era tan fuerte que casi no podía caminar. Pensé en volver. Aun así, seguí, paso a paso, detrás de una pareja de argentinos que no paraba de cantar.',
+          'Het pad was uitputtend. Hoewel ik goede schoenen aanhad, had ik natte en koude voeten. Na vier uur was de wind zo sterk dat ik bijna niet meer kon lopen. Ik dacht erover terug te gaan. Toch liep ik door, stap voor stap, achter een Argentijns stel dat maar bleef zingen.'],
+        ['Cuando llegué al mirador, había tanta neblina que no se veían las torres. Me senté en una piedra, un poco triste. Y de repente, durante dos minutos, las nubes se abrieron. Por más fotos que tomé, ninguna muestra lo que sentí en ese momento. Ahora, cuando algo me cuesta, me acuerdo de ese día.',
+          'Toen ik bij het uitzichtpunt aankwam, was er zoveel mist dat je de torens niet zag. Ik ging een beetje verdrietig op een steen zitten. En opeens, twee minuten lang, gingen de wolken open. Hoeveel foto\'s ik ook maakte, geen enkele laat zien wat ik op dat moment voelde. Nu, als iets me moeite kost, denk ik aan die dag.']
+      ],
+      gl: [['la subida', 'de klim'], ['ir con cuidado', 'voorzichtig zijn'], ['los calcetines', 'de sokken'], ['de repente', 'opeens'], ['costar (ue)', 'moeite kosten']],
+      q: [
+        { t: 'mc', q: '¿Cómo era el pronóstico cuando llegó a Puerto Natales?', o: ['Terrible: viento, lluvia y nieve', 'Soleado y sin viento', 'Con mucho calor'] },
+        { t: 'mc', q: '¿Por qué pensó en volver?', o: ['Porque el viento era tan fuerte que casi no podía caminar', 'Porque se perdió', 'Porque los argentinos cantaban'] },
+        { t: 'mc', q: '¿Qué vio desde el mirador?', o: ['Al principio nada, pero luego las torres durante dos minutos', 'Nada en todo el día', 'Las torres durante horas'] },
+        { t: 'mc', q: '¿Qué aprendió la autora?', o: ['A no rendirse cuando algo le cuesta', 'A no viajar nunca a la Patagonia', 'A sacar mejores fotos'] }
+      ]
+    }
+  });
 })(window.SPT);

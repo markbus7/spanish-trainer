@@ -70,7 +70,7 @@ ok(C('ano', ['año']).warn === 'enye', 'ñ-waarschuwing');
 
 /* ---------- lesstof ---------- */
 const units = S.C.all();
-ok(units.length === 38, 'aantal units = ' + units.length);
+ok(units.length === 40, 'aantal units = ' + units.length);
 const ids = new Set();
 const tags = S.C.TAGS;
 for (const u of units) {
@@ -690,6 +690,16 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   ok(I.art('onbekend') === '' && !I.has('🐢'), 'iconen: onbekende naam geeft niets (emoji blijft staan)');
   ok(html.indexOf('js/icons.js') > html.indexOf('js/tutor.js') && html.indexOf('js/icons.js') < html.indexOf('js/app.js') && sw.includes("'js/icons.js'"), 'iconen: script geladen na tutor.js en in de offline-cache');
   ok(sw.includes("'icons/apple-touch-icon.png'") && fs.existsSync(path.join(root, 'icons/apple-touch-icon.png')), 'iconen: app-icoon voor het beginscherm');
+}
+
+{ // eigen tekening per unit (js/unit-art.js)
+  const c = vm.createContext({ console }); c.window = c; c.SPT = {};
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/unit-art.js'), 'utf8'), c, { filename: 'js/unit-art.js' });
+  const I = c.SPT.Icons, html = fs.readFileSync(path.join(root, 'index.html'), 'utf8'), sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  units.forEach(u => { const s = I.unitSvg(u.id); ok(/^<svg[^>]*viewBox="0 0 48 48"/.test(s) && !/undefined|NaN/.test(s), 'unittekening: ' + u.id + ' heeft een eigen tekening'); });
+  const bodies = units.map(u => I.UNIT_ART[u.id]); ok(new Set(bodies).size === bodies.length, 'unittekening: elke unit een andere tekening');
+  ok(I.unitSvg('en-a1-01') === '', 'unittekening: andere cursussen houden hun emoji');
+  ok(html.indexOf('js/unit-art.js') > html.indexOf('js/icons.js') && html.indexOf('js/unit-art.js') < html.indexOf('js/app.js') && sw.includes("'js/unit-art.js'"), 'unittekening: script geladen en in de offline-cache');
 }
 
 /* ---------- Profe Lupe als begeleider: elke situatie heeft een Spaanse zin, Latijns-Amerikaans ---------- */
