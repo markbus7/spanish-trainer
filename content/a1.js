@@ -242,8 +242,8 @@
       { t: 'match', p: [['el abuelo', 'de opa'], ['la tía', 'de tante'], ['el primo', 'de neef'], ['la hija', 'de dochter'], ['los padres', 'de ouders']], tag: 'vocab' }
     ],
     say: [['Tengo un hermano y una hermana.', 'Ik heb een broer en een zus.'], ['Mi papá tiene sesenta años.', 'Mijn vader is zestig.'], ['¿Tienes una familia grande?', 'Heb je een grote familie?']],
-    task: { nl: 'Beschrijf je familie: wie hoort erbij, hoe heten ze en hoe oud zijn ze?', model: 'Mi familia es pequeña. Mi papá se llama Peter y tiene sesenta años. Mi mamá se llama Ingrid. Tengo un hermano menor: se llama Tim y tiene veintiocho años.' },
-    scenario: { nl: 'Je zit bij een Colombiaanse familie aan tafel en oma wil alles over jouw familie weten.', role: 'Eres doña Rosa, una abuela colombiana muy cariñosa de Medellín. Haces muchas preguntas sobre la familia del estudiante y hablas con orgullo de tus nietos.', goal: 'Vertel over je familie: hoeveel mensen, namen en leeftijden.' }
+    task: { nl: 'Beschrijf een familie (je eigen of een verzonnen): wie hoort erbij, hoe heten ze en hoe oud zijn ze?', model: 'Mi familia es pequeña. Mi papá se llama Peter y tiene sesenta años. Mi mamá se llama Ingrid. Tengo un hermano menor: se llama Tim y tiene veintiocho años.' },
+    scenario: { nl: 'Je zit bij een Colombiaanse familie aan tafel en oma wil alles over jouw familie weten.', role: 'Eres doña Rosa, una abuela colombiana muy cariñosa de Medellín. Haces muchas preguntas sobre la familia del estudiante y hablas con orgullo de tus nietos.', goal: 'Vertel over je familie in je rol (verzin gerust namen): hoeveel mensen, namen en leeftijden.' }
   });
 
   /* ───────────────────────── A1 · 4 ───────────────────────── */

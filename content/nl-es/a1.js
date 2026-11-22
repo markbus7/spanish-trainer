@@ -187,7 +187,7 @@
     },
     say: [['Dit is mijn familie.', 'Esta es mi familia.'], ['Ik heb twee broers en een zus.', 'Tengo dos hermanos y una hermana.'], ['Haar naam is Sofía.', 'Ella se llama Sofía.']],
     task: { nl: 'Describe a tu familia en 4 frases: cuántos hermanos tienes, cómo se llaman y algo de ellos.', model: 'Ik heb een kleine familie. Ik heb een broer. Hij heet Luis en hij is 20 jaar. Mijn moeder is docent en mijn vader heeft een winkel.' },
-    scenario: { nl: 'Le muestras fotos de tu familia a Daan, un amigo de Ámsterdam.', role: 'Je bent Daan, een nieuwsgierige vriend uit Amsterdam. De leerling laat foto’s van de familie zien op de telefoon. Stel eenvoudige vragen over elke persoon.', goal: 'Muéstrale tu familia a Daan y contesta sus preguntas.' }
+    scenario: { nl: 'Le muestras fotos de tu familia a Daan, un amigo de Ámsterdam.', role: 'Je bent Daan, een nieuwsgierige vriend uit Amsterdam. De leerling laat foto’s van de familie zien op de telefoon. Stel eenvoudige vragen over elke persoon.', goal: 'Muéstrale a Daan la familia de tu papel (puedes inventar los nombres) y contesta sus preguntas.' }
   });
 
   /* ───────────────────────── A1 · 3 ───────────────────────── */

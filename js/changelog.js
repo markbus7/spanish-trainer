@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.51.1', date: '2026-11-22',
+    nl: ['Rollenspel: Lupe vraagt niet meer naar je echte familie of privézaken. Je speelt een verzonnen rol (met rolkaartje), en van gesprekken bewaart de app alleen je fouten, niet wat je schreef.'],
+    es: [] },
   { v: '1.51.0', date: '2026-11-22',
     nl: ['Rollenspel met Lupe: tik op elk woord van Lupe voor de vertaling in deze zin (niet letterlijk, uitdrukkingen samen). Met 🔊 uitspraak en ＋ Mijn woorden.', 'Correcties: je eigen zin staat erbij met de verbeteringen erin: goed is groen, fout is rood doorgestreept, met de verbetering ernaast. Ook bij ✍️ Correctie.', 'Lupe praat in een rollenspel sneller: ze begint zodra haar antwoord binnen is.'],
     es: [] },

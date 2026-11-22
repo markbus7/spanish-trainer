@@ -185,7 +185,7 @@
     },
     say: [['This is my family.', 'Esta es mi familia.'], ['I have two brothers and one sister.', 'Tengo dos hermanos y una hermana.'], ['Her name is Sofía.', 'Ella se llama Sofía.']],
     task: { nl: 'Describe a tu familia en 4 frases: cuántos hermanos tienes, cómo se llaman y algo de ellos.', model: "I have a small family. I have one brother. His name is Luis and he is 20. My mom is a teacher and my dad has a store." },
-    scenario: { nl: 'Le muestras fotos de tu familia a Tom, un amigo de Chicago.', role: 'You are Tom, a curious friend from Chicago. The learner shows you photos of their family on their phone. Ask simple questions about each person.', goal: 'Muéstrale tu familia a Tom y contesta sus preguntas.' }
+    scenario: { nl: 'Le muestras fotos de tu familia a Tom, un amigo de Chicago.', role: 'You are Tom, a curious friend from Chicago. The learner shows you photos of their family on their phone. Ask simple questions about each person.', goal: 'Muéstrale a Tom la familia de tu papel (puedes inventar los nombres) y contesta sus preguntas.' }
   });
 
   /* ───────────────────────── A1 · 3 ───────────────────────── */

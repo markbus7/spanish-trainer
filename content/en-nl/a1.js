@@ -192,7 +192,7 @@
     },
     say: [['This is my family.', 'Dit is mijn familie.'], ['I have one brother and two sisters.', 'Ik heb één broer en twee zussen.'], ['My mom is fifty-two.', 'Mijn moeder is tweeënvijftig.'], ["Her name is Femke.", 'Zij heet Femke.']],
     task: { nl: 'Beschrijf je familie in 4 of 5 zinnen: wie zijn er, hoe heten ze en hoe oud zijn ze? Gebruik have/has en my/his/her.', model: "I have a small family. My mom's name is Ellen and she's fifty-eight. My dad is sixty. I have one sister. Her name is Femke and she has a little boy." },
-    scenario: { nl: 'Je laat foto’s van je familie zien aan een Amerikaanse vriendin.', role: 'You are Emily, a curious and friendly American from Chicago. The learner shows you photos of their family on their phone. Ask simple questions: who is this, what is his/her name, how old is he/she.', goal: 'Vertel over je familie: namen, leeftijden en wie wie is.' }
+    scenario: { nl: 'Je laat foto’s van je familie zien aan een Amerikaanse vriendin.', role: 'You are Emily, a curious and friendly American from Chicago. The learner shows you photos of their family on their phone. Ask simple questions: who is this, what is his/her name, how old is he/she.', goal: 'Vertel over je familie in je rol (verzin gerust namen): namen, leeftijden en wie wie is.' }
   });
 
   /* ───────────────────────── A1 · 3 ───────────────────────── */

@@ -883,7 +883,7 @@
       const scs = (cur.scenario ? [unitScenario(cur)] : []).concat(S.scenarios);
       scs.forEach(sc => list.append(h('button', { class: 'scen', type: 'button', onclick: () => { startRoleplay(sc); render(); } },
         h('span', { class: 'qi' }, sc.icon), h('div', { class: 'grow' }, h('b', null, sc.title || sc.nl), h('small', null, (sc.place || '') + (sc.lv ? ' · ' + sc.lv : ' · huidige unit')), h('small', { class: 'muted' }, '🎯 ' + sc.goal)))));
-      wrap.append(section('Kies een situatie', list));
+      wrap.append(section('Kies een situatie', h('div', null, h('p', { class: 'small muted privacy-note' }, '🔒 Je speelt altijd een verzonnen rol: Lupe vraagt niet naar je echte familie of privézaken, en geeft je zo nodig een rolkaartje met namen. Van gesprekken bewaart de app alleen je fouten (het foute stukje met de verbetering), niet wat je schreef.'), list)));
       return wrap;
     }
     if (chat.mode === 'roleplay') wrap.append(h('div', { class: 'scen-head' }, h('span', null, (chat.scenario.icon || '🎭') + ' ' + (chat.scenario.title || chat.scenario.nl) + (chat.scenario.place ? ' · ' + chat.scenario.place : '')), h('small', null, '🎯 ' + chat.scenario.goal),
@@ -1141,8 +1141,7 @@
       wrap.append(section('Laatste fouten', h('div', { class: 'card' }, r.recent.map(e => h('details', { class: 'rep-recent' },
         h('summary', null, h('span', { class: 'grow' }, '❌ ', h('s', { lang: 'es' }, e.w), ' → ', h('b', { lang: 'es' }, e.c)), h('small', { class: 'muted' }, fmtDate(e.t, { day: 'numeric', month: 'short' }))),
         h('small', { class: 'muted' }, (e.m === 'write' ? '✍️ Correctie' : '🎭 ' + (e.sc || 'Rollenspel')) + ' · ' + (e.tag === 'vocab' ? 'woordenschat' : e.tag === 'other' ? 'overig' : C.tag(e.tag))),
-        e.why ? h('p', { class: 'small' }, e.why) : null,
-        e.u ? h('p', { class: 'small muted', lang: 'es' }, 'Jij schreef: «' + e.u + '»') : null)))));
+        e.why ? h('p', { class: 'small' }, e.why) : null)))));
     }
     return wrap;
   };
