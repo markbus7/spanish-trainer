@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.60.0', date: '2026-11-23',
+    nl: ['Dialogen en leesteksten: tik op een woord voor de betekenis. Ook vervoegde vormen (está → estar, hij/zij/u) en meervoud werken, en uitdrukkingen uit je lessen (mucho gusto) lichten samen op.', 'Elke zin heeft nu een eigen NL-knopje naast 🔊 voor de vertaling van alleen die zin. «Alles vertalen» blijft voor alles tegelijk.', 'In het woordkaartje staat onderaan ook de vertaling van de hele zin.'],
+    es: [] },
   { v: '1.59.0', date: '2026-11-23',
     nl: ['Hint geeft nu in elk woord tegelijk een letter meer. Sneltoetsen: Ctrl+H = hint, Ctrl+I = Ik weet het niet.'],
     es: [] },

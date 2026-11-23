@@ -66,7 +66,7 @@ WORD GLOSS (required, invisible): right after the <fix> line, add one line <glos
       for (let s = pos; s <= keys.length - ek.length; s++) if (at(s)) { i = s; break; }
       if (i < 0) for (let s = 0; s < pos && s <= keys.length - ek.length; s++) if (at(s)) { i = s; break; }
       if (i < 0) return;
-      for (let j = 0; j < ek.length; j++) out[i + j] = { t: e.t, m: e.m, g: gi };
+      for (let j = 0; j < ek.length; j++) out[i + j] = { t: e.t, m: e.m, g: gi, les: e.les };
       if (i >= pos) pos = i + ek.length;
     });
     return out;
@@ -142,13 +142,16 @@ WORD GLOSS (required, invisible): right after the <fix> line, add one line <glos
       });
     };
     walk(el);
+    const textBefore = sp => { let n = sp.previousSibling, t = ''; while (n && !(n.classList && n.classList.contains('tw')) && t.length < 6) { t = n.textContent + t; n = n.previousSibling; } return n ? t : '.'; };
     const sentence = el.textContent.replace(/\s+/g, ' ').trim();
     const map = align(all.map(s => s.textContent), gloss);
     all.forEach((sp, i) => {
       sp.tabIndex = 0; sp.setAttribute('role', 'button');
       const e = map[i];
       if (e) sp.dataset.g = e.g;
-      const open = ev => { ev.stopPropagation(); ev.preventDefault(); show(sp, e, all.filter((x, j) => e && map[j] && map[j].g === e.g), sentence, ctx); };
+      // hoofdletter midden in een zin = waarschijnlijk een naam (Mark, Bogotá)
+      if (/^\p{Lu}/u.test(sp.textContent) && i && !/[.?!¿¡:—–-]\s*$/.test(textBefore(sp))) sp.dataset.name = '1';
+      const open = ev => { if (ctx.skip && ctx.skip()) return; ev.stopPropagation(); ev.preventDefault(); show(sp, e, all.filter((x, j) => e && map[j] && map[j].g === e.g), sentence, ctx); };
       sp.addEventListener('click', open);
       sp.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') open(ev); });
     });
@@ -156,16 +159,126 @@ WORD GLOSS (required, invisible): right after the <fix> line, add one line <glos
     return all.length;
   }
 
-  /* ---------- losse woorden opzoeken als Lupe ze niet gaf ---------- */
+  /* ---------- losse woorden opzoeken (lesstof, vervoegingen, kleine woordjes) ---------- */
   const cache = new Map();
-  function local(word) {
-    const b = bare(word); if (!b) return null;
-    const art = /^(el|la|los|las|un|una|the|a|an|de|het|een)\s+/i;
-    for (const u of C.all()) for (const v of u.vocab || []) {
-      if (bare(String(v[0]).replace(art, '')) === b) return { t: word, m: String(v[1]), src: 'les' };
+  const ART = /^(el|la|los|las|un|una|the|a|an|de|het|een)\s+/i;
+  let IDX = null; // { one: Map(kaal woord → {t,m}), multi: [{k:[kale woorden], t, m}], verb: Map(vorm → {inf, tense, p}) }
+  /** Varianten van een woordenlijst-item: «el chico / la chica» → chico, chica; «bueno/a» → bueno, buena. */
+  function variants(es) {
+    const out = [];
+    String(es).replace(/\([^)]*\)/g, ' ').split(/\s+\/\s+|\s*;\s*|,\s+/).forEach(part => {
+      part = part.replace(/[¿?¡!.…]/g, '').trim().replace(ART, '').trim();
+      if (!part) return;
+      const m = part.match(/^(\S+?)(o|e|)\/(a|as|os)$/); // bueno/a, profesor/a
+      if (m) { out.push(m[1] + m[2]); out.push(m[1] + m[3]); return; }
+      out.push(part.replace(/\/\S*$/, ''));
+    });
+    return out.filter(Boolean);
+  }
+  function index() {
+    if (IDX && IDX.n === C.all().length) return IDX;
+    // twee sleutels per woord: precies (kleine letters, mét accenten: está ≠ esta) en kaal (zonder accenten, als vangnet)
+    const one = new Map(), exact = new Map(), multi = [], verb = new Map(), verbX = new Map();
+    const low = w => String(w).toLowerCase();
+    const put1 = (w, x) => { if (!exact.has(low(w))) exact.set(low(w), x); if (!one.has(bare(w))) one.set(bare(w), x); };
+    const put = (es, nl) => variants(es).forEach(v => {
+      const ws = words(v); if (!ws.length) return;
+      if (ws.length === 1) put1(ws[0], { t: v, m: nl });
+      else multi.push({ k: ws.map(bare), t: v, m: nl });
+    });
+    C.all().forEach(u => (u.vocab || []).forEach(v => put(v[0], String(v[1]))));
+    // daarna de woordjes bij leesteksten en de koppelparen uit de oefeningen
+    C.all().forEach(u => {
+      (u.reading && u.reading.gl || []).forEach(v => put(v[0], String(v[1])));
+      (u.ex || []).forEach(x => { if (x && x.t === 'match' && Array.isArray(x.p)) x.p.forEach(v => Array.isArray(v) && put(v[0], String(v[1]))); });
+    });
+    if (S.Words && S.Store && S.Store.state) try { S.Words.mine().forEach(w => put(w.es, w.nl)); } catch (e) { /* geen eigen woorden */ }
+    if (S.course.target === 'es' && S.course.ui === 'nl') {
+      Object.keys(SMALL).forEach(k => put1(k, { t: k, m: SMALL[k] }));
+      if (S.conj) Object.keys(S.conj.VERBS).forEach(k => { const nl = S.conj.VERBS[k].nl; if (nl) put1(k, { t: k, m: nl.replace(/,\s*/g, ' / ') }); });
     }
+    // vervoegde vormen van alle werkwoorden uit de lessen (alleen Spaans): «está» → estar
+    if (S.course.target === 'es' && S.conj) {
+      const infs = new Set(Object.keys(S.conj.VERBS));
+      exact.forEach((v, k) => { if (/^[a-zñ]+(ar|er|ir|ír)(se)?$/.test(k)) infs.add(k); });
+      // volgorde = voorkeur bij gelijke vormen: «habla» = hij praat (niet: praat! tegen jou), «siga» = gaat u door (bevel aan usted)
+      const TENSES = ['pres', 'imper', 'pret', 'imp', 'fut', 'cond', 'subj', 'impsubj'];
+      infs.forEach(inf => {
+        if (!/^[a-zñáéíóú]*(ar|er|ir|ír)(se)?$/i.test(inf)) return;
+        const add = (f, tense, p) => {
+          const w = low(String(f || '').split(' ').pop()); if (!w || w === inf) return;
+          if (!verbX.has(w)) verbX.set(w, { inf, tense, p });
+          if (!verb.has(bare(w))) verb.set(bare(w), { inf, tense, p });
+        };
+        TENSES.forEach(tn => { let t; try { t = S.conj.table(inf, tn); } catch (e) { t = null; } (t || []).forEach((f, p) => f && add(f, tn, p)); });
+        try { add(S.conj.gerundio(inf), 'ger', -1); add(S.conj.participio(inf), 'part', -1); } catch (e) { /* onregelmatig zonder tabel */ }
+      });
+    }
+    multi.sort((a, b) => b.k.length - a.k.length);
+    return (IDX = { one, exact, multi, verb, verbX, n: C.all().length });
+  }
+  const meanOf = inf => {
+    const ix = index(), x = ix.exact.get(inf) || ix.exact.get(inf.replace(/se$/, ''));
+    const v = S.conj && S.conj.info(inf);
+    return x ? x.m : v && v.nl ? v.nl.replace(/,\s*/g, ' / ') : '';
+  };
+  const VNL = { ger: 'bezig met (-ndo)', part: 'voltooid deelwoord' };
+  /** Wat betekent dit woord? Eerst de lesstof, dan een vervoegde vorm, dan meervoud/vrouwelijk terug naar de basis. Zonder DOM. */
+  function lookup(word) {
+    const b = bare(word); if (!b) return null;
+    const ix = index(), lw = String(word).toLowerCase();
+    const hit = ix.exact.get(lw);
+    if (hit) return { t: hit.t, m: hit.m, src: 'les' };
+    // meervoud eerst (casas = huizen, niet: je trouwt), dan vervoegde vormen, dan de rest
+    const pl = [lw.replace(/es$/, ''), lw.replace(/s$/, ''), lw.replace(/ces$/, 'z')].find(k => k !== lw && k.length > 1 && ix.exact.get(k));
+    if (pl) { const x = ix.exact.get(pl); return { t: x.t, m: x.m, w: 'meervoud van ' + x.t, src: 'les' }; }
+    const v = ix.verbX.get(lw) || (!ix.one.get(b) && ix.verb.get(b));
+    if (!v && ix.one.get(b)) { const x = ix.one.get(b); return { t: x.t, m: x.m, src: 'les' }; }
+    if (v) {
+      const m = meanOf(v.inf);
+      const ten = S.conj.TENSES[v.tense], who = v.p >= 0 ? S.conj.personNl(v.tense, v.p) : '';
+      const how = (who ? who + ', ' : '') + (ten ? ten.nl : VNL[v.tense] || '');
+      return { t: v.inf, m: m || v.inf, w: 'vorm van ' + v.inf + (how ? ' (' + how + ')' : ''), src: 'vorm' };
+    }
+    // meervoud en vrouwelijk: casas → casa, amables → amable, cerrada → cerrado
+    const tries = [b.replace(/es$/, ''), b.replace(/s$/, ''), b.replace(/as?$/, 'o'), b.replace(/os$/, 'o'), b.replace(/ces$/, 'z')];
+    for (const k of tries) if (k !== b && k.length > 1 && ix.one.get(k)) { const x = ix.one.get(k); return { t: x.t, m: x.m, w: 'van ' + x.t, src: 'les' }; }
     return null;
   }
+  /** Vaste uitdrukkingen uit de lessen die in deze zin staan, als gloss-lijst (in volgorde): «mucho gusto» licht samen op. */
+  function phrases(sentence) {
+    const ws = words(sentence).map(bare), used = new Array(ws.length).fill(false), found = [];
+    index().multi.forEach(p => {
+      for (let i = 0; i + p.k.length <= ws.length; i++) {
+        if (p.k.every((k, j) => ws[i + j] === k && !used[i + j])) { p.k.forEach((_, j) => { used[i + j] = true; }); found.push({ i, t: words(sentence).slice(i, i + p.k.length).join(' '), m: p.m }); }
+      }
+    });
+    return found.sort((a, b) => a.i - b.i).map(({ t, m }) => ({ t, m, les: true }));
+  }
+  /* Kleine woordjes die als los woord niet in de woordenlijsten staan (alleen Spaans → Nederlands). */
+  const SMALL = {
+    a: 'naar / aan / om', al: 'naar de / aan de', de: 'van / uit', del: 'van de', en: 'in / op', con: 'met', sin: 'zonder', por: 'door / via / voor', para: 'voor / om te',
+    y: 'en', e: 'en', o: 'of', u: 'of', pero: 'maar', que: 'dat / die / wat', si: 'als / of', 'sí': 'ja', no: 'nee / niet', ni: 'noch / zelfs niet',
+    el: 'de / het', la: 'de / het', los: 'de', las: 'de', lo: 'het / hem', un: 'een', una: 'een', unos: 'een paar', unas: 'een paar', le: 'hem / haar / u (aan)', les: 'hun / jullie (aan)',
+    me: 'mij / me', te: 'jou / je', se: 'zich / zichzelf', nos: 'ons', mi: 'mijn', mis: 'mijn', tu: 'jouw', tus: 'jouw', su: 'zijn / haar / uw / hun', sus: 'zijn / haar / uw / hun', nuestro: 'ons', nuestra: 'onze',
+    yo: 'ik', 'tú': 'jij', 'él': 'hij', ella: 'zij', usted: 'u', nosotros: 'wij', ellos: 'zij', ellas: 'zij', ustedes: 'jullie / u',
+    muy: 'heel / erg', 'más': 'meer', menos: 'minder', 'también': 'ook', tampoco: 'ook niet', ya: 'al / nu', todavía: 'nog', 'aquí': 'hier', 'allí': 'daar', 'allá': 'daar', 'ahí': 'daar',
+    'qué': 'wat / welk', 'cómo': 'hoe', 'dónde': 'waar', 'cuándo': 'wanneer', 'cuánto': 'hoeveel', 'quién': 'wie', 'cuál': 'welke', porque: 'omdat',
+    este: 'deze / dit', esta: 'deze / dit', esto: 'dit', ese: 'die / dat', esa: 'die / dat', eso: 'dat', estos: 'deze', estas: 'deze', esos: 'die', esas: 'die',
+    casa: 'huis', gusto: 'smaak / plezier', 'año': 'jaar', 'día': 'dag', vez: 'keer', veces: 'keer / keren', hora: 'uur / tijd', tiempo: 'tijd / weer', mundo: 'wereld', lugar: 'plek', vida: 'leven', cosa: 'ding', gente: 'mensen', persona: 'persoon',
+    'país': 'land', ciudad: 'stad', agua: 'water', mar: 'zee', trabajo: 'werk', clase: 'les / klas', animal: 'dier', idea: 'idee', problema: 'probleem', fin: 'einde', lado: 'kant', 'razón': 'reden / gelijk', calor: 'warmte / hitte',
+    'teléfono': 'telefoon', turista: 'toerist', 'señor': 'meneer', 'señora': 'mevrouw', 'señorita': 'juffrouw',
+    todo: 'alles / helemaal', toda: 'heel', todos: 'iedereen / alle', todas: 'alle', solo: 'alleen / maar', 'así': 'zo', tan: 'zo', tanto: 'zoveel', cada: 'elk(e)', casi: 'bijna', mismo: 'zelf / dezelfde', misma: 'zelf / dezelfde',
+    otro: 'ander(e)', otra: 'ander(e) / nog een', otros: 'andere', otras: 'andere', algo: 'iets', nada: 'niets', alguien: 'iemand', nadie: 'niemand', siempre: 'altijd', nunca: 'nooit', ahora: 'nu', hoy: 'vandaag',
+    bien: 'goed', mal: 'slecht', buen: 'goed(e)', mejor: 'beter / best', peor: 'slechter', mucho: 'veel', mucha: 'veel', muchos: 'veel', muchas: 'veel', poco: 'weinig / een beetje', perfecto: 'perfect', exacto: 'precies', normal: 'normaal', terrible: 'verschrikkelijk', nacional: 'nationaal',
+    desde: 'sinds / vanaf', hasta: 'tot', sobre: 'over / op', entre: 'tussen', hacia: 'naar', 'según': 'volgens', durante: 'tijdens', mientras: 'terwijl', cuando: 'wanneer / als', donde: 'waar', como: 'zoals / als / hoe', quien: 'die / wie', aunque: 'hoewel / ook al', sino: 'maar (wel)',
+    cerca: 'dichtbij', lejos: 'ver weg', media: 'half', medio: 'half', primero: 'eerst', 'último': 'laatste', pues: 'nou / dus', ti: 'jou', aquel: 'die (daar)', aquella: 'die (daar)',
+    ja: 'ha', jaja: 'haha', ay: 'ach / au', uy: 'oei', mmm: 'hmm', oye: 'hé / zeg', mira: 'kijk', dale: 'oké / doe maar', ok: 'oké',
+    uno: 'één', dos: 'twee', tres: 'drie', cuatro: 'vier', cinco: 'vijf', seis: 'zes', siete: 'zeven', ocho: 'acht', nueve: 'negen', diez: 'tien', veinte: 'twintig', cien: 'honderd', ciento: 'honderd', mil: 'duizend',
+    'acá': 'hier', tal: 'zo’n / zulk', primer: 'eerste', malo: 'slecht', dentro: 'binnen', importante: 'belangrijk', bastante: 'behoorlijk / genoeg', arriba: 'boven', abajo: 'beneden', miedo: 'angst', pena: 'jammer / schaamte',
+    foto: 'foto', 'número': 'nummer', minuto: 'minuut', algunos: 'sommige', algunas: 'sommige', apartamento: 'appartement', 'región': 'regio',
+    hay: 'er is / er zijn', luego: 'daarna / dan', entonces: 'dan / dus', bueno: 'goed / nou', claro: 'natuurlijk', 'después': 'daarna / na', antes: 'eerder / voor'
+  };
   async function ai(word, sentence) {
     const k = bare(word) + '|' + sentence;
     if (cache.has(k)) return cache.get(k);
@@ -187,7 +300,7 @@ WORD GLOSS (required, invisible): right after the <fix> line, add one line <glos
   let pop = null, lit = [], scroller = null;
   function close() {
     if (pop) { pop.remove(); pop = null; }
-    if (scroller) { scroller.removeEventListener('scroll', close); scroller = null; }
+    if (scroller) { scroller.removeEventListener('scroll', close, { capture: true }); scroller = null; }
     lit.forEach(x => x.classList.remove('lit')); lit = [];
     document.removeEventListener('pointerdown', outside, true);
     window.removeEventListener('resize', close);
@@ -222,24 +335,32 @@ WORD GLOSS (required, invisible): right after the <fix> line, add one line <glos
         if (res) { S.Store.save(); add.textContent = res.dup ? '✓ Staat al in Mijn woorden' : '✓ In Mijn woorden en je herhaling'; add.disabled = true; }
       } }, '＋ Mijn woorden') : null;
       body.append(h('div', { class: 'gp-foot' }, h('small', { class: 'muted' }, note), add));
+      if (ctx.sentence) body.append(sentenceRow());
       if (r.t !== phrase) pop.querySelector('.gp-top b').textContent = r.t;
       place(sp);
     };
-    if (e) fill(e, 'in deze zin');
+    // de hele zin vertaald: onderaan het kaartje (ctx.sentence = vertaling), tik = ook in de ballon open
+    const sentenceRow = () => h('button', { class: 'gp-sent', type: 'button', onclick: ev => { ev.stopPropagation(); close(); if (ctx.onSentence) ctx.onSentence(); } },
+      h('span', { class: 'gp-sent-l small muted' }, 'Hele zin'), h('span', { class: 'gp-sent-t' }, ctx.sentence));
+    const NOTE = { les: 'uit je lessen', vorm: 'vervoeging' };
+    if (e && e.les) { const l = lookup(word); fill(Object.assign({}, e, { w: l && l.src === 'les' && !l.w && bare(l.t) !== bare(e.t) ? l.m : '' }), NOTE.les); }
+    else if (e) fill(e, 'in deze zin');
     else {
-      const l = local(word);
-      if (l) fill(l, 'uit je lessen');
-      if (S.AI.enabled()) {
-        if (!l) { body.append(h('div', { class: 'gp-m muted' }, h('span', { class: 'typing' }, '…'), ' Lupe zoekt het op')); }
+      const l = lookup(word);
+      if (l) fill(l, NOTE[l.src] || NOTE.les);
+      if (S.AI.enabled() && !(l && ctx.lessonFirst)) {
+        if (!l) { body.append(h('div', { class: 'gp-m muted' }, h('span', { class: 'typing' }, '…'), ' Lupe zoekt het op')); if (ctx.sentence) body.append(sentenceRow()); }
         const me = pop;
-        ai(word, sentence).then(r => { if (pop === me) fill(r, 'in deze zin'); }).catch(err => { if (pop === me && !l) { body.innerHTML = ''; body.append(h('div', { class: 'gp-m warn small' }, '⚠️ ' + err.message)); place(sp); } });
-      } else if (!l) body.append(h('div', { class: 'gp-m muted small' }, 'Geen vertaling gevonden.'));
+        ai(word, sentence).then(r => { if (pop === me) fill(r, 'in deze zin'); }).catch(err => { if (pop === me && !l) { body.innerHTML = ''; body.append(h('div', { class: 'gp-m warn small' }, '⚠️ ' + err.message)); if (ctx.sentence) body.append(sentenceRow()); place(sp); } });
+      } else if (!l) { body.append(h('div', { class: 'gp-m muted small' }, sp.dataset.name ? 'Een naam (van een persoon of plaats).' : 'Dit woord staat niet in je lessen.')); if (ctx.sentence) body.append(sentenceRow()); }
     }
     document.body.append(pop); place(sp);
     setTimeout(() => document.addEventListener('pointerdown', outside, true), 0);
     window.addEventListener('resize', close);
-    if (ctx.scroller) { scroller = ctx.scroller; scroller.addEventListener('scroll', close, { passive: true }); }
+    // bij scrollen (ook in de les) gaat het kaartje dicht, anders zweeft het los van het woord
+    scroller = ctx.scroller || document; scroller.addEventListener('scroll', close, { passive: true, capture: true });
   }
 
-  S.Gloss = { promptRule, strip, parseGloss, parseFix, words, align, tokens, diff, summary, diffView, decorate, close, local };
+  const local = lookup;
+  S.Gloss = { promptRule, strip, parseGloss, parseFix, words, align, tokens, diff, summary, diffView, decorate, close, local, lookup, phrases };
 })(window.SPT);
