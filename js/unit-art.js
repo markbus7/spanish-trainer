@@ -169,7 +169,32 @@
       <path d="M2 32c4 2 7 2 11 0s7-2 11 0 7 2 11 0 7-2 11 0v14H2z" fill="${C.b}"/><path d="M2 32c4 2 7 2 11 0s7-2 11 0 7 2 11 0 7-2 11 0" stroke="#fff" stroke-width="1.4" fill="none" opacity=".5"/>
       <path d="M8 44c0-9 6.4-15 15-15s15 6 15 15z" fill="#5a4630"/><path d="M8 44c0-9 6.4-15 15-15s15 6 15 15" fill="none" stroke="#3e2f1f" stroke-width="1.6"/>
       <path d="M17 31.5l2.2 5.4h7.6l2.2-5.4M19.2 36.9 15 43.5M26.8 36.9 31 43.5M13 36.4l6.2.5M33 36.4l-6.2.5" stroke="#8a6d46" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
-      <path d="M36.5 40c1.6-4.4 4.6-7.6 7.4-7.2 2.2.3 2.6 2.8.8 4.2-1.4 1.1-3.4 1.4-4.6 4.4z" fill="#8c8466"/><circle cx="43" cy="35" r=".9" fill="${C.ink}"/>`
+      <path d="M36.5 40c1.6-4.4 4.6-7.6 7.4-7.2 2.2.3 2.6 2.8.8 4.2-1.4 1.1-3.4 1.4-4.6 4.4z" fill="#8c8466"/><circle cx="43" cy="35" r=".9" fill="${C.ink}"/>`,
+    /* Salar de Uyuni bij zonsopgang: flamingo met spiegelbeeld op het natte zout */
+    'b2-11': `<rect x="2" y="3" width="44" height="25" rx="6" fill="#ffd9c2"/><path d="M2 14h44v14H2z" fill="#ffc2a8" opacity=".7"/>
+      <circle cx="35" cy="26" r="7.5" fill="${C.g}"/><circle cx="35" cy="26" r="10.5" fill="${C.g2}" opacity=".35"/>
+      <path d="M2 28l7-7 5 4 6-8 6 8 4-3 6 6z" fill="#b99ad0"/><path d="M20 17l-2.4 3.2 2.4 1.4 2.4-1.4z" fill="#fff" opacity=".85"/>
+      <path d="M2 27h44v13a6 6 0 0 1-6 6H8a6 6 0 0 1-6-6z" fill="#cfe7f7"/><path d="M2 27h44v5H2z" fill="#fff" opacity=".55"/>
+      <ellipse cx="35" cy="31" rx="7" ry="2" fill="${C.g2}" opacity=".7"/>
+      <path d="M8 38l4-2.4 4 2.4M22 42l4-2.4 4 2.4M33 38l4-2.4 4 2.4" fill="none" stroke="#fff" stroke-width="1.3" stroke-linejoin="round" opacity=".9"/>
+      <g opacity=".3" transform="translate(0 54.6) scale(1 -1)"><path d="M15.5 27.4V19" stroke="${C.p}" stroke-width="1.5"/><ellipse cx="15" cy="16.5" rx="6.6" ry="4.4" fill="${C.p}"/></g>
+      <path d="M14 27.4V21M17 27.4v-4l-2.2-1.6" fill="none" stroke="#d9567f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <ellipse cx="15" cy="17" rx="6.8" ry="4.5" fill="${C.p}"/><path d="M9.5 16c2.6-2.6 7-3 10-1-2 3-6.6 3.6-10 1z" fill="${C.p2}"/><path d="M8.6 18.4l-3 1.6 3.6.6z" fill="#d9567f"/>
+      <path d="M20 15.5c2.6-1.4 2.2-4.4.4-6.2-1.6-1.6-.8-4.2 1.6-4.4" fill="none" stroke="${C.p}" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="22.6" cy="5.2" r="2.5" fill="${C.p}"/><path d="M24.4 3.5c2.5-.3 4.4.9 4.7 3l-1 3.3-1.7-2.7-2.3-.5z" fill="${C.cream}"/><path d="M28.7 5.300c.5.9.5 1.7.4 2.300l-1 2.2-1.1-1.900z" fill="${C.ink}"/><circle cx="22.9" cy="4.7" r=".7" fill="${C.ink}"/>`,
+    /* Tereré: rode thermoskan, guampa van hoorn met bombilla en verse yuyos */
+    'b2-12': `<circle cx="38" cy="9" r="5.5" fill="${C.g}"/><circle cx="38" cy="9" r="8" fill="${C.g2}" opacity=".35"/>
+      <path d="M10 11a5 5 0 0 1 10 0" fill="none" stroke="${C.brown}" stroke-width="2.2" stroke-linecap="round"/>
+      <rect x="6" y="14" width="18" height="30" rx="4.5" fill="${C.red}"/><rect x="6" y="14" width="18" height="6.5" rx="3" fill="${C.grey}"/><rect x="11" y="10" width="8" height="5.5" rx="2" fill="${C.ink}" opacity=".8"/>
+      <path d="M6 28h18v7H6z" fill="${C.cream}"/><path d="M6 28h18" stroke="${C.b}" stroke-width="1.6"/><path d="M6 35h18" stroke="${C.b}" stroke-width="1.6"/>${spark(15, 31.5, 2.6, C.g)}
+      <rect x="8.4" y="22" width="2.6" height="19" rx="1.3" fill="#fff" opacity=".3"/>
+      <path d="M36 23L43.5 5" stroke="${C.grey}" stroke-width="2.6" stroke-linecap="round"/><path d="M36 23L43.5 5" stroke="#fff" stroke-width=".9" stroke-linecap="round" opacity=".7"/><ellipse cx="43.8" cy="4.6" rx="2.2" ry="1.3" transform="rotate(-22 43.8 4.6)" fill="${C.grey}"/>
+      <path d="M29 22c-2-4 0-7 3-7 0 3 0 5-1 7zM33 21c0-4 3-6 6-5-1 3-3 5-5 6z" fill="${C.green}"/><path d="M36 22c2-3 5-3 7-1-2 2-4 3-7 2z" fill="${C.green2}"/>
+      <path d="M27 22h16l-1.8 15.5c-.5 4-3 6.5-6.2 6.5s-5.7-2.5-6.2-6.500z" fill="#e9dcc3"/><path d="M28.2 32h13.600l-.6 5.500c-.5 4-3 6.5-6.2 6.500s-5.7-2.5-6.2-6.500z" fill="#6b4a32"/>
+      <path d="M27.6 27.500c5 2.4 10 2.4 14.8 0l-.5 4.500c-4.6 2-9.2 2-13.8 0z" fill="#a8845c"/>
+      <rect x="26" y="20.5" width="18" height="4.4" rx="2.2" fill="${C.grey}"/><rect x="26" y="20.5" width="18" height="1.6" rx=".8" fill="#fff" opacity=".6"/>
+      <rect x="29.6" y="26" width="2" height="12" rx="1" fill="#fff" opacity=".35"/>
+      <path d="M3 44.500h42" stroke="${C.brown2}" stroke-width="3" stroke-linecap="round"/>`
   };
 
   function svg(id) { const b = ART[id]; return b ? `<svg class="ic-art" viewBox="0 0 48 48" aria-hidden="true">${b}</svg>` : ''; }

@@ -1091,4 +1091,235 @@
       ]
     }
   });
+
+  /* ───────────────────────── B2 · 11 ───────────────────────── */
+  U({
+    id: 'b2-11', level: 'B2', icon: '🦩', title: 'Llevo tres días viajando', nl: 'Werkwoordgroepen: llevar, seguir, ponerse a, estar a punto de en acabar + gerundio',
+    goals: ['Zeggen hoe lang je iets al doet met llevar + gerundio (Llevo tres días viajando) en llevar … sin + infinitief', 'Verloop uitdrukken met seguir, ir en acabar + gerundio (sigo esperando, te vas acostumbrando, acabé comprando)', 'Begin, bijna en einde uitdrukken met ponerse a, echarse a, estar a punto de en dejar de'],
+    vocab: [
+      ['llevar + gerundio', 'al (een tijd) bezig zijn met …'], ['seguir + gerundio', 'nog steeds …, blijven …'], ['ir + gerundio', 'langzaamaan …, beetje bij beetje …'], ['acabar + gerundio', 'uiteindelijk (toch) …'],
+      ['ponerse a + infinitivo', 'beginnen te … (ineens)'], ['echarse a reír', 'in lachen uitbarsten'], ['estar a punto de + infinitivo', 'op het punt staan te …'], ['demorarse en + infinitivo', 'er lang over doen om te …', 'LatAm'],
+      ['el salar', 'de zoutvlakte'], ['la sal', 'het zout'], ['el altiplano', 'de hoogvlakte (in de Andes)'], ['la altura', 'de hoogte'],
+      ['el soroche', 'de hoogteziekte', 'BO · PE · EC'], ['el mate de coca', 'de cocathee'], ['el teleférico', 'de kabelbaan'], ['el flamenco', 'de flamingo'],
+      ['el espejo', 'de spiegel'], ['el amanecer', 'de zonsopgang'], ['el recorrido', 'de route, de tocht'], ['abrigarse', 'zich warm aankleden'],
+      ['acostumbrarse a', 'wennen aan'], ['la chompa', 'de trui', 'BO · PE · EC'], ['la movilidad', 'het vervoer; het busje, de auto', 'BO · PE'], ['la cholita', 'Aymara- of Quechuavrouw in traditionele kleding', 'BO'],
+      ['la pollera', 'de wijde, traditionele rok', 'BO · PE'], ['la salteña', 'gevuld deegpasteitje met sappige vulling', 'BO'], ['el casero / la casera', 'de vaste verkoper / verkoopster (ook: vaste klant)', 'BO'], ['la yapa', 'het extraatje (gratis erbij)', 'BO · PE · EC'],
+      ['la wawa', 'de baby, het kindje', 'BO · PE · EC (uit het Quechua en Aymara)'], ['¿ya?', 'oké?, goed?', 'BO · PE'], ['¡qué macana!', 'wat jammer!, wat balen!', 'BO (informeel)'], ['¡jallalla!', 'proost!, leve …! (Aymara)', 'BO']
+    ],
+    grammar: [
+      { t: 'Llevar + gerundio: hoe lang al?', es: 'Llevar + gerundio',
+        html: `<p>Met <b>llevar + tijd + gerundio</b> zeg je <b>hoe lang iets al bezig is</b>. In het Nederlands gebruik je «al»:</p>
+<p>📌 <i><b>Llevo</b> tres días <b>viajando</b> por Bolivia.</i> = Ik reis <b>al</b> drie dagen door Bolivia. Hetzelfde als <i>Hace tres días que viajo por Bolivia.</i></p>
+<p>📌 <b>Ontkennend</b> gebruik je <b>sin + infinitief</b>: <i>Llevo dos noches <b>sin dormir</b> bien.</i> (Ik slaap al twee nachten niet goed.)</p>
+<p>📌 Zonder werkwoord kan ook: <i>Llevo un mes <b>en La Paz</b>.</i> (Ik ben al een maand in La Paz.)</p>
+<p>📌 In het <b>verleden</b> neem je de imperfecto: <i><b>Llevábamos</b> una hora esperando cuando llegó la movilidad.</i> (We stonden al een uur te wachten toen…) Nooit <s>he llevado</s> of <s>llevé</s> in deze betekenis.</p>`,
+        table: [['', 'vorm', 'voorbeeld'], ['nu', 'llevo + tijd + gerundio', 'Llevo ocho años trabajando aquí.'], ['ontkennend', 'llevo + tijd + sin + infinitief', 'Llevo un año sin verla.'], ['verleden', 'llevaba + tijd + gerundio', 'Llevaba dos horas caminando.'], ['vraag', '¿Cuánto tiempo llevas…?', '¿Cuánto tiempo llevas estudiando español?']],
+        ex: [['¿Cuánto tiempo llevas viviendo en Bolivia?', 'Hoe lang woon je al in Bolivia?'], ['Llevamos tres horas sin comer nada.', 'We hebben al drie uur niets gegeten.']],
+        sum: 'Llevar + tiempo + gerundio = «hace … que»: Llevo tres días viajando. En negativo: llevo dos días sin dormir.' },
+      { t: 'Seguir, ir en acabar + gerundio', es: 'Seguir · Ir · Andar · Acabar + gerundio',
+        html: `<p>Vier werkwoorden die samen met een <b>gerundio</b> (-ando, -iendo) laten zien <b>hoe iets verloopt</b>:</p>
+<p>📌 <b>seguir + gerundio</b> = nog steeds, blijven: <i><b>Sigo estudiando</b> español.</i> Ontkennend met <b>sin</b>: <i>Sigo <b>sin entender</b>.</i> (Ik begrijp het nog steeds niet.)</p>
+<p>📌 <b>ir + gerundio</b> = langzaamaan, stap voor stap: <i>Te <b>vas acostumbrando</b> a la altura.</i> (Je went langzaam aan de hoogte.)</p>
+<p>📌 <b>andar + gerundio</b> = steeds maar, de hele tijd (vaak een beetje kritisch): <i><b>Anda diciendo</b> que es guía.</i> (Hij loopt maar te vertellen dat hij gids is.)</p>
+<p>📌 <b>acabar / terminar + gerundio</b> = uiteindelijk toch: <i><b>Acabé comprando</b> tres chompas.</i> Let op het verschil met <b>acabar de + infinitief</b> = net: <i><b>Acabo de comprar</b> una chompa.</i> (Ik heb net een trui gekocht.)</p>`,
+        table: [['vorm', 'betekenis', 'voorbeeld'], ['seguir + gerundio', 'nog steeds', 'Sigue lloviendo.'], ['seguir sin + inf.', 'nog steeds niet', 'Sigo sin saberlo.'], ['ir + gerundio', 'langzaamaan', 'Voy aprendiendo.'], ['andar + gerundio', 'steeds maar', 'Anda buscando trabajo.'], ['acabar + gerundio', 'uiteindelijk', 'Acabamos yendo en taxi.'], ['acabar de + inf.', 'net', 'Acabamos de llegar.']],
+        ex: [['Llevo ocho años haciendo este recorrido y sigo emocionándome.', 'Ik doe deze tocht al acht jaar en ik raak nog steeds ontroerd.'], ['Íbamos a caminar, pero acabamos tomando el teleférico.', 'We zouden gaan lopen, maar uiteindelijk namen we de kabelbaan.']],
+        sum: 'Seguir + gerundio (todavía), ir + gerundio (poco a poco), acabar + gerundio (al final). Ojo: acabar de + infinitivo = hace un momento.' },
+      { t: 'Beginnen, bijna en ophouden', es: 'Ponerse a · Estar a punto de · Dejar de',
+        html: `<p>Deze groepen krijgen een <b>infinitief</b>. Let goed op het <b>voorzetsel</b>:</p>
+<p>📌 <b>ponerse a</b> + inf. = (ineens) beginnen te: <i>Me <b>puse a hablar</b> con una casera.</i> Bij lachen, huilen, rennen en vliegen hoor je ook <b>echarse a</b>: <i>Los flamencos <b>se echaron a volar</b>.</i></p>
+<p>📌 <b>estar a punto de</b> + inf. = op het punt staan: <i><b>Estamos a punto de</b> salir.</i> In Zuid-Amerika hoor je ook kort <b>estar por</b>: <i>Estamos por salir.</i></p>
+<p>📌 <b>dejar de</b> + inf. = ophouden met: <i><b>Dejó de</b> llover.</i> En <b>no dejar de</b> = maar blijven doen: <i><b>No dejo de</b> tomar fotos.</i></p>
+<p>📌 <b>soler</b> + inf. (zonder voorzetsel) = gewoonlijk: <i>Aquí <b>suele</b> hacer frío de noche.</i> En <b>demorarse en</b> + inf. = er lang over doen: <i>La movilidad <b>se demoró en</b> llegar.</i></p>`,
+        table: [['vorm', 'betekenis', 'voorbeeld'], ['ponerse a + inf.', 'beginnen te', 'Se puso a llover.'], ['echarse a + inf.', 'het op een … zetten', 'Se echó a reír.'], ['estar a punto de + inf.', 'op het punt staan', 'Está a punto de amanecer.'], ['dejar de + inf.', 'ophouden met', 'Dejé de tomar café.'], ['no dejar de + inf.', 'blijven doen', 'No deja de hablar.'], ['soler + inf.', 'gewoonlijk', 'Suelo levantarme temprano.']],
+        ex: [['Estábamos a punto de salir cuando se puso a llover.', 'We stonden op het punt te vertrekken toen het begon te regenen.'], ['Desde que llegué a Bolivia no dejo de comer salteñas.', 'Sinds ik in Bolivia ben, eet ik aan één stuk door salteñas.']],
+        sum: 'Ponerse a (empezar), estar a punto de (casi), dejar de (parar), no dejar de (seguir), soler (normalmente) + infinitivo.' }
+    ],
+    verbs: ['llevar', 'seguir', 'ir', 'acabar', 'ponerse', 'dejar', 'estar', 'viajar', 'esperar', 'subir', 'caminar', 'tomar'], tenses: ['pres', 'imp'],
+    dialogue: {
+      t: 'Amanecer en el salar', place: 'Salar de Uyuni 🇧🇴',
+      lines: [
+        ['Wara', '¡Buenos días, Mark! ¿Sigues durmiendo? Estamos a punto de salir: el sol sale en media hora.', 'Goedemorgen, Mark! Slaap je nog steeds? We staan op het punt te vertrekken: de zon komt over een half uur op.'],
+        ['Mark', 'Ya voy, ya voy. Llevo dos noches sin dormir bien por la altura.', 'Ik kom al, ik kom al. Ik slaap al twee nachten niet goed door de hoogte.'],
+        ['Wara', 'Es el soroche. Tómate un mate de coca y abrígate bien, ¿ya? Poco a poco te vas acostumbrando.', 'Dat is de hoogteziekte. Drink een cocathee en kleed je warm aan, oké? Beetje bij beetje wen je eraan.'],
+        ['Mark', 'Gracias. ¿Cuánto tiempo llevas trabajando de guía?', 'Dank je. Hoe lang werk je al als gids?'],
+        ['Wara', 'Llevo ocho años haciendo este recorrido y sigo emocionándome cada vez. Mira: como llovió anoche, el salar se convirtió en un espejo.', 'Ik doe deze tocht al acht jaar en ik raak nog elke keer ontroerd. Kijk: doordat het vannacht geregend heeft, is de zoutvlakte een spiegel geworden.'],
+        ['Mark', '¡Qué belleza! No puedo dejar de tomar fotos. ¿Y esos pájaros rosados?', 'Wat prachtig! Ik kan niet ophouden met foto\'s maken. En die roze vogels?'],
+        ['Wara', 'Son flamencos. Si nos acercamos, se echan a volar, así que mejor los miramos desde aquí.', 'Dat zijn flamingo\'s. Als we dichterbij komen, vliegen ze op, dus we kunnen beter van hieraf kijken.'],
+        ['Mark', 'Ayer en Uyuni me puse a hablar con una casera del mercado y acabé comprando tres chompas de alpaca.', 'Gisteren in Uyuni raakte ik aan de praat met een marktvrouw en uiteindelijk kocht ik drie alpacatruien.'],
+        ['Wara', '¡Jajaja! Así son las caseras. ¿Por lo menos te dio yapa?', 'Hahaha! Zo zijn de marktvrouwen. Heb je er tenminste iets gratis bij gekregen?'],
+        ['Mark', 'Sí, unos guantes chiquitos para la wawa de mi hermana. Oye, me está dando hambre…', 'Ja, kleine handschoentjes voor de baby van mijn zus. Zeg, ik begin honger te krijgen…'],
+        ['Wara', 'Tranquilo, la movilidad está a punto de llegar con el desayuno: salteñas calientitas. Pero ojo, que el jugo suele chorrear.', 'Rustig maar, het busje komt er zo aan met het ontbijt: lekker warme salteñas. Maar pas op, het sap druipt er meestal uit.']
+      ],
+      q: [
+        { t: 'mc', q: '¿Por qué Mark no ha dormido bien?', o: ['Por la altura', 'Porque hacía mucho calor', 'Porque se acostó muy tarde'] },
+        { t: 'mc', q: '¿Cuánto tiempo lleva Wara trabajando de guía?', o: ['Ocho años', 'Tres días', 'Dos años'] },
+        { t: 'mc', q: '¿Qué pasó ayer en el mercado de Uyuni?', o: ['Mark acabó comprando tres chompas', 'Mark perdió sus guantes', 'Mark no quiso hablar con nadie'] }
+      ]
+    },
+    culture: { t: 'Bolivia: zout, hoogte en Aymara-woorden', html: `<p>🧂 De <b>Salar de Uyuni</b> is de grootste zoutvlakte ter wereld: ruim 10.000 km² wit, op ongeveer 3.650 meter hoogte. In de regentijd (ongeveer december tot maart) blijft er een dun laagje water op staan en verandert de vlakte in een reusachtige <b>spiegel</b>. Onder het zout ligt een van de grootste lithiumvoorraden op aarde.</p>
+<p>🚡 <b>La Paz</b> ligt op zo'n 3.600 meter en buurstad El Alto nog hoger. Tegen de <i>soroche</i> (hoogteziekte) drinken mensen <i>mate de coca</i>. Het openbaar vervoer gaat er door de lucht: <b>Mi Teleférico</b> is het grootste stedelijke kabelbaannet ter wereld.</p>
+<p>🗣️ Het Spaans van Bolivia zit vol woorden uit het <b>Aymara</b> en <b>Quechua</b>: <i>la wawa</i> (baby), <i>la yapa</i> (extraatje) en <i>¡jallalla!</i> (proost, leve!). Op de markt noemen verkoopster en klant elkaar allebei <i>casera</i> of <i>casero</i>. En zinnen eindigen vaak op een vriendelijk <i>¿ya?</i></p>` },
+    ex: [
+      { t: 'cloze', s: 'Llevo tres días ___ por Bolivia.', a: ['viajando'], o: ['viajando', 'viajar', 'viajado'], nl: 'Ik reis al drie dagen door Bolivia.', tag: 'periphrasis-adv' },
+      { t: 'cloze', s: '___ ocho años trabajando de guía.', a: ['Llevo'], o: ['Llevo', 'Hace', 'Soy'], nl: 'Ik werk al acht jaar als gids.', tag: 'periphrasis-adv' },
+      { t: 'cloze', s: 'Llevo dos noches sin ___ bien.', a: ['dormir'], o: ['dormir', 'durmiendo', 'dormido'], nl: 'Ik slaap al twee nachten niet goed.', x: 'Ontkennend: llevar + tijd + sin + infinitief.', tag: 'periphrasis-adv' },
+      { t: 'cloze', s: '¿Sigues ___ en La Paz?', a: ['viviendo'], o: ['viviendo', 'vivir', 'vivido'], nl: 'Woon je nog steeds in La Paz?', tag: 'periphrasis-adv' },
+      { t: 'cloze', s: 'Estamos a punto ___ salir.', a: ['de'], o: ['de', 'a', 'en'], nl: 'We staan op het punt te vertrekken.', tag: 'periphrasis-adv' },
+      { t: 'cloze', s: 'Cuando vio la foto, se puso ___ reír.', a: ['a'], o: ['a', 'de', 'en'], nl: 'Toen ze de foto zag, begon ze te lachen.', tag: 'periphrasis-adv' },
+      { t: 'cloze', s: 'Por fin dejó ___ llover.', a: ['de'], o: ['de', 'a', 'que'], nl: 'Eindelijk hield het op met regenen.', tag: 'periphrasis-adv' },
+      { t: 'cloze', s: 'No quería gastar plata, pero acabé ___ tres chompas.', a: ['comprando'], o: ['comprando', 'comprar', 'de comprar'], nl: 'Ik wilde geen geld uitgeven, maar uiteindelijk kocht ik drie truien.', x: 'Acabar + gerundio = uiteindelijk. Acabar de + infinitief = net.', tag: 'periphrasis-adv' },
+      { t: 'cloze', s: 'Poco a poco te vas ___ a la altura.', a: ['acostumbrando'], o: ['acostumbrando', 'acostumbrar', 'acostumbrado'], nl: 'Beetje bij beetje wen je aan de hoogte.', tag: 'periphrasis-adv' },
+      { t: 'cloze', s: '___ una hora esperando cuando por fin llegó la movilidad.', a: ['Llevábamos'], o: ['Llevábamos', 'Hemos llevado', 'Llevaremos'], nl: 'We stonden al een uur te wachten toen het busje eindelijk kwam.', x: 'In het verleden: llevaba + tijd + gerundio.', tag: 'periphrasis-adv' },
+      { t: 'mc', q: '«Acabo de comer» en «Acabé comiendo solo» betekenen:', o: ['Ik heb net gegeten / Uiteindelijk at ik alleen', 'Ik ben klaar met eten / Ik at net alleen', 'Ik ga zo eten / Ik at alles alleen op'], tag: 'periphrasis-adv' },
+      { t: 'mc', q: 'Welke zin betekent «Ik leer al twee jaar Spaans»?', o: ['Llevo dos años estudiando español.', 'Llevo dos años a estudiar español.', 'Estoy dos años estudiando español.'], tag: 'periphrasis-adv' },
+      { t: 'mc', q: '«Sigo sin entender» betekent:', o: ['Ik begrijp het nog steeds niet.', 'Ik blijf het begrijpen.', 'Ik begrijp het zonder moeite.'], tag: 'periphrasis-adv' },
+      { t: 'mc', q: 'Wat is «el soroche»?', o: ['de hoogteziekte', 'een warme trui', 'een zoutvlakte'], tag: 'vocab' },
+      { t: 'mc', q: 'Je krijgt op de markt iets gratis erbij. Dat is…', o: ['la yapa', 'la pollera', 'la movilidad'], tag: 'vocab' },
+      { t: 'order', s: 'Llevo ocho años haciendo este recorrido.', nl: 'Ik doe deze tocht al acht jaar.', tag: 'periphrasis-adv' },
+      { t: 'tr', nl: 'Ik woon al een jaar in Bolivia.', a: ['Llevo un año viviendo en Bolivia.', 'Llevo un año en Bolivia.', 'Hace un año que vivo en Bolivia.', 'Vivo en Bolivia desde hace un año.', 'Ya llevo un año viviendo en Bolivia.', 'Ya llevo un año en Bolivia.'], tag: 'periphrasis-adv' },
+      { t: 'tr', nl: 'We staan op het punt te vertrekken.', a: ['Estamos a punto de salir.', 'Estamos a punto de irnos.', 'Estamos por salir.', 'Estamos a punto de partir.', 'Estamos por irnos.'], tag: 'periphrasis-adv' },
+      { t: 'tr', nl: 'Het bleef de hele nacht regenen.', a: ['Siguió lloviendo toda la noche.', 'Siguió lloviendo durante toda la noche.', 'Continuó lloviendo toda la noche.', 'No dejó de llover en toda la noche.', 'No dejó de llover toda la noche.'], tag: 'periphrasis-adv' },
+      { t: 'match', p: [['llevar + gerundio', 'al … bezig zijn'], ['seguir + gerundio', 'nog steeds …'], ['ponerse a', 'beginnen te …'], ['estar a punto de', 'op het punt staan te …'], ['acabar + gerundio', 'uiteindelijk …']], tag: 'vocab' }
+    ],
+    say: [['Llevo tres días viajando por Bolivia.', 'Ik reis al drie dagen door Bolivia.'], ['Sigo emocionándome cada vez.', 'Ik raak nog elke keer ontroerd.'], ['Estamos a punto de salir.', 'We staan op het punt te vertrekken.'], ['Acabé comprando tres chompas de alpaca.', 'Uiteindelijk kocht ik drie alpacatruien.']],
+    task: { nl: 'Vertel in 6 tot 8 zinnen over iets wat je al een tijd doet (een hobby, je werk, Spaans leren). Gebruik llevar + gerundio, seguir + gerundio, ponerse a of estar a punto de, en acabar + gerundio.', model: 'Llevo casi un año estudiando español. Al principio me ponía a estudiar solo los domingos, pero poco a poco fui encontrando mi ritmo. Ahora practico todos los días y sigo aprendiendo palabras nuevas. Hace un mes estuve a punto de dejarlo porque tenía mucho trabajo, pero acabé estudiando en el tren. Llevo tres semanas sin faltar ni un día. No voy a dejar de practicar hasta poder viajar por Bolivia sin problemas.' },
+    scenario: { nl: 'Je bent op de Salar de Uyuni met een Boliviaanse gids. Vertel hoe je reis tot nu toe gaat en vraag naar haar werk en naar Bolivia.', role: 'Eres Wara, una guía boliviana de 30 años, de origen aymara, que lleva ocho años haciendo recorridos por el Salar de Uyuni. Eres tranquila, cálida y bromista. Usas muchas perífrasis verbales («llevo ocho años trabajando…», «sigue haciendo frío», «estamos a punto de…», «te vas acostumbrando», «acabamos comiendo…») y le preguntas al estudiante cuánto tiempo lleva viajando o estudiando español. Usas palabras bolivianas como «¿ya?», «la movilidad», «la chompa», «la yapa», «la wawa», «casera» y «soroche», y las explicas si el estudiante no las entiende.', goal: 'Gebruik minstens twee keer llevar + gerundio en één keer seguir + gerundio of estar a punto de.' },
+    reading: {
+      t: 'La ciudad que viaja por el aire', type: 'Reportage',
+      p: [
+        ['La Paz lleva más de diez años moviéndose por el aire. Desde 2014, miles de paceños dejaron de pasar horas en el tráfico y se pusieron a viajar en teleférico. Hoy la red tiene diez líneas y sigue siendo la red de teleféricos urbanos más grande del mundo.',
+          'La Paz verplaatst zich al meer dan tien jaar door de lucht. Sinds 2014 staan duizenden inwoners niet meer urenlang in het verkeer en zijn ze met de kabelbaan gaan reizen. Nu heeft het net tien lijnen en het is nog steeds het grootste stedelijke kabelbaannet ter wereld.'],
+        ['La ciudad está a unos 3.600 metros de altura y El Alto, la ciudad vecina, a más de 4.000. Antes, bajar de una a otra en minibús podía tardar una hora; ahora el viaje dura unos quince minutos. Los turistas que acaban de llegar suelen marearse un poco, pero poco a poco se van acostumbrando.',
+          'De stad ligt op ongeveer 3.600 meter hoogte en El Alto, de buurstad, op meer dan 4.000. Vroeger kon de afdaling van de ene naar de andere stad per minibus een uur duren; nu duurt de rit ongeveer een kwartier. Toeristen die net zijn aangekomen worden meestal een beetje duizelig, maar langzaamaan wennen ze eraan.'],
+        ['En las cabinas viaja todo el mundo: estudiantes, oficinistas y también las cholitas, mujeres aymaras que llevan pollera, manta y sombrero bombín. Durante mucho tiempo fueron discriminadas, pero ellas siguieron luchando por sus derechos. Hoy hay cholitas que trabajan como abogadas, presentadoras de televisión y hasta escaladoras de montañas.',
+          'In de cabines reist iedereen: studenten, kantoormensen en ook de cholitas, Aymara-vrouwen die een wijde rok, een omslagdoek en een bolhoed dragen. Lange tijd werden ze gediscrimineerd, maar ze bleven vechten voor hun rechten. Nu zijn er cholitas die werken als advocaat, tv-presentatrice en zelfs als bergbeklimster.'],
+        ['Los domingos, muchos visitantes suben a El Alto para ver a las cholitas luchadoras. Cuando la lucha está a punto de empezar, el público se pone a gritar y nadie deja de aplaudir hasta el final. Más de uno llega solo por curiosidad y acaba volviendo el domingo siguiente.',
+          'Op zondag gaan veel bezoekers omhoog naar El Alto om de worstelende cholitas te zien. Als het gevecht op het punt staat te beginnen, begint het publiek te schreeuwen en houdt niemand op met klappen tot het einde. Menigeen komt alleen uit nieuwsgierigheid en komt de zondag erna toch weer terug.']
+      ],
+      gl: [['paceño / paceña', 'uit La Paz'], ['la red', 'het netwerk'], ['marearse', 'duizelig of misselijk worden'], ['la manta', 'de omslagdoek'], ['el sombrero bombín', 'de bolhoed'], ['la escaladora', 'de bergbeklimster']],
+      q: [
+        { t: 'mc', q: '¿Qué cambió en La Paz desde 2014?', o: ['Mucha gente dejó de pasar horas en el tráfico y viaja en teleférico', 'Se prohibieron los minibuses', 'La ciudad se trasladó a El Alto'] },
+        { t: 'mc', q: '¿Qué les suele pasar a los turistas que acaban de llegar?', o: ['Se marean un poco por la altura', 'Se pierden en el teleférico', 'Compran una pollera'] },
+        { t: 'mc', q: '¿Qué dice el texto sobre las cholitas?', o: ['Siguieron luchando por sus derechos y hoy tienen todo tipo de profesiones', 'Ya no llevan ropa tradicional', 'No pueden viajar en teleférico'] },
+        { t: 'mc', q: '¿Qué pasa los domingos en El Alto?', o: ['Hay lucha libre de cholitas', 'Cierran el teleférico', 'Hay un mercado de sal'] }
+      ]
+    }
+  });
+
+  /* ───────────────────────── B2 · 12 ───────────────────────── */
+  U({
+    id: 'b2-12', level: 'B2', icon: '🧉', title: 'Busco a alguien que sepa…', nl: 'Subjuntivo na que: wat je zoekt, wat niet bestaat en «lo que quieras»',
+    goals: ['Kiezen tussen indicativo (iets wat je kent) en subjuntivo (iets wat je zoekt): Tengo una pieza que tiene patio / Busco una pieza que tenga patio', 'Ontkennen en vragen met nadie que, nada que en ¿hay alguien que…? + subjuntivo, ook in het verleden (No había nadie que supiera…)', 'De keuze aan de ander laten: lo que quieras, donde quieras, cuando puedas, pase lo que pase'],
+    vocab: [
+      ['alguien que', 'iemand die'], ['nadie que', 'niemand die'], ['cualquiera', 'wie dan ook, om het even welke'], ['cualquier cosa', 'wat dan ook, om het even wat'],
+      ['lo que quieras', 'wat je maar wilt'], ['donde quieras', 'waar je maar wilt'], ['cuando puedas', 'wanneer je kunt'], ['como prefieras', 'zoals je het liefst hebt'],
+      ['pase lo que pase', 'wat er ook gebeurt'], ['da igual', 'het maakt niet uit'], ['el alquiler', 'de huur'], ['la pieza', 'de kamer', 'PY · AR · CL'],
+      ['amoblado / amoblada', 'gemeubileerd', 'LatAm'], ['el aire acondicionado', 'de airco'], ['el patio', 'de binnenplaats, de patio'], ['el quincho', 'de overdekte barbecueplek', 'PY · AR · UY'],
+      ['el dueño / la dueña', 'de eigenaar / de eigenares'], ['el aviso', 'de advertentie', 'LatAm'], ['compartir', 'delen'], ['el colectivo', 'de (stads)bus', 'PY · AR'],
+      ['el tereré', 'koude mate met kruiden', 'PY'], ['la guampa', 'de beker voor tereré (vaak van hoorn)', 'PY'], ['la bombilla', 'het metalen rietje (voor mate en tereré)'], ['los yuyos', 'de (genees)kruiden', 'PY · AR · UY'],
+      ['la chipa', 'het kaasbroodje van maniokmeel', 'PY'], ['la sopa paraguaya', 'hartige maïscake (geen soep!)', 'PY'], ['el jopara', 'de mengeling van Spaans en Guaraní', 'PY'], ['bilingüe', 'tweetalig'],
+      ['¿mba’éichapa?', 'hoe gaat het? (Guaraní)', 'PY'], ['iporã', 'goed, mooi (Guaraní)', 'PY'], ['aguyje', 'dank je (Guaraní)', 'PY'], ['haku', 'heet, warm (Guaraní)', 'PY']
+    ],
+    grammar: [
+      { t: 'Bekend of nog op zoek?', es: 'Oraciones de relativo: indicativo o subjuntivo',
+        html: `<p>Na <b>que</b> kies je de wijs op basis van één vraag: <b>ken je het al, of zoek je het nog?</b></p>
+<p>📌 <b>Bekend, bestaat zeker → indicativo</b>: <i>Tengo una pieza que <b>tiene</b> aire acondicionado.</i> (Die kamer is er, ik ken hem.)</p>
+<p>📌 <b>Onbekend, je zoekt of wenst het → subjuntivo</b>: <i>Busco una pieza que <b>tenga</b> aire acondicionado.</i> (Welke dan ook, als hij maar airco heeft.)</p>
+<p>📌 Dit hoor je vaak na <b>buscar, necesitar, querer, ¿conoces…?</b> en <b>¿hay…?</b>: <i>Necesitamos a alguien que <b>ayude</b> con la limpieza. ¿Hay algún colectivo que <b>pase</b> cerca?</i></p>
+<p>📌 Let op de <b>a</b> bij personen: een bekende persoon krijgt <i>a</i>, een onbekende niet: <i>Busco <b>a</b> un profesor que <b>habla</b> guaraní</i> (ik weet wie) ↔ <i>Busco un profesor que <b>hable</b> guaraní</i> (maakt niet uit wie). <i>Alguien</i> en <i>nadie</i> krijgen wél altijd <i>a</i>: <i>Busco <b>a alguien</b> que hable guaraní.</i></p>`,
+        table: [['', 'wijs', 'voorbeeld'], ['bekend', 'indicativo', 'Vivo en una casa que tiene patio.'], ['gezocht', 'subjuntivo', 'Quiero una casa que tenga patio.'], ['bekend', 'indicativo', 'Conozco a una chica que habla guaraní.'], ['gezocht', 'subjuntivo', '¿Conoces a alguien que hable guaraní?']],
+        ex: [['Busco una pieza que no esté muy lejos del centro.', 'Ik zoek een kamer die niet te ver van het centrum ligt.'], ['Esta es la pieza que se alquila: tiene aire y da al patio.', 'Dit is de kamer die verhuurd wordt: hij heeft airco en kijkt uit op de patio.']],
+        sum: 'Conocido → indicativo (tengo una pieza que tiene aire). Buscado o deseado → subjuntivo (busco una pieza que tenga aire).' },
+      { t: 'Nadie que, nada que + subjuntivo', es: 'Antecedente negativo',
+        html: `<p>Bestaat iets of iemand <b>niet</b> (voor zover jij weet)? Dan volgt altijd de <b>subjuntivo</b>:</p>
+<p>📌 <i>No hay <b>nadie que hable</b> tan rápido.</i> · <i>No conozco a <b>nadie que no tome</b> tereré.</i> · <i>No encuentro <b>nada que me guste</b>.</i> · <i>No hay <b>ningún</b> supermercado <b>que abra</b> de noche.</i></p>
+<p>📌 Ook bij <b>weinig</b>: <i>Hay <b>poca gente que sepa</b> escribir bien en guaraní.</i></p>
+<p>📌 Staat de hoofdzin in het <b>verleden</b>, dan gebruik je de <b>imperfecto de subjuntivo</b>: <i>Buscaba una casa que <b>tuviera</b> patio.</i> · <i>No había nadie que <b>supiera</b> inglés.</i></p>`,
+        table: [['hoofdzin', 'bijzin', 'voorbeeld'], ['No hay nadie que…', 'presente de subjuntivo', 'No hay nadie que lo sepa.'], ['No había nadie que…', 'imperfecto de subjuntivo', 'No había nadie que lo supiera.'], ['Busco algo que…', 'presente de subjuntivo', 'Busco algo que sea barato.'], ['Buscaba algo que…', 'imperfecto de subjuntivo', 'Buscaba algo que fuera barato.']],
+        ex: [['En esta casa no hay nadie que no hable guaraní.', 'In dit huis is er niemand die geen Guaraní spreekt.'], ['No encontré ninguna pieza que tuviera patio.', 'Ik vond geen enkele kamer die een patio had.']],
+        sum: 'Si no existe (nadie, nada, ningún… que) → subjuntivo. Con el verbo principal en pasado → imperfecto de subjuntivo.' },
+      { t: 'Lo que quieras: jij mag kiezen', es: 'Donde quieras · Lo que quieras · Pase lo que pase',
+        html: `<p>Met <b>lo que, donde, cuando, como, quien + subjuntivo</b> laat je de keuze open. In het Nederlands zeg je dan «…maar»:</p>
+<p>📌 <i>Siéntate <b>donde quieras</b>.</i> (waar je maar wilt) · <i>Cocina <b>lo que quieras</b>.</i> (wat je maar wilt) · <i>Ven <b>cuando puedas</b>.</i> (wanneer je kunt) · <i>Hazlo <b>como prefieras</b>.</i></p>
+<p>📌 Vergelijk met de indicativo, als je het antwoord al weet: <i>Hago <b>lo que quieres</b>.</i> (Ik doe wat jij wilt, en ik weet wat dat is.) ↔ <i>Haré <b>lo que quieras</b>.</i> (wat je ook maar wilt)</p>
+<p>📌 <b>Cualquier(a) … que</b> + subjuntivo: <i>Llámame por <b>cualquier cosa que necesites</b>.</i></p>
+<p>📌 Twee keer hetzelfde werkwoord = «wat/waar/hoe … ook»: <i><b>pase lo que pase</b></i> (wat er ook gebeurt), <i><b>digan lo que digan</b></i> (wat ze ook zeggen), <i><b>sea como sea</b></i> (hoe dan ook), <i><b>vayas donde vayas</b></i> (waar je ook heen gaat).</p>`,
+        table: [['Spaans', 'Nederlands'], ['lo que quieras', 'wat je maar wilt'], ['donde quieras', 'waar je maar wilt'], ['cuando puedas', 'wanneer je kunt'], ['como prefieras', 'zoals je wilt'], ['quien quiera', 'wie maar wil'], ['pase lo que pase', 'wat er ook gebeurt']],
+        ex: [['Puedes invitar a quien quieras.', 'Je mag uitnodigen wie je maar wilt.'], ['Pase lo que pase, aquí siempre vas a tener una casa.', 'Wat er ook gebeurt, hier heb je altijd een thuis.']],
+        sum: 'Lo que / donde / cuando / como / quien + subjuntivo = elección abierta: siéntate donde quieras. Pase lo que pase, sea como sea.' }
+    ],
+    verbs: ['tener', 'saber', 'hablar', 'querer', 'poder', 'ser', 'estar', 'hacer', 'decir', 'vivir', 'buscar', 'necesitar', 'conocer', 'preferir'], tenses: ['subj', 'impsubj'],
+    dialogue: {
+      t: 'Se alquila una pieza', place: 'Asunción 🇵🇾',
+      lines: [
+        ['Arami', '¡Hola! ¿Vos sos Mark? Mba’éichapa. Pasá, pasá, que afuera hace un calor terrible.', 'Hoi! Ben jij Mark? Hoe gaat het? Kom binnen, kom binnen, want buiten is het vreselijk heet.'],
+        ['Mark', '¡Hola, Arami! Vengo por el aviso: busco una pieza que tenga aire acondicionado y que no esté muy lejos del centro.', 'Hoi, Arami! Ik kom voor de advertentie: ik zoek een kamer die airco heeft en die niet te ver van het centrum ligt.'],
+        ['Arami', 'Entonces llegaste al lugar correcto. Mirá, esta es la pieza que se alquila: tiene aire, está amoblada y da al patio.', 'Dan ben je op de juiste plek. Kijk, dit is de kamer die verhuurd wordt: hij heeft airco, is gemeubileerd en kijkt uit op de patio.'],
+        ['Mark', 'Me encanta. ¿Y hay algún colectivo que pase cerca y que me lleve a la universidad?', 'Ik vind hem geweldig. En is er een bus die hier in de buurt langskomt en die me naar de universiteit brengt?'],
+        ['Arami', 'Sí, el 30 pasa por la esquina y te deja en la puerta. Lo que no hay en este barrio es un supermercado que abra de noche.', 'Ja, lijn 30 komt langs de hoek en zet je voor de deur af. Wat er in deze wijk niet is, is een supermarkt die \'s nachts open is.'],
+        ['Mark', 'No importa. ¿Y cuáles son las reglas de la casa?', 'Dat geeft niet. En wat zijn de huisregels?'],
+        ['Arami', 'Pocas. Podés cocinar lo que quieras e invitar a quien quieras, pero necesitamos a alguien que ayude a limpiar el quincho después de los asados.', 'Weinig. Je mag koken wat je wilt en uitnodigen wie je wilt, maar we hebben iemand nodig die helpt de barbecueplek schoon te maken na de barbecues.'],
+        ['Mark', 'Hecho. Por cierto, estoy buscando a alguien que me enseñe un poco de guaraní. ¿Conoces a alguien?', 'Afgesproken. Trouwens, ik zoek iemand die me een beetje Guaraní leert. Ken jij iemand?'],
+        ['Arami', '¡En esta casa no hay nadie que no hable guaraní! Empezamos hoy: «haku» quiere decir que hace calor, y cuando hace calor se toma tereré.', 'In dit huis is er niemand die geen Guaraní spreekt! We beginnen vandaag: «haku» wil zeggen dat het heet is, en als het heet is drink je tereré.'],
+        ['Mark', '¿Tereré? ¿Es como el mate?', 'Tereré? Is dat zoiets als mate?'],
+        ['Arami', 'Sí, pero con agua bien fría y yuyos. Sentate donde quieras, que ya traigo la guampa.', 'Ja, maar met ijskoud water en kruiden. Ga zitten waar je wilt, ik haal de beker.'],
+        ['Mark', 'Aguyje, Arami. Creo que no voy a encontrar ningún lugar que me guste más que este.', 'Dank je, Arami. Ik denk niet dat ik een plek ga vinden die me beter bevalt dan deze.']
+      ],
+      q: [
+        { t: 'mc', q: '¿Qué tipo de pieza busca Mark?', o: ['Una que tenga aire acondicionado y no esté lejos del centro', 'Una que tenga cocina propia', 'Una que esté cerca de un supermercado'] },
+        { t: 'mc', q: '¿Qué no hay en el barrio?', o: ['Un supermercado que abra de noche', 'Un colectivo que pase cerca', 'Una universidad'] },
+        { t: 'mc', q: '¿Quién le va a enseñar guaraní a Mark?', o: ['La gente de la casa, porque todos lo hablan', 'Un profesor de la universidad', 'Nadie: en Asunción no se habla guaraní'] }
+      ]
+    },
+    culture: { t: 'Paraguay: twee talen en één tereré', html: `<p>🗣️ <b>Paraguay</b> is echt <b>tweetalig</b>: het <b>Guaraní</b> is sinds 1992 officieel naast het Spaans en de meeste Paraguayanen spreken het elke dag, wat hun afkomst ook is. Vaak worden de twee talen in één zin gemengd; dat heet <i>jopara</i>. Je hoort meteen <i>¿mba’éichapa?</i> (hoe gaat het?), <i>iporã</i> (goed) en <i>aguyje</i> (dank je).</p>
+<p>🧉 <b>Tereré</b> is mate met ijskoud water en verse kruiden (<i>yuyos</i>), gedronken uit een <i>guampa</i> met een <i>bombilla</i>. Eén beker gaat de kring rond. Sinds 2020 staat het op de UNESCO-lijst van immaterieel erfgoed. En let op: <i>sopa paraguaya</i> is geen soep, maar een hartige maïscake.</p>
+<p>👋 Net als in Argentinië en Uruguay zeggen Paraguayanen onder elkaar <b>vos</b>: <i>vos sos, vos tenés, pasá, mirá, sentate</i>. In de subjuntivo verandert er niets: <i>lo que quieras, donde quieras</i>.</p>` },
+    ex: [
+      { t: 'cloze', s: 'Busco una pieza que ___ aire acondicionado.', a: ['tenga'], o: ['tenga', 'tiene', 'tendrá'], nl: 'Ik zoek een kamer die airco heeft.', tag: 'subj-relative' },
+      { t: 'cloze', s: 'Vivo en una casa que ___ un patio enorme.', a: ['tiene'], o: ['tiene', 'tenga', 'tuviera'], nl: 'Ik woon in een huis dat een enorme patio heeft.', x: 'Het huis bestaat en je kent het: indicativo.', tag: 'subj-relative' },
+      { t: 'cloze', s: '¿Conoces a alguien que ___ guaraní?', a: ['hable', 'sepa'], o: ['hable', 'habla', 'hablar'], nl: 'Ken jij iemand die Guaraní spreekt?', tag: 'subj-relative' },
+      { t: 'cloze', s: 'En esta casa no hay nadie que no ___ tereré.', a: ['tome'], o: ['tome', 'toma', 'tomar'], nl: 'In dit huis is er niemand die geen tereré drinkt.', tag: 'subj-relative' },
+      { t: 'cloze', s: 'Necesitamos a alguien que ___ con la limpieza.', a: ['ayude'], o: ['ayude', 'ayuda', 'ayudará'], nl: 'We hebben iemand nodig die helpt met schoonmaken.', tag: 'subj-relative' },
+      { t: 'cloze', s: 'Siéntate donde ___.', a: ['quieras', 'prefieras'], o: ['quieras', 'quieres', 'querrás'], nl: 'Ga zitten waar je maar wilt.', tag: 'subj-relative' },
+      { t: 'cloze', s: 'Buscaba una casa que ___ patio, pero no encontré ninguna.', a: ['tuviera', 'tuviese'], o: ['tuviera', 'tenga', 'tiene'], nl: 'Ik zocht een huis dat een patio had, maar ik vond er geen.', x: 'Hoofdzin in het verleden → imperfecto de subjuntivo.', tag: 'subj-relative' },
+      { t: 'cloze', s: 'No había nadie que ___ inglés.', a: ['hablara', 'supiera', 'hablase', 'supiese'], o: ['hablara', 'hablaba', 'hable'], nl: 'Er was niemand die Engels sprak.', tag: 'subj-relative' },
+      { t: 'cloze', s: 'Pase lo que ___, te voy a ayudar.', a: ['pase'], o: ['pase', 'pasa', 'pasó'], nl: 'Wat er ook gebeurt, ik ga je helpen.', tag: 'subj-relative' },
+      { t: 'cloze', s: 'Puedes venir cuando ___.', a: ['quieras', 'puedas'], o: ['quieras', 'quieres', 'querer'], nl: 'Je mag komen wanneer je maar wilt.', tag: 'subj-relative' },
+      { t: 'cloze', s: 'Llámame por cualquier cosa que ___.', a: ['necesites'], o: ['necesites', 'necesitas', 'necesitar'], nl: 'Bel me voor wat je ook maar nodig hebt.', tag: 'subj-relative' },
+      { t: 'mc', q: '«Busco a un profesor que habla guaraní» of «Busco un profesor que hable guaraní»: wat is het verschil?', o: ['De eerste is een bepaalde leraar die je kent; de tweede mag om het even welke leraar zijn', 'Er is geen verschil', 'De eerste is formeel, de tweede informeel'], tag: 'subj-relative' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['No conozco a nadie que viva en Paraguay.', 'No conozco a nadie que vive en Paraguay.', 'No conozco nadie que vivir en Paraguay.'], x: 'Na «nadie que» altijd subjuntivo.', tag: 'subj-relative' },
+      { t: 'mc', q: '«Digan lo que digan» betekent:', o: ['Wat ze ook zeggen', 'Zeg wat je wilt', 'Ze zeggen het zoals het is'], tag: 'subj-relative' },
+      { t: 'mc', q: 'Wat is «sopa paraguaya»?', o: ['een hartige maïscake', 'een koude soep', 'een kruidenthee'], tag: 'vocab' },
+      { t: 'mc', q: 'Hoe heet de mengeling van Spaans en Guaraní?', o: ['jopara', 'guampa', 'tereré'], tag: 'vocab' },
+      { t: 'order', s: 'Busco a alguien que me enseñe guaraní.', nl: 'Ik zoek iemand die me Guaraní leert.', tag: 'subj-relative' },
+      { t: 'tr', nl: 'Ik zoek een kamer die niet duur is.', a: ['Busco una pieza que no sea cara.', 'Busco un cuarto que no sea caro.', 'Busco una habitación que no sea cara.', 'Estoy buscando una pieza que no sea cara.', 'Estoy buscando un cuarto que no sea caro.', 'Estoy buscando una habitación que no sea cara.'], tag: 'subj-relative' },
+      { t: 'tr', nl: 'Er is niemand die het weet.', a: ['No hay nadie que lo sepa.', 'No hay nadie que sepa.', 'No hay nadie que sepa eso.', 'No hay nadie que lo sepa aquí.'], tag: 'subj-relative' },
+      { t: 'tr', nl: 'Doe wat je wilt.', a: ['Haz lo que quieras.', 'Hacé lo que quieras.', 'Haga lo que quiera.', 'Hagan lo que quieran.'], tag: 'subj-relative' },
+      { t: 'match', p: [['lo que quieras', 'wat je maar wilt'], ['donde quieras', 'waar je maar wilt'], ['nadie que', 'niemand die'], ['la pieza', 'de kamer'], ['el tereré', 'koude mate']], tag: 'vocab' }
+    ],
+    say: [['Busco una pieza que tenga aire acondicionado.', 'Ik zoek een kamer die airco heeft.'], ['¿Conoces a alguien que hable guaraní?', 'Ken jij iemand die Guaraní spreekt?'], ['No hay nadie que no tome tereré.', 'Er is niemand die geen tereré drinkt.'], ['Siéntate donde quieras.', 'Ga zitten waar je maar wilt.']],
+    task: { nl: 'Schrijf een advertentie van 6 tot 8 zinnen: je zoekt een kamer, een huisgenoot of een taalmaatje. Beschrijf wat je zoekt met que + subjuntivo, gebruik één keer nadie que of nada que, en sluit af met cuando quieras of lo que prefieras.', model: 'Hola, me llamo Mark y voy a vivir tres meses en Asunción. Busco una pieza que esté cerca del centro y que tenga aire acondicionado. Prefiero una casa donde viva gente que quiera compartir la cocina y conversar. También busco a alguien que me enseñe guaraní, porque todavía no conozco a nadie que lo hable. No necesito nada que sea lujoso: con una cama y un escritorio me alcanza. Puedo pagar el alquiler como prefieran, por semana o por mes. Escríbanme cuando quieran. ¡Aguyje!' },
+    scenario: { nl: 'Je bekijkt een kamer in een gedeeld huis in Asunción. Vertel wat voor kamer je zoekt en vraag naar het huis, de buurt en de regels.', role: 'Eres Arami, una paraguaya de 26 años que vive en una casa compartida en Asunción y busca un compañero de casa. Eres alegre, directa y muy hospitalaria. Tratas al estudiante de «vos» (vos sos, tenés, mirá, pasá, sentate). Usas muchas oraciones de relativo con subjuntivo («buscamos a alguien que…», «no hay nadie que…», «cociná lo que quieras», «vení cuando puedas») y le preguntas qué tipo de pieza busca. Mezclas alguna palabra en guaraní («mba’éichapa», «iporã», «aguyje», «haku») y hablas del tereré, la chipa y el quincho; explicas las palabras si el estudiante no las entiende.', goal: 'Beschrijf wat je zoekt met minstens drie zinnen met que + subjuntivo (busco una pieza que…, necesito algo que…, ¿hay alguien que…?).' },
+    reading: {
+      t: 'Un país, dos lenguas', type: 'Artikel',
+      p: [
+        ['Paraguay es un caso único en América: casi toda la población, sea cual sea su origen, habla una lengua indígena. No hay otro país en la región que tenga una situación parecida. El guaraní es oficial junto con el español desde 1992, y la mayoría de los paraguayos lo usa todos los días.',
+          'Paraguay is een uniek geval in Amerika: bijna de hele bevolking, wat haar afkomst ook is, spreekt een inheemse taal. Er is geen ander land in de regio dat een vergelijkbare situatie heeft. Het Guaraní is sinds 1992 officieel naast het Spaans, en de meeste Paraguayanen gebruiken het elke dag.'],
+        ['En la calle es difícil encontrar a alguien que hable solo una de las dos lenguas. Lo normal es mezclarlas en la misma frase, una costumbre que se llama jopara. Quien llegue a Asunción escuchará enseguida «mba’éichapa» (¿cómo estás?) e «iporã» (bien).',
+          'Op straat is het moeilijk iemand te vinden die maar één van de twee talen spreekt. Het is normaal om ze in dezelfde zin te mengen, een gewoonte die jopara heet. Wie in Asunción aankomt, hoort meteen «mba’éichapa» (hoe gaat het?) en «iporã» (goed).'],
+        ['Durante mucho tiempo, el guaraní estuvo prohibido en las escuelas y muchos padres preferían que sus hijos hablaran solo español. Hoy la situación es otra: se enseña en todos los colegios, y muchas empresas buscan empleados que sepan atender al público en los dos idiomas.',
+          'Lange tijd was het Guaraní op scholen verboden en veel ouders hadden liever dat hun kinderen alleen Spaans spraken. Nu is de situatie anders: het wordt op alle scholen onderwezen, en veel bedrijven zoeken werknemers die klanten in beide talen kunnen helpen.'],
+        ['Y si hay algo que une a todos los paraguayos, es el tereré: yerba mate con agua helada y yuyos, que se comparte en una sola guampa. No importa dónde estés ni la hora que sea: siempre habrá alguien que te ofrezca uno. Desde 2020 es Patrimonio Cultural Inmaterial de la Humanidad.',
+          'En als er iets is wat alle Paraguayanen verbindt, dan is het de tereré: yerba mate met ijskoud water en kruiden, die je deelt uit één beker. Het maakt niet uit waar je bent of hoe laat het is: er is altijd wel iemand die je er een aanbiedt. Sinds 2020 is het immaterieel cultureel erfgoed van de mensheid.']
+      ],
+      gl: [['indígena', 'inheems'], ['la costumbre', 'de gewoonte'], ['enseguida', 'meteen'], ['atender al público', 'klanten helpen'], ['helado / helada', 'ijskoud'], ['el patrimonio', 'het erfgoed']],
+      q: [
+        { t: 'mc', q: '¿Por qué Paraguay es un caso único?', o: ['Porque casi toda la población habla una lengua indígena', 'Porque nadie habla español', 'Porque tiene tres lenguas oficiales'] },
+        { t: 'mc', q: '¿Qué es el jopara?', o: ['La mezcla de guaraní y español en la misma frase', 'Una bebida fría con yuyos', 'Una escuela bilingüe'] },
+        { t: 'mc', q: '¿Qué buscan hoy muchas empresas?', o: ['Empleados que sepan atender en los dos idiomas', 'Empleados que hablen solo español', 'Profesores de inglés'] },
+        { t: 'mc', q: '¿Qué dice el texto sobre el tereré?', o: ['Que siempre habrá alguien que te ofrezca uno', 'Que solo se toma en invierno', 'Que está prohibido compartirlo'] }
+      ]
+    }
+  });
 })(window.SPT);
