@@ -106,34 +106,47 @@
     });
     return el;
   }
-  /* Hint en "Ik weet het niet" onder een typvraag. Elke hint onthult één letter meer
-     (eerste hint: lidwoord + eerste letter van elk woord); de laatste letter blijft altijd verborgen. */
+  /* Hint en "Ik weet het niet" onder een typvraag. Elke hint geeft in élk woord één letter meer
+     (eerste hint: lidwoord + eerste letter van elk woord); de laatste letter van een woord blijft verborgen. */
   const ART_RE = /^(el|la|los|las|un|una)\s+/i;
   function hintMask(ans, n) {
     const m = ans.match(ART_RE); const art = m ? m[0] : '';
     const words = ans.slice(art.length).trim().split(/\s+/).map(w => [...w]);
     const isL = c => /[\p{L}\p{N}]/u.test(c);
-    // volgorde: eerst de eerste letter van elk woord, daarna de rest van links naar rechts
-    const firsts = [], rest = [];
-    words.forEach((w, wi) => { let f = true; w.forEach((c, ci) => { if (!isL(c)) return; (f ? firsts : rest).push(wi + ':' + ci); f = false; }); });
-    const open = new Set(n > 0 ? firsts.concat(rest.slice(0, n - 1)) : []);
-    const text = art + words.map((w, wi) => w.map((c, ci) => !isL(c) || open.has(wi + ':' + ci) ? c : '_').join('\u2009')).join('   ');
-    return { text, max: Math.max(1, rest.length) }; // de laatste letter blijft verborgen
+    const lens = words.map(w => w.filter(isL).length);
+    // per woord: de eerste n letters zichtbaar, maar nooit de laatste (behalve bij woorden van één letter)
+    const text = art + words.map((w, wi) => { let k = 0; const show = lens[wi] <= 1 ? 1 : Math.min(n, lens[wi] - 1);
+      return w.map(c => { if (!isL(c)) return c; return k++ < show ? c : '_'; }).join('\u2009'); }).join('   ');
+    return { text, max: Math.max(1, ...lens.map(l => l - 1)) };
   }
+  // sneltoetsen: Ctrl+H = hint, Ctrl+I = ik weet het niet (werkt ook tijdens het typen, ook op een iPad-toetsenbord)
+  const KEY_HINT = 'h', KEY_DK = 'i';
   function typeHelp(inp, ctx, answer, onDontKnow) {
     let n = 0;
+    const kbd = k => h('kbd', { class: 'kbd-hint', 'aria-hidden': 'true' }, '⌃' + k.toUpperCase());
     const hintLine = h('div', { class: 'type-hint hidden', lang: 'es', 'aria-live': 'polite' });
-    const hintBtn = h('button', { class: 'btn ghost small', type: 'button', onclick: () => {
+    const hintLabel = h('span', null, '💡 Hint');
+    const hint = () => {
       const a = answer(); const { max } = hintMask(a, 0);
       if (n >= max) return;
       n++; const r = hintMask(a, n);
       hintLine.textContent = '💡 ' + r.text; hintLine.classList.remove('hidden');
-      hintBtn.textContent = n >= max ? '💡 Geen hints meer' : '💡 Nog een letter';
+      hintLabel.textContent = n >= max ? '💡 Geen hints meer' : '💡 Nog een letter';
       hintBtn.disabled = n >= max;
       inp.focus({ preventScroll: true });
-    } }, '💡 Hint');
-    const dkBtn = h('button', { class: 'btn ghost small', type: 'button', onclick: () => { if (ctx.answered()) return; inp.disabled = true; row.classList.add('hidden'); onDontKnow(); } }, '🤷 Ik weet het niet');
+    };
+    const hintBtn = h('button', { class: 'btn ghost small', type: 'button', title: 'Sneltoets: Ctrl+H', onclick: hint }, hintLabel, kbd(KEY_HINT));
+    const dontKnow = () => { if (ctx.answered()) return; inp.disabled = true; row.classList.add('hidden'); onDontKnow(); };
+    const dkBtn = h('button', { class: 'btn ghost small', type: 'button', title: 'Sneltoets: Ctrl+I', onclick: dontKnow }, '🤷 Ik weet het niet', kbd(KEY_DK));
     const row = h('div', { class: 'type-help' }, ctx.mode === 'exam' ? null : hintBtn, dkBtn);
+    const onKey = e => {
+      if (!e.ctrlKey || e.metaKey || e.altKey || ctx.answered() || row.classList.contains('hidden') || !row.isConnected) return;
+      const k = (e.key || '').toLowerCase();
+      if (k === KEY_HINT && ctx.mode !== 'exam') { e.preventDefault(); e.stopPropagation(); hint(); }
+      else if (k === KEY_DK) { e.preventDefault(); e.stopPropagation(); dontKnow(); }
+    };
+    document.addEventListener('keydown', onKey, true);
+    if (ctx.onLeave) ctx.onLeave(() => document.removeEventListener('keydown', onKey, true));
     return { el: h('div', null, hintLine, row), hints: () => n, done: () => row.classList.add('hidden') };
   }
   /* ---------- vervoegen: kaart met uitleg + mini-tabel ---------- */
@@ -544,7 +557,11 @@
     const fillBlank = txt => { if (sent) { const bl = sent.querySelector('.blank'); if (bl) { bl.textContent = txt; bl.classList.add('filled'); } } };
     const help = typeHelp({ focus: o => field().focus(o), set disabled(v) { field().disabled = v; } }, ctx, () => it.answers[0], () => {
       fillBlank(it.answers[0]);
-      ctx.submit({ ok: false, dontKnow: true, user: '', expected: it.answers[0], x: it.x, alts: it.answers });
+      // wat je al wel goed had getypt telt mee: die woorden staan er bij de herhaling al
+      const typed = it.translate ? (part ? part.value() : inp.value).trim() : '';
+      if (part) part.mark(typed, it.answers);
+      const w = wrap.querySelector('.p-whole'); if (w) w.remove();
+      ctx.submit({ ok: false, dontKnow: true, user: '', expected: it.answers[0], x: it.x, alts: it.answers, parts: typed ? S.check.parts(typed, it.answers) : null });
     });
     const bar = accentBar(() => part ? part.current() : inp);
     if (part) {
@@ -585,7 +602,13 @@
     let inp = part ? null : textInput('Typ wat je hoort…');
     const field = () => part || inp;
     const help = typeHelp({ focus: o => field().focus(o), set disabled(v) { field().disabled = v; } }, ctx, () => it.text,
-      () => ctx.submit({ ok: false, dontKnow: true, user: '', expected: it.text, nl: it.nl }));
+      () => {
+        // wat je al wel goed had getypt telt mee: die woorden staan er bij de herkansing al
+        const typed = (part ? part.value() : inp.value).trim();
+        if (part) part.mark(typed, [it.text]);
+        const w = wrap.querySelector('.p-whole'); if (w) w.remove();
+        ctx.submit({ ok: false, dontKnow: true, user: '', expected: it.text, nl: it.nl, parts: typed ? S.check.parts(typed, [it.text]) : null });
+      });
     const bar = accentBar(() => part ? part.current() : inp);
     const body = [];
     if (part) {
@@ -746,7 +769,7 @@
       line.classList.add(ok ? 'right' : 'wrong');
       return { ok, user, expected: it.target, nl: it.nl };
     };
-    return h('div', { class: 'order' }, h('div', { class: 'instr' }, T('order')), it.nl ? h('div', { class: 'prompt small' }, it.nl) : null, line, pool, kbTip);
+    return h('div', { class: 'order' }, h('div', { class: 'instr' }, T('order')), it.support ? h('div', { class: 'p-note' }, '🧩 Deze zin is lastig. Bouw hem eerst met de tegels, daarna typ je hem zelf.') : null, it.nl ? h('div', { class: 'prompt small' }, it.nl) : null, line, pool, kbTip);
   };
 
   R.match = (it, ctx) => {
@@ -889,6 +912,18 @@
       setTimeout(() => m.setAttribute('content', c), 300); // daarna mag je weer zelf knijpzoomen
       window.scrollTo(0, 0);
     }
+    /* Een zin waar je steeds op vastloopt: eerst de woorden als tegels aanklikken, dan zelf typen.
+       Lastig = in je herhaling al 2× of vaker fout (of 3× fout in totaal), of net «Ik weet het niet» / bijna niets goed. */
+    function hardSentence(it) {
+      const c = it.srsId && S.Store.state.srs[it.srsId];
+      return !!(c && ((c.l || 0) >= 2 || (c.f || 0) >= 3));
+    }
+    function needsTiles(it) {
+      if (!it || it.kind !== 'type' || !it.translate || it.tiled || it.mainOnly || !it.answers || !it.answers[0]) return false;
+      if (session.mode !== 'learn' && session.mode !== 'review') return false;
+      if (session.timer || it.answers[0].split(/\s+/).length < 3) return false;
+      return !!it.scaffold || hardSentence(it);
+    }
     function isGraded(it) { return !['card', 'info', 'dialogue', 'write'].includes(it.kind); }
     function touch() { const n = Date.now(); activeMs += Math.min(n - last, 60000); last = n; }
     function progress() {
@@ -924,6 +959,8 @@
       closePeek(); unzoom();
       leaveFns.forEach(f => f()); leaveFns = [];
       if (idx >= queue.length) return finish();
+      // lastige zin? Eerst met woordtegels bouwen, daarna typ je hem zelf
+      if (needsTiles(queue[idx])) { queue[idx].tiled = true; queue.splice(idx, 0, { kind: 'order', support: true, target: queue[idx].answers[0], nl: queue[idx].prompt, orig: queue[idx] }); }
       progress(); persist(idx);
       const it = queue[idx];
       answered = false; fb.innerHTML = ''; fb.className = 'ls-fb'; foot.classList.remove('ok', 'bad');
@@ -958,6 +995,7 @@
     function feedback(it, r) {
       if (answered) return; answered = true; touch(); lastR = r;
       skipBtn.hidden = true; backBtn.hidden = true; peekBtn.hidden = true; closePeek();
+      if (it.support) { supportFeedback(it, r); return; }
       const first = !graded.has(it.orig || it);
       if (first) graded.set(it.orig || it, r.ok);
       if (r.ok) { streak++; bestStreak = Math.max(bestStreak, streak); xp += it.retry || r.hinted || r.alt ? 5 : 10; } else streak = 0;
@@ -975,6 +1013,12 @@
         if (r.alt) mainOnlyCopy(copy);
         // zin half goed: straks alleen de foute woorden opnieuw invullen
         if (S.check.partsUsable(r.parts)) { copy.keep = { a: r.parts.a, k: r.parts.k }; r.keepLater = true; }
+        // geen idee of nog niet de helft goed? Dan straks eerst met woordtegels
+        if (it.translate && !r.ok && !copy.mainOnly) {
+          const n = (S.check.words(it.answers[0]).length - 1) / 2;
+          if (r.dontKnow ? !(r.parts && r.parts.k.length) || r.parts.k.length < n / 2 : !(r.parts && r.parts.k.length >= n / 2)) { copy.tiled = false; copy.scaffold = true; r.tilesLater = true; }
+          else if (hardSentence(it)) copy.tiled = true; // al tegels gehad deze ronde
+        }
         if (copy.options) copy.options = U.shuffle(copy.options);
         // niet alle herkansingen als één blok aan het eind: een paar vragen later terug, tussen de rest door
         const at = idx + 5;
@@ -994,6 +1038,20 @@
       }
     }
 
+    /* Tegelstap vóór een lastige zin: geen punten, geen herhaling; alleen laten zien hoe de zin in elkaar zit. */
+    function supportFeedback(it, r) {
+      (r.ok ? Sound.good : Sound.bad)();
+      foot.classList.add(r.ok ? 'ok' : 'bad'); fb.className = 'ls-fb show';
+      fb.append(h('div', { class: 'fb-title' }, r.ok ? 'Mooi, zo zit de zin in elkaar!' : 'Bijna! Zo hoort de zin:'));
+      fb.append(h('div', { class: 'fb-exp' }, h('b', { lang: 'es' }, r.expected), speakBtn(r.expected)));
+      fb.append(h('div', { class: 'small' }, '⌨️ Nu typ je hem zelf. Je hebt de woorden net gezien.'));
+      if (S.Store.state.settings.autoSpeak) setTimeout(() => Speech.say(r.expected), 150);
+      touch(); persist(idx + 1);
+      mainBtn.hidden = false; mainBtn.disabled = false; mainBtn.textContent = T('next');
+      mainBtn.onclick = () => { touch(); idx++; show(); };
+      setTimeout(() => mainBtn.focus({ preventScroll: true }), 50);
+    }
+
     /* Vooraf geschreven uitleg bij de zin van deze oefening (niet bij losse woorden). */
     function feedbackNotes(it, r) {
       if (it.word || it.conj || it.kind === 'match') return it.i ? [{ html: it.i }] : [];
@@ -1011,7 +1069,8 @@
       const fbTitle = t => S.Tutor.coachOn() ? h('div', { class: 'fb-head' }, S.Tutor.avatar(44, 'fb-lupe' + (r.ok ? '' : ' sad')), h('div', { class: 'fb-title' }, streakLine || t)) : h('div', { class: 'fb-title' }, streakLine || t);
       if (r.silent && r.ok) { fb.append(fbTitle(U.pick(PRAISE))); return; }
       fb.append(fbTitle(r.dontKnow ? 'Geen probleem!' : r.ok ? U.pick(PRAISE) : U.pick(OOPS)));
-      if (r.dontKnow) fb.append(h('div', { class: 'small' }, '🔁 Dit komt later terug in je herhaling.'));
+      if (r.dontKnow && !r.tilesLater) fb.append(h('div', { class: 'small' }, '🔁 Dit komt later terug in je herhaling.'));
+      if (r.tilesLater) fb.append(h('div', { class: 'small' }, '🧩 Straks bouw je deze zin eerst met woordtegels, daarna typ je hem zelf.'));
       if (r.ok && r.hinted) fb.append(h('div', { class: 'small' }, '💡 Goed, met ' + (r.hinted === 1 ? 'een hint' : r.hinted + ' hints') + ' — je krijgt hem straks nog een keer.'));
       if (r.matchMistakes) fb.append(h('div', null, r.matchMistakes + (r.matchMistakes === 1 ? ' fout' : ' fouten') + ' — die woorden komen terug in je herhaling.'));
       if (r.speakScore != null) fb.append(h('div', null, 'Uitspraakscore: ' + r.speakScore + '%'));
@@ -1028,7 +1087,7 @@
         if (r.user && it.kind !== 'mc') fb.append(h('div', { class: 'small muted' }, 'Jouw antwoord: ' + r.user));
         if (r.parts && r.parts.k.length) {
           fb.append(h('div', { class: 'small fb-wrong' }, 'Per woord: ', wordDiff(r.parts), h('span', { class: 'muted' }, ' (groen goed' + (r.parts.st.includes('accent') ? ' · geel: let op het accent' : '') + ' · rood fout)')));
-          if (r.keepLater) fb.append(h('div', { class: 'small fb-wrong' }, '🔁 Straks staan de groene woorden er al en vul je alleen de rode opnieuw in.'));
+          if (r.keepLater && !r.tilesLater) fb.append(h('div', { class: 'small fb-wrong' }, '🔁 Straks staan de groene woorden er al en vul je alleen de rode opnieuw in.'));
         }
         if (r.warn === 'article-wrong') {
           const noun = r.expected.replace(S.Gen.ART, '');

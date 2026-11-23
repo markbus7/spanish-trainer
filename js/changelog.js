@@ -4,6 +4,15 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.59.0', date: '2026-11-23',
+    nl: ['Hint geeft nu in elk woord tegelijk een letter meer. Sneltoetsen: Ctrl+H = hint, Ctrl+I = Ik weet het niet.'],
+    es: [] },
+  { v: '1.58.0', date: '2026-11-23',
+    nl: ['Lastige zin (vaak fout, of «Ik weet het niet»): eerst bouw je hem met woordtegels, daarna typ je hem zelf.'],
+    es: [] },
+  { v: '1.57.1', date: '2026-11-23',
+    nl: ['«Ik weet het niet» bij een zin of dictee: de woorden die je al goed had getypt staan er bij de herhaling al.'],
+    es: [] },
   { v: '1.57.0', date: '2026-11-23',
     nl: ['Twee nieuwe B2-lessen: B2 · 11 «Llevo tres días viajando» (Bolivia: llevar, seguir, ponerse a, estar a punto de) en B2 · 12 «Busco a alguien que sepa…» (Paraguay: subjuntivo na que, lo que quieras)', 'Twee nieuwe personages: gids Wara (Andesflamingo) op de zoutvlakte van Uyuni en Arami (manenwolf) in Asunción', 'Unitpagina mooier: getekende iconen bij de doelen, de naslag-tabs en het rollenspel; op Hoy staat de tekening van je unit', 'Op de iPad valt de Lupe-knop niet meer over «Start»'],
     es: [] },
