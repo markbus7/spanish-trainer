@@ -769,17 +769,19 @@
   }
   function statusIcon(s) { return s === 'new' ? '○' : SRS.ICON[s]; }
   function statusLabel(s) { return { new: 'nieuw', learning: 'aan het leren', known: 'bekend', mastered: 'beheerst' }[s]; }
+  // in de naslag: ook hier op een woord tikken voor de betekenis
+  function tapEs(es, nl) { const el = h('span', { lang: 'es' }, es); if (S.Lesson.wordTaps) S.Lesson.wordTaps(el, { sentence: nl }); return el; }
   function dialogueRead(u) {
     const d = u.dialogue, seen = new Set();
     return h('div', { class: 'dl-list read' }, h('p', { class: 'muted small' }, d.place + ' — ' + d.t),
       d.lines.map(([who, es, nl, x]) => { const nt = S.Lesson.noteToggle(S.Lesson.findNotes(es, { extra: x, seen })); const ch = S.Cast && (who === 'Mark' ? st().me && S.Cast.get(st().me) : S.Cast.forSpeaker(who, d.place));
-        return h('div', { class: 'dl-read' }, ch ? S.Cast.avatar(ch.id, 36, 'dl-read-av', { look: ch.player ? st().meLook : null }) : null, S.Lesson.speakBtn(es, { clipNs: S.course.ns ? undefined : 'ch' }), h('div', { class: 'grow' }, h('b', null, who + ': '), h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl), nt && nt.box), nt && nt.btn); }));
+        return h('div', { class: 'dl-read' }, ch ? S.Cast.avatar(ch.id, 36, 'dl-read-av', { look: ch.player ? st().meLook : null }) : null, S.Lesson.speakBtn(es, { clipNs: S.course.ns ? undefined : 'ch' }), h('div', { class: 'grow' }, h('b', null, who + ': '), tapEs(es, nl), h('div', { class: 'small muted' }, nl), nt && nt.box), nt && nt.btn); }));
   }
 
   function readingRead(u) {
     const r = u.reading, seen = new Set();
     return h('div', { class: 'dl-list read' }, h('p', { class: 'muted small' }, (r.type || 'Lectura') + ' — ' + r.t),
-      r.p.map(([es, nl, x]) => { const nt = S.Lesson.noteToggle(S.Lesson.findNotes(es, { extra: x, seen })); return h('div', { class: 'dl-read' }, S.Lesson.speakBtn(es), h('div', { class: 'grow' }, h('span', { lang: 'es' }, es), h('div', { class: 'small muted' }, nl), nt && nt.box), nt && nt.btn); }));
+      r.p.map(([es, nl, x]) => { const nt = S.Lesson.noteToggle(S.Lesson.findNotes(es, { extra: x, seen })); return h('div', { class: 'dl-read' }, S.Lesson.speakBtn(es), h('div', { class: 'grow' }, tapEs(es, nl), h('div', { class: 'small muted' }, nl), nt && nt.box), nt && nt.btn); }));
   }
 
   /* ================= PRÁCTICA ================= */

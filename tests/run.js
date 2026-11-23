@@ -827,6 +827,22 @@ await micTests();
     const d3 = G.diff('Me gusta mucho', 'Me gusta mucho.');
     ok(G.summary(d3).bad === 0, 'diff: alleen leesteken = goed');
     ok(G.diff('', 'Hola') === null, 'diff: lege tekst');
+    // tik op een woord in een dialoog: lesstof, vervoegde vormen, meervoud, uitdrukkingen
+    const L = w => G.lookup(w) || {};
+    ok(L('banco').m === 'de bank' && L('Disculpe').src === 'les', 'woordtik: woord uit de les');
+    ok(L('está').t === 'estar' && L('está').src === 'vorm' && /hij/.test(L('está').w), 'woordtik: está = vorm van estar (niet esta)');
+    ok(L('tengo').t === 'tener' && L('voy').t === 'ir' && L('fui').src === 'vorm', 'woordtik: vervoegingen terug naar het hele werkwoord');
+    ok(L('cuadras').t === 'cuadra' && L('casas').t === 'casa', 'woordtik: meervoud terug naar enkelvoud');
+    ok(L('hay').m && L('muy').m && L('dos').m, 'woordtik: kleine woordjes');
+    ok(G.lookup('xyzzy') === null, 'woordtik: onbekend woord = null');
+    const ph = G.phrases('Con mucho gusto.');
+    ok(ph.length === 1 && ph[0].t === 'mucho gusto' && ph[0].les, 'woordtik: uitdrukking uit de les gevonden');
+    ok(G.align(G.words('Con mucho gusto.'), ph)[2].g === 0, 'woordtik: uitdrukking licht samen op');
+    {
+      let n = 0, miss = 0;
+      S.C.all().filter(u => u.level === 'A1').forEach(u => { const walk = o => { if (!o || typeof o !== 'object') return; if (Array.isArray(o.lines)) o.lines.forEach(l => G.words(l[1]).forEach(w => { n++; if (!G.lookup(w) && !/^\p{Lu}/u.test(w)) miss++; })); Object.values(o).forEach(walk); }; walk(u); });
+      ok(n > 300 && miss / n < 0.05, 'woordtik: A1-dialogen bijna helemaal gedekt (' + (n - miss) + '/' + n + ')');
+    }
     const prompt = S.AI.roleplaySystem({ role: 'mesero', goal: 'pedir' });
     ok(prompt.includes('<gloss>') && prompt.includes('<fix>') && prompt.indexOf('<fix>') < prompt.indexOf('LOGGING'), 'gloss: regels in rollenspelprompt, log blijft laatste');
     ok(S.AI.writingSystem().includes('<fix>') && !S.AI.writingSystem().includes('<gloss>'), 'gloss: correctie vraagt alleen verbeterde versie');

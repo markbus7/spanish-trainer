@@ -67,6 +67,17 @@
     if (opt.open) btn.classList.add('on');
     return { btn, box };
   }
+  /* Vertaling per zin: een rond knopje met de taal van de uitleg (NL) naast 🔊. Tik = deze zin vertaald, nog eens = weer weg. */
+  const TR_LABEL = (S.course.ui || 'nl').toUpperCase();
+  function trToggle(fn) {
+    return h('button', { class: 'tr-btn', type: 'button', title: 'Vertaling van deze zin', 'aria-label': 'Vertaling van deze zin', 'aria-pressed': 'false', onclick: e => { e.stopPropagation(); fn(); } }, TR_LABEL);
+  }
+  /* Tik op een woord: de betekenis (js/gloss.js). Uitdrukkingen uit de lessen lichten samen op. */
+  function wordTaps(el, opt) {
+    if (!S.Gloss) return;
+    S.Gloss.decorate(el, S.Gloss.phrases(el.textContent), Object.assign({ lessonFirst: true }, opt));
+    el.classList.add('tw-soft');
+  }
   const findNotes = (text, opt) => (S.Uitleg ? S.Uitleg.find(text, opt) : []);
 
   // Speciale tekens van de doeltaal. Engels heeft ze niet nodig: dan blijft de balk leeg en verborgen.
@@ -329,15 +340,19 @@
     };
     const lines = d.lines.map(([who, es, nl, x]) => {
       const tr = h('div', { class: 'nl hidden' }, nl);
-      const esEl = h('div', { class: 'es', lang: 'es' }, es);
+      const esEl = h('div', { class: 'es', lang: S.course.target }, es);
       const extra = h('div', { class: 'rp-turn' });
       const nt = noteToggle(findNotes(es, { extra: x, seen }));
+      const toggle = open => { if (line.classList.contains('mine')) return; const on = tr.classList.toggle('hidden', open === undefined ? undefined : !open) === false; trB.classList.toggle('on', on); trB.setAttribute('aria-pressed', String(on)); };
+      const trB = trToggle(() => toggle());
       const line = h('div', { class: 'dl ' + side(who) + (charOf(who) ? ' has-cast' : '') },
         face(who, 46),
-        h('div', { class: 'bubble', onclick: () => { if (line.classList.contains('mine')) return; tr.classList.toggle('hidden'); } },
+        h('div', { class: 'bubble', onclick: () => toggle() },
           h('div', { class: 'who' }, who), esEl, tr, nt && nt.box, extra),
-        h('div', { class: 'dl-btns' }, speakBtn(es, say), nt && nt.btn));
-      Object.assign(line, { _tr: tr, _es: es, _nl: nl, _who: who, _esEl: esEl, _extra: extra, _note: !!nt });
+        h('div', { class: 'dl-btns' }, speakBtn(es, say), trB, nt && nt.btn));
+      // elk woord aantikbaar: betekenis uit je lessen (ook vervoegde vormen), onderaan de hele zin
+      wordTaps(esEl, { sentence: nl, onSentence: () => toggle(true), skip: () => list.classList.contains('masked') || line.classList.contains('mine') && esEl.classList.contains('hide-es') });
+      Object.assign(line, { _tr: tr, _es: es, _nl: nl, _who: who, _esEl: esEl, _extra: extra, _note: !!nt, _trB: trB });
       return line;
     });
     const list = h('div', { class: 'dl-list' }, lines);
@@ -380,7 +395,7 @@
     function mask(on) {
       list.classList.toggle('masked', on);
       maskBtn.textContent = on ? '👀 Toon de tekst' : '🎧 Verberg de tekst';
-      intro.textContent = (on ? '🎧 Luister eerst zonder tekst. Hoeveel versta je? Daarna maak je de tekst zichtbaar.' : 'Lees en luister. Tik op een zin voor de vertaling.') + (seen.size || lines.some(l => l._note) ? ' Tik op ⓘ voor extra uitleg.' : '');
+      intro.textContent = (on ? '🎧 Luister eerst zonder tekst. Hoeveel versta je? Daarna maak je de tekst zichtbaar.' : 'Lees en luister. Tik op een woord voor de betekenis, of op ' + TR_LABEL + ' voor de hele zin.') + (seen.size || lines.some(l => l._note) ? ' Tik op ⓘ voor extra uitleg.' : '');
     }
     mask(listenFirst);
 
@@ -395,7 +410,7 @@
       if (role.active) stopRole();
       playAll();
     } }, '▶ Alles afspelen');
-    const trBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => { showAll = !showAll; lines.forEach(l => l._tr.classList.toggle('hidden', !showAll)); trBtn.textContent = showAll ? '🙈 Verberg vertaling' : '👁 Toon vertaling'; } }, '👁 Toon vertaling');
+    const trBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => { showAll = !showAll; lines.forEach(l => { l._tr.classList.toggle('hidden', !showAll); l._trB.classList.toggle('on', showAll); }); trBtn.textContent = showAll ? '🙈 Verberg alle vertalingen' : '👁 Alles vertalen'; } }, '👁 Alles vertalen');
 
     /* Rollenspel: jij speelt één persoon. De app speelt de anderen; jouw zinnen spreek je zelf in. */
     const role = { active: false, me: null, scores: [] };
@@ -469,7 +484,7 @@
       });
     }
 
-    ctx.onLeave(() => { playing = false; if (role.active) stopRole(); Speech.stop(); });
+    ctx.onLeave(() => { playing = false; if (role.active) stopRole(); Speech.stop(); S.Gloss && S.Gloss.close(); });
     return h('div', { class: 'dialogue' },
       h('div', { class: 'eyebrow' }, '💬 ' + (d.place || '')), h('h2', null, d.t),
       stage, stage && sceneBubble, stage && info, intro,
@@ -484,8 +499,12 @@
     const paras = r.p.map(([es, nl, x]) => {
       const tr = h('div', { class: 'nl hidden' }, nl);
       const nt = noteToggle(findNotes(es, { extra: x, seen }));
-      const p = h('div', { class: 'rd-p' }, h('div', { class: 'rd-text', onclick: () => tr.classList.toggle('hidden') }, h('p', { class: 'es', lang: 'es' }, es), tr, nt && nt.box), h('div', { class: 'dl-btns' }, speakBtn(es), nt && nt.btn));
-      p._tr = tr; p._es = es; return p;
+      const esEl = h('p', { class: 'es', lang: S.course.target }, es);
+      const toggle = open => { const on = tr.classList.toggle('hidden', open === undefined ? undefined : !open) === false; trB.classList.toggle('on', on); trB.setAttribute('aria-pressed', String(on)); };
+      const trB = trToggle(() => toggle());
+      const p = h('div', { class: 'rd-p' }, h('div', { class: 'rd-text', onclick: () => toggle() }, esEl, tr, nt && nt.box), h('div', { class: 'dl-btns' }, speakBtn(es), trB, nt && nt.btn));
+      wordTaps(esEl, { sentence: nl, onSentence: () => toggle(true) });
+      p._tr = tr; p._es = es; p._trB = trB; return p;
     });
     let playing = false;
     const playBtn = h('button', { class: 'btn ghost', type: 'button', onclick: async () => {
@@ -494,11 +513,11 @@
       for (const p of paras) { if (!playing) break; p.classList.add('active'); p.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); await Speech.say(p._es); p.classList.remove('active'); }
       playing = false; playBtn.textContent = '▶ Voorlezen';
     } }, '▶ Voorlezen');
-    const trBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => { showAll = !showAll; paras.forEach(p => p._tr.classList.toggle('hidden', !showAll)); trBtn.textContent = showAll ? '🙈 Verberg vertaling' : '👁 Toon vertaling'; } }, '👁 Toon vertaling');
-    ctx.onLeave(() => { playing = false; Speech.stop(); });
+    const trBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => { showAll = !showAll; paras.forEach(p => { p._tr.classList.toggle('hidden', !showAll); p._trB.classList.toggle('on', showAll); }); trBtn.textContent = showAll ? '🙈 Verberg alle vertalingen' : '👁 Alles vertalen'; } }, '👁 Alles vertalen');
+    ctx.onLeave(() => { playing = false; Speech.stop(); S.Gloss && S.Gloss.close(); });
     return h('div', { class: 'reading' },
       h('div', { class: 'eyebrow' }, '📖 ' + (r.type || 'Lectura')), h('h2', null, r.t),
-      h('p', { class: 'muted small' }, 'Lees eerst zonder vertaling. Tik op een alinea als je vastloopt.' + (seen.size ? ' Tik op ⓘ voor extra uitleg.' : '')),
+      h('p', { class: 'muted small' }, 'Lees eerst zonder vertaling. Tik op een woord voor de betekenis, of op ' + TR_LABEL + ' voor de hele alinea.' + (seen.size ? ' Tik op ⓘ voor extra uitleg.' : '')),
       h('div', { class: 'row gap wrap' }, Speech.canSpeak() ? playBtn : null, trBtn),
       h('div', { class: 'rd-body' }, paras),
       r.gl && r.gl.length ? h('details', { class: 'rd-gl' }, h('summary', null, '📝 Woordjes bij de tekst'), h('ul', null, r.gl.map(([es, nl]) => h('li', null, h('b', { lang: 'es' }, es), ' — ' + nl)))) : null);
@@ -1255,5 +1274,5 @@
     show();
   }
 
-  S.Lesson = { run, grammarBlock, speakBtn, accentBar, T, esMode, conjTable, noteToggle, findNotes };
+  S.Lesson = { run, grammarBlock, speakBtn, accentBar, T, esMode, conjTable, noteToggle, findNotes, wordTaps };
 })(window.SPT);
