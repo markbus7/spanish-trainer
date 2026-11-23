@@ -106,34 +106,47 @@
     });
     return el;
   }
-  /* Hint en "Ik weet het niet" onder een typvraag. Elke hint onthult één letter meer
-     (eerste hint: lidwoord + eerste letter van elk woord); de laatste letter blijft altijd verborgen. */
+  /* Hint en "Ik weet het niet" onder een typvraag. Elke hint geeft in élk woord één letter meer
+     (eerste hint: lidwoord + eerste letter van elk woord); de laatste letter van een woord blijft verborgen. */
   const ART_RE = /^(el|la|los|las|un|una)\s+/i;
   function hintMask(ans, n) {
     const m = ans.match(ART_RE); const art = m ? m[0] : '';
     const words = ans.slice(art.length).trim().split(/\s+/).map(w => [...w]);
     const isL = c => /[\p{L}\p{N}]/u.test(c);
-    // volgorde: eerst de eerste letter van elk woord, daarna de rest van links naar rechts
-    const firsts = [], rest = [];
-    words.forEach((w, wi) => { let f = true; w.forEach((c, ci) => { if (!isL(c)) return; (f ? firsts : rest).push(wi + ':' + ci); f = false; }); });
-    const open = new Set(n > 0 ? firsts.concat(rest.slice(0, n - 1)) : []);
-    const text = art + words.map((w, wi) => w.map((c, ci) => !isL(c) || open.has(wi + ':' + ci) ? c : '_').join('\u2009')).join('   ');
-    return { text, max: Math.max(1, rest.length) }; // de laatste letter blijft verborgen
+    const lens = words.map(w => w.filter(isL).length);
+    // per woord: de eerste n letters zichtbaar, maar nooit de laatste (behalve bij woorden van één letter)
+    const text = art + words.map((w, wi) => { let k = 0; const show = lens[wi] <= 1 ? 1 : Math.min(n, lens[wi] - 1);
+      return w.map(c => { if (!isL(c)) return c; return k++ < show ? c : '_'; }).join('\u2009'); }).join('   ');
+    return { text, max: Math.max(1, ...lens.map(l => l - 1)) };
   }
+  // sneltoetsen: Ctrl+H = hint, Ctrl+I = ik weet het niet (werkt ook tijdens het typen, ook op een iPad-toetsenbord)
+  const KEY_HINT = 'h', KEY_DK = 'i';
   function typeHelp(inp, ctx, answer, onDontKnow) {
     let n = 0;
+    const kbd = k => h('kbd', { class: 'kbd-hint', 'aria-hidden': 'true' }, '⌃' + k.toUpperCase());
     const hintLine = h('div', { class: 'type-hint hidden', lang: 'es', 'aria-live': 'polite' });
-    const hintBtn = h('button', { class: 'btn ghost small', type: 'button', onclick: () => {
+    const hintLabel = h('span', null, '💡 Hint');
+    const hint = () => {
       const a = answer(); const { max } = hintMask(a, 0);
       if (n >= max) return;
       n++; const r = hintMask(a, n);
       hintLine.textContent = '💡 ' + r.text; hintLine.classList.remove('hidden');
-      hintBtn.textContent = n >= max ? '💡 Geen hints meer' : '💡 Nog een letter';
+      hintLabel.textContent = n >= max ? '💡 Geen hints meer' : '💡 Nog een letter';
       hintBtn.disabled = n >= max;
       inp.focus({ preventScroll: true });
-    } }, '💡 Hint');
-    const dkBtn = h('button', { class: 'btn ghost small', type: 'button', onclick: () => { if (ctx.answered()) return; inp.disabled = true; row.classList.add('hidden'); onDontKnow(); } }, '🤷 Ik weet het niet');
+    };
+    const hintBtn = h('button', { class: 'btn ghost small', type: 'button', title: 'Sneltoets: Ctrl+H', onclick: hint }, hintLabel, kbd(KEY_HINT));
+    const dontKnow = () => { if (ctx.answered()) return; inp.disabled = true; row.classList.add('hidden'); onDontKnow(); };
+    const dkBtn = h('button', { class: 'btn ghost small', type: 'button', title: 'Sneltoets: Ctrl+I', onclick: dontKnow }, '🤷 Ik weet het niet', kbd(KEY_DK));
     const row = h('div', { class: 'type-help' }, ctx.mode === 'exam' ? null : hintBtn, dkBtn);
+    const onKey = e => {
+      if (!e.ctrlKey || e.metaKey || e.altKey || ctx.answered() || row.classList.contains('hidden') || !row.isConnected) return;
+      const k = (e.key || '').toLowerCase();
+      if (k === KEY_HINT && ctx.mode !== 'exam') { e.preventDefault(); e.stopPropagation(); hint(); }
+      else if (k === KEY_DK) { e.preventDefault(); e.stopPropagation(); dontKnow(); }
+    };
+    document.addEventListener('keydown', onKey, true);
+    if (ctx.onLeave) ctx.onLeave(() => document.removeEventListener('keydown', onKey, true));
     return { el: h('div', null, hintLine, row), hints: () => n, done: () => row.classList.add('hidden') };
   }
   /* ---------- vervoegen: kaart met uitleg + mini-tabel ---------- */
