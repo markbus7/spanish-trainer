@@ -190,7 +190,7 @@
         ['el soroche', 'de hoogteziekte'], ['¡qué roche!', 'wat gênant!', 'i'], ['la chela', 'het biertje', 'i'], ['jalar', 'zakken (voor een examen)', 'i'], ['al toque', 'meteen', 'i'], ['¡habla!', 'hé, hoe is het?', 'i'], ['pituco / pituca', 'kakker', 'i'], ['¡qué palta!', 'wat gênant!', 'i'], ['¡asu mare!', 'jeetje!', 'i'], ['la jerma', 'de vriendin', 'i'], ['la flaca', 'het meisje, de vriendin', 'i'], ['la combi', 'het busje'], ['la yapa', 'het extraatje (gratis erbij)'], ['bamba', 'nep', 'i']],
       fact: 'Peruanen zeggen «palta» voor avocado, net als in Chili en Argentinië. In Mexico en Colombia is het «aguacate».' },
 
-    { id: 'bo', flag: '🇧🇴', name: 'Bolivia', city: 'La Paz', speakers: '±12 mln', group: 'zuid', voice: 'BO', listen: 'es-BO', pin: [342, 444],
+    { id: 'bo', flag: '🇧🇴', name: 'Bolivia', city: 'La Paz', speakers: '±12 mln', group: 'zuid', voice: 'BO', listen: 'es-BO', pin: [342, 444], unit: 'b2-11',
       hello: ['¡Hola, cumpa! Bienvenido a Bolivia.', 'Hoi, maat! Welkom in Bolivia.'],
       intro: 'Hoog in de Andes. Veel mensen spreken ook Quechua of Aymara, en het Spaans is rustig en helder.',
       sounds: [
@@ -201,7 +201,7 @@
         ['el api', 'warme maïsdrank (paars)'], ['el micro', 'de bus'], ['¡jallalla!', 'proost! / leve! (Aymara)'], ['el soroche', 'de hoogteziekte'], ['la farra', 'het feest', 'i'], ['¡ya, pues!', 'oké, goed dan!', 'i'], ['la chela', 'het biertje', 'i'], ['¡qué macana!', 'wat jammer!', 'i'], ['el cuate', 'de vriend', 'i'], ['el llokalla', 'de jongen', 'i', 'el yocalla'], ['jailón / jailona', 'kakker', 'i'], ['el pucho', 'de sigaret', 'i']],
       fact: 'La Paz ligt op ±3600 meter. Er rijdt een kabelbaan als openbaar vervoer.' },
 
-    { id: 'py', flag: '🇵🇾', name: 'Paraguay', city: 'Asunción', speakers: '±7 mln', group: 'zuid', voice: 'PY', listen: 'es-PY', pin: [392, 494],
+    { id: 'py', flag: '🇵🇾', name: 'Paraguay', city: 'Asunción', speakers: '±7 mln', group: 'zuid', voice: 'PY', listen: 'es-PY', pin: [392, 494], unit: 'b2-12',
       hello: ['¡Hola! Bienvenido a Paraguay.', 'Hoi! Welkom in Paraguay.'],
       intro: 'Een tweetalig land: bijna iedereen spreekt ook Guaraní. Veel mensen mengen de twee talen (dat heet «jopara»).',
       sounds: [

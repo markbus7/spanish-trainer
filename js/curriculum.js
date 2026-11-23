@@ -37,7 +37,8 @@
     'impsubj': 'imperfecto de subjuntivo', 'si-irreal': 'si tuviera…, haría', 'subj-past': 'subjuntivo in het verleden', 'voseo': 'voseo (vos sos, vos tenés)', 'si-past': 'si hubiera…, habría',
     'passive': 'passief (fue construido)', 'se-accidental': 'se me olvidó (per ongeluk)', 'caribe': 'Caribisch Spaans',
     'register': 'formeel register (e-mails)', 'concession': 'aunque + subjuntivo',
-    'probability': 'vermoedens (¿dónde estará?)', 'relative-adv': 'en la que, lo cual, cuyo'
+    'probability': 'vermoedens (¿dónde estará?)', 'relative-adv': 'en la que, lo cual, cuyo',
+    'periphrasis-adv': 'llevar / seguir + gerundio, ponerse a', 'subj-relative': 'busco algo que + subjuntivo'
   };
 
   const units = [];

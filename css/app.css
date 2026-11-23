@@ -1456,3 +1456,22 @@ button.course-pick:focus-visible { outline: 2px solid var(--accent); outline-off
 .how-list b { font-size: .95rem; }
 .how-list p { margin: .1rem 0 0; }
 .how-nums { font-weight: 600; }
+
+/* ---------- kleine getekende iconen in tekst: doelen, naslag-tabs, knoppen, unittitels (v1.57) ---------- */
+.ic.ic-in { width: 1.35em; height: 1.35em; vertical-align: -.32em; margin-right: .38em; flex: none; }
+.u-art.u-inline { width: 1.45em; height: 1.45em; vertical-align: -.36em; margin: 0 .35em 0 .1em; }
+.goals { display: grid; gap: .5rem; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: .8rem .95rem; }
+.goals li { margin: 0; display: flex; align-items: flex-start; gap: .55rem; line-height: 1.4; }
+.goals li .ic.g-ic { width: 1.5rem; height: 1.5rem; margin: -.06rem 0 0; flex: none; }
+.tab { display: inline-flex; align-items: center; }
+.tab .ic.ic-in { width: 1.3em; height: 1.3em; margin-right: .4em; vertical-align: 0; }
+.scenario-card .sc-t, .scenario-card .sc-g { display: flex; align-items: flex-start; gap: .1rem; }
+.scenario-card .sc-t .ic.ic-in { width: 1.9rem; height: 1.9rem; margin: -.2rem .5rem 0 0; }
+.scenario-card .sc-g .ic.ic-in { width: 1.15rem; height: 1.15rem; margin: .02rem .4rem 0 0; }
+/* iPad staand: de Lupe-knop rechts is compact, zodat hij niet over «Start» en de tegels valt */
+@media (min-width: 760px) and (max-width: 1023px) {
+  .ask-fab { width: 46px; height: 58px; padding-left: 2px; }
+  .ask-fab:hover { width: 50px; }
+  .ask-fab .lupe svg { width: 38px; height: 38px; }
+  .ask-fab-q { width: 16px; height: 16px; line-height: 16px; font-size: .62rem; }
+}

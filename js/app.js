@@ -506,6 +506,10 @@
   /* Eigen tekening van de unit (js/unit-art.js); zonder tekening de emoji. */
   const STATUS_NL = { done: 'Klaar', tested: 'Overgeslagen met de toets', locked: 'Op slot', current: 'Hier ben je nu', started: 'Begonnen' };
   function uIcon(u) { return S.Icons && S.Icons.unit ? S.Icons.unit(u) : u.icon; }
+  /* Unittitel met de eigen tekening ervoor (in een zin of kaarttitel); zonder tekening blijft de emoji staan. */
+  function uTitle(u, pre) { const art = S.Icons && S.Icons.unitSvg && S.Icons.unitSvg(u.id); return art ? [pre || '', S.Icons.unit(u, 'u-inline'), u.title] : (pre || '') + u.icon + ' ' + u.title; }
+  /* Klein getekend icoon vóór een tekst (doelen, naslag-tabs, knoppen). */
+  function ico(name, text, cls) { return S.Icons && S.Icons.has(name) ? [S.Icons.el(name, 'ic-in ' + (cls || '')), text] : text; }
   function quick(icon, t, s, fn, done, x) { return h('button', { class: 'quick-btn' + (done ? ' did' : ''), type: 'button', onclick: fn }, h('span', { class: 'qi' }, S.Icons && S.Icons.has(icon) ? S.Icons.el(icon) : icon), done ? h('span', { class: 'qd', title: 'Vandaag gedaan' }, '✓') : null, h('b', null, t), x ? h('span', { class: 'qx' }, x) : null, h('small', null, s)); }
 
   /* ================= Dagplan (Hoy) ================= */
@@ -525,9 +529,9 @@
     if (T.learn.done) {
       items.push(task('learn', '📘', d.done.learnLast || 'Nieuwe stof', T.learn.count > 1 ? `${T.learn.count} stappen gedaan vandaag` : 'Stap afgerond',
         step ? { label: 'Nog een stap', fn: () => startStep(u, step.id) } : { label: 'Naar de route', fn: () => { location.hash = '#/ruta'; } },
-        step ? `Volgende: ${step.icon} ${step.nl} van ${u.icon} ${u.title}` : 'Alle units van dit niveau zijn klaar.'));
+        step ? uTitle(u, `Volgende: ${step.nl} van `) : 'Alle units van dit niveau zijn klaar.'));
     } else if (step) {
-      items.push(task('learn', step.icon, `${u.icon} ${u.title}`, `${step.nl} · ±${step.min} min`, { label: step.id === 'test' ? 'Start toets' : 'Start', fn: () => startStep(u, step.id) }, learnDesc));
+      items.push(task('learn', step.icon, uTitle(u), `${step.nl} · ±${step.min} min`, { label: step.id === 'test' ? 'Start toets' : 'Start', fn: () => startStep(u, step.id) }, learnDesc));
     } else {
       items.push(task('learn', '🎓', 'Niveau-examen ' + u.level, 'Alle units zijn klaar', { label: 'Naar de route', fn: () => { location.hash = '#/ruta'; } }, 'Een geslaagde stap of het examen vinkt deze taak af.'));
     }
@@ -570,7 +574,7 @@
   /* Na een voltooid dagplan: één aanbevolen vervolg, met een paar kleine alternatieven eronder. */
   function goOn({ due, u, step }) {
     const main = step
-      ? { icon: step.icon, kicker: step.id === 'test' ? 'Volgende: de unittoets' : 'Volgende les', title: `${step.nl} · ${u.icon} ${u.title}`,
+      ? { icon: step.icon, kicker: step.id === 'test' ? 'Volgende: de unittoets' : 'Volgende les', title: uTitle(u, `${step.nl} · `),
         sub: `${u.level} · unit ${C.unitsOf(u.level).indexOf(u) + 1} — ${u.nl} · ±${step.min} min`, label: step.id === 'test' ? '▶ Start toets' : '▶ Ga verder', fn: () => startStep(u, step.id) }
       : { icon: '🎓', kicker: 'Volgende stap', title: 'Niveau-examen ' + u.level, sub: 'Alle units van ' + u.level + ' zijn klaar. Haal het examen en ga door naar het volgende niveau.', label: '▶ Naar het examen', fn: () => { location.hash = '#/ruta'; } };
     const prog = P.unitProgress(u);
@@ -721,7 +725,7 @@
     const wrap = h('div', { class: 'page unit-page', style: { '--lc': L.color } });
     wrap.append(h('a', { class: 'back', href: '#/ruta' }, '← Ruta'),
       h('div', { class: 'unit-hero' }, h('div', { class: 'u-big' }, uIcon(u)), h('div', null, h('div', { class: 'eyebrow' }, u.level + ' · unit ' + (C.unitsOf(u.level).indexOf(u) + 1)), h('h1', null, u.title), h('p', { class: 'muted' }, u.nl))),
-      h('ul', { class: 'goals' }, u.goals.map(g => h('li', null, '🎯 ' + g))));
+      h('ul', { class: 'goals' }, u.goals.map(g => h('li', null, ico('goal', g, 'g-ic') === g ? '🎯 ' + g : [S.Icons.el('goal', 'g-ic'), h('span', null, g)]))));
     const steps = h('div', { class: 'steps' });
     const nxt = P.nextStep(u);
     Gen.STEPS.forEach(x => {
@@ -734,14 +738,14 @@
     wrap.append(section('Stappen', steps));
     if (!s.done) wrap.append(h('div', { class: 'row gap wrap' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => S.confirm('Ik ken dit al', 'Je doet meteen de unittoets. Haal je 80% of meer, dan is de unit afgerond en gaan de woorden en oefeningen in je herhaling.', 'Start toets', () => {
       startStep(u, 'test');
-    }) }, '⏭️ Ik ken dit al → direct de toets'), s.best ? h('span', { class: 'muted small' }, 'Beste toets: ' + Math.round(s.best * 100) + '%') : null));
+    }) }, ico('skip', 'Ik ken dit al → direct de toets') === 'Ik ken dit al → direct de toets' ? '⏭️ Ik ken dit al → direct de toets' : ico('skip', 'Ik ken dit al → direct de toets')), s.best ? h('span', { class: 'muted small' }, 'Beste toets: ' + Math.round(s.best * 100) + '%') : null));
 
     // naslag
-    const tabs = [['📖 Grammatica', () => h('div', null, u.grammar.map(g => S.Lesson.grammarBlock(g)))],
-      ['🃏 Woorden', () => wordList(u)],
-      ['💬 Dialoog', () => dialogueRead(u)],
-      ['📰 Lezen', () => u.reading ? readingRead(u) : h('p', null, '—')],
-      ['🌎 Cultuur', () => u.culture ? h('div', { class: 'info' }, h('h2', null, u.culture.t), h('div', { class: 'prose', html: u.culture.html })) : h('p', null, '—')]];
+    const tabs = [[ico('grammar', 'Grammatica'), () => h('div', null, u.grammar.map(g => S.Lesson.grammarBlock(g)))],
+      [ico('vocab', 'Woorden'), () => wordList(u)],
+      [ico('dialogue', 'Dialoog'), () => dialogueRead(u)],
+      [ico('read', 'Lezen'), () => u.reading ? readingRead(u) : h('p', null, '—')],
+      [ico('globe', 'Cultuur'), () => u.culture ? h('div', { class: 'info' }, h('h2', null, u.culture.t), h('div', { class: 'prose', html: u.culture.html })) : h('p', null, '—')]];
     const tabBar = h('div', { class: 'tabs', role: 'tablist' }); const pane = h('div', { class: 'tab-pane' });
     let curTab = 0; try { curTab = +(sessionStorage.getItem('spt.utab') || 0); } catch (e) { /* */ }
     tabs.forEach(([t, fn], i) => tabBar.append(h('button', { class: 'tab' + (i === curTab ? ' active' : ''), type: 'button', role: 'tab', onclick: () => {
@@ -750,7 +754,7 @@
     } }, t)));
     pane.append(tabs[curTab] ? tabs[curTab][1]() : tabs[0][1]());
     wrap.append(section('Naslag', tabBar, pane));
-    if (u.scenario) wrap.append(section('Rollenspel', h('div', { class: 'scenario-card' }, h('b', null, '🎭 ' + u.scenario.nl), h('small', null, '🎯 ' + u.scenario.goal),
+    if (u.scenario) wrap.append(section('Rollenspel', h('div', { class: 'scenario-card' }, h('b', { class: 'sc-t' }, ico('roleplay', h('span', null, u.scenario.nl), 'sc-ic')), h('small', { class: 'sc-g' }, ico('goal', h('span', null, u.scenario.goal))),
       h('button', { class: 'btn primary', type: 'button', onclick: () => { if (!S.AI.enabled()) { location.hash = '#/docente'; return; } startRoleplay(unitScenario(u)); location.hash = '#/docente'; } }, S.AI.enabled() ? 'Start gesprek' : 'Stel de AI-docent in'))));
     return wrap;
   };

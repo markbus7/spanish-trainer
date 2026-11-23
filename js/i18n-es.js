@@ -941,6 +941,8 @@
     "💬 Dialoog": "💬 Diálogo",
     "📰 Lezen": "📰 Lectura",
     "🌎 Cultuur": "🌎 Cultura",
+    "Cultuur": "Cultura",
+    "Ik ken dit al → direct de toets": "Ya me lo sé → directo al examen",
     "Profe Lupe vat samen": "Profe Lupe resume",
     "Rollenspel": "Juego de roles",
     "Beluister": "Escuchar",

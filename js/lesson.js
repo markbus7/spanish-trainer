@@ -274,7 +274,7 @@
   function grammarBlock(g) {
     const es = esMode();
     const wrap = h('div', { class: 'grammar' },
-      h('div', { class: 'eyebrow' }, '🧩 ' + (g.es || S.tl('Gramática'))),
+      h('div', { class: 'eyebrow' }, S.Icons && S.Icons.has('grammar') ? [S.Icons.el('grammar', 'ic-in'), g.es || S.tl('Gramática')] : '🧩 ' + (g.es || S.tl('Gramática'))),
       h('h2', null, g.t));
     const sumEl = () => S.Tutor.coach({ es: g.sum, lang: S.course.target, nl: es ? '' : 'Kort samengevat, in het Spaans. Tik om het te horen.' }, { size: 54, label: 'Profe Lupe vat samen', cls: 'lc-sum' }) || h('div', { class: 'sum', lang: S.course.target }, (S.course.target === 'es' ? '🇪🇸 ' : S.course.flag + ' ') + g.sum);
     if (g.sum && es) wrap.append(sumEl());

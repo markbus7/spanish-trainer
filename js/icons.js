@@ -129,10 +129,19 @@
       <path d="M4 42h40" stroke="${C.green}" stroke-width="3" stroke-linecap="round"/>`,
     parejas: `<g transform="rotate(-10 16 25)"><rect x="5" y="10" width="21" height="29" rx="4" fill="${C.t}"/><rect x="8.5" y="13.5" width="14" height="22" rx="2.5" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="2.6 2.2" opacity=".75"/></g>
       <g transform="rotate(9 32 25)"><rect x="21" y="10" width="21" height="29" rx="4" fill="${C.cream}"/><rect x="21" y="10" width="21" height="29" rx="4" fill="none" stroke="${C.p}" stroke-width="2"/>
-      <path d="M31.5 31s-6.5-4-6.5-8.2a3.4 3.4 0 0 1 6.5-1.5 3.4 3.4 0 0 1 6.5 1.5c0 4.2-6.5 8.2-6.5 8.2z" fill="${C.p}"/></g>`
+      <path d="M31.5 31s-6.5-4-6.5-8.2a3.4 3.4 0 0 1 6.5-1.5 3.4 3.4 0 0 1 6.5 1.5c0 4.2-6.5 8.2-6.5 8.2z" fill="${C.p}"/></g>`,
+    /* doel: roos met een pijl in het midden */
+    goal: `<circle cx="22" cy="26" r="18" fill="${C.o}"/><circle cx="22" cy="26" r="13" fill="${C.cream}"/><circle cx="22" cy="26" r="8.4" fill="${C.o2}"/><circle cx="22" cy="26" r="3.6" fill="${C.cream}"/>
+      <path d="M22 26 39 9" stroke="${C.ink}" stroke-width="2.6" stroke-linecap="round"/><path d="M36 5.500l1.2 5.3 5.3 1.2 3.5-4-4.7-1-1-4.700z" fill="${C.t}"/><circle cx="22" cy="26" r="1.8" fill="${C.ink}"/>`,
+    /* overslaan: twee pijlen naar de finishvlag */
+    skip: `<path d="M5 13l14 11L5 35z" fill="${C.g}"/><path d="M19 13l14 11-14 11z" fill="${C.o}"/><path d="M38 8v33" stroke="${C.brown}" stroke-width="3.4" stroke-linecap="round"/>
+      <path d="M38 9h8v10h-8z" fill="${C.cream}"/><path d="M38 9h4v5h-4zM42 14h4v5h-4z" fill="${C.ink}"/>`,
+    /* rollenspel: twee maskers (vrolijk en verbaasd) */
+    roleplay: `<g transform="rotate(-9 17 22)"><path d="M4 9c8.6 3 17.4 3 26 0v13c0 9-5.8 15-13 15S4 31 4 22z" fill="${C.g}"/><path d="M9.5 17.500c1.6-1.8 3.8-1.8 5.4 0M19.1 17.500c1.6-1.8 3.8-1.8 5.4 0" fill="none" stroke="${C.ink}" stroke-width="2.2" stroke-linecap="round"/><path d="M10.5 24.500c4 5 9 5 13 0z" fill="${C.ink}"/></g>
+      <g transform="rotate(8 33 28)"><path d="M21 16c8 2.6 16 2.6 24 0v12c0 8.4-5.4 14-12 14s-12-5.6-12-14z" fill="${C.t}"/><circle cx="28.5" cy="25" r="2.1" fill="#fff"/><circle cx="37.5" cy="25" r="2.1" fill="#fff"/><ellipse cx="33" cy="33.5" rx="3" ry="3.6" fill="#fff"/></g>`
   };
   // emoji → illustratie (zodat bestaande teksten met emoji's vanzelf een tekening krijgen)
-  const EMOJI = { '🔁': 'review', '🃏': 'vocab', '🧩': 'grammar', '💬': 'dialogue', '📖': 'read', '🎙️': 'speak', '🗣️': 'dialogue', '🏁': 'test', '🎁': 'gift', '🏆': 'trophy', '🎓': 'exam', '⏸️': 'pause', '📘': 'read', '⚡': 'sprint', '🎧': 'listen', '🎲': 'dice', '📚': 'books', '🧭': 'compass', '🌎': 'globe', '🗂️': 'allgames' };
+  const EMOJI = { '🔁': 'review', '🃏': 'vocab', '🧩': 'grammar', '💬': 'dialogue', '📖': 'read', '🎙️': 'speak', '🗣️': 'dialogue', '🏁': 'test', '🎁': 'gift', '🏆': 'trophy', '🎓': 'exam', '⏸️': 'pause', '📘': 'read', '⚡': 'sprint', '🎧': 'listen', '🎲': 'dice', '📚': 'books', '🧭': 'compass', '🌎': 'globe', '🗂️': 'allgames', '🎯': 'goal', '⏭️': 'skip', '🎭': 'roleplay' };
   function art(name) {
     const n = ART[name] ? name : EMOJI[name]; if (!n) return '';
     return `<svg class="ic-art" viewBox="0 0 48 48" aria-hidden="true">${ART[n]}</svg>`;

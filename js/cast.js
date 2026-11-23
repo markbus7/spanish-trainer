@@ -544,7 +544,13 @@
       beast({ fur: ['#c49a74', '#94683e', '#6a4424'], ears: 'tiny', earIn: '#4a2e18', muzzle: '#f2e2cc', mrx: 17, mry: 12, my: 83, wear: { kind: 'tee', a: '#ffd23f', b: '#f2a81d', trim: '#1f4f9e' }, eyes: { lash: true }, front: ACC.whisk('#5a3a20') + ACC.earrings() })),
     extra({ id: 'diego-pe', name: 'Diego', animal: 'pingüino de Humboldt', nl: 'humboldtpinguïn', city: 'Lima', cc: 'PE', age: 31, female: false, trait: 'Limeño die getuige is op de bruiloft van zijn broer, en daar behoorlijk zenuwachtig over is.', color: '#2a2a33' },
       bird({ fur: ['#5a5a66', '#33333d', '#1e1e26'], beak: '#3a3a44', beak2: '#e8a0a8', wear: { kind: 'blazer', a: '#2a2a33', b: '#18181f', trim: '#3a3a46', inner: '#fff', pin: '#fff' },
-        marks: '<path d="M30 52C40 40 80 40 90 52C96 70 86 94 60 96C34 94 24 70 30 52Z" fill="#fbf8f2"/><path d="M28 52C36 38 52 34 60 34C68 34 84 38 92 52" fill="none" stroke="#fbf8f2" stroke-width="3"/>', eyes: { col: '#1a1018' }, front: '<path d="M52 100L60 104 68 100 68 108 60 104 52 108Z" fill="#2a2a33"/>' }))
+        marks: '<path d="M30 52C40 40 80 40 90 52C96 70 86 94 60 96C34 94 24 70 30 52Z" fill="#fbf8f2"/><path d="M28 52C36 38 52 34 60 34C68 34 84 38 92 52" fill="none" stroke="#fbf8f2" stroke-width="3"/>', eyes: { col: '#1a1018' }, front: '<path d="M52 100L60 104 68 100 68 108 60 104 52 108Z" fill="#2a2a33"/>' })),
+    extra({ id: 'wara', name: 'Wara', animal: 'flamenco andino', nl: 'Andesflamingo', city: 'Uyuni', cc: 'BO', age: 30, female: true, trait: 'Aymara-gids op de zoutvlakte. Doet de tocht al acht jaar en raakt nog elke zonsopgang ontroerd.', color: '#f0789f' },
+      bird({ fur: ['#ffd0dc', '#f78fb0', '#d95a86'], hook: true, beak: '#fbe3d2', beak2: '#2a2a33', wear: { kind: 'poncho', a: '#7b3fa0', b: '#5a2a7a', trim: '#ffd23f', trim2: '#2fa79a' },
+        marks: '<path d="M30 58C34 52 48 52 51 60C49 68 35 70 30 64Z" fill="#fff" opacity=".55"/><path d="M90 58C86 52 72 52 69 60C71 68 85 70 90 64Z" fill="#fff" opacity=".55"/>', hat: HAT.chullo('#2fa79a', '#ffd23f'), eyes: { lash: true, iris: '#c9762a' } })),
+    extra({ id: 'arami', name: 'Arami', animal: 'aguará guazú', nl: 'manenwolf', city: 'Asunción', cc: 'PY', age: 26, female: true, trait: 'Paraguayaanse die van Spaans naar Guaraní springt in één zin. Heeft altijd een koude tereré klaarstaan.', color: '#d9642a' },
+      beast({ fur: ['#f9b078', '#e0712f', '#b04c18'], ears: 'big', earIn: '#fff1e0', muzzle: '#4a2f24', mrx: 13, mry: 11.5, noseCol: '#160e0a', line: '#f2c8a8', wear: { kind: 'stripes', a: '#d52b1e', b: '#a81f16', trim: '#fff', trim2: '#0038a8' },
+        marks: '<path d="M38 96C46 104 74 104 82 96C76 102 68 104 60 104C52 104 44 102 38 96Z" fill="#fff6ea"/><path d="M52 30C56 20 64 20 68 30C64 27 56 27 52 30Z" fill="#3a2218"/>', eyes: { lash: true, iris: '#8a5a1e' }, front: ACC.earrings() + flower(88, 40, '#fff', 2.6, '#ffd23f') }))
   );
 
   /* ---------- jouw eigen personage (kies je in Perfil; staat rechts bij jouw zinnen in de dialogen) ---------- */
@@ -586,7 +592,7 @@
     doctora: V('es-MX-Dalia', -6, -4), entrevistadora: V('es-MX-Dalia', -4), yarisel: V('es-PA-Margarita'), yokasta: V('es-DO-Ramona'),
     paola: V('es-MX-Dalia'), 'tio-beto': V('es-MX-Jorge', -10, -6), lupita: V('es-MX-Dalia', 8, 6), mauricio: V('es-CR-Juan', 0, -4),
     turista: V('es-US-Alonso', -4, -4), 'ana-lucia': V('es-GT-Marta'), daniela: V('es-EC-Andrea'), fer: V('es-MX-Jorge', 6, 4),
-    moderadora: V('es-PE-Camila', -4), quispe: V('es-PE-Alex', -8, -6), huaman: V('es-BO-Marcelo'), 'valentina-co': V('es-CO-Salome'), 'diego-pe': V('es-PE-Alex')
+    moderadora: V('es-PE-Camila', -4), quispe: V('es-PE-Alex', -8, -6), huaman: V('es-BO-Marcelo'), 'valentina-co': V('es-CO-Salome'), 'diego-pe': V('es-PE-Alex'), wara: V('es-BO-Sofia'), arami: V('es-PY-Tania')
   };
   CAST.forEach(c => { c.voice = VOICE[c.id] || null; });
   const BY = Object.fromEntries([...CAST, ...PLAYERS].map(c => [c.id, c]));
@@ -599,7 +605,7 @@
     'Andrés': 'andres', 'Valentina': 'valentina-co', 'Valentina@PE': 'valentina-ar', 'Camila': 'camila', 'Señora': 'senora-cartagena', 'Ana': 'ana',
     'Mesero': 'mesero', 'Vendedora': 'vendedora', 'Andrea': 'andrea', 'Carlos': 'carlos', 'Doctora': 'doctora', 'Entrevistadora': 'entrevistadora',
     'Yarisel': 'yarisel', 'Yokasta': 'yokasta', 'Paola': 'paola', 'Tío Beto': 'tio-beto', 'Lupita': 'lupita', 'Guía Mauricio': 'mauricio',
-    'Turista': 'turista', 'Ana Lucía': 'ana-lucia', 'Daniela': 'daniela', 'Fer': 'fer', 'Moderadora': 'moderadora', 'Prof. Quispe': 'quispe', 'Sr. Huamán': 'huaman'
+    'Turista': 'turista', 'Ana Lucía': 'ana-lucia', 'Daniela': 'daniela', 'Fer': 'fer', 'Moderadora': 'moderadora', 'Prof. Quispe': 'quispe', 'Sr. Huamán': 'huaman', 'Wara': 'wara', 'Arami': 'arami'
   };
   function country(place) {
     const cps = [...String(place || '')].map(c => c.codePointAt(0)).filter(c => c >= 0x1F1E6 && c <= 0x1F1FF);
