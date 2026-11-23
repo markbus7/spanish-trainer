@@ -544,7 +544,11 @@
     const fillBlank = txt => { if (sent) { const bl = sent.querySelector('.blank'); if (bl) { bl.textContent = txt; bl.classList.add('filled'); } } };
     const help = typeHelp({ focus: o => field().focus(o), set disabled(v) { field().disabled = v; } }, ctx, () => it.answers[0], () => {
       fillBlank(it.answers[0]);
-      ctx.submit({ ok: false, dontKnow: true, user: '', expected: it.answers[0], x: it.x, alts: it.answers });
+      // wat je al wel goed had getypt telt mee: die woorden staan er bij de herhaling al
+      const typed = it.translate ? (part ? part.value() : inp.value).trim() : '';
+      if (part) part.mark(typed, it.answers);
+      const w = wrap.querySelector('.p-whole'); if (w) w.remove();
+      ctx.submit({ ok: false, dontKnow: true, user: '', expected: it.answers[0], x: it.x, alts: it.answers, parts: typed ? S.check.parts(typed, it.answers) : null });
     });
     const bar = accentBar(() => part ? part.current() : inp);
     if (part) {
@@ -585,7 +589,13 @@
     let inp = part ? null : textInput('Typ wat je hoort…');
     const field = () => part || inp;
     const help = typeHelp({ focus: o => field().focus(o), set disabled(v) { field().disabled = v; } }, ctx, () => it.text,
-      () => ctx.submit({ ok: false, dontKnow: true, user: '', expected: it.text, nl: it.nl }));
+      () => {
+        // wat je al wel goed had getypt telt mee: die woorden staan er bij de herkansing al
+        const typed = (part ? part.value() : inp.value).trim();
+        if (part) part.mark(typed, [it.text]);
+        const w = wrap.querySelector('.p-whole'); if (w) w.remove();
+        ctx.submit({ ok: false, dontKnow: true, user: '', expected: it.text, nl: it.nl, parts: typed ? S.check.parts(typed, [it.text]) : null });
+      });
     const bar = accentBar(() => part ? part.current() : inp);
     const body = [];
     if (part) {
