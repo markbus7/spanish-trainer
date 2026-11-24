@@ -939,6 +939,8 @@ await micTests();
     const hd = Mi.hardItems();
     ok(hd.some(x => x.id === 'x|a1-04|5' && x.unit === 'a1-04' && x.f === 4 && x.a), 'oefenfouten: vaak fout uit de herhaling, met antwoord');
     ok(Mi.asText(Mi.report(30)).includes('[x|a1-04|5]'), 'oefenfouten: vaak fout staat in de tekst');
+    ok(Mi.asText(Mi.report(30)).includes('✔ al verwerkt in v') && Mi.asText(Mi.report(30)).includes('Al verwerkt in eerdere updates'), 'verwerkt: Lupe ziet wat al in de app zit');
+    ok((S.reworked || []).every(x => (x.tag ? S.C.TAGS[x.tag] && S.C.get(x.unit) : x.ids.every(id => S.C.word(S.C.get(id.split('|')[1]), +id.split('|')[2]))) && /^\d{4}-\d\d-\d\d$/.test(x.date)), 'verwerkt: tags, units en woorden bestaan');
     const md = S.md ? S.md('- **Titel** (uitleg erbij)\n  Waar: a1-04\n  Wat: iets\n- Tweede') : '';
     ok(!S.md || (md.match(/<li>/g) || []).length === 2 && md.includes('Waar: a1-04'), 'voorstellen: ingesprongen regels horen bij hetzelfde punt');
   }

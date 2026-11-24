@@ -187,6 +187,21 @@
     { t: 'tr', nl: 'Daar ben ik het niet mee eens.', a: ['No estoy de acuerdo con eso.', 'No estoy de acuerdo.', 'Con eso no estoy de acuerdo.'], tag: 'argument' }
   ] });
   /* ======================= A1 · voorstellen van Lupe (24 nov 2026) ======================= */
+  // Wat er al verwerkt is, zodat Lupe in haar rapport/voorstellen niet opnieuw hetzelfde voorstelt
+  // (oude foutcijfers blijven namelijk staan). Bij een nieuwe ronde: regel toevoegen of bijwerken.
+  S.reworked = (S.reworked || []).concat([
+    { tag: 'contractions', unit: 'a1-04', v: '1.62.2', date: '2026-11-24', what: 'uitleg al/del + uitzondering bij namen, ±20 invul-, meerkeuze- en vertaaloefeningen' },
+    { tag: 'hay-estar', unit: 'a1-04', v: '1.62.2', date: '2026-11-24', what: 'korte regel hay vs. estar (en nooit ser voor een plek) met contrastparen, ±17 oefeningen' },
+    { tag: 'articles', unit: 'a1-02', v: '1.62.2', date: '2026-11-24', what: 'uitleg wél/géén lidwoord (beroep na ser, na gustar), ±15 oefeningen in a1-02 en a1-06' },
+    { tag: 'gender', unit: 'a1-02', v: '1.62.2', date: '2026-11-24', what: 'lijstje woorden op -ma (el problema, el idioma…) met oefeningen' },
+    { tag: 'adj-agree', unit: 'a1-03', v: '1.62.0', date: '2026-11-24', what: 'uitleg bijvoeglijke naamwoorden in het meervoud, 8 oefeningen' },
+    { tag: 'numbers', unit: 'a1-03', v: '1.62.2', date: '2026-11-24', what: 'uitleg getallen 30–99 (sesenta/setenta), 12 oefeningen' },
+    { tag: 'weather', unit: 'a1-10', v: '1.62.0', date: '2026-11-24', what: 'uitleg hace bij het weer, oefeningen' },
+    { tag: 'ir-a', unit: 'a1-10', v: '1.62.0', date: '2026-11-24', what: 'ir a + infinitief, 7 oefeningen' },
+    { tag: 'questions', unit: 'a1-10', v: '1.62.0', date: '2026-11-24', what: 'cuánto/cuánta/cuántos/cuántas, 7 oefeningen' },
+    { ids: ['w|a1-01|17'], v: '1.62.0', date: '2026-11-24', what: '«mucho gusto» telt goed' },
+    { ids: ['w|a1-03|32', 'w|a1-03|37', 'w|a1-03|47', 'w|a1-03|48'], v: '1.62.2', date: '2026-11-24', what: 'suegro, divorciado, carnal en ñaña in voorbeeldzinnen geoefend' }
+  ]);
   // A1 · 2 Personas y profesiones: wanneer wél en wanneer géén lidwoord
   X('a1-02', {
     grammar: [
@@ -196,7 +211,12 @@
 <p>✅ Bij <b>señor / señora + naam</b> als je óver iemand praat: <i><b>La</b> señora García es abogada.</i> (Spreek je iemand direct aan, dan zonder: <i>Buenos días, señora García.</i>)</p>
 <p>✅ Na <b>gustar</b> en <b>encantar</b>: <i>Me gusta <b>el</b> trabajo. Me gustan <b>los</b> tacos.</i></p>
 <p>❌ Géén lidwoord bij een beroep of nationaliteit na <b>ser</b>: <i>Soy médico. Es argentina.</i> Maar mét een bijvoeglijk naamwoord erbij wel <i>un/una</i>: <i>Es <b>un</b> médico excelente.</i></p>`,
-        sum: 'Lo general lleva artículo (la gente, los tacos). La profesión después de «ser», no: soy médico.' }
+        sum: 'Lo general lleva artículo (la gente, los tacos). La profesión después de «ser», no: soy médico.' },
+      { t: 'Woorden op -ma: vaak mannelijk', es: 'El problema, el idioma…',
+        html: `<p>Veel woorden op <b>-ma</b> komen uit het Grieks en zijn <b>mannelijk</b>, ook al eindigen ze op -a. Leer ze met <i>el</i> erbij.</p>
+<p>⚠️ Niet alle: <i>la cama</i> (het bed), <i>la forma</i> (de vorm) en <i>la mamá</i> zijn gewoon vrouwelijk.</p>`,
+        table: [['mannelijk (el)', 'betekenis'], ['el problema', 'het probleem'], ['el idioma', 'de taal'], ['el sistema', 'het systeem'], ['el programa', 'het programma'], ['el tema', 'het onderwerp'], ['el clima', 'het klimaat / weer'], ['el drama', 'het drama']],
+        sum: 'El problema, el idioma, el sistema, el tema, el clima: masculinos.' }
     ],
     ex: [
       { t: 'mc', q: 'Welke zin is goed?', o: ['La señora García es abogada.', 'Señora García es abogada.', 'La señora García es una abogada.'], x: 'Over iemand praten: la señora García. Beroep na ser: zonder lidwoord.', tag: 'articles' },
@@ -211,7 +231,11 @@
       { t: 'cloze', s: '___ problema es grande.', a: ['El'], o: ['El', 'La', 'Los'], nl: 'Het probleem is groot.', x: 'Problema eindigt op -a, maar is mannelijk.', tag: 'gender' },
       { t: 'cloze', s: 'Me gusta ___ café.', a: ['el'], o: ['el', 'la', 'un'], nl: 'Ik hou van koffie.', tag: 'articles' },
       { t: 'cloze', s: 'Me gusta ___ música.', a: ['la'], o: ['la', 'el', 'los'], nl: 'Ik hou van muziek.', tag: 'articles' },
-      { t: 'tr', nl: 'Pedro is kok.', a: ['Pedro es cocinero.'], x: 'Beroep na ser: zonder lidwoord.', tag: 'articles' }
+      { t: 'tr', nl: 'Pedro is kok.', a: ['Pedro es cocinero.'], x: 'Beroep na ser: zonder lidwoord.', tag: 'articles' },
+      { t: 'cloze', s: 'El español es ___ idioma muy bonito.', a: ['un'], o: ['un', 'una', 'unos'], nl: 'Spaans is een heel mooie taal.', x: 'El idioma is mannelijk: un idioma.', tag: 'gender' },
+      { t: 'cloze', s: '___ tema de hoy es la familia.', a: ['El'], o: ['El', 'La', 'Los'], nl: 'Het onderwerp van vandaag is de familie.', tag: 'gender' },
+      { t: 'mc', q: 'Welke is vrouwelijk?', o: ['la cama', 'el problema', 'el sistema'], x: 'Cama is gewoon vrouwelijk; problema en sistema zijn mannelijk.', tag: 'gender' },
+      { t: 'tr', nl: 'Ik ben student.', a: ['Soy estudiante.', 'Yo soy estudiante.'], x: 'Beroep/studie na ser: zonder lidwoord.', tag: 'articles' }
     ]
   });
 
@@ -246,7 +270,17 @@
       { t: 'mc', q: 'Hoe schrijf je 76?', o: ['setenta y seis', 'sesenta y seis', 'setentaiseis'], x: '70 = setenta, 60 = sesenta.', tag: 'numbers' },
       { t: 'mc', q: 'Hoe schrijf je 94?', o: ['noventa y cuatro', 'nueventa y cuatro', 'noventicuatro'], tag: 'numbers' },
       { t: 'mc', q: '«sesenta y ocho» is…', o: ['68', '78', '86'], tag: 'numbers' },
-      { t: 'tr', nl: 'Mijn opa is negenenveertig jaar.', a: ['Mi abuelo tiene cuarenta y nueve años.', 'Mi abuelo tiene 49 años.'], tag: 'numbers' }
+      { t: 'tr', nl: 'Mijn opa is negenenveertig jaar.', a: ['Mi abuelo tiene cuarenta y nueve años.', 'Mi abuelo tiene 49 años.'], tag: 'numbers' },
+      { t: 'cloze', s: 'Mi profesor tiene ___ años. (53)', a: ['cincuenta y tres'], nl: 'Mijn leraar is 53 jaar.', tag: 'numbers' },
+      { t: 'cloze', s: 'Mi bisabuela tiene ___ años. (81)', a: ['ochenta y un', 'ochenta y uno'], nl: 'Mijn overgrootmoeder is 81 jaar.', x: 'Voor een mannelijk woord (años) wordt uno → un: ochenta y un años.', tag: 'numbers' },
+      { t: 'cloze', s: 'Mi prima tiene ___ años. (29)', a: ['veintinueve'], nl: 'Mijn nicht is 29 jaar.', x: 'Tot en met 29 één woord: veintinueve.', tag: 'numbers' },
+      // familiewoorden die vaak misgaan (Lupe-rapport): in een zin
+      { t: 'tr', nl: 'Mijn schoonmoeder kookt heel lekker.', a: ['Mi suegra cocina muy rico.', 'Mi suegra cocina muy bien.', 'Mi suegra cocina riquísimo.'], tag: 'vocab' },
+      { t: 'cloze', s: 'El papá de mi esposa es mi ___.', a: ['suegro'], nl: 'De vader van mijn vrouw is mijn schoonvader.', tag: 'vocab' },
+      { t: 'tr', nl: 'Mijn ouders zijn gescheiden.', a: ['Mis papás están divorciados.', 'Mis padres están divorciados.', 'Mis papás son divorciados.', 'Mis padres son divorciados.'], x: 'In Latijns-Amerika meestal: están divorciados.', tag: 'vocab' },
+      { t: 'cloze', s: 'Mi tía está ___.', h: 'divorciado', a: ['divorciada'], nl: 'Mijn tante is gescheiden.', tag: 'adj-agree' },
+      { t: 'mc', q: 'Een Mexicaan zegt «Mi carnal vive en Monterrey». Wie is dat?', o: ['zijn broer of heel goede vriend', 'zijn vader', 'zijn buurman'], tag: 'vocab' },
+      { t: 'mc', q: 'Een Ecuadoriaanse zegt «Mi ñaña tiene veinte años». Wie is dat?', o: ['haar zus', 'haar oma', 'haar dochter'], x: 'Ñaña = zus, ñaño = broer (Ecuador, informeel).', tag: 'vocab' }
     ]
   });
 
@@ -262,7 +296,8 @@
         sum: 'Solo con «el»: al, del. Con la, los, las no se junta nada.' },
       { t: 'Kort: hay = er is · estar = waar het is', es: 'Hay o está: la regla corta',
         html: `<p><b>hay</b> = <i>er is / er zijn</i>: je vertelt dát iets er is (iets nieuws, met <i>un/una</i>, een getal, of zonder lidwoord). Na <i>hay</i> komt nooit <s>el/la</s>.</p>
-<p><b>estar</b> = <i>waar</i> iets bekends is (met <i>el/la</i>, <i>mi/tu</i> of een naam).</p>`,
+<p><b>estar</b> = <i>waar</i> iets bekends is (met <i>el/la</i>, <i>mi/tu</i> of een naam).</p>
+<p>❌ <b>ser</b> gebruik je níet voor de plek van een gebouw of ding: <i>¿Dónde <b>está</b> el hospital?</i>, nooit <s>¿dónde es?</s>. Kort: <b>¿Dónde está + el/la/mi …?</b> en <b>¿Hay + un/una/mucho …?</b></p>`,
         table: [['hay (er is …)', 'estar (waar is …)'], ['¿Qué hay para ver aquí?', '¿Dónde está el museo?'], ['Hay un mercado en el centro.', 'El mercado está en el centro.'], ['Hay muchos restaurantes.', 'Los restaurantes están en la plaza.'], ['No hay supermercado.', 'Mi casa está cerca.']],
         sum: '«Hay» dice que algo existe; «estar» dice dónde está algo conocido.' }
     ],
@@ -299,6 +334,12 @@
       { t: 'cloze', s: '¿___ un banco aquí?', a: ['Hay'], o: ['Hay', 'Está', 'Es'], nl: 'Is er hier een bank?', tag: 'hay-estar' },
       { t: 'cloze', s: 'La farmacia ___ cerca.', a: ['está'], o: ['está', 'hay', 'es'], nl: 'De apotheek is in de buurt.', x: 'La farmacia (bekend) → estar. Ser gebruik je nooit voor een plek.', tag: 'hay-estar' },
       { t: 'tr', nl: 'In mijn stad zijn veel parken.', a: ['En mi ciudad hay muchos parques.', 'Hay muchos parques en mi ciudad.'], tag: 'hay-estar' },
+      { t: 'cloze', s: 'La escuela está cerca ___ parque.', a: ['del'], o: ['del', 'de el', 'de la'], nl: 'De school is dicht bij het park.', tag: 'contractions' },
+      { t: 'cloze', s: 'Vamos ___ playa mañana.', a: ['a la'], o: ['a la', 'al', 'a el'], nl: 'We gaan morgen naar het strand.', tag: 'contractions' },
+      { t: 'cloze', s: 'El carro es ___ profesor.', a: ['del'], o: ['del', 'de la', 'de el'], nl: 'De auto is van de leraar.', tag: 'contractions' },
+      { t: 'cloze', s: '¿Dónde ___ el hospital?', a: ['está'], o: ['está', 'es', 'hay'], nl: 'Waar is het ziekenhuis?', x: 'Plek van een gebouw: estar, nooit ser.', tag: 'hay-estar' },
+      { t: 'mc', q: '«Pardon, waar is het ziekenhuis?»', o: ['Disculpe, ¿dónde está el hospital?', 'Disculpe, ¿dónde es el hospital?', 'Disculpe, ¿dónde hay el hospital?'], x: 'Dónde está + el/la: estar. Ser niet voor een plek, en na hay nooit el.', tag: 'hay-estar' },
+      { t: 'tr', nl: 'Is er een bank in de buurt?', a: ['¿Hay un banco cerca?', '¿Hay un banco por aquí?', '¿Hay un banco cerca de aquí?'], tag: 'hay-estar' },
       { t: 'tr', nl: 'Wat is er hier mooi om te zien?', a: ['¿Qué hay bonito para ver aquí?', '¿Qué hay de bonito para ver aquí?', '¿Qué hay bonito para ver por aquí?', '¿Qué hay de bonito para ver por aquí?'], x: 'Hay voor «er is», niet es.', tag: 'hay-estar' }
     ]
   });

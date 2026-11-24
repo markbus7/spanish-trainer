@@ -122,7 +122,7 @@
         let q = '', a = '', tag = 'vocab';
         if (u && id[0] === 'w' && u.vocab[i]) { q = u.vocab[i][1]; a = u.vocab[i][0]; }
         else if (u && u.ex[i]) { const e = u.ex[i]; tag = e.tag || 'vocab'; q = e.s || e.q || e.nl || ''; a = e.t === 'tr' ? e.a[0] : e.t === 'order' ? e.s : e.o ? e.o[0] : (e.a || [])[0] || ''; if (e.t === 'tr') q = e.nl; }
-        return { id, unit, q, a, tag, f: c.f || 0, g: c.g || 0 };
+        return { id, unit, q, a, tag, f: c.f || 0, g: c.g || 0, last: c.t || 0 };
       });
   }
 
@@ -202,6 +202,17 @@
       return ans.length > 0 && S.check.check(e.u, ans, {}).ok;
     } catch (err) { return false; }
   }
+  /* Wat in een eerdere update al verwerkt is (S.reworked in de lesstof), zodat Lupe het niet opnieuw voorstelt. */
+  function reworked(tag, id) {
+    const R = S.reworked || [];
+    return R.find(x => (tag && x.tag === tag) || (id && x.ids && x.ids.includes(id))) || null;
+  }
+  function since(rw) { return rw ? new Date(rw.date + 'T00:00:00').getTime() : 0; }
+  function reworkNote(rw, list) {
+    if (!rw) return '';
+    const after = (list || []).filter(e => e.t >= since(rw)).length;
+    return ` · ✔ al verwerkt in v${rw.v} (${fmtD(since(rw))}): ${rw.what}${list ? '; fouten sinds die update: ' + after : ''}`;
+  }
   function report(days = 30, now = Date.now()) {
     const L = db(), from = now - days * DAY;
     const log = L.log.filter(e => e.t >= from);
@@ -257,8 +268,8 @@
     if (r.topics.length) {
       lines.push('', 'Waar ik de mist in ga in gesprekken (grammatica):');
       r.topics.forEach(t => {
-        lines.push(`- ${t.label} [${t.tag}]: ${t.n}×${les(t.units[0])}`);
-        t.ex.forEach(e => lines.push(`    «${e.w}» → «${e.c}»${e.why ? ' (' + e.why + ')' : ''}`));
+        lines.push(`- ${t.label} [${t.tag}]: ${t.n}×${les(t.units[0])}${reworkNote(reworked(t.tag), db().log.filter(e => e.tag === t.tag))}`);
+        t.ex.forEach(e => lines.push(`    ${fmtD(e.t)}: «${e.w}» → «${e.c}»${e.why ? ' (' + e.why + ')' : ''}`));
       });
     }
     if (r.words.length) {
@@ -268,19 +279,26 @@
     if (r.exTopics && r.exTopics.length) {
       lines.push('', 'Fouten in gewone oefeningen (typen, meerkeuze, dictee, woordtegels):');
       r.exTopics.slice(0, 8).forEach(t => {
-        lines.push(`- ${t.label} [${t.tag}]: ${t.n}×${les(t.units[0])}`);
-        t.ex.forEach(e => lines.push(`    ${e.k ? '(' + e.k + ') ' : ''}${e.q ? '«' + e.q + '» ' : ''}ik: ${e.dk ? 'weet het niet' : '«' + e.u + '»'} → goed: «${e.a}»${e.id ? ' [' + e.id + ']' : ''}`));
+        lines.push(`- ${t.label} [${t.tag}]: ${t.n}×${les(t.units[0])}${reworkNote(reworked(t.tag), (db().ex || []).filter(e => e.tag === t.tag))}`);
+        t.ex.forEach(e => lines.push(`    ${fmtD(e.t)} ${e.k ? '(' + e.k + ') ' : ''}${e.q ? '«' + e.q + '» ' : ''}ik: ${e.dk ? 'weet het niet' : '«' + e.u + '»'} → goed: «${e.a}»${e.id ? ' [' + e.id + ']' : ''}`));
       });
     }
     if (r.hard && r.hard.length) {
       lines.push('', 'Oefeningen en woorden die vaak fout gaan (alle tijd, uit de herhaling):');
-      r.hard.forEach(x => lines.push(`- [${x.id}] «${x.q}» → «${x.a}»: ${x.f}× fout, ${x.g}× goed${x.tag !== 'vocab' ? ' · ' + C.tag(x.tag) + ' [' + x.tag + ']' : ''}`));
+      r.hard.forEach(x => {
+        const rw = reworked(x.tag !== 'vocab' ? x.tag : null, x.id);
+        lines.push(`- [${x.id}] «${x.q}» → «${x.a}»: ${x.f}× fout, ${x.g}× goed (totaal)${x.last ? ', laatst geoefend ' + fmtD(x.last) : ''}${x.tag !== 'vocab' ? ' · ' + C.tag(x.tag) + ' [' + x.tag + ']' : ''}${rw ? ' · ✔ al verwerkt in v' + rw.v + (x.last && x.last < since(rw) ? ', sindsdien niet meer geoefend' : '') : ''}`);
+      });
     }
     const weak = Object.entries(s.tags).filter(([k, v]) => k !== 'vocab' && v.ok + v.no >= 3 && v.ok / (v.ok + v.no) < 0.8)
       .sort((a, b) => a[1].ok / (a[1].ok + a[1].no) - b[1].ok / (b[1].ok + b[1].no)).slice(0, 6);
     if (weak.length) {
       lines.push('', 'Zwakke punten uit oefeningen en gesprekken samen:');
-      weak.forEach(([k, v]) => lines.push(`- ${C.tag(k)} [${k}]: ${Math.round(v.ok / (v.ok + v.no) * 100)}% goed (${v.ok + v.no} antwoorden)${les(unitsFor(k)[0])}`));
+      weak.forEach(([k, v]) => lines.push(`- ${C.tag(k)} [${k}]: ${Math.round(v.ok / (v.ok + v.no) * 100)}% goed (${v.ok + v.no} antwoorden, totaal)${les(unitsFor(k)[0])}${reworked(k) ? ' · ✔ al verwerkt in v' + reworked(k).v + ' (' + fmtD(since(reworked(k))) + ')' : ''}`));
+    }
+    if ((S.reworked || []).length && opt.done !== false) {
+      lines.push('', 'Al verwerkt in eerdere updates van de app (niet opnieuw voorstellen, tenzij er ná die datum nieuwe fouten zijn):');
+      S.reworked.forEach(x => lines.push(`- v${x.v} (${fmtD(since(x))}) ${x.tag ? '[' + x.tag + ']' + (x.unit ? ' ' + x.unit : '') : (x.ids || []).join(', ')}: ${x.what}`));
     }
     if (r.advice && r.advice.text && opt.advice !== false) lines.push('', 'Advies van Lupe (' + fmtD(r.advice.t) + '):', r.advice.text.replace(/\*\*/g, ''));
     if (opt.update !== false) { const u = updateText(r, opt); if (u) lines.push('', u); }
@@ -320,6 +338,7 @@ Write in Dutch. Give 3–6 proposals, most important first, and always finish ev
   Wat: <exactly what to change or build, in one or two sentences>
   Voorbeelden: <for answers: the exact extra accepted answer(s); for exercises: 3–5 ready-to-use items as «${ES ? 'Spanish' : S.course.ai.target} sentence» = «Dutch translation», with ___ for a gap if it is a fill-in item; otherwise leave this line out>
 
+Lines marked «✔ al verwerkt» and the list «Al verwerkt in eerdere updates» describe what the app already contains. Totals and percentages there still include old answers from before that update. Do NOT propose those things again; only mention such a topic if the report shows mistakes dated after that update, and then propose something different (e.g. another exercise type), saying how many new mistakes there were.
 Rules: only propose what the report supports, and say so in "Waarom"; if the report is thin, give fewer proposals. Prefer fixing the learner's most frequent mistakes. Don't repeat something that already exists in the course unless it should be explained or practised differently. ${ES ? 'Always Latin American Spanish norms (ustedes, never vosotros; regional vocabulary like carro, celular, computadora).' : 'Teach ' + S.course.ai.target + '.'}`;
     const text = await S.AI.ask({ system: sys, prompt: asText(r, { advice: true, proposal: false }), maxTokens: 4000 });
     db().update = { t: Date.now(), text: text.trim() };
