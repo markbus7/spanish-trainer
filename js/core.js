@@ -835,7 +835,7 @@
     listen(opt = {}) {
       return this._listen(opt).catch(err => {
         if (!err || !err.quiet || opt._retried) throw err;
-        this.retries = (this.retries || 0) + 1;
+        this.retries = (this.retries || 0) + 1; this.mlog('dove start → nog een keer');
         return new Promise(r => setTimeout(r, 350)).then(() => this._listen(Object.assign({}, opt, { _retried: true })));
       });
     },
@@ -847,12 +847,37 @@
       try { if (this.el) { this.el.pause(); this.el.removeAttribute('src'); this.el.load(); } } catch (e) { /* */ }
       try { S.Sound && S.Sound.release && S.Sound.release(); } catch (e) { /* */ }
     },
+    /* Logboek van de laatste microfoonbeurten (voor «Wat gebeurde er?» bij een fout en in de microfoontest). */
+    micLog: [],
+    mlog(ev) {
+      const L = this.micLog, now = Date.now();
+      if (!L.length || now - L[L.length - 1].t > 60000) L.length = 0;
+      L.push({ t: now, ev });
+      if (L.length > 60) L.splice(0, L.length - 60);
+    },
+    micLogText() {
+      const L = this.micLog; if (!L.length) return '(nog niets)';
+      const t0 = L[0].t;
+      return L.map(x => '+' + ((x.t - t0) / 1000).toFixed(1) + 's ' + x.ev).join('\n');
+    },
     _listen(opt = {}) {
       const R = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!R) return Promise.reject(this.micError('unsupported'));
       // Hangt er nog een oude herkenning (op iPad komt 'klaar' soms nooit)? Rond die nu echt af en ruim hem op.
       if (this._kill) this._kill();
       if (this._rec) { try { this._rec.abort(); } catch (e) { /* */ } this._rec = null; }
+      /* Is de vorige herkenning voor Safari nog niet echt klaar (geen 'end' gekregen)? Dan kan er geen nieuwe starten:
+         Safari luistert maar naar één tegelijk, en de nieuwe hoort dan niets. Eerst afbreken en op 'end' wachten. */
+      const prev = this._prev;
+      if (prev && !prev.ended && Date.now() - prev.t < 30000) {
+        this.mlog('vorige nog niet klaar → afbreken en wachten');
+        try { prev.r.abort(); } catch (e) { /* */ }
+        try { opt.onState && opt.onState('starting'); } catch (e) { /* */ }
+        return new Promise(res => {
+          const t = Date.now(), wait = () => (prev.ended || Date.now() - t > 1500) ? res() : setTimeout(wait, 50);
+          wait();
+        }).then(() => { this.mlog(prev.ended ? 'vorige klaar na ' + (Date.now() - prev.t) + 'ms' : 'vorige reageert niet, toch starten'); prev.ended = true; return this._listen(opt); });
+      }
       // Lupe, een opname of een tikgeluidje mag niet meer klinken: op iPad deelt de microfoon het geluidskanaal met het afspelen.
       this.releaseAudio();
       const t0 = Date.now(); let heardAny = false;
@@ -865,10 +890,14 @@
         r.interimResults = true; r.maxAlternatives = 3; r.continuous = false;
         let done = false, started = false, stopping = false, finalAlts = null, interim = '', silenceT = null;
         const timers = [];
+        const me = { r, t: Date.now(), ended: false }; this._prev = me;
         const finish = (ok, val) => {
           if (done) return; done = true;
           timers.forEach(clearTimeout); clearTimeout(silenceT);
-          const noop = () => {}; r.onstart = r.onsoundstart = r.onspeechstart = r.onresult = r.onerror = r.onend = noop;
+          this.mlog(ok ? 'klaar: «' + (val && val[0]) + '»' : 'fout: ' + (val && val.code));
+          const noop = () => {}; r.onstart = r.onaudiostart = r.onsoundstart = r.onspeechstart = r.onresult = r.onerror = noop;
+          // blijf luisteren naar Safari's echte 'end': pas dan is de microfoon vrij voor de volgende keer
+          r.onend = () => { me.ended = true; this.mlog('(Safari: echt klaar)'); };
           if (this._rec === r) this._rec = null;
           if (this._kill === kill) this._kill = null;
           if (this._soft === softStop) this._soft = null;
@@ -887,15 +916,17 @@
            Daarom: na stop() even wachten, dan abort(), en daarna zelf afronden. */
         const softStop = () => {
           if (done || stopping) return; stopping = true;
+          this.mlog('stop()');
           try { r.stop(); } catch (e) { /* */ }
           timers.push(setTimeout(() => { if (!done) { try { r.abort(); } catch (e) { /* */ } } }, 1200));
           timers.push(setTimeout(() => { if (!done) settle(); }, 2000));
         };
-        r.onstart = () => { started = true; state('listening'); };
-        r.onsoundstart = () => { heardAny = true; state('sound'); };
-        r.onspeechstart = () => { heardAny = true; state('speech'); };
+        r.onstart = () => { started = true; this.mlog('start'); state('listening'); };
+        r.onaudiostart = () => this.mlog('microfoon open');
+        r.onsoundstart = () => { heardAny = true; this.mlog('geluid'); state('sound'); };
+        r.onspeechstart = () => { heardAny = true; this.mlog('spraak'); state('speech'); };
         r.onresult = e => {
-          heardAny = true;
+          heardAny = true; if (!interim) this.mlog('eerste tekst');
           let txt = '';
           for (let i = 0; i < e.results.length; i++) txt += e.results[i][0].transcript;
           interim = txt.replace(/\s+/g, ' ').trim();
@@ -912,15 +943,17 @@
           silenceT = setTimeout(softStop, finalAlts ? 300 : 1600);
         };
         r.onerror = e => {
+          this.mlog('error: ' + e.error);
           const got = heardSoFar();
           if (got && got.length && (e.error === 'no-speech' || e.error === 'aborted')) return finish(true, got);
           finish(false, this.micError(e.error));
         };
-        r.onend = settle;
+        r.onend = () => { me.ended = true; this.mlog('end'); settle(); };
         // Start de microfoon niet binnen een paar seconden, dan blijft hij anders stil 'hangen' (zo leek het alsof er niets gebeurde).
         timers.push(setTimeout(() => { if (!started && !done) { try { r.abort(); } catch (e) { /* */ } finish(false, this.micError('start-timeout')); } }, 6000));
         timers.push(setTimeout(softStop, opt.max || 20000));
         this._rec = r; this._kill = kill; this._soft = softStop;
+        this.mlog('nieuwe herkenning (' + r.lang + (opt._retried ? ', 2e poging' : '') + ')');
         state('starting');
         try { r.start(); } catch (e) { finish(false, this.micError(e && e.name === 'NotAllowedError' ? 'not-allowed' : 'start-failed', e && e.message)); }
       });
