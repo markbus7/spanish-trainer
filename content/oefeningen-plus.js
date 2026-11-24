@@ -197,6 +197,9 @@
     { tag: 'pres-regular', unit: 'a1-05', v: '1.63.2', date: '2026-11-24T21:28:00Z', what: 'waarschuwing «trabajando» ≠ «ik werk» (trabajo) + oefeningen yo/usted/nosotros' },
     { tag: 'connectors', unit: 'a2-12', v: '1.63.2', date: '2026-11-24T21:28:00Z', what: 'uitleg «que» na creer/pensar/decir (nooit weglaten) + está vs. esta, 5 oefeningen' },
     { tag: 'tu-usted', unit: 'a1-01', v: '1.63.2', date: '2026-11-24T21:28:00Z', what: 'don/doña alleen voor een ander, nooit voor jezelf, 3 oefeningen' },
+    { tag: 'conj', unit: 'a1-04', v: '1.63.3', date: '2026-11-24T21:36:00Z', what: '8 typoefeningen gemengd vervoegen (ser, estar, ir, vivir, tener) in een stad-context' },
+    { tag: 'plural', unit: 'a1-02', v: '1.63.3', date: '2026-11-24T21:36:00Z', what: '6 typoefeningen meervoud (-s, -es, -z → -ces) met beroepen en personen' },
+    { tag: 'possessive', unit: 'a1-03', v: '1.63.3', date: '2026-11-24T21:36:00Z', what: '6 oefeningen mi/tu/su/nuestro, su = zijn/haar/uw/hun' },
     { tag: 'articles', unit: 'a1-02', v: '1.63.1', date: '2026-11-24T21:19:00Z', what: 'uitleg wél/géén lidwoord (beroep na ser, na gustar), ±15 oefeningen in a1-02 en a1-06' },
     { tag: 'gender', unit: 'a1-02', v: '1.63.1', date: '2026-11-24T21:19:00Z', what: 'lijstje woorden op -ma (el problema, el idioma…) met oefeningen' },
     { tag: 'adj-agree', unit: 'a1-03', v: '1.62.0', date: '2026-11-24T20:57:00Z', what: 'uitleg bijvoeglijke naamwoorden in het meervoud, 8 oefeningen' },
@@ -491,4 +494,31 @@
       { t: 'tr', nl: 'Ik denk dat het mooi is.', a: ['Creo que es bonito.', 'Creo que está bonito.', 'Pienso que es bonito.', 'Creo que es bonita.', 'Creo que está bonita.', 'Creo que es lindo.'], tag: 'connectors' }
     ]
   });
+  /* ---------- Lupe-rapport 24 nov, vijfde ronde ---------- */
+  X('a1-04', { ex: [
+    { t: 'cloze', s: 'Yo ___ en una ciudad grande.', h: 'vivir', a: ['vivo'], nl: 'Ik woon in een grote stad.', tag: 'conj' },
+    { t: 'cloze', s: 'Nosotros ___ al centro en metro.', h: 'ir', a: ['vamos'], nl: 'Wij gaan met de metro naar het centrum.', tag: 'conj' },
+    { t: 'cloze', s: 'Ustedes ___ muchos museos en su ciudad.', h: 'tener', a: ['tienen'], nl: 'Jullie hebben veel musea in jullie stad.', tag: 'conj' },
+    { t: 'cloze', s: 'Tú ___ de Lima, ¿verdad?', h: 'ser', a: ['eres'], nl: 'Jij komt uit Lima, toch?', tag: 'conj' },
+    { t: 'cloze', s: '¿Dónde ___ usted ahora?', h: 'estar', a: ['está'], nl: 'Waar bent u nu?', tag: 'conj' },
+    { t: 'cloze', s: '¿Tú ___ al mercado hoy?', h: 'ir', a: ['vas'], nl: 'Ga jij vandaag naar de markt?', tag: 'conj' },
+    { t: 'cloze', s: 'Mis amigos ___ en el barrio de San Telmo.', h: 'vivir', a: ['viven'], nl: 'Mijn vrienden wonen in de wijk San Telmo.', tag: 'conj' },
+    { t: 'cloze', s: 'Yo no ___ carro, voy en bus.', h: 'tener', a: ['tengo'], nl: 'Ik heb geen auto, ik ga met de bus.', tag: 'conj' }
+  ] });
+  X('a1-02', { ex: [
+    { t: 'cloze', s: 'Los ___ trabajan aquí.', h: 'doctor', a: ['doctores'], nl: 'De dokters werken hier.', x: 'Medeklinker aan het eind → -es.', tag: 'plural' },
+    { t: 'cloze', s: 'Dos ___ hablan inglés.', h: 'profesor', a: ['profesores'], nl: 'Twee leraren spreken Engels.', tag: 'plural' },
+    { t: 'cloze', s: 'Las ___ son simpáticas.', h: 'mujer', a: ['mujeres'], nl: 'De vrouwen zijn aardig.', tag: 'plural' },
+    { t: 'cloze', s: 'Tres ___ viven en mi ciudad.', h: 'juez', a: ['jueces'], nl: 'Drie rechters wonen in mijn stad.', x: '-z wordt -ces: juez → jueces.', tag: 'plural' },
+    { t: 'cloze', s: 'Mis ___ son cocineros.', h: 'amigo', a: ['amigos'], nl: 'Mijn vrienden zijn koks.', x: 'Klinker aan het eind → -s.', tag: 'plural' },
+    { t: 'cloze', s: 'Ellos son ___.', h: 'alemán', a: ['alemanes'], nl: 'Zij zijn Duitsers.', x: 'Alemán → alemanes: het accent valt weg, want de klemtoon blijft op -ma-.', tag: 'plural' }
+  ] });
+  X('a1-03', { ex: [
+    { t: 'cloze', s: '___ padres viven en Quito.', h: 'mijn', a: ['Mis'], nl: 'Mijn ouders wonen in Quito.', x: 'Meervoud (padres) → mis.', tag: 'possessive' },
+    { t: 'cloze', s: 'Ella habla con ___ hermano.', h: 'haar', a: ['su'], nl: 'Zij praat met haar broer.', tag: 'possessive' },
+    { t: 'cloze', s: 'Nosotros queremos mucho a ___ abuela.', h: 'onze', a: ['nuestra'], nl: 'Wij houden veel van onze oma.', x: 'Nuestro past zich aan: abuela → nuestra.', tag: 'possessive' },
+    { t: 'cloze', s: 'Señor López, ¿cómo está ___ familia?', h: 'uw', a: ['su'], nl: 'Meneer López, hoe is het met uw familie?', tag: 'possessive' },
+    { t: 'cloze', s: 'Ellos visitan a ___ tíos.', h: 'hun', a: ['sus'], nl: 'Zij bezoeken hun ooms en tantes.', tag: 'possessive' },
+    { t: 'tr', nl: 'Is dat jouw hond?', a: ['¿Ese es tu perro?', '¿Es tu perro?'], tag: 'possessive' }
+  ] });
 })(window.SPT);

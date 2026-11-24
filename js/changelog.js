@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.63.3', date: '2026-11-24',
+    nl: ['Vijfde ronde voorstellen van Lupe: gemengd vervoegen (ser, estar, ir, vivir, tener) in Mi ciudad, meervoud (-s, -es, -z → -ces) in Personas y profesiones en mi/tu/su/nuestro in Mi familia.'],
+    es: [] },
   { v: '1.63.2', date: '2026-11-24',
     nl: ['Vierde ronde voorstellen van Lupe: hay, está of es (ook «¿Qué hay para ver?» en «¿Dónde es la fiesta?» bij een evenement); «Trabajo», niet «trabajando», voor «ik werk»; stamwisselaars met usted/ustedes zoals «¿Qué recomienda?»; «que» na creer/pensar/decir en está vs. esta (A2 · Aquí se vive bien); don/doña nooit voor jezelf.', 'Lupe\'s rapport laat punten weg die al verwerkt zijn en waar je sindsdien geen fouten meer in maakte, zodat ze echt alleen nieuwe dingen voorstelt. Oude voorstellen van vóór een update krijgen een seintje om nieuwe te vragen.'],
     es: [] },
