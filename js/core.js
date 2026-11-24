@@ -870,13 +870,14 @@
       if (this._rec) { try { this._rec.abort(); } catch (e) { /* */ } this._rec = null; }
       /* Is de vorige herkenning voor Safari nog niet echt klaar (geen 'end' gekregen)? Dan kan er geen nieuwe starten:
          Safari luistert maar naar één tegelijk, en de nieuwe hoort dan niets. Eerst afbreken en op 'end' wachten. */
-      const prev = this._prev;
+      const prev = this._prev, gentle = this.gentle();
       if (prev && !prev.ended && Date.now() - prev.t < 30000) {
-        this.mlog('vorige nog niet klaar → afbreken en wachten');
-        try { prev.r.abort(); } catch (e) { /* */ }
+        // iPhone/iPad: nooit afbreken (dat maakt elke volgende beurt doof), maar wachten tot hij vanzelf klaar is.
+        this.mlog(gentle ? 'vorige nog bezig → wachten tot hij vanzelf stopt' : 'vorige nog niet klaar → afbreken en wachten');
+        if (!gentle) { try { prev.r.abort(); } catch (e) { /* */ } }
         try { opt.onState && opt.onState('starting'); } catch (e) { /* */ }
         return new Promise(res => {
-          const t = Date.now(), wait = () => (prev.ended || Date.now() - t > 1500) ? res() : setTimeout(wait, 50);
+          const t = Date.now(), wait = () => (prev.ended || Date.now() - t > (gentle ? 8000 : 1500)) ? res() : setTimeout(wait, 50);
           wait();
         }).then(() => { this.mlog(prev.ended ? 'vorige klaar na ' + (Date.now() - prev.t) + 'ms' : 'vorige reageert niet, toch starten'); prev.ended = true; return this._listen(opt); });
       }
@@ -885,11 +886,7 @@
       const t0 = Date.now(); let heardAny = false;
       const state = s => { try { opt.onState && opt.onState(s); } catch (e) { /* */ } };
       return new Promise((resolve, reject) => {
-        /* iPhone/iPad: steeds dezelfde herkenning hergebruiken. Een nieuwe per beurt kreeg op iOS bij de tweede keer
-           wel 'microfoon open', maar daarna nooit meer geluid. Elders (en na een dove start) een nieuwe. */
-        const reuse = this.isIOS() && !opt._fresh && this._recObj instanceof R;
-        const r = reuse ? this._recObj : new R();
-        if (this.isIOS()) this._recObj = r;
+        const r = new R();
         const v = this.voice();
         r.lang = S.course.target !== 'es' ? S.course.listen
           : v && /^es-(mx|us|419|co|ar|cl|pe|ve|uy|cr|ec|gt|pa|pr|do|bo|py|sv|hn|ni|cu)$/i.test(v.lang.replace('_', '-')) ? v.lang.replace('_', '-') : 'es-MX';
@@ -916,25 +913,31 @@
         // Afronden met wat er al gehoord is (of 'niets gehoord').
         const settle = () => { const got = heardSoFar(); got && got.length ? finish(true, got) : finish(false, this.micError('no-speech')); };
         // Hard opruimen: abort() laat de microfoon op iPad meteen los; daarna de belofte zelf afronden.
-        const kill = () => { if (done) return; stopping = true; try { r.abort(); } catch (e) { /* */ } settle(); };
+        const kill = () => { if (done) return; stopping = true; if (!gentle) { try { r.abort(); } catch (e) { /* */ } } settle(); };
         /* Netjes stoppen. Safari op iPad stuurt na stop() soms nooit 'onend': dan bleef de knop op opnemen staan,
            hield Safari de microfoon vast en deed een tweede keer niets meer (tot je naar een andere app ging).
            Daarom: na stop() even wachten, dan abort(), en daarna zelf afronden. */
         const softStop = () => {
           if (done || stopping) return; stopping = true;
+          /* iPhone/iPad (WebKit-fout 321436): wie een beurt met stop() of abort() afkapt, krijgt daarna alleen nog dove
+             beurten, tot je de browser helemaal afsluit. Daarom daar niet stoppen: we nemen wat er gehoord is en laten
+             de herkenning vanzelf uitlopen (continuous = false stopt na een korte stilte). */
+          if (gentle) { this.mlog('klaar (iOS: laat hem vanzelf uitlopen)'); return settle(); }
           this.mlog('stop()');
           try { r.stop(); } catch (e) { /* */ }
           timers.push(setTimeout(() => { if (!done) { try { r.abort(); } catch (e) { /* */ } } }, 1200));
           timers.push(setTimeout(() => { if (!done) settle(); }, 2000));
         };
-        /* Doof? Microfoon open, maar 4 s lang geen enkel geluid (ook geen geruis): dan stil opnieuw met een verse herkenning. */
+        /* Doof? Microfoon open, maar een tijd lang geen enkel geluid: elders stil opnieuw met een verse herkenning.
+           Op iPhone/iPad helpt opnieuw starten niet (en afbreken maakt het erger): dan een duidelijke uitleg. */
         const deafCheck = () => { if (opt._retried) return; timers.push(setTimeout(() => {
           if (done || heardAny || stopping) return;
+          if (gentle) { this.mlog('6s geen geluid → iOS-doof'); stopping = true; return finish(false, this.micError('ios-deaf')); }
           this.mlog('4s geen geluid → doof?');
           stopping = true; try { r.abort(); } catch (e) { /* */ }
           const err = this.micError('no-speech'); err.quiet = true; finish(false, err);
-        }, 4000)); };
-        r.onstart = () => { started = true; this.mlog('start' + (reuse ? ' (hergebruikt)' : '')); state('listening'); deafCheck(); };
+        }, gentle ? 6000 : 4000)); };
+        r.onstart = () => { started = true; this.mlog('start'); state('listening'); deafCheck(); };
         r.onaudiostart = () => { this.mlog('microfoon open'); };
         r.onsoundend = () => this.mlog('geluid weg');
         r.onaudioend = () => this.mlog('microfoon dicht');
@@ -965,12 +968,31 @@
         };
         r.onend = () => { me.ended = true; this.mlog('end'); settle(); };
         // Start de microfoon niet binnen een paar seconden, dan blijft hij anders stil 'hangen' (zo leek het alsof er niets gebeurde).
-        timers.push(setTimeout(() => { if (!started && !done) { try { r.abort(); } catch (e) { /* */ } finish(false, this.micError('start-timeout')); } }, 6000));
+        timers.push(setTimeout(() => { if (!started && !done) { if (!gentle) { try { r.abort(); } catch (e) { /* */ } } finish(false, this.micError('start-timeout')); } }, gentle ? 9000 : 6000));
         timers.push(setTimeout(softStop, opt.max || 20000));
         this._rec = r; this._kill = kill; this._soft = softStop;
         this.mlog('nieuwe herkenning (' + r.lang + (opt._retried ? ', 2e poging' : '') + ')');
         state('starting');
-        try { r.start(); } catch (e) { finish(false, this.micError(e && e.name === 'NotAllowedError' ? 'not-allowed' : 'start-failed', e && e.message)); }
+        const go = () => { if (done) return; try { r.start(); } catch (e) { finish(false, this.micError(e && e.name === 'NotAllowedError' ? 'not-allowed' : 'start-failed', e && e.message)); } };
+        // iPhone/iPad: eerst een kort zinnetje uitspreken en vlak daarna starten (de werkende omweg uit WebKit-fout 321436).
+        if (gentle) this.primer().then(() => setTimeout(go, 300)); else go();
+      });
+    },
+    /* iPhone/iPad: voorzichtige microfoon (nooit stop()/abort()). Te forceren via Speech.gentleMode = true/false (tests). */
+    gentle() { return this.gentleMode != null ? !!this.gentleMode : this.isIOS(); },
+    PRIMER: { es: 'Te escucho.', en: "I'm listening.", nl: 'Ik luister.' },
+    primer() {
+      if (!('speechSynthesis' in window)) return Promise.resolve();
+      return new Promise(res => {
+        let ok = false; const end = why => { if (ok) return; ok = true; this.mlog('♪ «' + txt + '» ' + why); res(); };
+        const txt = this.PRIMER[S.course.target] || this.PRIMER.es;
+        try {
+          const u = new SpeechSynthesisUtterance(txt), v = this.voice({ female: true });
+          if (v) { u.voice = v; u.lang = v.lang; } else u.lang = S.course.speak || 'es-MX';
+          u.onend = () => end('klaar'); u.onerror = () => end('fout');
+          speechSynthesis.speak(u);
+        } catch (e) { end('kon niet'); }
+        setTimeout(() => end('(tijd om)'), 3000);
       });
     },
     stopListening() { if (this._soft) this._soft(); else { try { if (this._rec) this._rec.stop(); } catch (e) { /* */ } } },
@@ -995,6 +1017,7 @@
         'audio-capture': ['Er is geen microfoon gevonden.', 'Een andere app gebruikt misschien de microfoon, of je koptelefoon of hoes zit ervoor. Sluit andere apps en probeer opnieuw.'],
         'network': ['Geen verbinding met de spraakdienst.', 'Spraakherkenning werkt via internet. Controleer je wifi en probeer opnieuw.'],
         'language-not-supported': ['Spaans wordt op dit apparaat niet herkend.', ios ? 'Voeg Spaans (Mexico) toe als toetsenbord: Instellingen › Algemeen › Toetsenbord › Toetsenborden › Nieuw toetsenbord › Spaans (Mexico). Dan kan ook het dicteren in het Spaans.' : 'Probeer een andere browser (Chrome of Edge).'],
+        'ios-deaf': ['De microfoon hoort niets (fout in iOS).', 'Dit is een bekende fout van iPhone/iPad: na een afgebroken spraakbeurt blijft de microfoon soms doof, in elke browser. Wacht een minuutje en probeer opnieuw, of sluit de browser helemaal af (veeg hem omhoog in de appkiezer) en open hem opnieuw. Je kunt deze oefening ook overslaan met «Kan nu niet praten».'],
         'start-timeout': ['De microfoon start niet.', ios ? 'Sluit de app helemaal af (veeg hem omhoog in de appkiezer) en open hem opnieuw. Controleer ook of Dicteren aan staat: Instellingen › Algemeen › Toetsenbord › Dicteer.' : 'Laad de pagina opnieuw en probeer het nog eens.'],
         'aborted': ['Het luisteren is afgebroken.', 'Tik opnieuw op de microfoon.'],
         'bad-grammar': ['Spraakherkenning gaf een fout.', 'Probeer het opnieuw.'],
