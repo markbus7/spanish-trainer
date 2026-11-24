@@ -768,6 +768,7 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 /* ---- Microfoon: luisterstatus, live tekst en foutuitleg ---- */
 .mic-live { border: 2px solid var(--line); background: var(--card); border-radius: 14px; padding: .6rem .8rem; margin: .5rem 0; text-align: left; }
 .mic-live[hidden] { display: none; }
+.mic-log-box { margin-top: .4rem; } .mic-log-box summary { cursor: pointer; color: var(--muted); } .mic-log { white-space: pre-wrap; font-family: ui-monospace, Menlo, monospace; font-size: .75rem; background: var(--bg); border-radius: 8px; padding: .5rem; margin: .3rem 0 0; max-height: 14rem; overflow: auto; }
 .mic-row { display: flex; align-items: center; gap: .6rem; font-weight: 700; }
 .mic-wave { display: flex; align-items: center; gap: 3px; height: 26px; flex: none; }
 .mic-wave i { display: block; width: 5px; height: 6px; border-radius: 3px; background: var(--muted); transition: height .15s; }

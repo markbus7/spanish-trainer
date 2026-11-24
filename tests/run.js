@@ -803,6 +803,16 @@ async function micTests() {
   await Sp.listen();
   ok(released === 1 && fakeEl.src === '' && fakeEl.loaded, 'mic: opname en tikgeluid laten het geluidskanaal los vóór het luisteren');
   Sp.el = elOld; S.Sound.release = relOld;
+  // Safari: is de vorige herkenning nog niet echt klaar (geen 'end'), dan eerst afbreken en wachten; anders start de nieuwe doof
+  let busy = null, deafStarts = 0;
+  class OneRec { start() { if (busy) deafStarts++; busy = this; Sp._fake = this; setTimeout(() => script && script(this), 0); } _end() { if (busy === this) busy = null; this.onend && this.onend(); } stop() { setTimeout(() => this._end(), 3000); } abort() { setTimeout(() => this._end(), 300); } }
+  ctx.webkitSpeechRecognition = OneRec;
+  script = r => { r.onstart(); r.onresult(ev([res('uno', false)])); setTimeout(() => Sp.stopListening(), 5); };
+  got = await Sp.listen();
+  script = r => { r.onstart(); r.onresult(ev([res('dos', true)])); r.onend(); };
+  got = await Sp.listen();
+  ok(got[0] === 'dos' && deafStarts === 0, 'mic: tweede start wacht tot Safari de vorige echt heeft afgesloten: ' + deafStarts);
+  ok(/stop\(\)/.test(Sp.micLogText()) && /vorige/.test(Sp.micLogText()), 'mic: logboek houdt bij wat er gebeurde');
   // naar de achtergrond: meteen loslaten
   script = r => { r.onstart(); r.onresult(ev([res('adiós', false)])); setTimeout(() => Sp.abortListening(), 5); };
   got = await Sp.listen();

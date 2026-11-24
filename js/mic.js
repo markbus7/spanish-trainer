@@ -47,11 +47,21 @@
         tip.hidden = true; help.innerHTML = '';
         if (err && err.help) help.append(h('p', null, err.help));
         if (opt.testLink !== false) help.append(h('a', { href: '#/ajustes', onclick: () => { S.micTestFocus = true; } }, '🎙️ Doe de microfoontest in Instellingen ›'));
+        help.append(logBox());
       },
       hide() { el.hidden = true; },
       hooks(extra = {}) { return Object.assign({ onState: set, onInterim: t => api.interim(t) }, extra); }
     };
     return api;
+  }
+
+  /* Uitklapper met wat de microfoon de laatste minuut deed (handig om te laten zien als het niet werkt). */
+  function logBox() {
+    const pre = h('pre', { class: 'mic-log small' });
+    const d = h('details', { class: 'mic-log-box' }, h('summary', null, '🔎 Wat gebeurde er?'), pre);
+    const fill = () => { pre.textContent = 'versie ' + ((self.SPT_VERSION && self.SPT_VERSION.number) || '?') + '\n' + Speech.micLogText(); };
+    fill(); d.addEventListener('toggle', fill);
+    return d;
   }
 
   /* ---------- Microfoontest (Instellingen) ---------- */
@@ -137,7 +147,7 @@
       h('p', { class: 'small muted' }, 'Praat je met Lupe of doe je een spreekoefening en gebeurt er niets? Met deze test zie je waar het zit.'),
       h('p', { class: 'small mic-env' }, envLine()),
       levelBtn, meter, levelOut,
-      recBtn, panel.el, recOut,
+      recBtn, panel.el, recOut, logBox(),
       h('details', { class: 'small' }, h('summary', null, 'Werkt het niet op je iPad of iPhone?'),
         h('ol', { class: 'steps-list' },
           h('li', null, 'Zet ', h('b', null, 'Dicteren'), ' aan: Instellingen › Algemeen › Toetsenbord › Dicteer.'),
@@ -149,5 +159,5 @@
     return card;
   }
 
-  S.Mic = { live, testCard };
+  S.Mic = { logBox, live, testCard };
 })(window.SPT = window.SPT || {});
