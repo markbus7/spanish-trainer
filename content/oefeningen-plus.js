@@ -190,17 +190,17 @@
   // Wat er al verwerkt is, zodat Lupe in haar rapport/voorstellen niet opnieuw hetzelfde voorstelt
   // (oude foutcijfers blijven namelijk staan). Bij een nieuwe ronde: regel toevoegen of bijwerken.
   S.reworked = (S.reworked || []).concat([
-    { tag: 'contractions', unit: 'a1-04', v: '1.62.2', date: '2026-11-24', what: 'uitleg al/del + uitzondering bij namen, ±20 invul-, meerkeuze- en vertaaloefeningen' },
-    { tag: 'hay-estar', unit: 'a1-04', v: '1.62.2', date: '2026-11-24', what: 'korte regel hay vs. estar (en nooit ser voor een plek) met contrastparen, ±17 oefeningen' },
-    { tag: 'articles', unit: 'a1-02', v: '1.62.2', date: '2026-11-24', what: 'uitleg wél/géén lidwoord (beroep na ser, na gustar), ±15 oefeningen in a1-02 en a1-06' },
-    { tag: 'gender', unit: 'a1-02', v: '1.62.2', date: '2026-11-24', what: 'lijstje woorden op -ma (el problema, el idioma…) met oefeningen' },
+    { tag: 'contractions', unit: 'a1-04', v: '1.63.1', date: '2026-11-24', what: 'uitleg al/del + uitzondering bij namen, ±20 invul-, meerkeuze- en vertaaloefeningen' },
+    { tag: 'hay-estar', unit: 'a1-04', v: '1.63.1', date: '2026-11-24', what: 'korte regel hay vs. estar (en nooit ser voor een plek) met contrastparen, ±17 oefeningen' },
+    { tag: 'articles', unit: 'a1-02', v: '1.63.1', date: '2026-11-24', what: 'uitleg wél/géén lidwoord (beroep na ser, na gustar), ±15 oefeningen in a1-02 en a1-06' },
+    { tag: 'gender', unit: 'a1-02', v: '1.63.1', date: '2026-11-24', what: 'lijstje woorden op -ma (el problema, el idioma…) met oefeningen' },
     { tag: 'adj-agree', unit: 'a1-03', v: '1.62.0', date: '2026-11-24', what: 'uitleg bijvoeglijke naamwoorden in het meervoud, 8 oefeningen' },
-    { tag: 'numbers', unit: 'a1-03', v: '1.62.2', date: '2026-11-24', what: 'uitleg getallen 30–99 (sesenta/setenta), 12 oefeningen' },
+    { tag: 'numbers', unit: 'a1-03', v: '1.63.1', date: '2026-11-24', what: 'uitleg getallen 30–99 (sesenta/setenta), 12 oefeningen' },
     { tag: 'weather', unit: 'a1-10', v: '1.62.0', date: '2026-11-24', what: 'uitleg hace bij het weer, oefeningen' },
     { tag: 'ir-a', unit: 'a1-10', v: '1.62.0', date: '2026-11-24', what: 'ir a + infinitief, 7 oefeningen' },
     { tag: 'questions', unit: 'a1-10', v: '1.62.0', date: '2026-11-24', what: 'cuánto/cuánta/cuántos/cuántas, 7 oefeningen' },
     { ids: ['w|a1-01|17'], v: '1.62.0', date: '2026-11-24', what: '«mucho gusto» telt goed' },
-    { ids: ['w|a1-03|32', 'w|a1-03|37', 'w|a1-03|47', 'w|a1-03|48'], v: '1.62.2', date: '2026-11-24', what: 'suegro, divorciado, carnal en ñaña in voorbeeldzinnen geoefend' }
+    { ids: ['w|a1-03|32', 'w|a1-03|37', 'w|a1-03|47', 'w|a1-03|48'], v: '1.63.1', date: '2026-11-24', what: 'suegro, divorciado, carnal en ñaña in voorbeeldzinnen geoefend' }
   ]);
   // A1 · 2 Personas y profesiones: wanneer wél en wanneer géén lidwoord
   X('a1-02', {
