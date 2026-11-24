@@ -813,6 +813,21 @@ async function micTests() {
   got = await Sp.listen();
   ok(got[0] === 'dos' && deafStarts === 0, 'mic: tweede start wacht tot Safari de vorige echt heeft afgesloten: ' + deafStarts);
   ok(/stop\(\)/.test(Sp.micLogText()) && /vorige/.test(Sp.micLogText()), 'mic: logboek houdt bij wat er gebeurde');
+  // iPhone/iPad (WebKit-fout 321436): na stop() of abort() blijft elke volgende beurt doof. Daar dus nooit afkappen.
+  let cut = false, gStarts = 0;
+  class IOSRec { start() { gStarts++; Sp._fake = this; const deaf = cut; setTimeout(() => { this.onstart(); if (!deaf) script && script(this); }, 0); }
+    stop() { cut = true; } abort() { cut = true; } }
+  ctx.webkitSpeechRecognition = IOSRec; Sp.gentleMode = true;
+  // tik nog eens = klaar, terwijl de herkenning nog loopt; hij stopt pas 'vanzelf' 300 ms later
+  script = r => { r.onresult(ev([res('primera vez', false)])); setTimeout(() => Sp.stopListening(), 5); setTimeout(() => r.onend(), 300); };
+  got = await Sp.listen();
+  ok(got[0] === 'primera vez' && !cut, 'mic iOS: tik = klaar zonder stop()/abort()');
+  script = r => { r.onresult(ev([res('segunda vez', true)])); setTimeout(() => r.onend(), 20); };
+  got = await Sp.listen();
+  ok(got[0] === 'segunda vez' && !cut && gStarts === 2, 'mic iOS: tweede beurt hoort weer (wachtte op het vanzelf stoppen)');
+  Sp.abortListening();
+  ok(!cut, 'mic iOS: les verlaten kapt de herkenning niet af');
+  Sp.gentleMode = null;
   // naar de achtergrond: meteen loslaten
   script = r => { r.onstart(); r.onresult(ev([res('adiós', false)])); setTimeout(() => Sp.abortListening(), 5); };
   got = await Sp.listen();
