@@ -918,7 +918,30 @@ await micTests();
   ok(r.topics[0].units.length === 1 && r.topics[0].units[0].ex.some(e => e.tag === 'ser-estar'), 'lupe-log: rapport noemt de les');
   ok(Mi.focus(7, 2).length === 1 && Mi.focus(7, 2)[0].tag === 'ser-estar', 'lupe-log: Hoy-focus vanaf 2×');
   const txt = Mi.asText(r);
-  ok(txt.includes('ser vs. estar: 2×') && txt.includes('«soy cansado» → «estoy cansado»') && txt.includes('el carro = de auto'), 'lupe-log: rapport als tekst');
+  ok(txt.includes('ser vs. estar [ser-estar]: 2×') && txt.includes('«soy cansado» → «estoy cansado»') && txt.includes('el carro = de auto'), 'lupe-log: rapport als tekst');
+  {
+    // fouten uit gewone oefeningen gaan ook in het rapport (en mee in de sync)
+    const u4 = S.C.get('a1-04'), i4 = u4.ex.findIndex(e => e.tag === 'contractions' && e.t === 'cloze');
+    const it4 = S.Gen.normEx(u4.ex[i4 >= 0 ? i4 : 0], u4, i4 >= 0 ? i4 : 0);
+    ok(Mi.exercise(it4, { ok: true, user: 'al', expected: 'al' }) === null && Mi.exercise(it4, { ok: false, self: true }) === null, 'oefenfouten: goed of zelf beoordeeld telt niet');
+    const e1 = Mi.exercise(it4, { ok: false, user: 'a el', expected: 'al' });
+    const e2 = Mi.exercise({ kind: 'type', translate: true, prompt: 'Waar is de wc?', tag: 'hay-estar', srsId: 'x|a1-04|12' }, { ok: false, dontKnow: true, user: '', expected: '¿Dónde está el baño?' });
+    ok(e1 && e1.u === 'a el' && e1.id === it4.srsId && e2.dk === 1 && e2.k === 'vertalen' && e2.t > e1.t, 'oefenfouten: bewaard met id, soort en antwoord');
+    const rx = Mi.report(30);
+    ok(rx.exTotal === 2 && rx.exTopics.length === 2 && rx.total === 6, 'oefenfouten: apart geteld in het rapport');
+    const tx = Mi.asText(rx);
+    ok(tx.includes('Fouten in gewone oefeningen') && tx.includes('ik: «a el» → goed: «al»') && tx.includes('[x|a1-04|12]') && tx.includes('(a1-04)'), 'oefenfouten: in de rapporttekst met ids');
+    const A2 = { log: [], n: 0, ex: [e1] }, B2 = { log: [], n: 0, ex: [e1, e2] };
+    const mx = Mi.merge(A2, B2);
+    ok(mx.ex.length === 2 && JSON.stringify(Mi.merge(mx, mx)) === JSON.stringify(mx), 'oefenfouten: sync voegt samen, idempotent');
+    const card = St.state.srs['x|a1-04|5'] = St.state.srs['x|a1-04|5'] || { i: 0, d: 0, r: 0, l: 0 };
+    card.f = 4; card.g = 1;
+    const hd = Mi.hardItems();
+    ok(hd.some(x => x.id === 'x|a1-04|5' && x.unit === 'a1-04' && x.f === 4 && x.a), 'oefenfouten: vaak fout uit de herhaling, met antwoord');
+    ok(Mi.asText(Mi.report(30)).includes('[x|a1-04|5]'), 'oefenfouten: vaak fout staat in de tekst');
+    const md = S.md ? S.md('- **Titel** (uitleg erbij)\n  Waar: a1-04\n  Wat: iets\n- Tweede') : '';
+    ok(!S.md || (md.match(/<li>/g) || []).length === 2 && md.includes('Waar: a1-04'), 'voorstellen: ingesprongen regels horen bij hetzelfde punt');
+  }
   const ses = Mi.practice(['ser-estar'], [w.id]);
   ok(ses.items.length > 0 && ses.items.some(it => it.tag === 'ser-estar'), 'lupe-log: oefensessie voor de fouten');
   const A = JSON.parse(JSON.stringify(St.state)), B = JSON.parse(JSON.stringify(St.state));

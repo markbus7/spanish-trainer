@@ -33,6 +33,8 @@
     let s = U.esc(t);
     s = s.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*(?!\s)(.+?)\*(?!\*)/g, '$1<i>$2</i>');
     s = s.replace(/^\s*---\s*$/gm, '<hr>');
+    // ingesprongen regels direct onder een opsommingsteken horen bij dat punt (Lupe's voorstellen: Waar / Waarom / Wat)
+    s = s.replace(/^([-•]\s+.*)((?:\n[ \t]{2,}\S.*)+)/gm, (m, a, b) => a + b.replace(/\n[ \t]+/g, '<br>'));
     s = s.replace(/^[-•]\s+(.*)$/gm, '<li>$1</li>').replace(/(<li>.*<\/li>\n?)+/g, m => '<ul>' + m + '</ul>');
     return s.replace(/\n/g, '<br>').replace(/<\/li><br>/g, '</li>').replace(/<ul><br>/g, '<ul>');
   };
@@ -105,6 +107,7 @@
     const d = Store.today(); d.items++; if (ok) d.ok++;
     if (it.skill) Store.skill(it.skill, ok);
     if (it.tag) Store.mark(it.tag, ok);
+    if (!ok && S.Mistakes) S.Mistakes.exercise(it, r); // voor het rapport en Lupe's advies: ook fouten uit gewone oefeningen
     if (it.srsId && it.wt && (!SRS.has(it.srsId) || (r && r.override && (st().srs[it.srsId].s || 0) >= Date.now() - 864e5 && st().srs[it.srsId].i === 0))) {
       // woordtoets: nieuw woord goed = meteen bekend (interval it.wt), fout of met hint = vandaag in de herhaling
       const known = ok && !(r && (r.hinted || r.alt));
@@ -1077,15 +1080,18 @@
     const r = M().report(30);
     const card = h('div', { class: 'card rep-sum' });
     const fixLine = r.fix.length ? h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, '✅ toch goed volgens Lupe'), h('small', { class: 'muted' }, U.plural(r.fix.length, 'antwoord', 'antwoorden'))) : null;
+    const exLine = r.exTotal ? h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, '✏️ in oefeningen' + (r.exTopics[0] ? ', vooral ' + r.exTopics[0].label : '')), h('small', { class: 'muted' }, U.plural(r.exTotal, 'fout', 'fouten'))) : null;
     if (!r.total) {
+      if (exLine) card.append(exLine);
       if (fixLine) card.append(fixLine);
-      card.append(h('p', { class: 'small' }, '📋 Lupe houdt hier bij waar je de mist in gaat in je gesprekken (🎭 rollenspel en ✍️ correctie). Nog niets genoteerd in de laatste 30 dagen.'));
+      card.append(h('p', { class: 'small' }, '📋 Lupe houdt hier bij waar je de mist in gaat in je gesprekken (🎭 rollenspel en ✍️ correctie) en in je oefeningen.' + (r.exTotal ? '' : ' Nog niets genoteerd in de laatste 30 dagen.')));
       card.append(h('a', { class: 'btn ghost wide', href: '#/rapport' }, '📋 Naar het rapport'));
       return card;
     }
     card.append(h('p', { class: 'small' }, h('b', null, U.plural(r.total, 'fout', 'fouten')), ' in je gesprekken met Lupe (laatste 30 dagen).'));
     r.topics.slice(0, 3).forEach(t => card.append(h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, t.label), h('small', { class: 'muted' }, t.n + '×'))));
     if (r.words.length) card.append(h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, 'woordenschat'), h('small', { class: 'muted' }, r.words.length + ' woorden')));
+    if (exLine) card.append(exLine);
     if (fixLine) card.append(fixLine);
     card.append(h('a', { class: 'btn primary wide', href: '#/rapport' }, '📋 Bekijk het hele rapport'));
     return card;
@@ -1102,7 +1108,7 @@
     const wrap = h('div', { class: 'page rapport' });
     const r = M().report(repDays);
     wrap.append(h('a', { class: 'back', href: '#/perfil' }, '← Perfil'), h('h1', null, 'Rapport van Lupe'),
-      h('p', { class: 'muted small' }, 'Wat er misging in je gesprekken met Lupe (🎭 rollenspel en ✍️ correctie), zodat je weet waar je op moet letten. Fouten tellen ook mee in je zwakke punten, en woorden die misgingen staan in je herhaling.'));
+      h('p', { class: 'muted small' }, 'Wat er misging in je gesprekken met Lupe (🎭 rollenspel en ✍️ correctie) en in je gewone oefeningen, zodat je weet waar je op moet letten. Fouten tellen ook mee in je zwakke punten, en woorden die misgingen staan in je herhaling.'));
     wrap.append(h('div', { class: 'chips rep-period' }, [[7, '7 dagen'], [30, '30 dagen'], [90, '90 dagen']].map(([d, l]) =>
       h('button', { class: 'chip toggle' + (repDays === d ? ' on' : ''), type: 'button', onclick: () => { repDays = d; render(); } }, l))));
     const trend = r.prev ? (r.total < r.prev ? '📉 minder dan de ' + r.days + ' dagen ervoor (' + r.prev + ')' : r.total > r.prev ? 'meer dan de ' + r.days + ' dagen ervoor (' + r.prev + ')' : 'evenveel als ervoor') : null;
@@ -1112,9 +1118,10 @@
     wrap.append(h('div', { class: 'stat-grid' },
       statCard('📝', r.total, 'fouten genoteerd', trend || 'laatste ' + r.days + ' dagen'),
       statCard('🧩', r.topics.length, 'onderwerpen'),
-      statCard('📚', r.words.length, 'woorden', 'in je herhaling')));
+      statCard('📚', r.words.length, 'woorden', 'in je herhaling'),
+      statCard('✏️', r.exTotal, 'fouten in oefeningen', 'laatste ' + r.days + ' dagen')));
     if (!r.total) {
-      wrap.append(h('div', { class: 'card' }, h('p', null, 'Nog geen fouten genoteerd in deze periode.'),
+      wrap.append(h('div', { class: 'card' }, h('p', null, r.exTotal ? 'Nog geen fouten uit gesprekken met Lupe in deze periode.' : 'Nog geen fouten genoteerd in deze periode.'),
         h('p', { class: 'small muted' }, S.AI.enabled() ? 'Voer een 🎭 rollenspel of laat een tekst verbeteren bij ✍️ Correctie. Lupe noteert dan wat er misgaat.' : 'Hiervoor heb je een AI-sleutel nodig (Instellingen). Dan kun je met Lupe praten en noteert ze wat er misgaat.'),
         h('a', { class: 'btn primary wide', href: '#/docente' }, '🗣️ Praat met Lupe')));
     }
@@ -1134,13 +1141,26 @@
           e.srs ? h('small', { class: 'muted', title: 'Staat in je herhaling' }, '🔁') : null))),
         h('small', { class: 'muted' }, '🔁 = staat in je herhaling en komt vandaag terug.'))));
     }
+    // fouten uit gewone oefeningen (typen, meerkeuze, dictee, woordtegels)
+    if (r.exTopics.length) {
+      const tags = r.exTopics.filter(t => t.tag !== 'vocab').map(t => t.tag);
+      const mx = Math.max(...r.exTopics.map(t => t.n));
+      wrap.append(section('Fouten in je oefeningen', h('div', { class: 'card' },
+        h('p', { class: 'small muted' }, 'Wat je in de lessen, herhaling en toetsen fout had. Lupe kijkt hier ook naar voor haar advies.'),
+        r.exTopics.slice(0, 8).map(t => h('details', { class: 'rep-topic' },
+          h('summary', null, h('span', { class: 'grow' }, h('b', null, t.label)), bar(t.n / mx, '#e2603a'), h('small', { class: 'muted' }, t.n + '×')),
+          t.ex.map(e => h('div', { class: 'rep-ex' }, e.q ? h('small', { class: 'muted' }, (e.k ? e.k + ' · ' : '') + e.q) : null,
+            h('div', null, '❌ ', e.dk ? h('i', null, 'weet het niet') : h('s', { lang: 'es' }, e.u || '…'), ' → ✅ ', h('b', { lang: 'es' }, e.a)))),
+          t.units.length ? h('a', { class: 'btn link small', href: '#/unit/' + t.units[0].id }, '📘 Uitleg in de les: ' + t.units[0].level + ' · ' + t.units[0].icon + ' ' + t.units[0].title) : null)),
+        tags.length ? h('button', { class: 'btn primary wide', type: 'button', onclick: () => practiceMistakes(tags.slice(0, 6), []) }, '🎯 Oefen deze onderwerpen') : null)));
+    }
     // advies van Lupe
     const adv = h('div', { class: 'card rep-advice' });
     const drawAdv = a => {
       adv.innerHTML = '';
       if (a && a.text) adv.append(h('div', { class: 'small', html: S.md(a.text) }), h('small', { class: 'muted' }, 'Advies van ' + fmtDate(a.t, { day: 'numeric', month: 'long' })));
-      else adv.append(h('p', { class: 'small muted' }, r.total ? 'Laat Lupe je fouten bekijken en vertellen waar je deze week op moet letten.' : 'Na een paar gesprekken kan Lupe je hier persoonlijk advies geven.'));
-      if (S.AI.enabled() && r.total) {
+      else adv.append(h('p', { class: 'small muted' }, r.total || r.exTotal ? 'Laat Lupe je fouten uit gesprekken en oefeningen bekijken en vertellen waar je deze week op moet letten.' : 'Na een paar gesprekken of oefeningen kan Lupe je hier persoonlijk advies geven.'));
+      if (S.AI.enabled() && (r.total || r.exTotal || r.hard.length)) {
         const btn = h('button', { class: 'btn ghost wide', type: 'button' }, a && a.text ? '✨ Nieuw advies' : '✨ Vraag Lupe om advies');
         btn.onclick = async () => {
           btn.disabled = true; btn.textContent = 'Lupe denkt na…';

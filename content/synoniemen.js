@@ -14,6 +14,7 @@
     'buenos días': ['buen día'],
     'buen día': ['buenos días'],
     'mucho gusto': ['encantado', 'encantada'],
+    'encantado / encantada': ['mucho gusto'], // Lupe-rapport 24 nov: «mucho gusto» bij «aangenaam (man / vrouw zegt)» is ook goed
     'adiós': ['chao'],
     'perdón': ['disculpa', 'disculpe', 'lo siento'],
     'disculpe': ['perdón', 'perdone'],
