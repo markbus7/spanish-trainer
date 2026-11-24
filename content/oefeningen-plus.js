@@ -189,18 +189,23 @@
   /* ======================= A1 · voorstellen van Lupe (24 nov 2026) ======================= */
   // Wat er al verwerkt is, zodat Lupe in haar rapport/voorstellen niet opnieuw hetzelfde voorstelt
   // (oude foutcijfers blijven namelijk staan). Bij een nieuwe ronde: regel toevoegen of bijwerken.
+  // date = moment van mergen (UTC). Punten zonder nieuwe fouten daarna laat het rapport voor Lupe weg.
   S.reworked = (S.reworked || []).concat([
-    { tag: 'contractions', unit: 'a1-04', v: '1.63.1', date: '2026-11-24', what: 'uitleg al/del + uitzondering bij namen, ±20 invul-, meerkeuze- en vertaaloefeningen' },
-    { tag: 'hay-estar', unit: 'a1-04', v: '1.63.1', date: '2026-11-24', what: 'korte regel hay vs. estar (en nooit ser voor een plek) met contrastparen, ±17 oefeningen' },
-    { tag: 'articles', unit: 'a1-02', v: '1.63.1', date: '2026-11-24', what: 'uitleg wél/géén lidwoord (beroep na ser, na gustar), ±15 oefeningen in a1-02 en a1-06' },
-    { tag: 'gender', unit: 'a1-02', v: '1.63.1', date: '2026-11-24', what: 'lijstje woorden op -ma (el problema, el idioma…) met oefeningen' },
-    { tag: 'adj-agree', unit: 'a1-03', v: '1.62.0', date: '2026-11-24', what: 'uitleg bijvoeglijke naamwoorden in het meervoud, 8 oefeningen' },
-    { tag: 'numbers', unit: 'a1-03', v: '1.63.1', date: '2026-11-24', what: 'uitleg getallen 30–99 (sesenta/setenta), 12 oefeningen' },
-    { tag: 'weather', unit: 'a1-10', v: '1.62.0', date: '2026-11-24', what: 'uitleg hace bij het weer, oefeningen' },
-    { tag: 'ir-a', unit: 'a1-10', v: '1.62.0', date: '2026-11-24', what: 'ir a + infinitief, 7 oefeningen' },
-    { tag: 'questions', unit: 'a1-10', v: '1.62.0', date: '2026-11-24', what: 'cuánto/cuánta/cuántos/cuántas, 7 oefeningen' },
-    { ids: ['w|a1-01|17'], v: '1.62.0', date: '2026-11-24', what: '«mucho gusto» telt goed' },
-    { ids: ['w|a1-03|32', 'w|a1-03|37', 'w|a1-03|47', 'w|a1-03|48'], v: '1.63.1', date: '2026-11-24', what: 'suegro, divorciado, carnal en ñaña in voorbeeldzinnen geoefend' }
+    { tag: 'contractions', unit: 'a1-04', v: '1.63.1', date: '2026-11-24T21:19:00Z', what: 'uitleg al/del + uitzondering bij namen, ±20 invul-, meerkeuze- en vertaaloefeningen' },
+    { tag: 'hay-estar', unit: 'a1-04', v: '1.63.2', date: '2026-11-24T21:28:00Z', what: 'korte regel hay vs. estar (nooit ser voor een plek, wél es bij een evenement: ¿dónde es la fiesta?), «¿Qué hay para ver?», ±22 oefeningen met keuze hay/está/es' },
+    { tag: 'stem-change', unit: 'a1-07', v: '1.63.2', date: '2026-11-24T21:28:00Z', what: 'invuloefeningen recomendar/preferir/empezar (e → ie) met yo/usted/ustedes/nosotros' },
+    { tag: 'pres-regular', unit: 'a1-05', v: '1.63.2', date: '2026-11-24T21:28:00Z', what: 'waarschuwing «trabajando» ≠ «ik werk» (trabajo) + oefeningen yo/usted/nosotros' },
+    { tag: 'connectors', unit: 'a2-12', v: '1.63.2', date: '2026-11-24T21:28:00Z', what: 'uitleg «que» na creer/pensar/decir (nooit weglaten) + está vs. esta, 5 oefeningen' },
+    { tag: 'tu-usted', unit: 'a1-01', v: '1.63.2', date: '2026-11-24T21:28:00Z', what: 'don/doña alleen voor een ander, nooit voor jezelf, 3 oefeningen' },
+    { tag: 'articles', unit: 'a1-02', v: '1.63.1', date: '2026-11-24T21:19:00Z', what: 'uitleg wél/géén lidwoord (beroep na ser, na gustar), ±15 oefeningen in a1-02 en a1-06' },
+    { tag: 'gender', unit: 'a1-02', v: '1.63.1', date: '2026-11-24T21:19:00Z', what: 'lijstje woorden op -ma (el problema, el idioma…) met oefeningen' },
+    { tag: 'adj-agree', unit: 'a1-03', v: '1.62.0', date: '2026-11-24T20:57:00Z', what: 'uitleg bijvoeglijke naamwoorden in het meervoud, 8 oefeningen' },
+    { tag: 'numbers', unit: 'a1-03', v: '1.63.1', date: '2026-11-24T21:19:00Z', what: 'uitleg getallen 30–99 (sesenta/setenta), 12 oefeningen' },
+    { tag: 'weather', unit: 'a1-10', v: '1.62.0', date: '2026-11-24T20:57:00Z', what: 'uitleg hace bij het weer, oefeningen' },
+    { tag: 'ir-a', unit: 'a1-10', v: '1.62.0', date: '2026-11-24T20:57:00Z', what: 'ir a + infinitief, 7 oefeningen' },
+    { tag: 'questions', unit: 'a1-10', v: '1.62.0', date: '2026-11-24T20:57:00Z', what: 'cuánto/cuánta/cuántos/cuántas, 7 oefeningen' },
+    { ids: ['w|a1-01|17'], v: '1.62.0', date: '2026-11-24T20:57:00Z', what: '«mucho gusto» telt goed' },
+    { ids: ['w|a1-03|32', 'w|a1-03|37', 'w|a1-03|47', 'w|a1-03|48'], v: '1.63.1', date: '2026-11-24T21:19:00Z', what: 'suegro, divorciado, carnal en ñaña in voorbeeldzinnen geoefend' }
   ]);
   // A1 · 2 Personas y profesiones: wanneer wél en wanneer géén lidwoord
   X('a1-02', {
@@ -403,6 +408,87 @@
       { t: 'cloze', s: '¿___ grados hace hoy?', a: ['Cuántos'], o: ['Cuántos', 'Cuánto', 'Cuántas'], nl: 'Hoeveel graden is het vandaag?', tag: 'questions' },
       { t: 'mc', q: '«Hoeveel koffers neem je mee?»', o: ['¿Cuántas maletas llevas?', '¿Cuántos maletas llevas?', '¿Cuánta maletas llevas?'], tag: 'questions' },
       { t: 'tr', nl: 'Hoeveel tijd hebben we?', a: ['¿Cuánto tiempo tenemos?'], tag: 'questions' }
+    ]
+  });
+  /* ---------- Lupe-rapport 24 nov, vierde ronde ---------- */
+  // A1 · 1: don / doña nooit voor jezelf
+  X('a1-01', {
+    grammar: [
+      { t: 'don en doña: alleen voor een ander', es: 'Don y doña',
+        html: `<p><b>don</b> (voor een man) en <b>doña</b> (voor een vrouw) zet je beleefd vóór de <b>voornaam van een ander</b>, vaak iemand die ouder is: <i>Buenos días, don Pedro. ¿Cómo está, doña Rosa?</i></p>
+<p>❌ Over <b>jezelf</b> gebruik je het nooit: <i>Soy Mark</i> of <i>Me llamo Mark</i>, niet <s>Soy don Mark</s>.</p>`,
+        sum: '«Don» y «doña» son para otras personas, nunca para uno mismo.' }
+    ],
+    ex: [
+      { t: 'mc', q: 'Je stelt jezelf voor aan een oudere meneer. Wat zeg je?', o: ['Mucho gusto, don Pedro. Me llamo Mark.', 'Mucho gusto, Pedro. Soy don Mark.', 'Mucho gusto. Me llamo don Mark.'], x: 'Don voor de ander, nooit voor jezelf.', tag: 'tu-usted' },
+      { t: 'mc', q: '— ¿Cómo se llama usted? Wat antwoord je?', o: ['Me llamo Mark.', 'Me llamo don Mark.', 'Soy don Mark.'], tag: 'tu-usted' },
+      { t: 'cloze', s: 'Buenos días, ___ Rosa. ¿Cómo está?', a: ['doña'], o: ['doña', 'don', 'señorita'], nl: 'Goedemorgen, mevrouw Rosa. Hoe gaat het met u?', tag: 'tu-usted' }
+    ]
+  });
+
+  // A1 · 4: hay / está / es (es bij een evenement)
+  X('a1-04', {
+    grammar: [
+      { t: 'Hay, está of es?', es: '¿Hay, está o es?',
+        html: `<p>🔎 <b>Wat is er (te zien / te doen)?</b> = <i>¿Qué <b>hay</b> para ver / para hacer?</i></p>
+<p>📍 <b>Waar is het museum?</b> = <i>¿Dónde <b>está</b> el museo?</i> (een plek, een gebouw, een ding)</p>
+<p>🎉 <b>Waar is het feest?</b> = <i>¿Dónde <b>es</b> la fiesta?</i> Bij een <b>evenement</b> (feest, concert, vergadering, les) gebruik je wél <b>ser</b>: het gaat om waar het plaatsvindt.</p>`,
+        sum: 'Lugar de una cosa: está. Evento: es (la fiesta es en mi casa). Existencia: hay.' }
+    ],
+    ex: [
+      { t: 'cloze', s: '¿Qué ___ para ver en tu ciudad?', a: ['hay'], o: ['hay', 'es', 'está'], nl: 'Wat is er te zien in jouw stad?', tag: 'hay-estar' },
+      { t: 'cloze', s: 'En mi barrio ___ un parque bonito.', a: ['hay'], o: ['hay', 'es', 'está'], nl: 'In mijn buurt is een mooi park.', tag: 'hay-estar' },
+      { t: 'cloze', s: 'El hotel ___ cerca de la plaza.', a: ['está'], o: ['está', 'es', 'hay'], nl: 'Het hotel is vlak bij het plein.', tag: 'hay-estar' },
+      { t: 'cloze', s: '¿Dónde ___ la fiesta de Ana?', a: ['es'], o: ['es', 'está', 'hay'], nl: 'Waar is het feest van Ana?', x: 'Een evenement (feest, concert) → ser: la fiesta es en su casa.', tag: 'hay-estar' },
+      { t: 'cloze', s: 'El concierto ___ en el parque.', a: ['es'], o: ['es', 'está', 'hay'], nl: 'Het concert is in het park.', x: 'Evenement → es.', tag: 'hay-estar' },
+      { t: 'cloze', s: 'Mi casa ___ cerca del parque.', a: ['está'], o: ['está', 'es', 'hay'], nl: 'Mijn huis ligt dicht bij het park.', tag: 'hay-estar' },
+      { t: 'tr', nl: 'Wat is er hier te doen?', a: ['¿Qué hay para hacer aquí?', '¿Qué hay que hacer aquí?', '¿Qué hay para hacer por aquí?'], tag: 'hay-estar' }
+    ]
+  });
+
+  // A1 · 5: «trabajando» is niet «ik werk»
+  X('a1-05', {
+    grammar: [
+      { t: 'Let op: trabajo, niet trabajando', es: 'Trabajo, no «trabajando»',
+        html: `<p>«Ik werk» is gewoon de presente: <b>trabajo</b>. De vorm <i>trabajando</i> (werkend) kan nooit alleen staan; je gebruikt hem pas later met <i>estar</i>: <i>estoy trabajando</i> = ik ben aan het werk.</p>
+<p>Kijk goed naar de persoon: <i>yo trabaj<b>o</b> · usted trabaj<b>a</b> · nosotros trabaj<b>amos</b></i>.</p>`,
+        sum: 'Yo trabajo, usted trabaja, nosotros trabajamos.' }
+    ],
+    ex: [
+      { t: 'cloze', s: 'Yo ___ en una oficina.', h: 'trabajar', a: ['trabajo'], nl: 'Ik werk op een kantoor.', x: 'Ik werk = trabajo (niet trabajando).', tag: 'pres-regular' },
+      { t: 'mc', q: '«Ik werk in Utrecht.»', o: ['Trabajo en Utrecht.', 'Trabajando en Utrecht.', 'Trabaja en Utrecht.'], x: 'Yo → -o: trabajo.', tag: 'pres-regular' },
+      { t: 'cloze', s: '¿Dónde ___ usted?', h: 'vivir', a: ['vive'], nl: 'Waar woont u?', x: 'Usted krijgt de vorm van él/ella: vive.', tag: 'pres-regular' },
+      { t: 'cloze', s: 'Nosotros ___ español los martes.', h: 'estudiar', a: ['estudiamos'], nl: 'Wij studeren Spaans op dinsdag.', tag: 'pres-regular' },
+      { t: 'cloze', s: '¿___ usted inglés?', h: 'hablar', a: ['Habla'], nl: 'Spreekt u Engels?', tag: 'pres-regular' }
+    ]
+  });
+
+  // A1 · 7: stamwisselaars met usted / ustedes
+  X('a1-07', {
+    ex: [
+      { t: 'cloze', s: '¿Qué ___ usted?', h: 'recomendar', a: ['recomienda'], nl: 'Wat raadt u aan?', x: 'Recomendar: e → ie (recomiendo, recomienda), maar nosotros recomendamos.', tag: 'stem-change' },
+      { t: 'cloze', s: '¿Qué ___ ustedes?', h: 'recomendar', a: ['recomiendan'], nl: 'Wat raden jullie aan?', tag: 'stem-change' },
+      { t: 'cloze', s: 'Te ___ los tacos al pastor.', h: 'recomendar, yo', a: ['recomiendo'], nl: 'Ik raad je de tacos al pastor aan.', tag: 'stem-change' },
+      { t: 'cloze', s: 'Ella ___ comer tacos.', h: 'preferir', a: ['prefiere'], nl: 'Zij eet liever taco’s.', tag: 'stem-change' },
+      { t: 'cloze', s: 'Nosotros ___ a las ocho.', h: 'empezar', a: ['empezamos'], nl: 'Wij beginnen om acht uur.', x: 'Bij nosotros geen ie: empezamos.', tag: 'stem-change' },
+      { t: 'tr', nl: 'Wat raadt u aan?', a: ['¿Qué recomienda?', '¿Qué me recomienda?', '¿Qué recomienda usted?', '¿Usted qué recomienda?'], tag: 'stem-change' }
+    ]
+  });
+
+  // A2 · 12: que na creer / pensar / decir, está vs. esta
+  X('a2-12', {
+    grammar: [
+      { t: 'Ik denk dát …: que mag niet weg', es: 'Creo que…',
+        html: `<p>In het Nederlands mag <i>dat</i> soms weg (<i>ik denk het is mooi</i>). In het Spaans <b>nooit</b>: na <b>creer, pensar, decir, saber</b> komt altijd <b>que</b>: <i>Creo <b>que</b> la ciudad es bonita.</i></p>
+<p>✍️ Let op het accent: <b>está</b> = is (estar) · <b>esta</b> = deze: <i>Creo que <b>esta</b> casa <b>está</b> limpia.</i></p>`,
+        sum: 'Creo que…, pienso que…, dice que…: el «que» nunca se omite.' }
+    ],
+    ex: [
+      { t: 'cloze', s: 'Creo ___ la ciudad es bonita.', a: ['que'], o: ['que', 'de', 'qué'], nl: 'Ik denk dat de stad mooi is.', x: 'Na creer altijd que (zonder accent).', tag: 'connectors' },
+      { t: 'cloze', s: 'Mi amiga dice ___ aquí se vive bien.', a: ['que'], o: ['que', 'qué', 'lo'], nl: 'Mijn vriendin zegt dat je hier goed leeft.', tag: 'connectors' },
+      { t: 'cloze', s: 'Pienso que la playa ___ muy tranquila hoy.', a: ['está'], o: ['está', 'esta', 'es'], nl: 'Ik denk dat het strand vandaag heel rustig is.', x: 'Está (met accent) = is; esta = deze.', tag: 'connectors' },
+      { t: 'cloze', s: 'Creo que ___ casa es grande.', a: ['esta'], o: ['esta', 'está', 'este'], nl: 'Ik denk dat dit huis groot is.', x: 'Esta (zonder accent) = deze/dit, bij casa (vrouwelijk).', tag: 'connectors' },
+      { t: 'tr', nl: 'Ik denk dat het mooi is.', a: ['Creo que es bonito.', 'Creo que está bonito.', 'Pienso que es bonito.', 'Creo que es bonita.', 'Creo que está bonita.', 'Creo que es lindo.'], tag: 'connectors' }
     ]
   });
 })(window.SPT);
