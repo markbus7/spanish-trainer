@@ -206,7 +206,12 @@
       { t: 'cloze', s: 'Me gusta ___ trabajo de periodista.', a: ['el'], o: ['el', 'la', 'un'], nl: 'Ik vind het werk van journalist leuk.', x: 'Na gustar komt een lidwoord: me gusta el trabajo.', tag: 'articles' },
       { t: 'cloze', s: 'A Andrés le gustan ___ ciudades grandes.', a: ['las'], o: ['las', 'los', 'la'], nl: 'Andrés houdt van grote steden.', tag: 'articles' },
       { t: 'mc', q: '«Mijn zus is lerares.»', o: ['Mi hermana es profesora.', 'Mi hermana es una profesora.', 'Mi hermana es la profesora.'], tag: 'articles' },
-      { t: 'tr', nl: 'Meneer López is ingenieur.', a: ['El señor López es ingeniero.'], x: 'El señor López (over iemand), ingeniero zonder lidwoord.', tag: 'articles' }
+      { t: 'tr', nl: 'Meneer López is ingenieur.', a: ['El señor López es ingeniero.'], x: 'El señor López (over iemand), ingeniero zonder lidwoord.', tag: 'articles' },
+      { t: 'mc', q: '«Mijn zus is dokter.»', o: ['Mi hermana es doctora.', 'Mi hermana es una doctora.', 'Mi hermana es la doctora.'], x: 'Beroep na ser: zonder lidwoord.', tag: 'articles' },
+      { t: 'cloze', s: '___ problema es grande.', a: ['El'], o: ['El', 'La', 'Los'], nl: 'Het probleem is groot.', x: 'Problema eindigt op -a, maar is mannelijk.', tag: 'gender' },
+      { t: 'cloze', s: 'Me gusta ___ café.', a: ['el'], o: ['el', 'la', 'un'], nl: 'Ik hou van koffie.', tag: 'articles' },
+      { t: 'cloze', s: 'Me gusta ___ música.', a: ['la'], o: ['la', 'el', 'los'], nl: 'Ik hou van muziek.', tag: 'articles' },
+      { t: 'tr', nl: 'Pedro is kok.', a: ['Pedro es cocinero.'], x: 'Beroep na ser: zonder lidwoord.', tag: 'articles' }
     ]
   });
 
@@ -217,7 +222,12 @@
         html: `<p>Gaat het over meer personen of dingen, dan krijgt ook het bijvoeglijk naamwoord een meervoud: <b>-o → -os</b>, <b>-a → -as</b>, <b>-e → -es</b>, medeklinker <b>+ -es</b>.</p>
 <p>Een <b>gemengde groep</b> (man + vrouw) krijgt de mannelijke vorm: <i>mi hermano y mi hermana → mis hermanos viven <b>solos</b></i>.</p>`,
         table: [['enkelvoud', 'meervoud'], ['mi primo es alto', 'mis primos son altos'], ['mi tía es simpática', 'mis tías son simpáticas'], ['mi abuelo es inteligente', 'mis abuelos son inteligentes'], ['mi hermana es joven', 'mis hermanas son jóvenes']],
-        sum: 'Mis hermanos viven solos. Mis abuelas son muy simpáticas.' }
+        sum: 'Mis hermanos viven solos. Mis abuelas son muy simpáticas.' },
+      { t: 'Getallen 30–99', es: 'Los números del 30 al 99',
+        html: `<p>Vanaf 31 maak je getallen met <b>tiental + y + eenheid</b>, in drie losse woorden: <i>treinta <b>y</b> uno, cuarenta <b>y</b> siete, setenta <b>y</b> seis</i>. (16–29 schrijf je juist als één woord: <i>veintiséis</i>.)</p>
+<p>⚠️ Let op de tientallen die op elkaar lijken: <b>sesenta</b> (60) en <b>setenta</b> (70).</p>`,
+        table: [['tiental', '', 'voorbeeld'], ['30', 'treinta', '34 treinta y cuatro'], ['40', 'cuarenta', '47 cuarenta y siete'], ['50', 'cincuenta', '58 cincuenta y ocho'], ['60', 'sesenta', '63 sesenta y tres'], ['70', 'setenta', '76 setenta y seis'], ['80', 'ochenta', '85 ochenta y cinco'], ['90', 'noventa', '99 noventa y nueve']],
+        sum: 'Cuarenta y siete, setenta y seis, noventa y nueve: siempre con «y».' }
     ],
     ex: [
       { t: 'cloze', s: 'Mis hermanos viven ___.', h: 'solo', a: ['solos'], nl: 'Mijn broer en zus wonen alleen.', x: 'Gemengde groep → mannelijk meervoud: solos.', tag: 'adj-agree' },
@@ -227,7 +237,16 @@
       { t: 'cloze', s: 'Los perros de mi tío son muy ___.', h: 'grande', a: ['grandes'], nl: 'De honden van mijn oom zijn heel groot.', tag: 'adj-agree' },
       { t: 'mc', q: '«Mijn broer en mijn zus zijn getrouwd.»', o: ['Mi hermano y mi hermana están casados.', 'Mi hermano y mi hermana están casadas.', 'Mi hermano y mi hermana están casado.'], x: 'Man + vrouw samen → mannelijk meervoud.', tag: 'adj-agree' },
       { t: 'tr', nl: 'Mijn ouders zijn heel aardig.', a: ['Mis papás son muy simpáticos.', 'Mis padres son muy simpáticos.', 'Mis papás son muy amables.', 'Mis padres son muy amables.'], tag: 'adj-agree' },
-      { t: 'tr', nl: 'Mijn zussen zijn lang.', a: ['Mis hermanas son altas.'], tag: 'adj-agree' }
+      { t: 'tr', nl: 'Mijn zussen zijn lang.', a: ['Mis hermanas son altas.'], tag: 'adj-agree' },
+      { t: 'cloze', s: 'Mi abuelo tiene ___ años. (76)', a: ['setenta y seis'], nl: 'Mijn opa is 76 jaar.', x: '70 = setenta (niet sesenta) + y + seis.', tag: 'numbers' },
+      { t: 'cloze', s: 'Mi tía tiene ___ años. (47)', a: ['cuarenta y siete'], nl: 'Mijn tante is 47 jaar.', tag: 'numbers' },
+      { t: 'cloze', s: 'Mi papá tiene ___ años. (63)', a: ['sesenta y tres'], nl: 'Mijn vader is 63 jaar.', tag: 'numbers' },
+      { t: 'cloze', s: 'Mi abuela tiene ___ años. (85)', a: ['ochenta y cinco'], nl: 'Mijn oma is 85 jaar.', tag: 'numbers' },
+      { t: 'cloze', s: 'Mi mamá tiene ___ años. (58)', a: ['cincuenta y ocho'], nl: 'Mijn moeder is 58 jaar.', tag: 'numbers' },
+      { t: 'mc', q: 'Hoe schrijf je 76?', o: ['setenta y seis', 'sesenta y seis', 'setentaiseis'], x: '70 = setenta, 60 = sesenta.', tag: 'numbers' },
+      { t: 'mc', q: 'Hoe schrijf je 94?', o: ['noventa y cuatro', 'nueventa y cuatro', 'noventicuatro'], tag: 'numbers' },
+      { t: 'mc', q: '«sesenta y ocho» is…', o: ['68', '78', '86'], tag: 'numbers' },
+      { t: 'tr', nl: 'Mijn opa is negenenveertig jaar.', a: ['Mi abuelo tiene cuarenta y nueve años.', 'Mi abuelo tiene 49 años.'], tag: 'numbers' }
     ]
   });
 
@@ -236,7 +255,8 @@
     grammar: [
       { t: 'al en del: wanneer wel, wanneer niet', es: '¿Al, a la, del, de la?',
         html: `<p><b>a + el = al</b> en <b>de + el = del</b>. Dat is verplicht: <s>a el</s> en <s>de el</s> schrijf je nooit.</p>
-<p>⚠️ Het gebeurt <b>alleen bij el</b>. Bij <b>la</b>, <b>los</b> en <b>las</b> blijven de woordjes los: <i>a la plaza, de la iglesia, a los parques, de las tiendas</i>.</p>`,
+<p>⚠️ Het gebeurt <b>alleen bij el</b>. Bij <b>la</b>, <b>los</b> en <b>las</b> blijven de woordjes los: <i>a la plaza, de la iglesia, a los parques, de las tiendas</i>.</p>
+<p>📌 Ook <b>niet</b> als <i>El</i> bij een <b>naam</b> hoort (met hoofdletter): <i>Viajo <b>a El</b> Salvador. Leo una noticia <b>de El</b> Tiempo</i> (een Colombiaanse krant).</p>`,
         table: [['', 'a (naar)', 'de (van / uit)'], ['el museo', 'al museo', 'del museo'], ['la plaza', 'a la plaza', 'de la plaza'], ['los parques', 'a los parques', 'de los parques'], ['las tiendas', 'a las tiendas', 'de las tiendas']],
         ex: [['Voy al museo y vengo del parque.', 'Ik ga naar het museum en ik kom van het park.'], ['El banco está enfrente de la iglesia.', 'De bank is tegenover de kerk.']],
         sum: 'Solo con «el»: al, del. Con la, los, las no se junta nada.' },
@@ -271,7 +291,15 @@
       { t: 'mc', q: 'Welke zin is goed?', o: ['Hay dos parques cerca.', 'Están dos parques cerca.', 'Son dos parques cerca.'], x: 'Een getal (iets nieuws noemen) → hay.', tag: 'hay-estar' },
       { t: 'tr', nl: 'Wat is er hier te zien?', a: ['¿Qué hay para ver aquí?', '¿Qué hay para ver por aquí?', '¿Qué hay que ver aquí?'], tag: 'hay-estar' },
       { t: 'tr', nl: 'Er is een markt in het centrum.', a: ['Hay un mercado en el centro.', 'En el centro hay un mercado.'], tag: 'hay-estar' },
-      { t: 'tr', nl: 'De markt is in het centrum.', a: ['El mercado está en el centro.'], tag: 'hay-estar' }
+      { t: 'tr', nl: 'De markt is in het centrum.', a: ['El mercado está en el centro.'], tag: 'hay-estar' },
+      { t: 'cloze', s: 'El libro es ___ profesor.', a: ['del'], o: ['del', 'de el', 'al'], nl: 'Het boek is van de leraar.', tag: 'contractions' },
+      { t: 'cloze', s: 'Mañana vamos ___ mercado.', a: ['al'], o: ['al', 'a el', 'a la'], nl: 'Morgen gaan we naar de markt.', tag: 'contractions' },
+      { t: 'cloze', s: 'El banco está al lado ___ hotel.', a: ['del'], o: ['del', 'de la', 'al'], nl: 'De bank is naast het hotel.', tag: 'contractions' },
+      { t: 'mc', q: '«Ik reis naar El Salvador.»', o: ['Viajo a El Salvador.', 'Viajo al Salvador.', 'Viajo a la Salvador.'], x: 'El hoort bij de naam van het land, dus geen samentrekking.', tag: 'contractions' },
+      { t: 'cloze', s: '¿___ un banco aquí?', a: ['Hay'], o: ['Hay', 'Está', 'Es'], nl: 'Is er hier een bank?', tag: 'hay-estar' },
+      { t: 'cloze', s: 'La farmacia ___ cerca.', a: ['está'], o: ['está', 'hay', 'es'], nl: 'De apotheek is in de buurt.', x: 'La farmacia (bekend) → estar. Ser gebruik je nooit voor een plek.', tag: 'hay-estar' },
+      { t: 'tr', nl: 'In mijn stad zijn veel parken.', a: ['En mi ciudad hay muchos parques.', 'Hay muchos parques en mi ciudad.'], tag: 'hay-estar' },
+      { t: 'tr', nl: 'Wat is er hier mooi om te zien?', a: ['¿Qué hay bonito para ver aquí?', '¿Qué hay de bonito para ver aquí?', '¿Qué hay bonito para ver por aquí?', '¿Qué hay de bonito para ver por aquí?'], x: 'Hay voor «er is», niet es.', tag: 'hay-estar' }
     ]
   });
 
