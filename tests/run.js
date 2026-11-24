@@ -782,6 +782,27 @@ async function micTests() {
   got = await Sp.listen();
   const f = await first;
   ok(got[0] === 'nuevo' && old.aborted >= 1 && f[0] === 'err', 'mic: oude herkenning wordt afgebroken bij opnieuw starten: ' + f);
+  // iPad: de tweede spreekoefening startte 'doof' (luistert, hoort niets, stopt meteen). Dan stil één keer opnieuw.
+  let starts = 0;
+  script = r => { starts++; if (starts === 1) { r.onstart(); r.onerror({ error: 'no-speech' }); r.onend(); } else { r.onstart(); r.onsoundstart(); r.onresult(ev([res('buenas noches', true)])); r.onend(); } };
+  got = await Sp.listen();
+  ok(starts === 2 && got[0] === 'buenas noches', 'mic: dove start wordt één keer opnieuw geprobeerd: ' + starts + ' ' + got);
+  // echt niets gezegd (ook de tweede keer): gewoon de melding, niet eindeloos opnieuw
+  starts = 0; script = r => { starts++; r.onstart(); r.onerror({ error: 'no-speech' }); r.onend(); };
+  err = null; try { await Sp.listen(); } catch (e) { err = e; }
+  ok(starts === 2 && err && err.code === 'no-speech', 'mic: na één nieuwe poging volgt de melding: ' + starts);
+  // wel geluid gehoord maar geen tekst: niet stil opnieuw (dan sprak je echt onduidelijk)
+  starts = 0; script = r => { starts++; r.onstart(); r.onsoundstart(); r.onerror({ error: 'no-speech' }); r.onend(); };
+  err = null; try { await Sp.listen(); } catch (e) { err = e; }
+  ok(starts === 1 && err && err.code === 'no-speech', 'mic: na gehoord geluid geen stille herhaling: ' + starts);
+  // vóór het luisteren laat het afspelen echt los: opname-element leeg en tikgeluid-context dicht
+  let released = 0; const relOld = S.Sound.release; S.Sound.release = () => { released++; };
+  const fakeEl = { src: 'audio/x.mp3', pause() {}, removeAttribute(a) { if (a === 'src') this.src = ''; }, load() { this.loaded = true; } };
+  const elOld = Sp.el; Sp.el = fakeEl;
+  script = r => { r.onstart(); r.onresult(ev([res('sí', true)])); r.onend(); };
+  await Sp.listen();
+  ok(released === 1 && fakeEl.src === '' && fakeEl.loaded, 'mic: opname en tikgeluid laten het geluidskanaal los vóór het luisteren');
+  Sp.el = elOld; S.Sound.release = relOld;
   // naar de achtergrond: meteen loslaten
   script = r => { r.onstart(); r.onresult(ev([res('adiós', false)])); setTimeout(() => Sp.abortListening(), 5); };
   got = await Sp.listen();

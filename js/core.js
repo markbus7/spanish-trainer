@@ -830,16 +830,32 @@
        opt.onState(s): 'starting' | 'listening' | 'sound' | 'speech' | 'stopping'.
        Tik nog eens (stopListening) = klaar: wat al herkend is telt dan als antwoord.
        Fouten hebben .code en .help (uitleg hoe je het oplost, zie micHelp). */
+    /* Eén keer stil opnieuw proberen: op iPad startte de tweede herkenning soms 'doof' (hij luisterde, maar hoorde
+       niets en stopte meteen), omdat het geluidskanaal nog op afspelen stond na het tikgeluidje of een opname. */
     listen(opt = {}) {
+      return this._listen(opt).catch(err => {
+        if (!err || !err.quiet || opt._retried) throw err;
+        this.retries = (this.retries || 0) + 1;
+        return new Promise(r => setTimeout(r, 350)).then(() => this._listen(Object.assign({}, opt, { _retried: true })));
+      });
+    },
+    /* Laat al het afspelen echt los, zodat de microfoon het geluidskanaal krijgt. Pauzeren alleen is op iPad niet genoeg:
+       een gepauzeerde <audio> en een AudioContext (ook 'suspended') houden het kanaal op afspelen, en dan hoort de
+       spraakherkenning stilte. */
+    releaseAudio() {
+      this.stop(); this._talk(false);
+      try { if (this.el) { this.el.pause(); this.el.removeAttribute('src'); this.el.load(); } } catch (e) { /* */ }
+      try { S.Sound && S.Sound.release && S.Sound.release(); } catch (e) { /* */ }
+    },
+    _listen(opt = {}) {
       const R = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!R) return Promise.reject(this.micError('unsupported'));
       // Hangt er nog een oude herkenning (op iPad komt 'klaar' soms nooit)? Rond die nu echt af en ruim hem op.
       if (this._kill) this._kill();
       if (this._rec) { try { this._rec.abort(); } catch (e) { /* */ } this._rec = null; }
-      // Een knipperend AudioContext (tikgeluidjes) kan op iPad het geluidskanaal vasthouden: even pauzeren.
-      try { S.Sound && S.Sound.pause && S.Sound.pause(); } catch (e) { /* */ }
-      // Lupe of een opname mag niet meer praten: op iPad deelt de microfoon het geluidskanaal met het voorlezen.
-      this.stop(); this._talk(false);
+      // Lupe, een opname of een tikgeluidje mag niet meer klinken: op iPad deelt de microfoon het geluidskanaal met het afspelen.
+      this.releaseAudio();
+      const t0 = Date.now(); let heardAny = false;
       const state = s => { try { opt.onState && opt.onState(s); } catch (e) { /* */ } };
       return new Promise((resolve, reject) => {
         const r = new R();
@@ -857,13 +873,15 @@
           if (this._kill === kill) this._kill = null;
           if (this._soft === softStop) this._soft = null;
           this._lastEnd = Date.now();
+          // Niets gehoord, niet zelf gestopt en meteen weer klaar: dat is de 'dove' start van iPad, niet de gebruiker.
+          if (!ok && val && !heardAny && !stopping && !opt._retried && ['no-speech', 'audio-capture', 'aborted'].includes(val.code) && Date.now() - t0 < 4000) val.quiet = true;
           ok ? resolve(val) : reject(val);
         };
         const heardSoFar = () => finalAlts || (interim ? [interim] : null);
         // Afronden met wat er al gehoord is (of 'niets gehoord').
         const settle = () => { const got = heardSoFar(); got && got.length ? finish(true, got) : finish(false, this.micError('no-speech')); };
         // Hard opruimen: abort() laat de microfoon op iPad meteen los; daarna de belofte zelf afronden.
-        const kill = () => { if (done) return; try { r.abort(); } catch (e) { /* */ } settle(); };
+        const kill = () => { if (done) return; stopping = true; try { r.abort(); } catch (e) { /* */ } settle(); };
         /* Netjes stoppen. Safari op iPad stuurt na stop() soms nooit 'onend': dan bleef de knop op opnemen staan,
            hield Safari de microfoon vast en deed een tweede keer niets meer (tot je naar een andere app ging).
            Daarom: na stop() even wachten, dan abort(), en daarna zelf afronden. */
@@ -874,9 +892,10 @@
           timers.push(setTimeout(() => { if (!done) settle(); }, 2000));
         };
         r.onstart = () => { started = true; state('listening'); };
-        r.onsoundstart = () => state('sound');
-        r.onspeechstart = () => state('speech');
+        r.onsoundstart = () => { heardAny = true; state('sound'); };
+        r.onspeechstart = () => { heardAny = true; state('speech'); };
         r.onresult = e => {
+          heardAny = true;
           let txt = '';
           for (let i = 0; i < e.results.length; i++) txt += e.results[i][0].transcript;
           interim = txt.replace(/\s+/g, ' ').trim();
@@ -944,6 +963,10 @@
   let actx = null;
   function tone(freqs, dur = 0.09, type = 'sine', vol = 0.06) {
     if (!Store.state.settings.sound) return;
+    // Niet tijdens het luisteren, en vlak erna even wachten tot iPad de microfoon heeft losgelaten.
+    if (Speech.isListening()) return;
+    const since = Date.now() - (Speech._lastEnd || 0);
+    if (since < 600) { setTimeout(() => tone(freqs, dur, type, vol), 600 - since); return; }
     try {
       actx = actx || new (window.AudioContext || window.webkitAudioContext)();
       if (actx.state === 'suspended' && actx.resume) actx.resume();
@@ -960,7 +983,9 @@
     bad: () => tone([220, 180], 0.11, 'triangle', 0.05),
     win: () => tone([523, 659, 784, 1047], 0.1, 'sine', 0.06),
     tap: () => tone([440], 0.03, 'sine', 0.025),
-    pause: () => { try { if (actx && actx.state === 'running' && actx.suspend) actx.suspend(); } catch (e) { /* */ } }
+    pause: () => { try { if (actx && actx.state === 'running' && actx.suspend) actx.suspend(); } catch (e) { /* */ } },
+    /* Helemaal sluiten (vóór de microfoon): het volgende tikgeluidje maakt vanzelf een nieuwe. */
+    release: () => { const c = actx; actx = null; try { c && c.close && c.close(); } catch (e) { /* */ } }
   };
   // Gaat de app naar de achtergrond, laat de microfoon dan echt los (anders hangt hij als je terugkomt).
   try {
