@@ -1,4 +1,6 @@
 /* Extra grammatica-oefeningen voor A2 en B1 (november 2026), zodat oefenen en unittoetsen minder op elkaar lijken.
+   Onderaan: A1-aanvulling uit de voorstellen van Lupe (rapport 24 november 2026): al/del, hay vs. estar,
+   lidwoord na gustar, het weer met hacer, ir a + infinitief, bijvoeglijke naamwoorden in het meervoud en cuánto/cuánta.
    Alles wordt achteraan de bestaande unit toegevoegd (zie S.extendUnit), zodat je voortgang blijft kloppen. */
 (function (S) {
   'use strict';
@@ -184,4 +186,154 @@
     { t: 'order', s: 'Por un lado es barato, pero por otro lado es lento.', nl: 'Aan de ene kant is het goedkoop, maar aan de andere kant is het traag.', tag: 'argument' },
     { t: 'tr', nl: 'Daar ben ik het niet mee eens.', a: ['No estoy de acuerdo con eso.', 'No estoy de acuerdo.', 'Con eso no estoy de acuerdo.'], tag: 'argument' }
   ] });
+  /* ======================= A1 · voorstellen van Lupe (24 nov 2026) ======================= */
+  // A1 · 2 Personas y profesiones: wanneer wél en wanneer géén lidwoord
+  X('a1-02', {
+    grammar: [
+      { t: 'Wél of géén lidwoord?', es: '¿Con o sin artículo?',
+        html: `<p>Het Spaans gebruikt <b>vaker een lidwoord</b> dan het Nederlands:</p>
+<p>✅ Als je iets <b>in het algemeen</b> bedoelt: <i><b>La</b> gente aquí es muy simpática. <b>Los</b> médicos trabajan mucho.</i></p>
+<p>✅ Bij <b>señor / señora + naam</b> als je óver iemand praat: <i><b>La</b> señora García es abogada.</i> (Spreek je iemand direct aan, dan zonder: <i>Buenos días, señora García.</i>)</p>
+<p>✅ Na <b>gustar</b> en <b>encantar</b>: <i>Me gusta <b>el</b> trabajo. Me gustan <b>los</b> tacos.</i></p>
+<p>❌ Géén lidwoord bij een beroep of nationaliteit na <b>ser</b>: <i>Soy médico. Es argentina.</i> Maar mét een bijvoeglijk naamwoord erbij wel <i>un/una</i>: <i>Es <b>un</b> médico excelente.</i></p>`,
+        sum: 'Lo general lleva artículo (la gente, los tacos). La profesión después de «ser», no: soy médico.' }
+    ],
+    ex: [
+      { t: 'mc', q: 'Welke zin is goed?', o: ['La señora García es abogada.', 'Señora García es abogada.', 'La señora García es una abogada.'], x: 'Over iemand praten: la señora García. Beroep na ser: zonder lidwoord.', tag: 'articles' },
+      { t: 'mc', q: '«Hij is een uitstekende arts.»', o: ['Es un médico excelente.', 'Es médico excelente.', 'Es el médico excelente.'], x: 'Beroep mét bijvoeglijk naamwoord: dan wél un/una.', tag: 'articles' },
+      { t: 'cloze', s: '___ profesores de mi universidad son muy simpáticos.', a: ['Los'], o: ['Los', 'Las', 'El'], nl: 'De docenten van mijn universiteit zijn heel aardig.', tag: 'articles' },
+      { t: 'cloze', s: '___ gente en Lima es muy amable.', a: ['La'], o: ['La', 'El', 'Los'], nl: 'De mensen in Lima zijn heel vriendelijk.', x: 'La gente is enkelvoud en vrouwelijk, en krijgt in het Spaans een lidwoord.', tag: 'articles' },
+      { t: 'cloze', s: 'Me gusta ___ trabajo de periodista.', a: ['el'], o: ['el', 'la', 'un'], nl: 'Ik vind het werk van journalist leuk.', x: 'Na gustar komt een lidwoord: me gusta el trabajo.', tag: 'articles' },
+      { t: 'cloze', s: 'A Andrés le gustan ___ ciudades grandes.', a: ['las'], o: ['las', 'los', 'la'], nl: 'Andrés houdt van grote steden.', tag: 'articles' },
+      { t: 'mc', q: '«Mijn zus is lerares.»', o: ['Mi hermana es profesora.', 'Mi hermana es una profesora.', 'Mi hermana es la profesora.'], tag: 'articles' },
+      { t: 'tr', nl: 'Meneer López is ingenieur.', a: ['El señor López es ingeniero.'], x: 'El señor López (over iemand), ingeniero zonder lidwoord.', tag: 'articles' }
+    ]
+  });
+
+  // A1 · 3 Mi familia: bijvoeglijke naamwoorden in het meervoud
+  X('a1-03', {
+    grammar: [
+      { t: 'Bijvoeglijke naamwoorden in het meervoud', es: 'Adjetivos en plural',
+        html: `<p>Gaat het over meer personen of dingen, dan krijgt ook het bijvoeglijk naamwoord een meervoud: <b>-o → -os</b>, <b>-a → -as</b>, <b>-e → -es</b>, medeklinker <b>+ -es</b>.</p>
+<p>Een <b>gemengde groep</b> (man + vrouw) krijgt de mannelijke vorm: <i>mi hermano y mi hermana → mis hermanos viven <b>solos</b></i>.</p>`,
+        table: [['enkelvoud', 'meervoud'], ['mi primo es alto', 'mis primos son altos'], ['mi tía es simpática', 'mis tías son simpáticas'], ['mi abuelo es inteligente', 'mis abuelos son inteligentes'], ['mi hermana es joven', 'mis hermanas son jóvenes']],
+        sum: 'Mis hermanos viven solos. Mis abuelas son muy simpáticas.' }
+    ],
+    ex: [
+      { t: 'cloze', s: 'Mis hermanos viven ___.', h: 'solo', a: ['solos'], nl: 'Mijn broer en zus wonen alleen.', x: 'Gemengde groep → mannelijk meervoud: solos.', tag: 'adj-agree' },
+      { t: 'cloze', s: 'Mis abuelas son muy ___.', h: 'simpático', a: ['simpáticas'], nl: 'Mijn oma’s zijn heel aardig.', tag: 'adj-agree' },
+      { t: 'cloze', s: 'Mis primos son ___.', h: 'alto', a: ['altos'], nl: 'Mijn neven zijn lang.', tag: 'adj-agree' },
+      { t: 'cloze', s: 'Mis tías son ___.', h: 'joven', a: ['jóvenes'], nl: 'Mijn tantes zijn jong.', x: 'Joven → jóvenes: het accent komt erbij om de klemtoon te houden.', tag: 'adj-agree' },
+      { t: 'cloze', s: 'Los perros de mi tío son muy ___.', h: 'grande', a: ['grandes'], nl: 'De honden van mijn oom zijn heel groot.', tag: 'adj-agree' },
+      { t: 'mc', q: '«Mijn broer en mijn zus zijn getrouwd.»', o: ['Mi hermano y mi hermana están casados.', 'Mi hermano y mi hermana están casadas.', 'Mi hermano y mi hermana están casado.'], x: 'Man + vrouw samen → mannelijk meervoud.', tag: 'adj-agree' },
+      { t: 'tr', nl: 'Mijn ouders zijn heel aardig.', a: ['Mis papás son muy simpáticos.', 'Mis padres son muy simpáticos.', 'Mis papás son muy amables.', 'Mis padres son muy amables.'], tag: 'adj-agree' },
+      { t: 'tr', nl: 'Mijn zussen zijn lang.', a: ['Mis hermanas son altas.'], tag: 'adj-agree' }
+    ]
+  });
+
+  // A1 · 4 Mi ciudad: al / del (en wanneer níet) + hay vs. estar
+  X('a1-04', {
+    grammar: [
+      { t: 'al en del: wanneer wel, wanneer niet', es: '¿Al, a la, del, de la?',
+        html: `<p><b>a + el = al</b> en <b>de + el = del</b>. Dat is verplicht: <s>a el</s> en <s>de el</s> schrijf je nooit.</p>
+<p>⚠️ Het gebeurt <b>alleen bij el</b>. Bij <b>la</b>, <b>los</b> en <b>las</b> blijven de woordjes los: <i>a la plaza, de la iglesia, a los parques, de las tiendas</i>.</p>`,
+        table: [['', 'a (naar)', 'de (van / uit)'], ['el museo', 'al museo', 'del museo'], ['la plaza', 'a la plaza', 'de la plaza'], ['los parques', 'a los parques', 'de los parques'], ['las tiendas', 'a las tiendas', 'de las tiendas']],
+        ex: [['Voy al museo y vengo del parque.', 'Ik ga naar het museum en ik kom van het park.'], ['El banco está enfrente de la iglesia.', 'De bank is tegenover de kerk.']],
+        sum: 'Solo con «el»: al, del. Con la, los, las no se junta nada.' },
+      { t: 'Kort: hay = er is · estar = waar het is', es: 'Hay o está: la regla corta',
+        html: `<p><b>hay</b> = <i>er is / er zijn</i>: je vertelt dát iets er is (iets nieuws, met <i>un/una</i>, een getal, of zonder lidwoord). Na <i>hay</i> komt nooit <s>el/la</s>.</p>
+<p><b>estar</b> = <i>waar</i> iets bekends is (met <i>el/la</i>, <i>mi/tu</i> of een naam).</p>`,
+        table: [['hay (er is …)', 'estar (waar is …)'], ['¿Qué hay para ver aquí?', '¿Dónde está el museo?'], ['Hay un mercado en el centro.', 'El mercado está en el centro.'], ['Hay muchos restaurantes.', 'Los restaurantes están en la plaza.'], ['No hay supermercado.', 'Mi casa está cerca.']],
+        sum: '«Hay» dice que algo existe; «estar» dice dónde está algo conocido.' }
+    ],
+    ex: [
+      // al / del
+      { t: 'cloze', s: 'Voy ___ museo.', a: ['al'], o: ['al', 'a el', 'a la'], nl: 'Ik ga naar het museum.', tag: 'contractions' },
+      { t: 'cloze', s: 'Vengo ___ parque.', a: ['del'], o: ['del', 'de el', 'de la'], nl: 'Ik kom van het park.', tag: 'contractions' },
+      { t: 'cloze', s: 'Vamos ___ plaza.', a: ['a la'], o: ['a la', 'al', 'a el'], nl: 'We gaan naar het plein.', x: 'Bij la geen samentrekking: a la plaza.', tag: 'contractions' },
+      { t: 'cloze', s: 'La parada está enfrente ___ estación.', a: ['de la'], o: ['de la', 'del', 'de el'], nl: 'De halte is tegenover het station.', x: 'La estación is vrouwelijk: de la, niet del.', tag: 'contractions' },
+      { t: 'cloze', s: 'El hotel está cerca ___ mercados.', a: ['de los'], o: ['de los', 'del', 'dels'], nl: 'Het hotel is dicht bij de markten.', x: 'Bij los geen samentrekking: de los.', tag: 'contractions' },
+      { t: 'cloze', s: 'Mañana vamos ___ tiendas del centro.', a: ['a las'], o: ['a las', 'al', 'a los'], nl: 'Morgen gaan we naar de winkels in het centrum.', tag: 'contractions' },
+      { t: 'cloze', s: 'El cajero está al lado ___ hospital.', a: ['del'], o: ['del', 'de la', 'de el'], nl: 'De geldautomaat is naast het ziekenhuis.', tag: 'contractions' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['Voy al banco.', 'Voy a el banco.', 'Voy del banco.'], x: 'a + el = al, altijd.', tag: 'contractions' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['Salgo de la farmacia.', 'Salgo del farmacia.', 'Salgo de el farmacia.'], x: 'La farmacia → de la farmacia. Del alleen bij el.', tag: 'contractions' },
+      { t: 'tr', nl: 'Ik ga naar het museum en ik kom van het park.', a: ['Voy al museo y vengo del parque.', 'Yo voy al museo y vengo del parque.'], tag: 'contractions' },
+      { t: 'tr', nl: 'We gaan naar het centrum.', a: ['Vamos al centro.', 'Nosotros vamos al centro.'], tag: 'contractions' },
+      { t: 'order', s: 'El museo está lejos del centro.', nl: 'Het museum is ver van het centrum.', tag: 'contractions' },
+      // hay vs. estar
+      { t: 'cloze', s: '¿Qué ___ para ver aquí?', a: ['hay'], o: ['hay', 'está', 'es'], nl: 'Wat is er hier te zien?', tag: 'hay-estar' },
+      { t: 'cloze', s: '¿Dónde ___ el museo?', a: ['está'], o: ['está', 'hay', 'es'], nl: 'Waar is het museum?', tag: 'hay-estar' },
+      { t: 'cloze', s: 'En el centro ___ muchos restaurantes.', a: ['hay'], o: ['hay', 'están', 'son'], nl: 'In het centrum zijn veel restaurants.', tag: 'hay-estar' },
+      { t: 'cloze', s: 'Los restaurantes ___ en la plaza.', a: ['están'], o: ['están', 'hay', 'son'], nl: 'De restaurants zijn op het plein.', x: 'Los restaurantes (bekend, met los) → estar.', tag: 'hay-estar' },
+      { t: 'cloze', s: 'En mi calle no ___ supermercado.', a: ['hay'], o: ['hay', 'está', 'es'], nl: 'In mijn straat is geen supermarkt.', x: 'Ontkenning: no hay, vaak zonder lidwoord.', tag: 'hay-estar' },
+      { t: 'cloze', s: '¿Dónde ___ mi celular? No lo encuentro.', a: ['está'], o: ['está', 'hay', 'es'], nl: 'Waar is mijn mobiel? Ik kan hem niet vinden.', tag: 'hay-estar' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['La catedral está en la plaza.', 'Hay la catedral en la plaza.', 'La catedral hay en la plaza.'], x: 'Na hay nooit el/la. Een bekend gebouw → estar.', tag: 'hay-estar' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['Hay dos parques cerca.', 'Están dos parques cerca.', 'Son dos parques cerca.'], x: 'Een getal (iets nieuws noemen) → hay.', tag: 'hay-estar' },
+      { t: 'tr', nl: 'Wat is er hier te zien?', a: ['¿Qué hay para ver aquí?', '¿Qué hay para ver por aquí?', '¿Qué hay que ver aquí?'], tag: 'hay-estar' },
+      { t: 'tr', nl: 'Er is een markt in het centrum.', a: ['Hay un mercado en el centro.', 'En el centro hay un mercado.'], tag: 'hay-estar' },
+      { t: 'tr', nl: 'De markt is in het centrum.', a: ['El mercado está en el centro.'], tag: 'hay-estar' }
+    ]
+  });
+
+  // A1 · 6 ¿Qué te gusta?: na gustar komt een lidwoord
+  X('a1-06', {
+    grammar: [
+      { t: 'Na gustar: mét lidwoord', es: 'Me gusta el picante',
+        html: `<p>In het Nederlands zeg je <i>ik hou van tacos</i>, zonder lidwoord. In het Spaans zet je na <b>gustar</b>, <b>encantar</b> en <b>interesar</b> wél een lidwoord: <i>Me gustan <b>los</b> tacos. Me gusta <b>el</b> picante. Me encanta <b>la</b> música.</i></p>
+<p>Na gustar komt een <b>werkwoord</b>? Dan juist géén lidwoord: <i>Me gusta bailar.</i></p>`,
+        ex: [['Me gusta el picante.', 'Ik hou van pittig eten.'], ['¿Te gustan los gatos?', 'Hou je van katten?']],
+        sum: 'Me gusta + el/la/los/las + cosa · me gusta + infinitivo.' }
+    ],
+    ex: [
+      { t: 'cloze', s: 'Me gusta ___ picante.', a: ['el'], o: ['el', 'la', 'los'], nl: 'Ik hou van pittig eten.', tag: 'articles' },
+      { t: 'cloze', s: 'Me gustan ___ tacos.', a: ['los'], o: ['los', 'las', 'el'], nl: 'Ik vind tacos lekker.', tag: 'articles' },
+      { t: 'cloze', s: 'A Lucía le encanta ___ música cubana.', a: ['la'], o: ['la', 'el', 'los'], nl: 'Lucía is dol op Cubaanse muziek.', tag: 'articles' },
+      { t: 'cloze', s: 'No me gustan ___ películas de terror.', a: ['las'], o: ['las', 'los', 'la'], nl: 'Ik hou niet van horrorfilms.', tag: 'articles' },
+      { t: 'cloze', s: 'Nos gusta ___ café de Colombia.', a: ['el'], o: ['el', 'la', 'los'], nl: 'Wij houden van Colombiaanse koffie.', tag: 'articles' },
+      { t: 'mc', q: '«Ik vind tacos lekker.»', o: ['Me gustan los tacos.', 'Me gustan tacos.', 'Me gusta los tacos.'], x: 'Na gustar een lidwoord, en gustan omdat tacos meervoud is.', tag: 'articles' },
+      { t: 'mc', q: '«Ik dans graag.»', o: ['Me gusta bailar.', 'Me gusta el bailar.', 'Me gusta la bailar.'], x: 'Bij een werkwoord géén lidwoord.', tag: 'articles' },
+      { t: 'tr', nl: 'Ik hou van pittig eten.', a: ['Me gusta la comida picante.', 'Me gusta el picante.', 'A mí me gusta la comida picante.', 'Me encanta la comida picante.', 'Me encanta el picante.'], tag: 'articles' },
+      { t: 'tr', nl: 'Wij houden van voetbal.', a: ['Nos gusta el fútbol.', 'A nosotros nos gusta el fútbol.', 'Nos encanta el fútbol.'], tag: 'articles' },
+      { t: 'tr', nl: 'Hou je van katten?', a: ['¿Te gustan los gatos?', '¿A ti te gustan los gatos?', '¿Le gustan los gatos?'], tag: 'articles' }
+    ]
+  });
+
+  // A1 · 10 Planes y el clima: weer met hacer, ir a + infinitief, cuánto/cuánta
+  X('a1-10', {
+    grammar: [
+      { t: 'Het weer: hace, niet es', es: '¿Qué tiempo hace?',
+        html: `<p>Voor het weer gebruik je <b>hacer</b>: <i>¿Qué tiempo <b>hace</b>? · ¿Qué clima <b>hace</b>? — <b>Hace</b> calor / frío / sol / buen tiempo.</i> Nooit <s>es calor</s> of <s>es frío</s>.</p>
+<p>Over het weer van morgen? Gebruik <b>ir a + infinitief</b>: <i>Mañana <b>va a hacer</b> calor. <b>Va a llover.</b></i> Na <b>ir a</b> komt altijd het hele werkwoord: <i>voy a <b>hacer</b></i>, niet <s>voy a hago</s> of <s>voy hacer</s>.</p>`,
+        ex: [['¿Qué tiempo hace hoy? — Hace mucho sol.', 'Wat voor weer is het vandaag? — De zon schijnt volop.'], ['Mañana va a hacer frío.', 'Morgen wordt het koud.']],
+        sum: 'El clima con «hacer»: hace calor. El futuro: va a hacer calor, va a llover.' },
+      { t: 'Hoeveel? cuánto, cuánta, cuántos, cuántas', es: '¿Cuánto o cuánta?',
+        html: `<p><b>Cuánto</b> past zich aan het woord erna aan, net als een bijvoeglijk naamwoord.</p>
+<p>Zonder zelfstandig naamwoord erachter gebruik je <b>cuánto</b>: <i>¿Cuánto cuesta?</i></p>`,
+        table: [['', 'enkelvoud', 'meervoud'], ['mannelijk', '¿cuánto tiempo?', '¿cuántos días?'], ['vrouwelijk', '¿cuánta lluvia?', '¿cuántas horas?']],
+        sum: 'Cuánto tiempo, cuánta lluvia, cuántos días, cuántas horas.' }
+    ],
+    ex: [
+      // weer met hacer
+      { t: 'cloze', s: '¿Qué tiempo ___ hoy?', a: ['hace'], o: ['hace', 'es', 'está'], nl: 'Wat voor weer is het vandaag?', tag: 'weather' },
+      { t: 'cloze', s: 'Hoy ___ buen tiempo.', a: ['hace'], o: ['hace', 'es', 'está'], nl: 'Vandaag is het lekker weer.', tag: 'weather' },
+      { t: 'mc', q: '«Het is koud.»', o: ['Hace frío.', 'Es frío.', 'Tiene frío.'], x: 'Weer = hacer. Tener frío is: (iemand) heeft het koud.', tag: 'weather' },
+      { t: 'tr', nl: 'Wat voor weer is het?', a: ['¿Qué tiempo hace?', '¿Qué clima hace?', '¿Cómo está el clima?', '¿Cómo está el tiempo?'], tag: 'weather' },
+      // ir a + infinitief
+      { t: 'cloze', s: 'Mañana ___ a hacer calor.', h: 'ir', a: ['va'], nl: 'Morgen wordt het warm.', tag: 'ir-a' },
+      { t: 'cloze', s: 'Este sábado yo ___ a ir a la playa.', h: 'ir', a: ['voy'], nl: 'Deze zaterdag ga ik naar het strand.', tag: 'ir-a' },
+      { t: 'cloze', s: '¿Qué ___ a hacer tú esta noche?', h: 'ir', a: ['vas'], nl: 'Wat ga jij vanavond doen?', tag: 'ir-a' },
+      { t: 'cloze', s: 'Ellos van a ___ a Cusco en mayo.', h: 'viajar', a: ['viajar'], nl: 'Zij gaan in mei naar Cusco reizen.', x: 'Na ir a komt altijd de infinitief.', tag: 'ir-a' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['Voy a hacer la maleta.', 'Voy hacer la maleta.', 'Voy a hago la maleta.'], x: 'ir + a + infinitief: voy a hacer.', tag: 'ir-a' },
+      { t: 'tr', nl: 'Morgen gaat het regenen.', a: ['Mañana va a llover.', 'Va a llover mañana.'], tag: 'ir-a' },
+      { t: 'tr', nl: 'Dit weekend gaan we koken.', a: ['Este fin de semana vamos a cocinar.', 'Vamos a cocinar este fin de semana.'], tag: 'ir-a' },
+      // cuánto / cuánta
+      { t: 'cloze', s: '¿___ tiempo vas a estar en Chile?', a: ['Cuánto'], o: ['Cuánto', 'Cuánta', 'Cuántos'], nl: 'Hoe lang blijf je in Chili?', x: 'El tiempo is mannelijk enkelvoud: cuánto tiempo.', tag: 'questions' },
+      { t: 'cloze', s: '¿___ días vas a estar en Cusco?', a: ['Cuántos'], o: ['Cuántos', 'Cuántas', 'Cuánto'], nl: 'Hoeveel dagen blijf je in Cusco?', tag: 'questions' },
+      { t: 'cloze', s: '¿___ horas de sol hay en verano?', a: ['Cuántas'], o: ['Cuántas', 'Cuántos', 'Cuánta'], nl: 'Hoeveel uur zon is er in de zomer?', tag: 'questions' },
+      { t: 'cloze', s: '¿___ lluvia cae en abril?', a: ['Cuánta'], o: ['Cuánta', 'Cuánto', 'Cuántas'], nl: 'Hoeveel regen valt er in april?', x: 'La lluvia is vrouwelijk enkelvoud: cuánta.', tag: 'questions' },
+      { t: 'cloze', s: '¿___ grados hace hoy?', a: ['Cuántos'], o: ['Cuántos', 'Cuánto', 'Cuántas'], nl: 'Hoeveel graden is het vandaag?', tag: 'questions' },
+      { t: 'mc', q: '«Hoeveel koffers neem je mee?»', o: ['¿Cuántas maletas llevas?', '¿Cuántos maletas llevas?', '¿Cuánta maletas llevas?'], tag: 'questions' },
+      { t: 'tr', nl: 'Hoeveel tijd hebben we?', a: ['¿Cuánto tiempo tenemos?'], tag: 'questions' }
+    ]
+  });
 })(window.SPT);
