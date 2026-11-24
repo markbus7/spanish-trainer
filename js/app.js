@@ -1248,6 +1248,8 @@
     const draw = u => {
       box.innerHTML = '';
       box.append(h('h3', { class: 'rep-h' }, '💡 Voorstellen van Lupe'));
+      const lr = M().lastRework && M().lastRework();
+      if (u && u.text && lr && u.t < lr.t) box.append(h('p', { class: 'small' }, '🔄 Deze voorstellen zijn van vóór update ' + lr.v + ', waarin ze (deels) verwerkt zijn. Tik op «Nieuwe voorstellen» voor een frisse lijst.'));
       if (u && u.text) box.append(h('div', { class: 'small', html: S.md(u.text) }), h('small', { class: 'muted' }, 'Voorgesteld op ' + fmtDate(u.t, { day: 'numeric', month: 'long' })));
       else box.append(h('p', { class: 'small muted' }, S.AI.enabled() ? 'Laat Lupe je fouten, zwakke punten en goedgekeurde antwoorden bekijken en voorstellen wat er in de volgende update moet komen.' : 'Met een AI-sleutel (Instellingen) kan Lupe hier voorstellen wat er in de volgende update moet komen.'));
       if (S.AI.enabled()) {

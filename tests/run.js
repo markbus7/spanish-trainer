@@ -927,10 +927,12 @@ await micTests();
     const e1 = Mi.exercise(it4, { ok: false, user: 'a el', expected: 'al' });
     const e2 = Mi.exercise({ kind: 'type', translate: true, prompt: 'Waar is de wc?', tag: 'hay-estar', srsId: 'x|a1-04|12' }, { ok: false, dontKnow: true, user: '', expected: '¿Dónde está el baño?' });
     ok(e1 && e1.u === 'a el' && e1.id === it4.srsId && e2.dk === 1 && e2.k === 'vertalen' && e2.t > e1.t, 'oefenfouten: bewaard met id, soort en antwoord');
+    const RW = S.reworked; S.reworked = []; // tijdsonafhankelijk: hier zonder «al verwerkt»
     const rx = Mi.report(30);
     ok(rx.exTotal === 2 && rx.exTopics.length === 2 && rx.total === 6, 'oefenfouten: apart geteld in het rapport');
     const tx = Mi.asText(rx);
     ok(tx.includes('Fouten in gewone oefeningen') && tx.includes('ik: «a el» → goed: «al»') && tx.includes('[x|a1-04|12]') && tx.includes('(a1-04)'), 'oefenfouten: in de rapporttekst met ids');
+    S.reworked = RW;
     const A2 = { log: [], n: 0, ex: [e1] }, B2 = { log: [], n: 0, ex: [e1, e2] };
     const mx = Mi.merge(A2, B2);
     ok(mx.ex.length === 2 && JSON.stringify(Mi.merge(mx, mx)) === JSON.stringify(mx), 'oefenfouten: sync voegt samen, idempotent');
@@ -940,7 +942,7 @@ await micTests();
     ok(hd.some(x => x.id === 'x|a1-04|5' && x.unit === 'a1-04' && x.f === 4 && x.a), 'oefenfouten: vaak fout uit de herhaling, met antwoord');
     ok(Mi.asText(Mi.report(30)).includes('[x|a1-04|5]'), 'oefenfouten: vaak fout staat in de tekst');
     ok(Mi.asText(Mi.report(30)).includes('✔ al verwerkt in v') && Mi.asText(Mi.report(30)).includes('Al verwerkt in eerdere updates'), 'verwerkt: Lupe ziet wat al in de app zit');
-    ok((S.reworked || []).every(x => (x.tag ? S.C.TAGS[x.tag] && S.C.get(x.unit) : x.ids.every(id => S.C.word(S.C.get(id.split('|')[1]), +id.split('|')[2]))) && /^\d{4}-\d\d-\d\d$/.test(x.date)), 'verwerkt: tags, units en woorden bestaan');
+    ok((S.reworked || []).every(x => (x.tag ? S.C.TAGS[x.tag] && S.C.get(x.unit) : x.ids.every(id => S.C.word(S.C.get(id.split('|')[1]), +id.split('|')[2]))) && /^\d{4}-\d\d-\d\d(T\d\d:\d\d:\d\dZ)?$/.test(x.date)), 'verwerkt: tags, units en woorden bestaan');
     const md = S.md ? S.md('- **Titel** (uitleg erbij)\n  Waar: a1-04\n  Wat: iets\n- Tweede') : '';
     ok(!S.md || (md.match(/<li>/g) || []).length === 2 && md.includes('Waar: a1-04'), 'voorstellen: ingesprongen regels horen bij hetzelfde punt');
   }
@@ -952,6 +954,22 @@ await micTests();
     const fl = Mi.report(30).fix;
     ok(!fl.some(e => e.u === 'mucho gusto') && fl.some(e => e.u === 'qué onda'), 'update-check: verwerkt antwoord valt weg, open punt blijft');
     St.state.lupe.fix = St.state.lupe.fix.filter(e => e.id !== wi.id);
+  }
+  {
+    // leerling met oude cijfers van vóór de update: Lupe krijgt die punten niet meer als open punt
+    const keep = JSON.stringify(St.state);
+    const before = new Date('2026-11-24T12:00:00Z').getTime();
+    St.state.lupe.ex = [{ t: before, id: 'x|a1-04|14', tag: 'contractions', k: 'invullen', q: 'La panadería está ___ lado del banco.', u: 'a el', a: 'al' }];
+    St.state.lupe.log = [{ t: before, m: 'roleplay', w: 'a el museo', c: 'al museo', tag: 'contractions' }];
+    St.state.tags.contractions = { ok: 8, no: 13 }; St.state.tags['hay-estar'] = { ok: 23, no: 17 };
+    St.state.srs['x|a1-04|14'] = { i: 0, d: 0, r: 0, l: 2, f: 5, g: 2, t: before };
+    St.state.srs['w|a1-03|32'] = { i: 0, d: 0, r: 0, l: 1, f: 3, g: 4, t: before };
+    let tx = Mi.asText(Mi.report(30, new Date('2026-11-24T22:00:00Z').getTime()));
+    ok(!tx.includes('[x|a1-04|14]') && !tx.includes('[w|a1-03|32]') && !/al \/ del \[contractions\]: \d/.test(tx) && !/hay vs\. estar \[hay-estar\]: \d/.test(tx) && /punten hierboven weggelaten/.test(tx), 'verwerkt: oude fouten van vóór de update niet meer als open punt');
+    Mi.exercise({ kind: 'mc', fill: true, sentence: 'Voy ___ museo.', tag: 'contractions', srsId: 'x|a1-04|14' }, { ok: false, user: 'a el', expected: 'al' });
+    tx = Mi.asText(Mi.report(30));
+    ok(tx.includes('[x|a1-04|14]') && /fouten sinds die update: 1/.test(tx), 'verwerkt: nieuwe fout ná de update komt terug, met aantal');
+    St.state = JSON.parse(keep);
   }
   const ses = Mi.practice(['ser-estar'], [w.id]);
   ok(ses.items.length > 0 && ses.items.some(it => it.tag === 'ser-estar'), 'lupe-log: oefensessie voor de fouten');

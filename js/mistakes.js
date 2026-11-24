@@ -207,7 +207,17 @@
     const R = S.reworked || [];
     return R.find(x => (tag && x.tag === tag) || (id && x.ids && x.ids.includes(id))) || null;
   }
-  function since(rw) { return rw ? new Date(rw.date + 'T00:00:00').getTime() : 0; }
+  function since(rw) { return rw ? new Date(/T/.test(rw.date) ? rw.date : rw.date + 'T00:00:00').getTime() : 0; }
+  /** Fouten (gesprekken + oefeningen) ná de update waarin dit onderwerp/woord verwerkt is. */
+  function newSince(rw, tag, id) {
+    if (!rw) return null;
+    const t0 = since(rw), L = db();
+    return L.log.filter(e => e.t >= t0 && tag && e.tag === tag).length + (L.ex || []).filter(e => e.t >= t0 && ((tag && e.tag === tag) || (id && e.id === id))).length;
+  }
+  /** Al verwerkt en sindsdien geen nieuwe fouten? Dan laten we het weg uit het rapport voor Lupe. */
+  /** Laatste update waarin voorstellen verwerkt zijn: {v, t} (of null). */
+  function lastRework() { const R = S.reworked || []; if (!R.length) return null; const x = R.reduce((a, b) => since(b) > since(a) ? b : a); return { v: x.v, t: since(x) }; }
+  function settled(tag, id) { const rw = reworked(tag, id); return !!rw && newSince(rw, tag, id) === 0; }
   function reworkNote(rw, list) {
     if (!rw) return '';
     const after = (list || []).filter(e => e.t >= since(rw)).length;
@@ -265,9 +275,11 @@
     lines.push(`App ${((typeof self !== 'undefined' && self.SPT_VERSION) || {}).number || '?'} · cursus ${S.course.id || '?'}`);
     const les = u => u ? ' — les: ' + u.level + ' ' + u.title + ' (' + u.id + ')' : '';
     if (!r.total) lines.push('', 'Nog geen fouten uit gesprekken genoteerd.');
-    if (r.topics.length) {
+    let hidden = 0;
+    const topics = r.topics.filter(t => settled(t.tag) ? (hidden++, false) : true);
+    if (topics.length) {
       lines.push('', 'Waar ik de mist in ga in gesprekken (grammatica):');
-      r.topics.forEach(t => {
+      topics.forEach(t => {
         lines.push(`- ${t.label} [${t.tag}]: ${t.n}×${les(t.units[0])}${reworkNote(reworked(t.tag), db().log.filter(e => e.tag === t.tag))}`);
         t.ex.forEach(e => lines.push(`    ${fmtD(e.t)}: «${e.w}» → «${e.c}»${e.why ? ' (' + e.why + ')' : ''}`));
       });
@@ -276,28 +288,30 @@
       lines.push('', 'Woorden die misgingen (staan in mijn herhaling):');
       r.words.slice(0, 15).forEach(e => lines.push(`- ${e.es || e.c}${e.nl ? ' = ' + e.nl : ''}${e.w ? ' (ik schreef «' + e.w + '»)' : ''}`));
     }
-    if (r.exTopics && r.exTopics.length) {
+    const exTopics = (r.exTopics || []).filter(t => settled(t.tag) ? (hidden++, false) : true);
+    if (exTopics.length) {
       lines.push('', 'Fouten in gewone oefeningen (typen, meerkeuze, dictee, woordtegels):');
-      r.exTopics.slice(0, 8).forEach(t => {
+      exTopics.slice(0, 8).forEach(t => {
         lines.push(`- ${t.label} [${t.tag}]: ${t.n}×${les(t.units[0])}${reworkNote(reworked(t.tag), (db().ex || []).filter(e => e.tag === t.tag))}`);
         t.ex.forEach(e => lines.push(`    ${fmtD(e.t)} ${e.k ? '(' + e.k + ') ' : ''}${e.q ? '«' + e.q + '» ' : ''}ik: ${e.dk ? 'weet het niet' : '«' + e.u + '»'} → goed: «${e.a}»${e.id ? ' [' + e.id + ']' : ''}`));
       });
     }
-    if (r.hard && r.hard.length) {
+    const hard = (r.hard || []).filter(x => settled(x.tag !== 'vocab' ? x.tag : null, x.id) || (x.tag === 'vocab' && settled(null, x.id)) ? (hidden++, false) : true);
+    if (hard.length) {
       lines.push('', 'Oefeningen en woorden die vaak fout gaan (alle tijd, uit de herhaling):');
-      r.hard.forEach(x => {
+      hard.forEach(x => {
         const rw = reworked(x.tag !== 'vocab' ? x.tag : null, x.id);
         lines.push(`- [${x.id}] «${x.q}» → «${x.a}»: ${x.f}× fout, ${x.g}× goed (totaal)${x.last ? ', laatst geoefend ' + fmtD(x.last) : ''}${x.tag !== 'vocab' ? ' · ' + C.tag(x.tag) + ' [' + x.tag + ']' : ''}${rw ? ' · ✔ al verwerkt in v' + rw.v + (x.last && x.last < since(rw) ? ', sindsdien niet meer geoefend' : '') : ''}`);
       });
     }
-    const weak = Object.entries(s.tags).filter(([k, v]) => k !== 'vocab' && v.ok + v.no >= 3 && v.ok / (v.ok + v.no) < 0.8)
+    const weak = Object.entries(s.tags).filter(([k, v]) => k !== 'vocab' && v.ok + v.no >= 3 && v.ok / (v.ok + v.no) < 0.8 && (settled(k) ? (hidden++, false) : true))
       .sort((a, b) => a[1].ok / (a[1].ok + a[1].no) - b[1].ok / (b[1].ok + b[1].no)).slice(0, 6);
     if (weak.length) {
       lines.push('', 'Zwakke punten uit oefeningen en gesprekken samen:');
       weak.forEach(([k, v]) => lines.push(`- ${C.tag(k)} [${k}]: ${Math.round(v.ok / (v.ok + v.no) * 100)}% goed (${v.ok + v.no} antwoorden, totaal)${les(unitsFor(k)[0])}${reworked(k) ? ' · ✔ al verwerkt in v' + reworked(k).v + ' (' + fmtD(since(reworked(k))) + ')' : ''}`));
     }
     if ((S.reworked || []).length && opt.done !== false) {
-      lines.push('', 'Al verwerkt in eerdere updates van de app (niet opnieuw voorstellen, tenzij er ná die datum nieuwe fouten zijn):');
+      lines.push('', `Al verwerkt in eerdere updates van de app (niet opnieuw voorstellen, tenzij er ná die datum nieuwe fouten zijn)${hidden ? '. ' + hidden + ' punten hierboven weggelaten: al verwerkt en sindsdien geen nieuwe fouten' : ''}:`);
       S.reworked.forEach(x => lines.push(`- v${x.v} (${fmtD(since(x))}) ${x.tag ? '[' + x.tag + ']' + (x.unit ? ' ' + x.unit : '') : (x.ids || []).join(', ')}: ${x.what}`));
     }
     if (r.advice && r.advice.text && opt.advice !== false) lines.push('', 'Advies van Lupe (' + fmtD(r.advice.t) + '):', r.advice.text.replace(/\*\*/g, ''));
@@ -319,7 +333,8 @@
     }
     if (r.update && r.update.text && opt.proposal !== false) {
       if (lines.length) lines.push('');
-      lines.push('Voorstellen van Lupe voor de volgende update (' + fmtD(r.update.t) + '):', r.update.text.replace(/\*\*/g, ''));
+      const lr = lastRework(), old = lr && r.update.t < lr.t;
+      lines.push('Voorstellen van Lupe voor de volgende update (' + fmtD(r.update.t) + (old ? ', van vóór update ' + lr.v + ': vraag eerst nieuwe voorstellen' : '') + '):', r.update.text.replace(/\*\*/g, ''));
     }
     return lines.join('\n');
   }
@@ -362,5 +377,5 @@ Write in Dutch, max ~120 words, no headings, no tables. Based on the learner's m
     return db().advice;
   }
 
-  S.Mistakes = { exercise, hardItems, scrubAll, promptRule, strip, parse, record, merge, report, focus, practice, asText, updateText, advise, proposeUpdate, regrade, accepted, findWord, unitsFor, MAX };
+  S.Mistakes = { lastRework, exercise, hardItems, scrubAll, promptRule, strip, parse, record, merge, report, focus, practice, asText, updateText, advise, proposeUpdate, regrade, accepted, findWord, unitsFor, MAX };
 })(window.SPT);
