@@ -191,6 +191,17 @@
       .sort((a, b) => b.n - a.n || order.indexOf(a.u.level) - order.indexOf(b.u.level) || a.i - b.i);
     return us.slice(0, 1).map(x => x.u);
   }
+  /** Staat dit goedgekeurde antwoord inmiddels in de lesstof (update verwerkt)? Dan hoort het niet meer bij «voor de volgende update». */
+  function inApp(e) {
+    try {
+      const m = /^([xw])\|([^|]+)\|(\d+)$/.exec(e.id || ''), u = m && C.get(m[2]);
+      if (!u || !S.Gen) return false;
+      let ans = [];
+      if (m[1] === 'w') { const w = C.word(u, +m[3]); if (!w) return false; ans = S.Gen.forms(w.es).concat(S.Gen.wordSynonyms(w)); }
+      else { const x = u.ex[+m[3]]; if (!x) return false; ans = x.t === 'tr' || (x.t === 'cloze' && !x.o) ? x.a || [] : []; }
+      return ans.length > 0 && S.check.check(e.u, ans, {}).ok;
+    } catch (err) { return false; }
+  }
   function report(days = 30, now = Date.now()) {
     const L = db(), from = now - days * DAY;
     const log = L.log.filter(e => e.t >= from);
@@ -202,7 +213,7 @@
     log.filter(e => e.tag === 'vocab').reverse().forEach(e => { const k = S.check.bare(e.es || e.c); if (!seenW.has(k)) { seenW.add(k); words.push(e); } });
     // vergelijken met de periode ervoor: gaat het beter?
     const prev = L.log.filter(e => e.t >= from - days * DAY && e.t < from).length;
-    const fix = (L.fix || []).filter(e => e.t >= from).slice().reverse();
+    const fix = (L.fix || []).filter(e => e.t >= from && !inApp(e)).slice().reverse();
     // fouten in gewone oefeningen, per onderwerp
     const exl = (L.ex || []).filter(e => e.t >= from);
     const byX = {};
@@ -302,7 +313,7 @@
     const sys = `You are Profe Lupe, the ${ES ? 'Latin American Spanish' : S.course.ai.target} teacher inside a language-learning web app${S.course.ui === 'nl' ? ' for a Dutch speaker' : ''}. The app's developer asks you what should go into the NEXT UPDATE, so the course fits this learner (and every learner like them) better. The developer edits the lesson files directly, so every proposal must point to the exact place and contain ready-to-use content.
 The report below contains: mistakes from conversations with you, mistakes from regular exercises (typing, multiple choice, dictation, word tiles), exercises that often go wrong (with ids), weak topics with % correct, and answers that were marked wrong but that you approved. Ids: "x|<unit>|<n>" = exercise n of a unit, "w|<unit>|<n>" = word n of a unit's word list; [tag] = grammar topic key; (a1-04) = unit id.
 
-Write in Dutch. Give 3–7 proposals, most important first. No intro, no outro, no headings. Use EXACTLY this format for each proposal (a line starting with "- ", then indented lines starting with two spaces):
+Write in Dutch. Give 3–6 proposals, most important first, and always finish every proposal completely (max 5 examples each). No intro, no outro, no headings. Use EXACTLY this format for each proposal (a line starting with "- ", then indented lines starting with two spaces):
 - **<short title>** (<one of: antwoord toevoegen · modelantwoord fout · oefeningen erbij · uitleg erbij · woorden erbij · functie>)
   Waar: <unit id + title, exercise or word id, tag key — exactly as in the report; "nieuw" if it does not exist yet>
   Waarom: <the evidence from the report: numbers (x× fout, % goed bij n antwoorden) and 1–2 literal wrong answers «…» → «…»>
@@ -310,7 +321,7 @@ Write in Dutch. Give 3–7 proposals, most important first. No intro, no outro, 
   Voorbeelden: <for answers: the exact extra accepted answer(s); for exercises: 3–5 ready-to-use items as «${ES ? 'Spanish' : S.course.ai.target} sentence» = «Dutch translation», with ___ for a gap if it is a fill-in item; otherwise leave this line out>
 
 Rules: only propose what the report supports, and say so in "Waarom"; if the report is thin, give fewer proposals. Prefer fixing the learner's most frequent mistakes. Don't repeat something that already exists in the course unless it should be explained or practised differently. ${ES ? 'Always Latin American Spanish norms (ustedes, never vosotros; regional vocabulary like carro, celular, computadora).' : 'Teach ' + S.course.ai.target + '.'}`;
-    const text = await S.AI.ask({ system: sys, prompt: asText(r, { advice: true, proposal: false }), maxTokens: 1800 });
+    const text = await S.AI.ask({ system: sys, prompt: asText(r, { advice: true, proposal: false }), maxTokens: 4000 });
     db().update = { t: Date.now(), text: text.trim() };
     return db().update;
   }
@@ -327,7 +338,7 @@ Write in Dutch, max ~120 words, no headings, no tables. Based on the learner's m
 Write in Latin American Spanish, max ~120 words, no headings, no tables. Based on the learner's mistake report (mistakes in conversations AND in regular exercises): name the 2–3 most important things to improve, explain each in one short sentence with one ${T} example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).`
       : `You are Profe Lupe, a warm Latin American Spanish teacher in a learning app for a Dutch speaker. Always Latin American norms (ustedes, never vosotros).
 Write in Dutch, max ~120 words, no headings, no tables. Based on the learner's mistake report (mistakes in conversations AND in regular exercises): name the 2–3 most important things to improve, explain each in one short sentence with one Latin American Spanish example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).`;
-    const text = await S.AI.ask({ system: sys, prompt: asText(r, { advice: false }), maxTokens: 700 });
+    const text = await S.AI.ask({ system: sys, prompt: asText(r, { advice: false }), maxTokens: 1200 });
     db().advice = { t: Date.now(), text: text.trim() };
     return db().advice;
   }

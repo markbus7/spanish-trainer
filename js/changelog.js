@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.62.1', date: '2026-11-24',
+    nl: ['Tweede ronde voorstellen van Lupe: getallen 30–99 (uitleg en 9 oefeningen, let op sesenta/setenta) in Mi familia; bij al/del de uitzondering voor namen (a El Salvador); Lupe\'s voorbeeldzinnen voor al/del, hay vs. estar en lidwoorden als extra oefeningen.', '«Voor de volgende update» toont geen antwoorden meer die de app inmiddels al goed rekent (zoals «mucho gusto»).', 'Lupe\'s voorstellen werden soms halverwege afgekapt; ze krijgt nu genoeg ruimte en maakt elk voorstel af.'],
+    es: [] },
   { v: '1.62.0', date: '2026-11-24',
     nl: ['Voorstellen van Lupe verwerkt: «mucho gusto» telt nu goed bij «aangenaam (man / vrouw zegt)». Extra uitleg en oefeningen in A1: al/del (en geen samentrekking bij la, los, las) en hay vs. estar in Mi ciudad, wanneer wél een lidwoord in Personas y profesiones en na gustar, bijvoeglijke naamwoorden in het meervoud in Mi familia, en hace bij het weer, ir a + infinitief en cuánto/cuánta in Planes y el clima.', 'Het rapport van Lupe kijkt nu ook naar je fouten in gewone oefeningen (typen, meerkeuze, dictee, woordtegels), niet alleen naar gesprekken. Haar advies en haar voorstellen voor de volgende update gebruiken dat ook.', 'Lupe\'s voorstellen voor de volgende update hebben nu een vaste opbouw: waar (les en oefening), waarom (cijfers en je foute antwoorden), wat er moet veranderen en kant-en-klare voorbeeldzinnen.'],
     es: [] },

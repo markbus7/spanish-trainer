@@ -942,6 +942,15 @@ await micTests();
     const md = S.md ? S.md('- **Titel** (uitleg erbij)\n  Waar: a1-04\n  Wat: iets\n- Tweede') : '';
     ok(!S.md || (md.match(/<li>/g) || []).length === 2 && md.includes('Waar: a1-04'), 'voorstellen: ingesprongen regels horen bij hetzelfde punt');
   }
+  {
+    // verwerkt in de lesstof? Dan staat het niet meer bij «voor de volgende update»
+    const wi = S.C.word(S.C.get('a1-01'), 17);
+    ok(wi && wi.es === 'encantado / encantada', 'update-check: w|a1-01|17 is encantado / encantada');
+    St.state.lupe.fix = (St.state.lupe.fix || []).concat([{ t: Date.now(), q: wi.nl, u: 'mucho gusto', a: ['encantado'], id: wi.id, unit: 'a1-01' }, { t: Date.now() + 1, q: wi.nl, u: 'qué onda', a: ['encantado'], id: wi.id, unit: 'a1-01' }]);
+    const fl = Mi.report(30).fix;
+    ok(!fl.some(e => e.u === 'mucho gusto') && fl.some(e => e.u === 'qué onda'), 'update-check: verwerkt antwoord valt weg, open punt blijft');
+    St.state.lupe.fix = St.state.lupe.fix.filter(e => e.id !== wi.id);
+  }
   const ses = Mi.practice(['ser-estar'], [w.id]);
   ok(ses.items.length > 0 && ses.items.some(it => it.tag === 'ser-estar'), 'lupe-log: oefensessie voor de fouten');
   const A = JSON.parse(JSON.stringify(St.state)), B = JSON.parse(JSON.stringify(St.state));
