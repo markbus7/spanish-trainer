@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.61.0', date: '2026-11-24',
+    nl: ['Nieuwe B2-les 13 «Dijo que vendría» in Caracas: nieuws en geruchten doorgeven, met radiomaakster Génesis. Op de iPhone gluurt Lupe buiten de lessen nu als smal lipje uit de rand, zodat ze geen tekst meer bedekt.'],
+    es: [] },
   { v: '1.60.3', date: '2026-11-24',
     nl: ['Microfoon op iPhone/iPad (Safari én Edge): de app gebruikt nu steeds dezelfde spraakherkenning in plaats van telkens een nieuwe, en na het inspreken klinken er geen tikgeluidjes meer (die zetten het geluid op afspelen).', 'Hoort de microfoon 4 seconden lang helemaal niets, dan start hij vanzelf opnieuw.'],
     es: [] },

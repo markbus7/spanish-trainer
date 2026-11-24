@@ -1322,4 +1322,116 @@
       ]
     }
   });
+
+  /* ───────────────────────── B2 · 13 ───────────────────────── */
+  U({
+    id: 'b2-13', level: 'B2', icon: '📻', title: 'Dijo que vendría', nl: 'Nieuws en geruchten doorgeven: indirecte rede in het verleden, según en «habría»',
+    goals: ['Doorvertellen wat iemand zei, met de tijden die opschuiven (dijo que estaba, que había vuelto, que vendría, que lo hiciera)', 'Nieuwswerkwoorden gebruiken: afirmar, asegurar, negar que + subjuntivo, anunciar, reconocer', 'Laten horen dat iets nog niet bevestigd is: según, al parecer, por lo visto en het condicional van geruchten (habría renunciado)'],
+    vocab: [
+      ['afirmar', 'beweren, verklaren'], ['asegurar', 'verzekeren, stellig zeggen'], ['negar (ie)', 'ontkennen'], ['anunciar', 'aankondigen'], ['advertir (ie)', 'waarschuwen'],
+      ['confesar (ie)', 'bekennen'], ['reconocer', 'toegeven, erkennen'], ['añadir', 'eraan toevoegen'], ['confirmar', 'bevestigen'], ['desmentir (ie)', '(een bericht) tegenspreken'],
+      ['al parecer', 'naar het schijnt'], ['por lo visto', 'blijkbaar, zo te zien'], ['se rumorea que', 'het gerucht gaat dat'], ['el rumor', 'het gerucht'], ['la fuente', 'de bron'],
+      ['el comunicado', 'de verklaring, het persbericht'], ['el titular', 'de krantenkop'], ['la rueda de prensa', 'de persconferentie'], ['el / la periodista', 'de journalist'],
+      ['la emisora', 'de radiozender'], ['el chisme', 'de roddel'], ['enterarse de', 'horen van, te weten komen'], ['al día siguiente', 'de volgende dag'], ['la víspera', 'de dag ervoor'],
+      ['dizque', 'zogenaamd, naar men zegt', 'LatAm (informeel)'], ['echar el cuento', 'het verhaal vertellen', 'VE (informeel)'], ['chamo / chama', 'jongen / meisje; gast', 'VE (informeel)'],
+      ['¡Epa!', 'hé!, hoi!', 'VE'], ['la cola', 'de file; de rij', 'VE: ook file'], ['la arepa', 'het gevulde maïsbroodje'], ['el teleférico', 'de kabelbaan'], ['el cerro', 'de berg, heuvel'],
+      ['emigrar', 'emigreren'], ['en el extranjero', 'in het buitenland']
+    ],
+    grammar: [
+      { t: 'Doorvertellen in het verleden: de tijden schuiven op', es: 'El estilo indirecto en pasado',
+        html: `<p>In B1 leerde je <i>Dice que…</i> en <i>Dijo que…</i>. Op B2 let je erop dat de tijden <b>één stap terug</b> gaan als je in het verleden doorvertelt (<i>dijo que, me contó que, explicó que</i>):</p>
+<p>📌 <b>presente → imperfecto</b>: «Estoy cansada.» → <i>Dijo que <b>estaba</b> cansada.</i></p>
+<p>📌 <b>indefinido / perfecto → pluscuamperfecto</b>: «Volví la semana pasada.» → <i>Dijo que <b>había vuelto</b> la semana anterior.</i></p>
+<p>📌 <b>futuro → condicional</b>: «Anunciaré algo.» → <i>Aseguró que <b>anunciaría</b> algo.</i> En <b>ir a</b> → <i>iba a</i>.</p>
+<p>📌 <b>imperativo → imperfecto de subjuntivo</b>: «No lo publiques.» → <i>Me pidió que no lo <b>publicara</b>.</i></p>
+<p>Ook woorden van tijd en plaats schuiven mee: <i>mañana → al día siguiente</i>, <i>ayer → el día anterior</i>, <i>aquí → allí</i>, <i>este → ese</i>.</p>`,
+        table: [['hij zei:', 'jij vertelt door:'], ['«Estoy feliz.»', 'Dijo que estaba feliz.'], ['«Volví ayer.»', 'Dijo que había vuelto el día anterior.'], ['«Lo haré mañana.»', 'Dijo que lo haría al día siguiente.'], ['«Llámame.»', 'Me pidió que lo llamara.']],
+        ex: [['Me contó que el cantante había vuelto al país.', 'Hij vertelde me dat de zanger was teruggekeerd naar het land.'], ['Aseguró que pronto anunciaría algo especial.', 'Hij verzekerde dat hij binnenkort iets speciaals zou aankondigen.']],
+        sum: 'Estilo indirecto en pasado: presente → imperfecto, indefinido → pluscuamperfecto, futuro → condicional, imperativo → imperfecto de subjuntivo.' },
+      { t: 'Nieuwswerkwoorden', es: 'Verbos para citar',
+        html: `<p>Journalisten (en goede vertellers) zeggen niet steeds <i>dijo</i>. Ze kiezen een werkwoord dat laat horen <b>hoe</b> iets gezegd werd:</p>
+<p>📌 <b>afirmar, asegurar</b> (stellig), <b>explicar, añadir</b> (uitleg, aanvulling), <b>reconocer, confesar</b> (toegeven), <b>advertir</b> (waarschuwen), <b>anunciar</b> (iets nieuws).</p>
+<p>⚠️ Na <b>negar que</b> (ontkennen) komt de <b>subjuntivo</b>, omdat je zegt dat iets níet zo is: <i>Negó que <b>hubiera</b> un problema.</i> Vergelijk: <i>Afirmó que <b>había</b> un problema.</i></p>
+<p>📌 <b>Advertir que</b> + indicativo is «waarschuwen dat»; <b>advertir que</b> + subjuntivo is «waarschuwen om»: <i>Nos advirtió que no <b>saliéramos</b> de noche.</i></p>`,
+        table: [['werkwoord', 'voorbeeld'], ['afirmar / asegurar', 'Aseguró que estaba feliz.'], ['reconocer', 'Reconoció que se había equivocado.'], ['negar que + subj.', 'Negó que hubiera un concierto.'], ['advertir que + subj.', 'Nos advirtió que no saliéramos.']],
+        ex: [['El cantante no negó que hubiera un concierto.', 'De zanger ontkende niet dat er een concert was.'], ['La empresa reconoció que había cometido un error.', 'Het bedrijf gaf toe dat het een fout had gemaakt.']],
+        sum: 'Afirmar, asegurar, reconocer + indicativo. Negar que + subjuntivo: Negó que hubiera un problema.' },
+      { t: 'Niet bevestigd: según, al parecer en «habría»', es: 'Información no confirmada',
+        html: `<p>Een goed nieuwsbericht laat horen <b>waar</b> informatie vandaan komt en of die al <b>zeker</b> is.</p>
+<p>📌 Bron noemen: <i><b>según</b> la policía…</i>, <i><b>de acuerdo con</b> el comunicado…</i></p>
+<p>📌 Nog onzeker: <i><b>al parecer</b>, <b>por lo visto</b>, <b>se rumorea que</b></i>, en informeel in veel landen <i><b>dizque</b></i> (zogenaamd).</p>
+<p>📌 Het <b>condicional van geruchten</b> (<i>condicional periodístico</i>) betekent «zou … hebben / zou … zijn», precies zoals het Nederlandse <b>zou</b> in het nieuws: <i>El alcalde <b>habría renunciado</b>.</i> = De burgemeester zou zijn afgetreden (nog niet bevestigd). <i>El concierto <b>sería</b> el sábado.</i> = Het concert zou zaterdag zijn.</p>`,
+        table: [['zeker', 'niet bevestigd'], ['El concierto es el sábado.', 'El concierto sería el sábado.'], ['El cantante volvió.', 'El cantante habría vuelto.'], ['Hay tres heridos.', 'Al parecer, habría tres heridos.']],
+        ex: [['Según una página de chismes, el concierto sería gratis.', 'Volgens een roddelsite zou het concert gratis zijn.'], ['Por lo visto, nadie lo ha confirmado todavía.', 'Blijkbaar heeft nog niemand het bevestigd.']],
+        sum: 'Según + fuente; al parecer, por lo visto: no confirmado. Condicional de rumor: habría renunciado = zou zijn afgetreden.' }
+    ],
+    verbs: ['decir', 'estar', 'ser', 'tener', 'volver', 'hacer', 'poder', 'venir', 'ir', 'saber', 'haber'], tenses: ['cond', 'condperf', 'impsubj'],
+    dialogue: {
+      t: '¿Te enteraste?', place: 'Caracas 🇻🇪',
+      lines: [
+        ['Génesis', '¡Epa, Mark! ¿Te enteraste? Dicen que la banda Cielo Abierto va a dar un concierto gratis en Caracas.', 'Hé Mark! Heb je het gehoord? Ze zeggen dat de band Cielo Abierto een gratis concert gaat geven in Caracas.'],
+        ['Mark', '¿En serio? ¿Quién te lo dijo?', 'Echt? Wie heeft je dat verteld?'],
+        ['Génesis', 'Un pana de la emisora me echó el cuento. Me dijo que el cantante había vuelto al país la semana pasada.', 'Een maat van de radiozender vertelde het me. Hij zei dat de zanger vorige week was teruggekeerd naar het land.'],
+        ['Mark', '¿Y eso está confirmado? Porque en internet se rumorea de todo.', 'En is dat bevestigd? Want op internet gaan allerlei geruchten rond.'],
+        ['Génesis', 'Todavía no. Según una página de chismes, el concierto sería el sábado en la plaza Altamira, pero no hay ningún comunicado.', 'Nog niet. Volgens een roddelsite zou het concert zaterdag op de Plaza Altamira zijn, maar er is geen persbericht.'],
+        ['Mark', 'Entonces mejor esperamos. ¿Y el cantante no ha dicho nada?', 'Dan wachten we beter af. En heeft de zanger niets gezegd?'],
+        ['Génesis', 'Sí, ayer dio una entrevista. Afirmó que estaba feliz de volver y aseguró que pronto anunciaría algo especial.', 'Ja, gisteren gaf hij een interview. Hij verklaarde dat hij blij was terug te zijn en verzekerde dat hij binnenkort iets speciaals zou aankondigen.'],
+        ['Mark', '¿Y negó lo del concierto?', 'En ontkende hij dat van het concert?'],
+        ['Génesis', 'No lo negó, pero tampoco lo confirmó. Y el productor me pidió que no lo publicara todavía.', 'Hij ontkende het niet, maar hij bevestigde het ook niet. En de producer vroeg me het nog niet te publiceren.'],
+        ['Mark', '¡Ajá! O sea que tú ya sabes la verdad.', 'Aha! Dus jij weet de waarheid al.'],
+        ['Génesis', 'Yo no he dicho nada, chamo. Pero el sábado no hagas planes.', 'Ik heb niets gezegd, gast. Maar maak zaterdag geen plannen.']
+      ],
+      q: [
+        { t: 'mc', q: '¿Quién le contó la noticia a Génesis?', o: ['Un amigo de la emisora', 'El cantante', 'Una página de chismes'] },
+        { t: 'mc', q: '¿Qué afirmó el cantante en la entrevista?', o: ['Que estaba feliz de volver', 'Que no habría concierto', 'Que se iba a otro país'] },
+        { t: 'mc', q: '¿Qué le pidió el productor a Génesis?', o: ['Que no publicara la noticia todavía', 'Que fuera al concierto', 'Que llamara a Mark'] }
+      ]
+    },
+    culture: { t: 'Caracas, onder de groene berg', html: `<p>⛰️ Caracas ligt in een lang dal onder <b>El Ávila</b>, een groene berg van ruim 2.000 meter die officieel <i>Waraira Repano</i> heet. Met de <b>teleférico</b> (kabelbaan) ga je in een kwartier van de stad naar de top, met uitzicht op de stad aan de ene en de Caribische Zee aan de andere kant.</p>
+<p>🫓 Venezolanen eten <b>arepas</b> bij elke maaltijd: een rond maïsbroodje dat je openmaakt en vult. Een <i>reina pepiada</i> is gevuld met kip en avocado, een <i>pabellón</i> met rijst, bonen en draadjesvlees.</p>
+<p>🌎 De laatste jaren zijn miljoenen Venezolanen naar het buitenland vertrokken, vooral naar Colombia, Peru, Chili en Spanje. Daardoor hoor je hun Spaans nu overal, en reist nieuws uit Venezuela via WhatsApp razendsnel naar familie ver weg.</p>
+<p>🗣️ Venezolaanse woorden: <b>chamo/chama</b> (gast, meisje), <b>pana</b> (maat), <b>¡Epa!</b> (hé!), <b>echar el cuento</b> (het verhaal vertellen) en <b>la cola</b>, dat er zowel de rij in de winkel als de file op de snelweg is.</p>` },
+    ex: [
+      { t: 'cloze', s: '«Estoy cansada.» → Me dijo que ___ cansada.', h: 'estar', a: ['estaba'], nl: 'Ze zei me dat ze moe was.', x: 'Presente → imperfecto.', tag: 'reported-adv' },
+      { t: 'cloze', s: '«Volví la semana pasada.» → Dijo que ___ la semana anterior.', h: 'volver', a: ['había vuelto', 'había regresado'], nl: 'Hij zei dat hij de week ervoor was teruggekeerd.', x: 'Indefinido → pluscuamperfecto.', tag: 'reported-adv' },
+      { t: 'cloze', s: '«Pronto anunciaré algo.» → Aseguró que pronto ___ algo.', h: 'anunciar', a: ['anunciaría'], nl: 'Hij verzekerde dat hij binnenkort iets zou aankondigen.', x: 'Futuro → condicional.', tag: 'reported-adv' },
+      { t: 'cloze', s: '«No lo publiques.» → El productor me pidió que no lo ___.', h: 'publicar', a: ['publicara'], nl: 'De producer vroeg me het niet te publiceren.', x: 'Imperativo → imperfecto de subjuntivo.', tag: 'reported-adv' },
+      { t: 'cloze', s: '«Nos vemos mañana.» → Me dijo que nos veríamos ___.', a: ['al día siguiente'], o: ['al día siguiente', 'ayer', 'la víspera'], nl: 'Hij zei dat we elkaar de volgende dag zouden zien.', tag: 'reported-adv' },
+      { t: 'cloze', s: 'El ministro negó que ___ un problema con el agua.', h: 'haber', a: ['hubiera', 'hubiese'], nl: 'De minister ontkende dat er een probleem met het water was.', x: 'Negar que + subjuntivo.', tag: 'reported-adv' },
+      { t: 'cloze', s: 'Según la policía, el ladrón ___ por la ventana.', a: ['habría entrado'], o: ['habría entrado', 'haya entrado', 'entraría mañana'], nl: 'Volgens de politie zou de dief door het raam zijn binnengekomen.', x: 'Nog niet zeker → condicional van geruchten.', tag: 'rumor' },
+      { t: 'cloze', s: '___, el concierto será gratis, pero nadie lo ha confirmado.', a: ['Al parecer', 'Por lo visto'], o: ['Al parecer', 'Sin duda', 'Por supuesto'], nl: 'Naar het schijnt is het concert gratis, maar niemand heeft het bevestigd.', tag: 'rumor' },
+      { t: 'mc', q: '«El alcalde habría renunciado.» betekent:', o: ['De burgemeester zou zijn afgetreden (niet bevestigd).', 'De burgemeester had moeten aftreden.', 'De burgemeester is zeker afgetreden.'], tag: 'rumor' },
+      { t: 'mc', q: '«Voy a llamarte.» → Me dijo que…', o: ['iba a llamarme', 'va a llamarte', 'fue a llamarme'], x: 'Ir a in het presente → ir a in het imperfecto, en «te» wordt «me».', tag: 'reported-adv' },
+      { t: 'mc', q: 'Welke zin is goed?', o: ['Negó que fuera verdad.', 'Negó que era verdad.', 'Negó que será verdad.'], tag: 'reported-adv' },
+      { t: 'mc', q: 'Welk werkwoord betekent «een bericht tegenspreken»?', o: ['desmentir', 'confirmar', 'anunciar'], tag: 'vocab' },
+      { t: 'mc', q: 'Wat betekent «¡Epa, chamo!» in Venezuela?', o: ['Hé, gast!', 'Pas op, kind!', 'Tot ziens, vriend!'], tag: 'vocab' },
+      { t: 'order', s: 'Al parecer el concierto sería el sábado.', nl: 'Naar het schijnt zou het concert zaterdag zijn.', tag: 'rumor' },
+      { t: 'tr', nl: 'Hij zei dat hij moe was.', a: ['Dijo que estaba cansado.', 'Él dijo que estaba cansado.', 'Me dijo que estaba cansado.'], tag: 'reported-adv' },
+      { t: 'tr', nl: 'Volgens de krant zou de zanger teruggekeerd zijn.', a: ['Según el periódico, el cantante habría vuelto.', 'Según el periódico, el cantante habría regresado.', 'Según el diario, el cantante habría vuelto.', 'Según el diario, el cantante habría regresado.'], tag: 'rumor' },
+      { t: 'match', p: [['el rumor', 'het gerucht'], ['la fuente', 'de bron'], ['desmentir', 'tegenspreken'], ['el titular', 'de krantenkop'], ['echar el cuento', 'het verhaal vertellen (VE)']], tag: 'vocab' }
+    ],
+    say: [['Me dijo que vendría al día siguiente.', 'Hij zei me dat hij de volgende dag zou komen.'], ['Al parecer, el concierto es gratis.', 'Naar het schijnt is het concert gratis.'], ['Según la radio, habría mucha cola en la autopista.', 'Volgens de radio zou er veel file op de snelweg staan.'], ['No lo confirmó, pero tampoco lo negó.', 'Hij bevestigde het niet, maar ontkende het ook niet.']],
+    task: { nl: 'Vertel een nieuwtje of roddel door die je deze week hoorde (6 tot 8 zinnen; verzinnen mag). Gebruik de indirecte rede in het verleden (dijo que…, me contó que…), minstens twee nieuwswerkwoorden (afirmar, negar, asegurar…) en één keer het condicional van geruchten (habría…).', model: 'Ayer mi vecina me contó que el panadero de la esquina se iba a jubilar. Me dijo que lo había anunciado en la tienda y que cerraría en enero. Según ella, su hijo habría comprado el negocio, pero nadie lo ha confirmado. Hoy le pregunté al panadero y negó que fuera a cerrar. Aseguró que solo se tomaría unas vacaciones largas. Al parecer, mi vecina exageró un poquito.' },
+    scenario: { nl: 'Een Venezolaanse radiomaakster in Caracas vertelt je het laatste nieuws uit de buurt. Jij vertelt haar ook iets door.', role: 'Eres Génesis, una periodista caraqueña de 34 años que presenta un programa de radio por la mañana. Eres alegre, curiosa y te encanta un buen chisme. Le cuentas al estudiante noticias del barrio y de la ciudad (siempre inventadas, nunca de política ni de personas reales), usando el estilo indirecto («me dijo que…», «aseguró que…») y el condicional de rumor («habría…», «sería…»). Usas expresiones venezolanas como «¡Epa!», «chamo», «pana», «echar el cuento» y «chévere». Le pides al estudiante que te cuente una noticia y quién se la contó.', goal: 'Geef twee nieuwtjes door met dijo que / me contó que en gebruik één keer según of al parecer.' },
+    reading: {
+      t: '¿Cómo saber si una noticia es falsa?', type: 'Artikel',
+      p: [
+        ['Un video que se compartió miles de veces en Venezuela aseguraba que el teleférico de Caracas cerraría para siempre. En pocas horas, muchas personas lo habían reenviado a sus familiares en el extranjero.',
+          'Een video die in Venezuela duizenden keren werd gedeeld, beweerde dat de kabelbaan van Caracas voorgoed zou sluiten. Binnen een paar uur hadden veel mensen hem doorgestuurd naar familie in het buitenland.'],
+        ['Al día siguiente, la empresa publicó un comunicado. En él explicó que el teleférico solo cerraría una semana por mantenimiento y negó que hubiera planes de cerrarlo. El video, por lo visto, venía de una cuenta que no existía hasta la semana anterior.',
+          'De volgende dag publiceerde het bedrijf een verklaring. Daarin legde het uit dat de kabelbaan maar een week dicht zou gaan voor onderhoud, en ontkende het dat er plannen waren om hem te sluiten. De video kwam blijkbaar van een account dat tot de week ervoor niet bestond.'],
+        ['Según la periodista Génesis Rojas, este tipo de rumores se extiende rápido porque mucha gente tiene a su familia lejos y quiere saber todo lo que pasa en su país. «Las noticias viajan más rápido que la verdad», afirma.',
+          'Volgens journaliste Génesis Rojas verspreiden zulke geruchten zich snel, omdat veel mensen hun familie ver weg hebben en alles willen weten wat er in hun land gebeurt. «Nieuws reist sneller dan de waarheid», zegt ze.'],
+        ['Su consejo: antes de compartir algo, pregúntate quién lo dice. Busca la fuente original, mira la fecha y fíjate en palabras como «al parecer» o «habría»: significan que la información todavía no está confirmada.',
+          'Haar advies: vraag je af wie het zegt voordat je iets deelt. Zoek de oorspronkelijke bron, kijk naar de datum en let op woorden als «al parecer» of «habría»: die betekenen dat de informatie nog niet bevestigd is.']
+      ],
+      gl: [['reenviar', 'doorsturen'], ['el mantenimiento', 'het onderhoud'], ['la cuenta', 'het account; de rekening'], ['extenderse (ie)', 'zich verspreiden'], ['fijarse en', 'letten op']],
+      q: [
+        { t: 'mc', q: '¿Qué aseguraba el video?', o: ['Que el teleférico cerraría para siempre', 'Que el teleférico sería gratis', 'Que habría un teleférico nuevo'] },
+        { t: 'mc', q: '¿Qué explicó la empresa en su comunicado?', o: ['Que solo cerraría una semana por mantenimiento', 'Que el video decía la verdad', 'Que cerraría un mes'] },
+        { t: 'mc', q: 'Según Génesis, ¿por qué se extienden rápido estos rumores?', o: ['Porque muchos tienen a su familia lejos', 'Porque a la gente le gustan los videos', 'Porque la radio los repite'] },
+        { t: 'mc', q: '¿Qué significan palabras como «habría»?', o: ['Que la información no está confirmada', 'Que la noticia es falsa', 'Que pasó hace mucho tiempo'] }
+      ]
+    }
+  });
 })(window.SPT);

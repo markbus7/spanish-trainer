@@ -142,7 +142,7 @@
         ['el pana', 'de maat', 'i'], ['¡ay bendito!', 'ach gut! / oh jee!'], ['brutal', 'geweldig', 'i'], ['el zafacón', 'de vuilnisbak'], ['los chavos', 'het geld', 'i'], ['¡acho!', 'jeetje! / hé!', 'i'], ['estar al garete', 'stuurloos zijn', 'i'], ['la china', 'de sinaasappel'], ['el mahón', 'de spijkerbroek'], ['el bizcocho', 'de taart'], ['la nena', 'het meisje', 'i'], ['bregar', 'ergens mee dealen', 'i'], ['¡ea rayos!', 'jeetje!', 'i'], ['¡qué jevi!', 'wat tof!', 'i']],
       fact: '«Janguear» komt van het Engelse «to hang out». Dat soort mengtaal heet Spanglish.' },
 
-    { id: 've', flag: '🇻🇪', name: 'Venezuela', city: 'Caracas', speakers: '±28 mln', group: 'zuid', voice: 'VE', listen: 'es-VE', pin: [334, 244],
+    { id: 've', flag: '🇻🇪', name: 'Venezuela', city: 'Caracas', speakers: '±28 mln', group: 'zuid', voice: 'VE', listen: 'es-VE', pin: [334, 244], unit: 'b2-13',
       hello: ['¡Epa, chamo! ¿Qué más? Bienvenido a Venezuela.', 'Hé gast, hoe is het? Welkom in Venezuela.'],
       intro: 'Vrolijk en melodieus Spaans met veel slang. Veel Venezolanen wonen nu in andere landen, dus je hoort het overal.',
       sounds: [

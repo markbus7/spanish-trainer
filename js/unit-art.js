@@ -194,7 +194,18 @@
       <path d="M27.6 27.500c5 2.4 10 2.4 14.8 0l-.5 4.500c-4.6 2-9.2 2-13.8 0z" fill="#a8845c"/>
       <rect x="26" y="20.5" width="18" height="4.4" rx="2.2" fill="${C.grey}"/><rect x="26" y="20.5" width="18" height="1.6" rx=".8" fill="#fff" opacity=".6"/>
       <rect x="29.6" y="26" width="2" height="12" rx="1" fill="#fff" opacity=".35"/>
-      <path d="M3 44.500h42" stroke="${C.brown2}" stroke-width="3" stroke-linecap="round"/>`
+      <path d="M3 44.500h42" stroke="${C.brown2}" stroke-width="3" stroke-linecap="round"/>`,
+    /* Radiomicrofoon «on air» voor El Ávila, met geluidsgolven en een vraagteken (gerucht) */
+    'b2-13': `<path d="M2 30c5-12 11-19 18-19 4 0 6 4 10 4 5 0 9-4 13 0 2 2 3 6 3 9v6z" fill="${C.green}"/><path d="M2 30c6-8 12-12 18-12 4 0 6 3 10 3 6 0 9-2 13 0 2 1 3 4 3 5v4z" fill="${C.green2}" opacity=".8"/>
+      <path d="M16 13l4-3.4 4 3.4" fill="none" stroke="#fff" stroke-width="1.4" stroke-linejoin="round" opacity=".7"/>
+      <path d="M33 5a5 5 0 0 1 5-4h4a5 5 0 0 1 5 5v2a5 5 0 0 1-5 5h-1l-3 3v-3a5 5 0 0 1-5-5z" fill="${C.cream}" stroke="${C.o}" stroke-width="1.4"/>${txt(39.6, 10.6, '?', 8.5, C.o, 900)}
+      <path d="M7 22a13 13 0 0 0 0 14M11 25a8 8 0 0 0 0 8" fill="none" stroke="${C.g}" stroke-width="2" stroke-linecap="round"/>
+      <path d="M41 22a13 13 0 0 1 0 14M37 25a8 8 0 0 1 0 8" fill="none" stroke="${C.g}" stroke-width="2" stroke-linecap="round"/>
+      <rect x="16" y="14" width="16" height="22" rx="8" fill="${C.ink}" opacity=".9"/><rect x="18" y="16" width="12" height="18" rx="6" fill="${C.grey}"/>
+      <path d="M18.5 20h11M18.5 23.5h11M18.5 27h11M18.5 30.5h11" stroke="${C.ink}" stroke-width="1.1" opacity=".55"/>${shine(21, 20, 2, 4.5)}
+      <path d="M14 29a10 10 0 0 0 20 0" fill="none" stroke="${C.ink}" stroke-width="2.2" stroke-linecap="round"/><path d="M24 39v4" stroke="${C.ink}" stroke-width="2.4"/>
+      <rect x="15" y="42.5" width="18" height="3.5" rx="1.75" fill="${C.ink}"/>
+      <rect x="2" y="37" width="12" height="8" rx="2.5" fill="${C.red}"/>${txt(8, 43, 'ON', 5.4, '#fff', 900)}`
   };
 
   function svg(id) { const b = ART[id]; return b ? `<svg class="ic-art" viewBox="0 0 48 48" aria-hidden="true">${b}</svg>` : ''; }
