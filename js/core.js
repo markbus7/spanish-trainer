@@ -657,6 +657,7 @@
           rej();
         };
         this._end = end; // stop() rondt het lopende fragment af
+        this.mlog('♪ opname');
         a.src = 'audio/' + this.clipKey(text, this.nsOf(opt.clipNs)) + '.mp3' + (direct ? '?direct=1' : '');
         a.preservesPitch = true; a.webkitPreservesPitch = true;
         // Op normale snelheid speelt de opname onbewerkt af: versnellen of vertragen met behoud van toonhoogte
@@ -808,6 +809,7 @@
           const parts = this.chunks(String(text).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, '').replace(/[*_#`>→]+/g, ' '));
           if (!parts.length) return res();
           const v = this.voice(opt);
+          this.mlog('♪ apparaatstem');
           if (this.last) this.last.voice = v ? v.name : null;
           parts.forEach((p, i) => {
             const u = new SpeechSynthesisUtterance(p);
@@ -836,7 +838,7 @@
       return this._listen(opt).catch(err => {
         if (!err || !err.quiet || opt._retried) throw err;
         this.retries = (this.retries || 0) + 1; this.mlog('dove start → nog een keer');
-        return new Promise(r => setTimeout(r, 350)).then(() => this._listen(Object.assign({}, opt, { _retried: true })));
+        return new Promise(r => setTimeout(r, 350)).then(() => this._listen(Object.assign({}, opt, { _retried: true, _fresh: true })));
       });
     },
     /* Laat al het afspelen echt los, zodat de microfoon het geluidskanaal krijgt. Pauzeren alleen is op iPad niet genoeg:
@@ -883,7 +885,11 @@
       const t0 = Date.now(); let heardAny = false;
       const state = s => { try { opt.onState && opt.onState(s); } catch (e) { /* */ } };
       return new Promise((resolve, reject) => {
-        const r = new R();
+        /* iPhone/iPad: steeds dezelfde herkenning hergebruiken. Een nieuwe per beurt kreeg op iOS bij de tweede keer
+           wel 'microfoon open', maar daarna nooit meer geluid. Elders (en na een dove start) een nieuwe. */
+        const reuse = this.isIOS() && !opt._fresh && this._recObj instanceof R;
+        const r = reuse ? this._recObj : new R();
+        if (this.isIOS()) this._recObj = r;
         const v = this.voice();
         r.lang = S.course.target !== 'es' ? S.course.listen
           : v && /^es-(mx|us|419|co|ar|cl|pe|ve|uy|cr|ec|gt|pa|pr|do|bo|py|sv|hn|ni|cu)$/i.test(v.lang.replace('_', '-')) ? v.lang.replace('_', '-') : 'es-MX';
@@ -895,7 +901,7 @@
           if (done) return; done = true;
           timers.forEach(clearTimeout); clearTimeout(silenceT);
           this.mlog(ok ? 'klaar: «' + (val && val[0]) + '»' : 'fout: ' + (val && val.code));
-          const noop = () => {}; r.onstart = r.onaudiostart = r.onsoundstart = r.onspeechstart = r.onresult = r.onerror = noop;
+          const noop = () => {}; r.onstart = r.onaudiostart = r.onaudioend = r.onsoundend = r.onsoundstart = r.onspeechstart = r.onresult = r.onerror = noop;
           // blijf luisteren naar Safari's echte 'end': pas dan is de microfoon vrij voor de volgende keer
           r.onend = () => { me.ended = true; this.mlog('(Safari: echt klaar)'); };
           if (this._rec === r) this._rec = null;
@@ -903,7 +909,7 @@
           if (this._soft === softStop) this._soft = null;
           this._lastEnd = Date.now();
           // Niets gehoord, niet zelf gestopt en meteen weer klaar: dat is de 'dove' start van iPad, niet de gebruiker.
-          if (!ok && val && !heardAny && !stopping && !opt._retried && ['no-speech', 'audio-capture', 'aborted'].includes(val.code) && Date.now() - t0 < 4000) val.quiet = true;
+          if (!ok && val && !val.quiet && !heardAny && !stopping && !opt._retried && ['no-speech', 'audio-capture', 'aborted'].includes(val.code) && Date.now() - t0 < 4000) val.quiet = true;
           ok ? resolve(val) : reject(val);
         };
         const heardSoFar = () => finalAlts || (interim ? [interim] : null);
@@ -921,8 +927,17 @@
           timers.push(setTimeout(() => { if (!done) { try { r.abort(); } catch (e) { /* */ } } }, 1200));
           timers.push(setTimeout(() => { if (!done) settle(); }, 2000));
         };
-        r.onstart = () => { started = true; this.mlog('start'); state('listening'); };
-        r.onaudiostart = () => this.mlog('microfoon open');
+        /* Doof? Microfoon open, maar 4 s lang geen enkel geluid (ook geen geruis): dan stil opnieuw met een verse herkenning. */
+        const deafCheck = () => { if (opt._retried) return; timers.push(setTimeout(() => {
+          if (done || heardAny || stopping) return;
+          this.mlog('4s geen geluid → doof?');
+          stopping = true; try { r.abort(); } catch (e) { /* */ }
+          const err = this.micError('no-speech'); err.quiet = true; finish(false, err);
+        }, 4000)); };
+        r.onstart = () => { started = true; this.mlog('start' + (reuse ? ' (hergebruikt)' : '')); state('listening'); deafCheck(); };
+        r.onaudiostart = () => { this.mlog('microfoon open'); };
+        r.onsoundend = () => this.mlog('geluid weg');
+        r.onaudioend = () => this.mlog('microfoon dicht');
         r.onsoundstart = () => { heardAny = true; this.mlog('geluid'); state('sound'); };
         r.onspeechstart = () => { heardAny = true; this.mlog('spraak'); state('speech'); };
         r.onresult = e => {
@@ -1001,7 +1016,11 @@
     const since = Date.now() - (Speech._lastEnd || 0);
     if (since < 600) { setTimeout(() => tone(freqs, dur, type, vol), 600 - since); return; }
     try {
+      // iPhone/iPad: na de microfoon geen tikgeluidjes meer via Web Audio; die zetten het geluidskanaal op afspelen
+      // en dan hoort de volgende spraakherkenning niets meer (Marks logboek, v1.60.2).
+      if (Speech._lastEnd && Speech.isIOS()) { Speech.mlog('♪ tikgeluid overgeslagen'); return; }
       actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      Speech.mlog('♪ tikgeluid');
       if (actx.state === 'suspended' && actx.resume) actx.resume();
       let t = actx.currentTime;
       freqs.forEach(f => {
