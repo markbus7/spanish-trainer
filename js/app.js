@@ -350,6 +350,32 @@
   }
 
   function section(title, ...kids) { return h('section', { class: 'sec' }, title ? h('h2', { class: 'sec-title' }, title) : null, kids); }
+  /* Inklapbaar blok voor de lange Perfil-pagina. Open/dicht wordt per apparaat onthouden. */
+  const FOLD_KEY = 'st-perfil-open';
+  function foldState() { try { return JSON.parse(localStorage.getItem(FOLD_KEY) || '{}') || {}; } catch (e) { return {}; } }
+  function fold(id, icon, title, def, meta, ...kids) {
+    const fs = foldState(); const open = id in fs ? !!fs[id] : def;
+    const d = h('details', { class: 'sec fold', id: 'p-' + id, open: open ? true : null },
+      h('summary', { class: 'fold-sum' }, h('span', { class: 'fold-ic', 'aria-hidden': 'true' }, icon), h('h2', { class: 'sec-title grow' }, title),
+        meta ? h('small', { class: 'fold-meta muted' }, meta) : null, h('span', { class: 'fold-chev', 'aria-hidden': 'true' }, '›')),
+      h('div', { class: 'fold-body' }, kids));
+    d.addEventListener('toggle', () => { const f = foldState(); f[id] = d.open; try { localStorage.setItem(FOLD_KEY, JSON.stringify(f)); } catch (e) { /* negeer */ } });
+    return d;
+  }
+  /* Tegels bovenaan Perfil: tik = naar het rapport of naar het blok hieronder (klapt het open). */
+  function profNav(items) {
+    const go = id => {
+      const el = document.getElementById('p-' + id); if (!el) return;
+      if (el.tagName === 'DETAILS') el.open = true;
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    return h('nav', { class: 'prof-nav', 'aria-label': 'Snel naar' },
+      items.map(([icon, label, to, sub, cls]) => {
+        const kids = [h('span', { class: 'pn-ic', 'aria-hidden': 'true' }, icon), h('b', null, label), sub ? h('small', { class: 'muted' }, sub) : null];
+        return to.startsWith('#') ? h('a', { class: 'pn-tile' + (cls ? ' ' + cls : ''), href: to }, kids)
+          : h('button', { class: 'pn-tile', type: 'button', onclick: () => go(to) }, kids);
+      }));
+  }
   function ring(frac, label, sub) {
     const r = 44, c = 2 * Math.PI * r, f = U.clamp(frac, 0, 1);
     const svg = `<svg viewBox="0 0 100 100" class="ring" aria-hidden="true"><circle cx="50" cy="50" r="${r}" class="ring-bg"/><circle cx="50" cy="50" r="${r}" class="ring-fg" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - f)}"/></svg>`;
@@ -1104,8 +1130,9 @@
     S.toast(done ? '📋 Rapport gekopieerd. Plak het in je chat met je coach.' : 'Kopiëren lukte niet. Selecteer de tekst hieronder en kopieer hem zelf.', 3600);
   }
   let repDays = 30;
-  routes.rapport = function () {
+  routes.rapport = function (arg) {
     const wrap = h('div', { class: 'page rapport' });
+    if (arg) setTimeout(() => rapportJump(wrap, arg), 60);
     const r = M().report(repDays);
     wrap.append(h('a', { class: 'back', href: '#/perfil' }, '← Perfil'), h('h1', null, 'Rapport van Lupe'),
       h('p', { class: 'muted small' }, 'Wat er misging in je gesprekken met Lupe (🎭 rollenspel en ✍️ correctie) en in je gewone oefeningen, zodat je weet waar je op moet letten. Fouten tellen ook mee in je zwakke punten, en woorden die misgingen staan in je herhaling.'));
@@ -1193,6 +1220,12 @@
     return wrap;
   };
   routes.rapport.tab = 'perfil';
+  /* #/rapport/update en #/rapport/advies: meteen naar dat blok (snelknoppen in Perfil). */
+  function rapportJump(wrap, arg) {
+    const want = { update: 'Voor de volgende update', advies: 'Advies van Lupe' }[arg]; if (!want) return;
+    const t = [...wrap.querySelectorAll('.sec-title')].find(x => x.textContent.trim() === want);
+    if (t) t.closest('.sec').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   /* Antwoorden die Lupe toch goed keurde (🤖 Toch goed?) en haar eigen voorstellen voor de volgende update. */
   function updateCard(r) {
@@ -1287,8 +1320,13 @@
       wrap.append(picker);
       if (!mine && s.me === undefined) { fillPicker(); picker.classList.remove('hidden'); }
     }
-    if (S.Life) wrap.append(lifeCard(s));
+    // ---- snel naar: alles op deze lange pagina in één tik (Mark zat te zoeken naar o.a. het rapport) ----
+    const rep = M().report(30), repN = rep.total + rep.exTotal;
+    const navAt = h('div');
+    wrap.append(navAt);
     wrap.append(S.Tutor.coach(S.Tutor.lines.profile({ words: wordStats(C.all()).seen, days: activeDays, streak: Store.liveStreak() }), { full: true }));
+    if (S.Life) { const lc = lifeCard(s); lc.id = 'p-leven'; wrap.append(lc); }
+    wrap.append(fold('rapport', '📋', 'Rapport van Lupe', true, repN ? U.plural(repN, 'fout', 'fouten') + ' · 30 dagen' : '', reportSummary()));
 
     // ---- niveau ----
     const les = lessonLevel(); const cur = P.current();
@@ -1299,12 +1337,9 @@
         lvTile('📚', 'Je lessen', les, cur.icon + ' ' + cur.title),
         lvTile('🎓', 'Examens', passed.length ? passed[passed.length - 1] : '—', passed.length ? 'behaald: ' + passed.join(', ') : 'nog geen')),
       h('div', { class: 'lv-bars' }, C.LEVELS.filter(L => C.available(L.id)).map(L => h('div', { class: 'lv-bar' }, h('b', null, L.id), bar(P.levelProgress(L.id), L.color), h('small', null, Math.round(P.levelProgress(L.id) * 100) + '% lessen')))));
-    wrap.append(section('Mijn niveau', lvCard));
     const adv = levelAdvice();
-    if (adv) wrap.append(adviceCard(adv));
-    else wrap.append(h('div', { class: 'card advice' }, h('b', null, '🧭 Weet je hoe goed je echt bent?'), h('p', { class: 'small' }, 'Doe de niveautest (±8 min). Dan zie je of je hoger zit dan de lessen die je nu krijgt, en kun je meteen hoger instappen.')));
-
-    wrap.append(section('Rapport van Lupe', reportSummary()));
+    wrap.append(fold('niveau', '🧭', 'Mijn niveau', true, est.label, lvCard, adv ? adviceCard(adv)
+      : h('div', { class: 'card advice' }, h('b', null, '🧭 Weet je hoe goed je echt bent?'), h('p', { class: 'small' }, 'Doe de niveautest (±8 min). Dan zie je of je hoger zit dan de lessen die je nu krijgt, en kun je meteen hoger instappen.'))));
 
     // ---- niveautests: historie ----
     const tests = testsOf().slice().reverse();
@@ -1321,7 +1356,7 @@
           x.lesson ? h('small', { class: 'muted' }, 'lessen: ' + x.lesson) : null),
         bandBars(x), partRows(x.parts)));
     });
-    wrap.append(section('Mijn niveautests', hist));
+    wrap.append(fold('tests', '📝', 'Mijn niveautests', false, t ? U.plural(tests.length, 'test', 'tests') + ' · laatste ' + fmtDate(t.d, { day: 'numeric', month: 'short' }) : 'nog geen', hist));
 
     // ---- woordenschat ----
     const lvls = C.LEVELS.filter(L => C.available(L.id));
@@ -1329,7 +1364,7 @@
     // lastig = woorden die je het vaakst fout had (c.l = keer fout), ongeacht hoe ver ze nu zijn
     const hard = Object.entries(s.srs).filter(([k, c]) => k.startsWith('w|') && c.l > 0).sort((a, b) => b[1].l - a[1].l || a[1].i - b[1].i).slice(0, 8)
       .map(([k, c]) => { const [, uid, i] = k.split('|'); const u = C.get(uid); const w = u ? C.word(u, +i) : null; return w ? { w, st: SRS.status(k), fout: c.l } : null; }).filter(Boolean);
-    wrap.append(section('Woordenschat', h('div', { class: 'card' },
+    wrap.append(fold('woorden', '📚', 'Woordenschat', false, allW.seen + ' van ' + allW.total, h('div', { class: 'card' },
       h('div', { class: 'vocab-big' }, h('b', null, allW.seen), h('span', null, ' van ' + allW.total + ' woorden geleerd')),
       stackBar(allW),
       h('div', { class: 'legend small' }, h('span', null, SRS.ICON.learning + ' ' + allW.learning + ' aan het leren'), h('span', null, SRS.ICON.known + ' ' + allW.known + ' bekend'), h('span', null, SRS.ICON.mastered + ' ' + allW.mastered + ' beheerst')),
@@ -1349,7 +1384,7 @@
     // ---- grammatica ----
     const tagRows = Object.entries(s.tags).filter(([k, v]) => k !== 'vocab' && v.ok + v.no >= 3).map(([k, v]) => [k, v.ok / (v.ok + v.no), v.ok + v.no]).sort((a, b) => b[1] - a[1]);
     const strong = tagRows.filter(r => r[1] >= 0.8), weak = tagRows.filter(r => r[1] < 0.8).reverse();
-    wrap.append(section('Grammatica', h('div', { class: 'card' },
+    wrap.append(fold('grammatica', '🧩', 'Grammatica', false, weak.length ? weak.length + ' om te oefenen' : strong.length ? strong.length + ' gaan goed' : '', h('div', { class: 'card' },
       tagRows.length ? null : h('p', { class: 'muted small' }, 'Nog te weinig antwoorden. Na een paar lessen zie je hier welke onderwerpen goed gaan en welke nog niet.'),
       strong.length ? h('div', null, h('h3', { class: 'sub' }, '💪 Gaat goed (' + strong.length + ')'), h('div', { class: 'chips' }, strong.map(([k, f]) => h('span', { class: 'chip ok' }, C.tag(k) + ' · ' + Math.round(f * 100) + '%')))) : null,
       weak.length ? h('div', null, h('h3', { class: 'sub' }, '🎯 Nog oefenen (' + weak.length + ')'), weak.slice(0, 8).map(([k, f, n]) => h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, C.tag(k)), bar(f, '#e2603a'), h('small', { class: 'muted' }, Math.round(f * 100) + '%'))),
@@ -1375,11 +1410,11 @@
         h('button', { class: 'btn ghost small-btn', type: 'button', onclick: () => startLevelExam(L.id) }, '🎓 Niveau-examen ' + L.id + (lv && lv.best ? ' (beste: ' + Math.round(lv.best * 100) + '%)' : '')));
       det.style.setProperty('--lc', L.color); unitsCard.append(det);
     });
-    wrap.append(section('Units', unitsCard));
+    wrap.append(fold('units', '🗺️', 'Units', false, cur.level + ' · ' + cur.title, unitsCard));
 
     // ---- vaardigheden ----
     const sk = [['vocab', '📚 Woordenschat'], ['grammar', '🧩 Grammatica'], ['listen', '🎧 Luisteren'], ['read', '📖 Lezen'], ['speak', '🎙️ Spreken'], ['write', '✍️ Schrijven']];
-    wrap.append(section('Vaardigheden', h('div', { class: 'card' }, sk.map(([k, l]) => {
+    wrap.append(fold('vaardigheden', '🎯', 'Vaardigheden', false, '', h('div', { class: 'card' }, sk.map(([k, l]) => {
       const v = s.skills[k]; const n = v.ok + v.no;
       return h('div', { class: 'skill-row' }, h('span', null, l), bar(n ? v.ok / n : 0), h('small', { class: 'muted' }, n ? Math.round(v.ok / n * 100) + '% · ' + n : '—'));
     }))));
@@ -1387,7 +1422,7 @@
     // ---- woordspellen ----
     const gs = s.games || {};
     const played = s.done.games || 0;
-    wrap.append(section('Woordspellen', h('div', { class: 'card' },
+    wrap.append(fold('spellen', '🎲', 'Woordspellen', false, played ? U.plural(played, 'spel', 'spellen') : '', h('div', { class: 'card' },
       h('p', { class: 'small muted' }, played ? U.plural(played, 'spel', 'spellen') + ' uitgespeeld.' : 'Nog geen spel uitgespeeld.'),
       S.Games.GAMES.map(g => { const x = gs[g.id]; return h('div', { class: 'skill-row' }, h('span', null, g.icon + ' ' + g.es), bar(x && x.words ? x.good / x.words : 0, '#1b998b'), h('small', { class: 'muted' }, x && x.words ? U.plural(x.n || 0, 'keer', 'keer') + ' · ' + Math.round(x.good / x.words * 100) + '%' : '—')); }),
       h('a', { class: 'btn ghost wide', href: '#/juegos' }, '🎲 Naar de spellen'))));
@@ -1395,17 +1430,34 @@
     // ---- activiteit ----
     const totalMin = Object.values(s.days).reduce((a, d) => a + d.min, 0);
     const totItems = Object.values(s.days).reduce((a, d) => a + d.items, 0), totOk = Object.values(s.days).reduce((a, d) => a + d.ok, 0);
-    wrap.append(section('Activiteit', h('div', { class: 'stat-grid' },
+    const fc = SRS.forecast(7); const mx = Math.max(1, ...fc);
+    wrap.append(fold('activiteit', '📅', 'Activiteit en kalender', false, '🔥 ' + U.plural(Store.liveStreak(), 'dag', 'dagen'), h('div', { class: 'stat-grid' },
       statCard('🔥', Store.liveStreak(), 'dagen op rij', 'record: ' + s.streak.best),
       statCard('⏱️', Math.round(totalMin), 'minuten geoefend', Math.round(totalMin / 60 * 10) / 10 + ' uur'),
       statCard('🎯', totItems ? Math.round(totOk / totItems * 100) + '%' : '—', 'goed beantwoord', totItems + ' antwoorden'),
-      statCard('📅', activeDays, 'dagen geoefend'))));
-    wrap.append(section('📅 Je oefenkalender', heatmap()));
-    const fc = SRS.forecast(7); const mx = Math.max(1, ...fc);
-    wrap.append(section('Herhaling komende 7 dagen', h('div', { class: 'card forecast' }, fc.map((n, i) => h('div', { class: 'fc' }, h('i', { style: { height: Math.max(3, n / mx * 70) + 'px' } }), h('b', null, n), h('small', null, i === 0 ? 'vandaag' : ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'][new Date(Date.now() + i * 864e5).getDay()]))))));
+      statCard('📅', activeDays, 'dagen geoefend')),
+      h('h3', { class: 'sub' }, 'Je oefenkalender'), heatmap(),
+      h('h3', { class: 'sub' }, 'Herhaling komende 7 dagen'), h('div', { class: 'card forecast' }, fc.map((n, i) => h('div', { class: 'fc' }, h('i', { style: { height: Math.max(3, n / mx * 70) + 'px' } }), h('b', null, n), h('small', null, i === 0 ? 'vandaag' : ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'][new Date(Date.now() + i * 864e5).getDay()]))))));
     // ---- badges en gegevens ----
-    wrap.append(section('Badges (' + s.badges.filter(b => BADGES[b]).length + '/' + Object.keys(BADGES).length + ')', h('div', { class: 'badges' }, Object.entries(BADGES).map(([id, b]) => h('div', { class: 'badge' + (s.badges.includes(id) ? ' on' : ''), title: b[2] }, h('span', null, b[0]), h('small', null, b[1]))))));
-    wrap.append(section('Je gegevens', dataTools()));
+    const nb = s.badges.filter(b => BADGES[b]).length;
+    wrap.append(fold('badges', '🏅', 'Badges', false, nb + ' van ' + Object.keys(BADGES).length, h('div', { class: 'badges' }, Object.entries(BADGES).map(([id, b]) => h('div', { class: 'badge' + (s.badges.includes(id) ? ' on' : ''), title: b[2] }, h('span', null, b[0]), h('small', null, b[1]))))));
+    wrap.append(fold('gegevens', '💾', 'Je gegevens', false, 'opslaan en terugzetten', dataTools()));
+    navAt.replaceWith(profNav([
+      ['📋', 'Rapport van Lupe', '#/rapport', repN ? U.plural(repN, 'fout', 'fouten') : 'fouten en advies', 'hot'],
+      ['💡', 'Voor de update', '#/rapport/update', rep.fix.length ? U.plural(rep.fix.length, 'antwoord', 'antwoorden') : 'voorstellen van Lupe'],
+      ['🧭', 'Mijn niveau', 'niveau', est.label],
+      S.Life ? ['🏡', 'Jouw leven', 'leven', 'je wereld'] : null,
+      ['📝', 'Niveautests', 'tests', t ? 'laatste ' + fmtDate(t.d, { day: 'numeric', month: 'short' }) : 'nog geen'],
+      ['📚', 'Woordenschat', 'woorden', allW.seen + ' woorden'],
+      ['🧩', 'Grammatica', 'grammatica', weak.length ? weak.length + ' om te oefenen' : 'sterk en zwak'],
+      ['🗺️', 'Units', 'units', 'alle lessen'],
+      ['🎯', 'Vaardigheden', 'vaardigheden', 'luisteren, spreken…'],
+      ['🎲', 'Spellen', 'spellen', played ? U.plural(played, 'spel', 'spellen') : 'scores'],
+      ['📅', 'Activiteit', 'activiteit', 'kalender en reeks'],
+      ['🏅', 'Badges', 'badges', nb + '/' + Object.keys(BADGES).length],
+      ['💾', 'Gegevens', 'gegevens', 'back-up'],
+      ['⚙️', 'Instellingen', '#/ajustes', 'stem, AI, profielen']
+    ].filter(Boolean)));
     return wrap;
   };
   routes.perfil.tab = 'perfil';

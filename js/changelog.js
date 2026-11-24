@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.63.0', date: '2026-11-24',
+    nl: ['Perfil is overzichtelijker: bovenaan tegels om meteen naar het rapport van Lupe, de voorstellen voor de update of elk ander blok te springen, en de blokken zijn in te klappen (de app onthoudt wat je open had).'],
+    es: [] },
   { v: '1.62.1', date: '2026-11-24',
     nl: ['Tweede ronde voorstellen van Lupe: getallen 30–99 (uitleg en 9 oefeningen, let op sesenta/setenta) in Mi familia; bij al/del de uitzondering voor namen (a El Salvador); Lupe\'s voorbeeldzinnen voor al/del, hay vs. estar en lidwoorden als extra oefeningen.', '«Voor de volgende update» toont geen antwoorden meer die de app inmiddels al goed rekent (zoals «mucho gusto»).', 'Lupe\'s voorstellen werden soms halverwege afgekapt; ze krijgt nu genoeg ruimte en maakt elk voorstel af.'],
     es: [] },
