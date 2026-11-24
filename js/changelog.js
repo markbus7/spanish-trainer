@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.60.3', date: '2026-11-24',
+    nl: ['Microfoon op iPhone/iPad (Safari én Edge): de app gebruikt nu steeds dezelfde spraakherkenning in plaats van telkens een nieuwe, en na het inspreken klinken er geen tikgeluidjes meer (die zetten het geluid op afspelen).', 'Hoort de microfoon 4 seconden lang helemaal niets, dan start hij vanzelf opnieuw.'],
+    es: [] },
   { v: '1.60.2', date: '2026-11-24',
     nl: ['Microfoon bij twee spreekoefeningen na elkaar: de app wacht nu tot Safari de vorige microfoonbeurt echt heeft afgesloten voordat hij een nieuwe start (anders luisterde de nieuwe doof).', 'Lukt het niet, tik dan bij de foutmelding op «🔎 Wat gebeurde er?» voor een logboek van de microfoon.'],
     es: [] },
