@@ -916,6 +916,10 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
   body.ask-fab-on #lesson .ls-body { padding-right: 56px; }
   body.ask-fab-on #lesson .ls-fb { padding-right: 46px; }
   body.ask-fab-on .page .lupe-coach:not(.lc-hero) .lc-bubble { margin-right: 44px; }
+  /* buiten een les: alleen een smal lipje met Lupe dat uit de rand gluurt, zodat het geen tekst bedekt */
+  body:not(.in-lesson) .ask-fab { width: 34px; padding: 0 0 0 3px; justify-content: flex-start; overflow: hidden; }
+  body:not(.in-lesson) .ask-fab:hover { width: 34px; }
+  body:not(.in-lesson) .ask-fab .ask-fab-q { top: 2px; left: 2px; width: 14px; height: 14px; line-height: 14px; font-size: .55rem; }
 }
 /* ---- ⓘ Uitleg zonder AI (content/uitleg.js) ---- */
 .dl-btns { display: flex; flex-direction: column; align-items: center; gap: .3rem; flex: none; }

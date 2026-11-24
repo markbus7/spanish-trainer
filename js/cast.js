@@ -550,7 +550,11 @@
         marks: '<path d="M30 58C34 52 48 52 51 60C49 68 35 70 30 64Z" fill="#fff" opacity=".55"/><path d="M90 58C86 52 72 52 69 60C71 68 85 70 90 64Z" fill="#fff" opacity=".55"/>', hat: HAT.chullo('#2fa79a', '#ffd23f'), eyes: { lash: true, iris: '#c9762a' } })),
     extra({ id: 'arami', name: 'Arami', animal: 'aguará guazú', nl: 'manenwolf', city: 'Asunción', cc: 'PY', age: 26, female: true, trait: 'Paraguayaanse die van Spaans naar Guaraní springt in één zin. Heeft altijd een koude tereré klaarstaan.', color: '#d9642a' },
       beast({ fur: ['#f9b078', '#e0712f', '#b04c18'], ears: 'big', earIn: '#fff1e0', muzzle: '#4a2f24', mrx: 13, mry: 11.5, noseCol: '#160e0a', line: '#f2c8a8', wear: { kind: 'stripes', a: '#d52b1e', b: '#a81f16', trim: '#fff', trim2: '#0038a8' },
-        marks: '<path d="M38 96C46 104 74 104 82 96C76 102 68 104 60 104C52 104 44 102 38 96Z" fill="#fff6ea"/><path d="M52 30C56 20 64 20 68 30C64 27 56 27 52 30Z" fill="#3a2218"/>', eyes: { lash: true, iris: '#8a5a1e' }, front: ACC.earrings() + flower(88, 40, '#fff', 2.6, '#ffd23f') }))
+        marks: '<path d="M38 96C46 104 74 104 82 96C76 102 68 104 60 104C52 104 44 102 38 96Z" fill="#fff6ea"/><path d="M52 30C56 20 64 20 68 30C64 27 56 27 52 30Z" fill="#3a2218"/>', eyes: { lash: true, iris: '#8a5a1e' }, front: ACC.earrings() + flower(88, 40, '#fff', 2.6, '#ffd23f') })),
+    extra({ id: 'genesis', name: 'Génesis', animal: 'turpial', nl: 'troepiaal', city: 'Caracas', cc: 'VE', age: 34, female: true, trait: 'Radiomaakster in Caracas die elk nieuwtje als eerste hoort. Zegt er altijd bij of het al bevestigd is.', color: '#f59a1b' },
+      bird({ fur: ['#ffd27a', '#f59a1b', '#c96f0a'], beak: '#c8ccd4', beak2: '#7a808c', wear: { kind: 'blazer', a: '#1f4f9e', b: '#173a78', trim: '#ffd23f', inner: '#fff' },
+        marks: '<path d="M26 60C27 36 44 24 60 24C76 24 93 36 94 60C88 50 76 46 60 46C44 46 32 50 26 60Z" fill="#1e1e26"/><ellipse cx="42" cy="64" rx="10" ry="9" fill="#3b82d6" opacity=".6"/><ellipse cx="78" cy="64" rx="10" ry="9" fill="#3b82d6" opacity=".6"/><path d="M24 92C30 86 38 88 40 96C34 100 26 98 24 92Z M96 92C90 86 82 88 80 96C86 100 94 98 96 92Z" fill="#fff" opacity=".85"/>',
+        eyes: { lash: true, iris: '#e8a010' }, front: ACC.mic() + ACC.earrings('#ffd23f') }))
   );
 
   /* ---------- jouw eigen personage (kies je in Perfil; staat rechts bij jouw zinnen in de dialogen) ---------- */
@@ -592,7 +596,7 @@
     doctora: V('es-MX-Dalia', -6, -4), entrevistadora: V('es-MX-Dalia', -4), yarisel: V('es-PA-Margarita'), yokasta: V('es-DO-Ramona'),
     paola: V('es-MX-Dalia'), 'tio-beto': V('es-MX-Jorge', -10, -6), lupita: V('es-MX-Dalia', 8, 6), mauricio: V('es-CR-Juan', 0, -4),
     turista: V('es-US-Alonso', -4, -4), 'ana-lucia': V('es-GT-Marta'), daniela: V('es-EC-Andrea'), fer: V('es-MX-Jorge', 6, 4),
-    moderadora: V('es-PE-Camila', -4), quispe: V('es-PE-Alex', -8, -6), huaman: V('es-BO-Marcelo'), 'valentina-co': V('es-CO-Salome'), 'diego-pe': V('es-PE-Alex'), wara: V('es-BO-Sofia'), arami: V('es-PY-Tania')
+    moderadora: V('es-PE-Camila', -4), quispe: V('es-PE-Alex', -8, -6), huaman: V('es-BO-Marcelo'), 'valentina-co': V('es-CO-Salome'), 'diego-pe': V('es-PE-Alex'), wara: V('es-BO-Sofia'), arami: V('es-PY-Tania'), genesis: V('es-VE-Paola', 4)
   };
   CAST.forEach(c => { c.voice = VOICE[c.id] || null; });
   const BY = Object.fromEntries([...CAST, ...PLAYERS].map(c => [c.id, c]));
@@ -605,7 +609,7 @@
     'Andrés': 'andres', 'Valentina': 'valentina-co', 'Valentina@PE': 'valentina-ar', 'Camila': 'camila', 'Señora': 'senora-cartagena', 'Ana': 'ana',
     'Mesero': 'mesero', 'Vendedora': 'vendedora', 'Andrea': 'andrea', 'Carlos': 'carlos', 'Doctora': 'doctora', 'Entrevistadora': 'entrevistadora',
     'Yarisel': 'yarisel', 'Yokasta': 'yokasta', 'Paola': 'paola', 'Tío Beto': 'tio-beto', 'Lupita': 'lupita', 'Guía Mauricio': 'mauricio',
-    'Turista': 'turista', 'Ana Lucía': 'ana-lucia', 'Daniela': 'daniela', 'Fer': 'fer', 'Moderadora': 'moderadora', 'Prof. Quispe': 'quispe', 'Sr. Huamán': 'huaman', 'Wara': 'wara', 'Arami': 'arami'
+    'Turista': 'turista', 'Ana Lucía': 'ana-lucia', 'Daniela': 'daniela', 'Fer': 'fer', 'Moderadora': 'moderadora', 'Prof. Quispe': 'quispe', 'Sr. Huamán': 'huaman', 'Wara': 'wara', 'Arami': 'arami', 'Génesis': 'genesis'
   };
   function country(place) {
     const cps = [...String(place || '')].map(c => c.codePointAt(0)).filter(c => c >= 0x1F1E6 && c <= 0x1F1FF);
