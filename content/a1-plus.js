@@ -88,7 +88,7 @@
       ['el bebé', 'de baby'], ['los gemelos / las gemelas', 'de tweeling'], ['hijo único / hija única', 'enig kind'], ['divorciado / divorciada', 'gescheiden'],
       ['la mascota', 'het huisdier'], ['vivir con…', 'wonen met…'], ['la edad', 'de leeftijd'], ['once', 'elf'], ['doce', 'twaalf'],
       ['sesenta', 'zestig'], ['setenta', 'zeventig'], ['ochenta', 'tachtig'], ['noventa', 'negentig'],
-      ['el carnal', 'de broer, goede maat', 'MX (informeel)'], ['la ñaña', 'de (oudere) zus', 'EC · PE (informeel)']
+      ['el carnal', 'de broer, goede maat', 'MX (informeel)'], ['la ñaña', 'de zus', 'EC (informeel) · ñaño = broer']
     ],
     ex: [
       { t: 'cloze', s: 'Mis abuelos ___ ochenta años.', a: ['tienen'], o: ['tienen', 'son', 'tenemos'], nl: 'Mijn grootouders zijn tachtig.', tag: 'tener' },
