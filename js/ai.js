@@ -138,7 +138,10 @@
   /* Privacy: Lupe vraagt nooit naar echte persoonlijke dingen (Mark, nov 2026). In rollenspellen speel je een verzonnen rol. */
   const PRIVACY = () => `PRIVACY (important): never ask for the learner's real personal information: no real names of family members, partner or friends, no address, phone number, email, workplace, health, money, relationships, religion or other private matters. When a topic is personal (family, home, work, plans, feelings), treat it as fiction: talk about an invented character or invented details. If the learner shares real private details anyway, do not ask follow-up questions about them and do not repeat them.`;
 
-  function baseRules(p) {
+  // Mark (2026-11-25): uitzonderingen altijd als uitzondering benoemen, met de reden
+  const EXCEPTION_RULE = () => `EXCEPTIONS: whenever something is an exception to a rule the learner knows (e.g. el problema/el tema/el idioma are masculine although they end in -a; la mano; el agua; ¿Dónde es la fiesta? with ser; irregular verb forms; irregular plurals), say explicitly that it IS an exception ("${CO().ui === 'nl' ? 'Uitzondering' : 'Excepción'}: …") and briefly explain WHY (origin or reason), in feedback, explanations and new material alike.`;
+  function baseRules(p) { return baseRules0(p) + '\n' + EXCEPTION_RULE(); }
+  function baseRules0(p) {
     if (CO().target !== 'es' && CO().ui === 'nl') {
       return `You are an expert, warm and encouraging ${CO().ai.target} teacher, working inside a learning app for a native Dutch speaker from the Netherlands${p.name ? ' named ' + p.name : ''}.
 Learner level: ${p.level} (CEFR). ${LEVEL_GENERIC[p.level] || LEVEL_GENERIC.B1}

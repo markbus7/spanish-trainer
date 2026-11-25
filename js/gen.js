@@ -99,7 +99,7 @@
   /* ---------- content-oefeningen normaliseren ---------- */
   function normEx(e, unit, idx, opts = {}) {
     const id = unit && idx != null ? 'x|' + unit.id + '|' + idx : null;
-    const base = { srsId: opts.noSrs ? null : id, tag: e.tag || 'vocab', x: e.x, i: e.i, skill: 'grammar' };
+    const base = { srsId: opts.noSrs ? null : id, tag: e.tag || 'vocab', x: e.x, i: e.i, uitz: e.uitz, skill: 'grammar' };
     switch (e.t) {
       case 'mc': return { ...base, kind: 'mc', q: e.q, options: U.shuffle(e.o), answer: e.o[0], skill: opts.skill || base.skill };
       case 'cloze':

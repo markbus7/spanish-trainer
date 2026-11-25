@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js']) {
+for (const f of ['js/core.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -1336,6 +1336,44 @@ await micTests();
   ok(K.check.check("I've lived here since 2015", ["I've lived here since 2015."]).ok, w + 'apostrof en punt');
   const it = { answers: ['the house'], articleOptional: true };
   ok(K.Gen.checkType('house', it).ok, w + 'lidwoord mag ontbreken');
+}
+{ // ⚠️ uitzonderingen altijd benoemd (js/uitzonderingen.js), in elke cursus
+  const files = [...fs.readFileSync(path.join(root, 'index.html'), 'utf8').matchAll(/src="((?:js|content)\/[^"?]+\.js)(?:\?[^"]*)?"/g)].map(m => m[1])
+    .filter(f => !/(app|lesson|ai|sync|ask)\.js$/.test(f));
+  ok(files.includes('js/uitzonderingen.js') && fs.readFileSync(path.join(root, 'sw.js'), 'utf8').includes('js/uitzonderingen.js'), 'uitzonderingen: in index.html en sw.js');
+  const load = course => { const c = vm.createContext({ console, setTimeout, clearTimeout }); c.window = c; c.globalThis = c; c.self = c; c.SPT_COURSE = course; for (const f of files) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), c, { filename: f }); return c.SPT; };
+  const has = (l, re) => l.some(x => re.test(x.t + ' ' + x.html));
+  { const K = load('es-nl'), U = K.Uitz, w = 'uitzondering es-nl: ';
+    // Marks voorbeeld: «___ tema de hoy es la familia» moet zeggen dát het een uitzondering is, en waarom
+    const tema = U.forItem({ kind: 'mc', sentence: '___ tema de hoy es la familia.', answer: 'El' }, { expected: 'El', ok: false });
+    ok(has(tema, /mannelijk/) && has(tema, /Waarom/) && K.Uitz.label() === '⚠️ Uitzondering', w + 'el tema (fout én met reden)');
+    ok(has(U.forItem({ kind: 'mc', sentence: '___ tema de hoy es la familia.', answer: 'El' }, { expected: 'El', ok: true }), /mannelijk/), w + 'el tema ook bij goed antwoord');
+    ok(has(U.forItem({ kind: 'mc', sentence: '¿Dónde ___ la fiesta de Ana?', answer: 'es' }, { expected: 'es' }), /evenement/), w + '¿dónde es la fiesta?');
+    ok(has(U.forItem({ kind: 'mc', q: 'Welk lidwoord? ___ mano', answer: 'la' }, { expected: 'la' }), /vrouwelijk/), w + 'la mano');
+    ok(has(U.forWord('el agua'), /beklemtoonde/) && has(U.forWord('el día'), /mannelijk/) && has(U.forWord('la foto'), /fotografía/), w + 'el agua, el día, la foto');
+    ok(has(U.forItem({ kind: 'type', conj: { verb: 'tener', tense: 'pres', person: 0 } }, { expected: 'tengo' }), /teno/), w + 'tengo (onregelmatig, niet teno)');
+    ok(has(U.forItem({ kind: 'type', conj: { verb: 'hacer', tense: 'pret', person: 2 } }, { expected: 'hizo' }), /sterke verleden tijd/), w + 'hizo');
+    ok(!U.forItem({ kind: 'type', conj: { verb: 'hablar', tense: 'pres', person: 0 } }, { expected: 'hablo' }).length, w + 'hablo is geen uitzondering');
+    ok(!U.find('Me gusta el café con leche').length && !U.forWord('el puesto').some(x => x.verb), w + 'geen valse uitzonderingen');
+    // juiste vertaalzin: geen werkwoord-blokken (alleen bij een fout woord)
+    ok(!U.forItem({ kind: 'type', translate: true, answers: ['Tengo dos hermanos.'] }, { expected: 'Tengo dos hermanos.', ok: true }).length, w + 'goede vertaalzin zonder werkwoordblok');
+    ok(has(U.forItem({ kind: 'type', translate: true }, { expected: 'Tengo dos hermanos.', ok: false, parts: { a: 'Tengo dos hermanos.', st: ['bad', 'ok', 'ok'], k: [0] } }), /teno/), w + 'fout getypte tengo krijgt het blok');
+    ok(Object.keys(U.GRAMMAR).every(t => K.C.all().some(u => u.grammar.some(g => g.t === t))), w + 'elke grammatica-uitzondering hoort bij een bestaand onderdeel');
+    // elke regel compileert en raakt iets in de lesstof (of in een eigen voorbeeld)
+    const all = K.C.all().flatMap(u => [...u.vocab.map(v => Array.isArray(v) ? v[0] : v.es), ...u.ex.map(e => (e.s ? e.s.replace('___', (e.a || e.o || [''])[0]) : '') + ' ' + (e.t === 'mc' ? e.o.join(' ') : '') + ' ' + (e.t === 'tr' ? e.a[0] : '')), ...(u.dialogue ? u.dialogue.lines.map(l => l[1]) : [])]).join(' \n ').toLowerCase();
+    U._rules().forEach(r => ok(new RegExp(r.re.source, 'u').test(all.replace(/[¡!¿?.,;:«»"“”()…]/g, ' ').replace(/ +/g, ' ')) || /cairo|tranvía|víctima|análisis|radio|él|muert/.test(r.p), w + 'regel raakt de lesstof: ' + r.t));
+  }
+  { const K = load('en-nl'), U = K.Uitz, w = 'uitzondering en-nl: ';
+    ok(has(U.forItem({ kind: 'type', sentence: 'We ___ to Chicago last year.', answers: ['went'] }, { expected: 'went' }), /goed<\/s>/), w + 'went (niet goed)');
+    ok(has(U.forWord('children'), /onregelmatig/) && has(U.forWord('an hour'), /klank/) && has(U.forWord('some advice'), /ontelbaar/), w + 'children, an hour, advice');
+    ok(U.label() === '⚠️ Uitzondering', w + 'label Nederlands');
+  }
+  { const K = load('en-es'), U = K.Uitz, w = 'uitzondering en-es: ';
+    ok(U.label() === '⚠️ Excepción' && has(U.forWord('children'), /irregular/) && has(U.forItem({ kind: 'type', sentence: 'We ___ to Chicago.', answers: ['went'] }, { expected: 'went' }), /verbo irregular/), w + 'uitleg in het Spaans');
+  }
+  { const K = load('nl-es'), U = K.Uitz, w = 'uitzondering nl-es: ';
+    ok(has(U.forWord('het meisje'), /siempre de het/) && has(U.forWord('de kinderen'), /-eren/) && has(U.forItem({ kind: 'type', sentence: 'Ik ___ naar huis.', answers: ['ging'] }, { expected: 'ging' }), /verbo irregular/), w + 'meisje, kinderen, ging');
+  }
 }
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
