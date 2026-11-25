@@ -209,6 +209,8 @@
     { tag: 'articles', unit: 'a1-02', v: '1.65.1', date: '2026-11-25T00:52:00Z', what: 'beroepszinnen als woordtegels, vertalen en dictee (el señor López es ingeniero, soy cocinero), spelling beroepen' },
     { tag: 'prepositions', unit: 'a1-04', v: '1.65.1', date: '2026-11-25T00:52:00Z', what: 'está of hay met plaatsvoorzetsels (encima de, detrás de, al lado de, enfrente de), 5 meerkeuze' },
     { ids: ['w|a1-04|48', 'w|a1-04|29', 'w|a1-04|37'], v: '1.65.1', date: '2026-11-25T00:52:00Z', what: 'dicteezinnen met hay una enfrente del banco, la catedral en ¿me puede ayudar?' },
+    { tag: 'hay-estar', unit: 'a1-04', v: '1.65.2', date: '2026-11-25T01:20:00Z', what: '5 vrije typvertalingen hay un/una/dos + enfrente de (⚠ hay uno zonder zelfst. nw.), no hay ningún' },
+    { tag: 'ser-estar', unit: 'a1-04', v: '1.65.2', date: '2026-11-25T01:20:00Z', what: '4 typvertalingen ¿Dónde está/están…? met accent (locatie = estar, nooit ¿dónde es?)' },
     { tag: 'articles', unit: 'a1-02', v: '1.63.1', date: '2026-11-24T21:19:00Z', what: 'uitleg wél/géén lidwoord (beroep na ser, na gustar), ±15 oefeningen in a1-02 en a1-06' },
     { tag: 'gender', unit: 'a1-02', v: '1.63.1', date: '2026-11-24T21:19:00Z', what: 'lijstje woorden op -ma (el problema, el idioma…) met oefeningen' },
     { tag: 'adj-agree', unit: 'a1-03', v: '1.62.0', date: '2026-11-24T20:57:00Z', what: 'uitleg bijvoeglijke naamwoorden in het meervoud, 8 oefeningen' },
@@ -638,5 +640,20 @@
     ],
     // ook als dictee (Práctica › Luisteren) en spreekoefening
     say: [['Sí, hay una enfrente del banco.', 'Ja, er is er een tegenover de bank.'], ['La catedral está enfrente del parque.', 'De kathedraal ligt tegenover het park.'], ['¿Me puede ayudar, por favor?', 'Kunt u me helpen, alstublieft?'], ['Hay un hotel enfrente de la catedral.', 'Er is een hotel tegenover de kathedraal.']]
+  });
+  // Lupe 25 nov: hay un/una + enfrente de en ¿Dónde está/están…? helemaal zelf typen
+  X('a1-04', {
+    ex: [
+      { t: 'tr', nl: 'Er is een apotheek tegenover het hotel.', a: ['Hay una farmacia enfrente del hotel.', 'Enfrente del hotel hay una farmacia.'], x: 'Hay + una (onbepaald). Tegenover = enfrente de, en de + el = del. Zonder «el frente».', tag: 'hay-estar' },
+      { t: 'tr', nl: 'Is er een bank hier in de buurt?', a: ['¿Hay un banco cerca de aquí?', '¿Hay un banco por aquí?', '¿Hay un banco cerca?'], tag: 'hay-estar' },
+      { t: 'tr', nl: 'Ja, er is er een tegenover het plein.', a: ['Sí, hay uno enfrente de la plaza.'], x: '⚠️ Uitzondering: zonder zelfstandig naamwoord erna wordt un → uno («er is er een» = hay uno, voor el banco). Bij een vrouwelijk woord blijft het una: hay una.', tag: 'hay-estar' },
+      { t: 'tr', nl: 'Nee, er is geen restaurant tegenover het park.', a: ['No, no hay ningún restaurante enfrente del parque.', 'No, no hay restaurante enfrente del parque.', 'No, no hay restaurantes enfrente del parque.'], x: 'Geen = no hay (ningún) …: twee keer no is in het Spaans gewoon goed.', tag: 'hay-estar' },
+      { t: 'tr', nl: 'Er zijn twee winkels tegenover de kerk.', a: ['Hay dos tiendas enfrente de la iglesia.', 'Enfrente de la iglesia hay dos tiendas.'], x: 'Ook in het meervoud blijft het hay. La iglesia → de la (niet del).', tag: 'hay-estar' },
+      { t: 'tr', nl: 'Waar zijn de taxi\'s?', a: ['¿Dónde están los taxis?'], x: 'Plaats = estar; los taxis is meervoud → están. Dónde krijgt een accent in een vraag.', tag: 'ser-estar' },
+      { t: 'tr', nl: 'Waar is jouw huis?', a: ['¿Dónde está tu casa?'], x: 'Waar iets is = estar, nooit «¿dónde es?». Dónde met accent.', tag: 'ser-estar' },
+      { t: 'tr', nl: 'Waar is het busstation?', a: ['¿Dónde está la estación de autobuses?', '¿Dónde está la terminal de autobuses?', '¿Dónde está la estación de buses?', '¿Dónde está la terminal de buses?'], tag: 'ser-estar' },
+      { t: 'tr', nl: 'Waar is mijn telefoon?', a: ['¿Dónde está mi celular?', '¿Dónde está mi teléfono?'], x: 'In Latijns-Amerika zeg je meestal celular (in Spanje móvil).', tag: 'ser-estar' }
+    ],
+    say: [['Sí, hay uno enfrente de la plaza.', 'Ja, er is er een tegenover het plein.'], ['¿Dónde están los taxis?', 'Waar zijn de taxi\'s?']]
   });
 })(window.SPT);
