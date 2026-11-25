@@ -968,9 +968,18 @@ await micTests();
     St.state.srs['w|a1-03|32'] = { i: 0, d: 0, r: 0, l: 1, f: 3, g: 4, t: before };
     let tx = Mi.asText(Mi.report(30, new Date('2026-11-24T22:00:00Z').getTime()));
     ok(!tx.includes('[x|a1-04|14]') && !tx.includes('[w|a1-03|32]') && !/al \/ del \[contractions\]: \d/.test(tx) && !/hay vs\. estar \[hay-estar\]: \d/.test(tx) && /punten hierboven weggelaten/.test(tx), 'verwerkt: oude fouten van vóór de update niet meer als open punt');
+    ctx.self = { SPT_VERSION: { number: '9.0.0' } };
     Mi.exercise({ kind: 'mc', fill: true, sentence: 'Voy ___ museo.', tag: 'contractions', srsId: 'x|a1-04|14' }, { ok: false, user: 'a el', expected: 'al' });
     tx = Mi.asText(Mi.report(30));
-    ok(tx.includes('[x|a1-04|14]') && /fouten sinds die update: 1/.test(tx), 'verwerkt: nieuwe fout ná de update komt terug, met aantal');
+    ok(tx.includes('[x|a1-04|14]') && /gemaakt in v[\d.]+ of nieuwer: 1/.test(tx) && /· ná v[\d.]+/.test(tx), 'verwerkt: nieuwe fout ná de update komt terug, met aantal');
+    ok(St.state.lupe.ex.slice(-1)[0].v === '9.0.0', 'verwerkt: fout bewaart de app-versie');
+    // fout ná de mergedatum, maar nog in een oude app-versie (niet bijgewerkt): telt als vóór de update
+    St.state.lupe.ex = [{ t: Date.now(), v: '1.0.0', id: 'x|a1-04|14', tag: 'contractions', k: 'invullen', q: 'Voy ___ museo.', u: 'a el', a: 'al' }];
+    tx = Mi.asText(Mi.report(30));
+    ok(!/al \/ del \[contractions\]: \d/.test(tx), 'verwerkt: fout in oude app-versie telt niet als nieuw');
+    St.state.lupe.log = [{ t: Date.now(), v: '1.0.0', m: 'write', w: 'donde es', c: 'dónde está', tag: 'zz-test' }];
+    ok(/· v1\.0\.0/.test(Mi.asText(Mi.report(30))), 'verwerkt: versie zichtbaar bij elke fout');
+    delete ctx.self;
     St.state = JSON.parse(keep);
   }
   const ses = Mi.practice(['ser-estar'], [w.id]);

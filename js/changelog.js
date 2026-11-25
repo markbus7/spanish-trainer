@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.65.2', date: '2026-11-25',
+    nl: ['Lupe weet nu bij elke fout in welke app-versie die gemaakt is, zodat ze fouten van vóór een verbetering negeert. Nieuw in Mi ciudad: zinnen met hay un/una + enfrente de zelf vertalen (⚠️ hay uno) en «¿Dónde está/están…?» helemaal typen met accent.'],
+    es: [] },
   { v: '1.65.1', date: '2026-11-25',
     nl: ['Zevende ronde voorstellen van Lupe: woorden op -ma in zinnen (el problema, un tema complicado); beroepen mannelijk/vrouwelijk (-o → -a, -or → -ora, -ista gelijk, ⚠️ uitzondering actor → actriz) met spelling en woordtegels (El señor López es ingeniero); está of hay met plaatsvoorzetsels (El libro está encima de la mesa); nieuwe dicteezinnen in Práctica › Luisteren (Sí, hay una enfrente del banco).', '«✨ Nieuwe voorstellen» kijkt eerst of je de nieuwste versie hebt. Zo niet, dan vraagt de app je eerst bij te werken, zodat Lupe geen dingen voorstelt die al verwerkt zijn.'],
     es: [] },

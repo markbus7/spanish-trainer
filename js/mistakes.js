@@ -76,7 +76,7 @@
     L.n = (L.n || 0) + 1;
     const out = list.map((x, i) => {
       // je eigen bericht zelf bewaren we niet (privacy): alleen het foute stukje, de verbetering en de uitleg
-      const e = Object.assign({ t: t0 + i, m: mode }, x);
+      const e = Object.assign({ t: t0 + i, m: mode, v: appV() }, x);
       if (extra.sc) e.sc = String(extra.sc).slice(0, 60);
       if (x.tag !== 'other') S.Store.mark(x.tag, false);
       if (x.tag === 'vocab') { const id = toReview(x.es, x.nl); if (id) e.srs = id; }
@@ -102,7 +102,7 @@
     if (!it || !r || r.ok || r.self || r.silent || it.support || it.kind === 'match') return null;
     const s = (x, n) => String(x == null ? '' : x).trim().slice(0, n);
     const id = it.srsId || (it.orig && it.orig.srsId) || '';
-    const e = { t: Date.now(), id: s(id, 80), tag: it.tag || 'vocab', k: exKind(it), q: s(exQ(it), 160), u: s(r.dontKnow ? '' : r.user, 120), a: s(r.expected, 160) };
+    const e = { t: Date.now(), v: appV(), id: s(id, 80), tag: it.tag || 'vocab', k: exKind(it), q: s(exQ(it), 160), u: s(r.dontKnow ? '' : r.user, 120), a: s(r.expected, 160) };
     if (r.dontKnow) e.dk = 1;
     const list = exlog();
     if (list.length && list[list.length - 1].t >= e.t) e.t = list[list.length - 1].t + 1;
@@ -208,12 +208,17 @@
     // de nieuwste update over dit onderwerp/woord telt
     return R.filter(x => (tag && x.tag === tag) || (id && x.ids && x.ids.includes(id))).sort((a, b) => since(b) - since(a))[0] || null;
   }
+  /** App-versie waarin een fout gemaakt is: bewaard per fout (veld v), zodat we weten of die van vóór of ná een update is. */
+  function appV() { return ((typeof self !== 'undefined' && self.SPT_VERSION) || {}).number || ''; }
+  function cmpV(a, b) { const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) { const d = (x[i] || 0) - (y[i] || 0); if (d) return d; } return 0; }
+  /** Is deze fout gemaakt ná de update rw? Met versie: versie ≥ die update (de datum van de merge zegt niets over wanneer jouw app bijgewerkt was). Zonder versie (oude fouten): op datum. */
+  function after(e, rw) { return e.v ? cmpV(e.v, rw.v) >= 0 : e.t >= since(rw); }
   function since(rw) { return rw ? new Date(/T/.test(rw.date) ? rw.date : rw.date + 'T00:00:00').getTime() : 0; }
   /** Fouten (gesprekken + oefeningen) ná de update waarin dit onderwerp/woord verwerkt is. */
   function newSince(rw, tag, id) {
     if (!rw) return null;
-    const t0 = since(rw), L = db();
-    return L.log.filter(e => e.t >= t0 && tag && e.tag === tag).length + (L.ex || []).filter(e => e.t >= t0 && ((tag && e.tag === tag) || (id && e.id === id))).length;
+    const L = db();
+    return L.log.filter(e => after(e, rw) && tag && e.tag === tag).length + (L.ex || []).filter(e => after(e, rw) && ((tag && e.tag === tag) || (id && e.id === id))).length;
   }
   /** Al verwerkt en sindsdien geen nieuwe fouten? Dan laten we het weg uit het rapport voor Lupe. */
   /** Laatste update waarin voorstellen verwerkt zijn: {v, t} (of null). */
@@ -221,8 +226,8 @@
   function settled(tag, id) { const rw = reworked(tag, id); return !!rw && newSince(rw, tag, id) === 0; }
   function reworkNote(rw, list) {
     if (!rw) return '';
-    const after = (list || []).filter(e => e.t >= since(rw)).length;
-    return ` · ✔ al verwerkt in v${rw.v} (${fmtD(since(rw))}): ${rw.what}${list ? '; fouten sinds die update: ' + after : ''}`;
+    const n = (list || []).filter(e => after(e, rw)).length;
+    return ` · ✔ al verwerkt in v${rw.v} (${fmtD(since(rw))}): ${rw.what}${list ? '; fouten gemaakt in v' + rw.v + ' of nieuwer: ' + n : ''}`;
   }
   function report(days = 30, now = Date.now()) {
     const L = db(), from = now - days * DAY;
@@ -267,6 +272,9 @@
   }
 
   /* ---------- als tekst, om te kopiëren of te delen ---------- */
+  function fmtT(t) { return new Date(t).toLocaleString(S.LOC, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); }
+  /** «25 nov 14:32 · v1.64.1 · vóór v1.65.1»: wanneer, in welke app-versie, en of het van vóór de verwerking is. */
+  function when(e, rw) { return fmtT(e.t) + (e.v ? ' · v' + e.v : ' · versie onbekend') + (rw ? (after(e, rw) ? ' · ná v' + rw.v : ' · vóór v' + rw.v + ', negeren') : ''); }
   function fmtD(t) { return new Date(t).toLocaleDateString(S.LOC, { day: 'numeric', month: 'short' }); }
   function asText(r = report(30), opt = {}) {
     const s = st(), p = S.AI ? S.AI.learnerProfile() : { level: '' };
@@ -282,7 +290,7 @@
       lines.push('', 'Waar ik de mist in ga in gesprekken (grammatica):');
       topics.forEach(t => {
         lines.push(`- ${t.label} [${t.tag}]: ${t.n}×${les(t.units[0])}${reworkNote(reworked(t.tag), db().log.filter(e => e.tag === t.tag))}`);
-        t.ex.forEach(e => lines.push(`    ${fmtD(e.t)}: «${e.w}» → «${e.c}»${e.why ? ' (' + e.why + ')' : ''}`));
+        t.ex.forEach(e => lines.push(`    ${when(e, reworked(t.tag))}: «${e.w}» → «${e.c}»${e.why ? ' (' + e.why + ')' : ''}`));
       });
     }
     if (r.words.length) {
@@ -294,7 +302,7 @@
       lines.push('', 'Fouten in gewone oefeningen (typen, meerkeuze, dictee, woordtegels):');
       exTopics.slice(0, 8).forEach(t => {
         lines.push(`- ${t.label} [${t.tag}]: ${t.n}×${les(t.units[0])}${reworkNote(reworked(t.tag), (db().ex || []).filter(e => e.tag === t.tag))}`);
-        t.ex.forEach(e => lines.push(`    ${fmtD(e.t)} ${e.k ? '(' + e.k + ') ' : ''}${e.q ? '«' + e.q + '» ' : ''}ik: ${e.dk ? 'weet het niet' : '«' + e.u + '»'} → goed: «${e.a}»${e.id ? ' [' + e.id + ']' : ''}`));
+        t.ex.forEach(e => lines.push(`    ${when(e, reworked(t.tag, e.id))} ${e.k ? '(' + e.k + ') ' : ''}${e.q ? '«' + e.q + '» ' : ''}ik: ${e.dk ? 'weet het niet' : '«' + e.u + '»'} → goed: «${e.a}»${e.id ? ' [' + e.id + ']' : ''}`));
       });
     }
     const hard = (r.hard || []).filter(x => settled(x.tag !== 'vocab' ? x.tag : null, x.id) || (x.tag === 'vocab' && settled(null, x.id)) ? (hidden++, false) : true);
@@ -354,7 +362,7 @@ Write in Dutch. Give 3–6 proposals, most important first, and always finish ev
   Wat: <exactly what to change or build, in one or two sentences>
   Voorbeelden: <for answers: the exact extra accepted answer(s); for exercises: 3–5 ready-to-use items as «${ES ? 'Spanish' : S.course.ai.target} sentence» = «Dutch translation», with ___ for a gap if it is a fill-in item; otherwise leave this line out>
 
-Lines marked «✔ al verwerkt» and the list «Al verwerkt in eerdere updates» describe what the app already contains. Totals and percentages there still include old answers from before that update. Do NOT propose those things again; only mention such a topic if the report shows mistakes dated after that update, and then propose something different (e.g. another exercise type), saying how many new mistakes there were.
+Lines marked «✔ al verwerkt» and the list «Al verwerkt in eerdere updates» describe what the app already contains. Totals and percentages there still include old answers from before that update. Do NOT propose those things again; each example mistake shows the app version it was made in and is marked «ná vX» (made in that version or newer) or «vóór vX, negeren» (made before the fix reached the learner). Ignore mistakes marked «vóór»; only mention such a topic if there are mistakes marked «ná», and then propose something different (e.g. another exercise type), saying how many new mistakes there were.
 Rules: only propose what the report supports, and say so in "Waarom"; if the report is thin, give fewer proposals. Prefer fixing the learner's most frequent mistakes. Don't repeat something that already exists in the course unless it should be explained or practised differently. ${ES ? 'Always Latin American Spanish norms (ustedes, never vosotros; regional vocabulary like carro, celular, computadora).' : 'Teach ' + S.course.ai.target + '.'}`;
     const text = await S.AI.ask({ system: sys, prompt: asText(r, { advice: true, proposal: false }), maxTokens: 4000 });
     db().update = { t: Date.now(), text: text.trim() };
