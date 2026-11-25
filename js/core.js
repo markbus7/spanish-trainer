@@ -369,7 +369,12 @@
     const later = (sa.last || '') > (sb.last || '') ? sa : (sb.last || '') > (sa.last || '') ? sb : (sa.cur >= sb.cur ? sa : sb);
     out.streak = { cur: later.cur, last: later.last, best: Math.max(sa.best || 0, sb.best || 0, later.cur || 0) };
     out.badges = [...new Set([...(N.badges || []), ...(O.badges || [])])];
+    // datum per badge: de eerste keer dat je hem haalde (op welk apparaat ook)
+    out.badgeAt = Object.assign({}, O.badgeAt || {}, N.badgeAt || {});
+    for (const id in O.badgeAt || {}) if (N.badgeAt && N.badgeAt[id]) out.badgeAt[id] = Math.min(N.badgeAt[id], O.badgeAt[id]);
     out.done = Object.assign({}, O.done || {}, N.done || {});
+    // tellers voor badges: de hoogste van beide apparaten
+    for (const f of ['games', 'ai']) { const v = Math.max((N.done || {})[f] || 0, (O.done || {})[f] || 0); if (v) out.done[f] = v; }
     // niveautests: alle uitslagen van beide apparaten (op tijdstip), oudste eerst
     const seenT = new Set(); out.tests = [];
     [...(N.tests || []), ...(O.tests || [])].sort((a, b) => a.d - b.d).forEach(t => { if (t && !seenT.has(t.d)) { seenT.add(t.d); out.tests.push(clone(t)); } });
