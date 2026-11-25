@@ -39,29 +39,33 @@
     return s.replace(/\n/g, '<br>').replace(/<\/li><br>/g, '</li>').replace(/<ul><br>/g, '<ul>');
   };
 
-  /* ================= badges ================= */
-  const BADGES = {
-    'first': ['🌱', 'Eerste les', 'Je eerste les afgerond'], 'placement': ['🧭', 'Niveautest', 'Niveautest gedaan'],
-    'streak3': ['🔥', '3 dagen', '3 dagen op rij geoefend'], 'streak7': ['🔥', 'Een week', '7 dagen op rij'], 'streak30': ['🌋', 'Een maand', '30 dagen op rij'],
-    'words50': ['📚', '50 woorden', '50 woorden in je herhaling'], 'words250': ['📚', '250 woorden', '250 woorden in je herhaling'], 'words500': ['🏛️', '500 woorden', '500 woorden in je herhaling'],
-    'unit1': ['🏅', 'Eerste unit', 'Je eerste unit gehaald'], 'perfect': ['💯', 'Foutloos', 'Een unittoets 100% gehaald'],
-    'A1': ['🥉', 'A1 behaald', 'Niveau-examen A1 gehaald'], 'A2': ['🥈', 'A2 behaald', 'Niveau-examen A2 gehaald'],
-    'ai': ['🤖', 'Eerste gesprek', 'Een gesprek met de AI-docent gevoerd'], 'goal': ['🎯', 'Dagdoel', 'Je dagdoel gehaald'],
-    'game': ['🎲', 'Speler', 'Je eerste woordspel uitgespeeld'], 'games10': ['🧩', 'Puzzelaar', '10 woordspellen uitgespeeld'],
-    'plan': ['🎁', 'Dagplan', 'Je eerste dagplan helemaal afgerond'], 'plan7': ['🗓️', 'Zeven plannen', '7 dagplannen afgerond'], 'plan30': ['🏆', 'Dertig plannen', '30 dagplannen afgerond'],
-    'early': ['🌅', 'Vroege vogel', 'Geoefend vóór 8:00'], 'night': ['🦉', 'Nachtuil', 'Geoefend na 23:00']
-  };
-  function award(id) {
-    if (st().badges.includes(id)) return;
-    st().badges.push(id); const b = BADGES[id]; if (b) setTimeout(() => S.toast(b[0] + ' Badge: ' + b[1] + '!'), 600);
-  }
-  function checkBadges() {
+  /* ================= badges (js/badges.js) =================
+     Reeksen met trappen; alles wordt uit je voortgang berekend. award(id) is voor losse momenten (vroege vogel …). */
+  function badgeEnv() {
     const s = st();
-    const streak = Store.liveStreak();
-    if (streak >= 3) award('streak3'); if (streak >= 7) award('streak7'); if (streak >= 30) award('streak30');
-    const words = Object.keys(s.srs).filter(k => k.startsWith('w|')).length;
-    if (words >= 50) award('words50'); if (words >= 250) award('words250'); if (words >= 500) award('words500');
-    const hr = new Date().getHours(); if (hr < 8 && hr >= 4) award('early'); if (hr >= 23 || hr < 3) award('night');
+    const levels = C.LEVELS.filter(L => C.available(L.id)).map(L => {
+      const us = C.unitsOf(L.id);
+      return { id: L.id, total: us.length, done: us.filter(u => { const x = s.units[u.id]; return x && (x.done || x.tested); }).length, passed: !!(s.levels[L.id] && s.levels[L.id].passed) };
+    });
+    const places = S.Mundo && S.Mundo.list().length ? { total: S.Mundo.list().length, stamps: S.Mundo.stamps() } : null;
+    return { streak: Store.liveStreak(), levels, places, units: C.all().length };
+  }
+  let badgeQueue = [], badgeTimer = 0;
+  function award(id, quiet) {
+    const s = st(); if (s.badges.includes(id)) return;
+    s.badges.push(id); (s.badgeAt || (s.badgeAt = {}))[id] = Date.now();
+    if (quiet) return;
+    badgeQueue.push(id); clearTimeout(badgeTimer);
+    badgeTimer = setTimeout(() => {
+      const q = badgeQueue; badgeQueue = [];
+      if (q.length > 2) S.toast('🏅 ' + q.length + ' nieuwe badges! Kijk in Perfil › Badges', 3500);
+      else q.forEach((x, i) => { const b = S.Badges.info(x); if (b) setTimeout(() => S.toast(b.icon + ' Badge: ' + b.name + '!', 3000), i * 1600); });
+    }, 600);
+  }
+  function checkBadges(quiet) {
+    // vroege vogel / nachtuil alleen na echt oefenen, niet bij het openen van Perfil
+    if (!quiet) { const hr = new Date().getHours(); if (hr < 8 && hr >= 4) award('early'); if (hr >= 23 || hr < 3) award('night'); }
+    S.Badges.earnable(st(), badgeEnv()).forEach(id => award(id, quiet));
   }
 
   /* ================= voortgangslogica ================= */
@@ -592,6 +596,14 @@
     }
     wantChest = false;
 
+    // bijna een badge: de dichtstbijzijnde volgende badge (vanaf de helft), tik = naar die reeks in Perfil
+    const nb0 = S.Badges.view(s, badgeEnv()).near.find(x => x.frac >= 0.5);
+    if (nb0) wrap.append(section(null, h('button', { class: 'bdg-row bdg-hoy card', type: 'button', onclick: () => { badgeFocus = nb0.series.id; location.hash = '#/perfil'; } },
+      medal(nb0.icon, nb0.tier, nb0.frac, nb0.series.top ? nb0.series.top.tier : null),
+      h('div', { class: 'grow' }, h('small', { class: 'muted' }, '🏅 Bijna een badge'), h('b', null, nb0.name),
+        bar(nb0.frac, 'var(--gold)'), h('small', { class: 'bdg-left' }, h('b', null, nb0.left), ' · ' + pct(nb0.frac))),
+      h('span', { class: 'fold-chev', 'aria-hidden': 'true' }, '›'))));
+
     // Lupe zag in je gesprekken steeds dezelfde fout: kort oefenen
     const fc = lupeFocusCard(); if (fc) wrap.append(section('Uit je gesprekken met Lupe', fc));
 
@@ -1108,7 +1120,7 @@
         if (!hidden && chat.mode !== 'ask') found = S.Mistakes.record(full, chat.mode, text, { sc: chat.mode === 'roleplay' && chat.scenario ? (chat.scenario.title || chat.scenario.nl) : '' });
         if (found) am.logged = found.length;
         fillBubble(b, am);
-        award('ai'); if (!hidden) Store.skill(chat.mode === 'write' ? 'write' : 'speak', !found || !found.length); Store.today().min += 0.5; Store.touchStreak();
+        st().done.ai = (st().done.ai || 0) + 1; award('ai'); checkBadges(); if (!hidden) Store.skill(chat.mode === 'write' ? 'write' : 'speak', !found || !found.length); Store.today().min += 0.5; Store.touchStreak();
         // drie beurten in een rollenspel = de spreektaak van je dagplan
         if (chat.mode === 'roleplay' && !hidden && (chat.turns = (chat.turns || 0) + 1) >= 3 && !Store.today().done.speak) {
           Store.today().done.speak = true; S.Sound.good(); S.toast('🗣️ Gesprek gevoerd: spreken is afgevinkt in je dagplan ✓', 3200);
@@ -1429,6 +1441,70 @@
     return card;
   }
 
+  /* ---- badges: medaille met voortgangsring, reeksen met trappen, «bijna binnen» ---- */
+  function medal(icon, ring, frac, fill, cls) {
+    // ring = trap waar de ring naartoe groeit, fill = hoogste behaalde trap (gekleurde medaille) of null
+    return h('span', { class: 'medal' + (fill != null ? ' on f' + Math.min(fill, 4) : '') + ' r' + Math.min(ring, 4) + (cls ? ' ' + cls : ''), style: { '--p': U.clamp(frac, 0, 1).toFixed(3) }, 'aria-hidden': 'true' },
+      h('span', { class: 'medal-ic' }, icon));
+  }
+  const pct = f => Math.floor(U.clamp(f, 0, 1) * 100) + '%';
+  let badgeFocus = null; // reeks die Perfil meteen openklapt (vanaf Hoy)
+  function badgeBoard(v) {
+    const box = h('div', { class: 'bdg' });
+    const openSeries = id => { const el = document.getElementById('bdg-' + id); if (!el) return; el.open = true; el.scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+    // samenvatting
+    box.append(h('div', { class: 'bdg-head card' },
+      medal('🏅', 2, v.earned / v.total, v.earned ? 2 : null, 'big'),
+      h('div', { class: 'grow' }, h('b', null, v.earned + ' van ' + v.total + ' badges'),
+        h('small', { class: 'muted' }, 'Elke reeks heeft trappen: brons, zilver, goud, platina en diamant. Tik op een reeks om te zien wat je nog moet doen.'),
+        bar(v.earned / v.total, 'var(--gold)'))));
+    if (badgeFocus) {
+      const id = badgeFocus; badgeFocus = null;
+      setTimeout(() => { const f = document.getElementById('p-badges'); if (f) f.open = true; openSeries(id); }, 80);
+    }
+    // bijna binnen
+    const near = v.near.filter(x => x.frac > 0).slice(0, 4);
+    if (near.length) box.append(h('h3', { class: 'sub' }, '⏳ Bijna binnen'), h('div', { class: 'bdg-near' }, near.map(n =>
+      h('button', { class: 'bdg-row card', type: 'button', onclick: () => openSeries(n.series.id) },
+        medal(n.icon, n.tier, n.frac, n.series.top ? n.series.top.tier : null),
+        h('div', { class: 'grow' }, h('b', null, n.name), h('small', { class: 'muted' }, n.desc),
+          bar(n.frac, 'var(--gold)'), h('small', { class: 'bdg-left' }, h('b', null, n.left), ' · ' + pct(n.frac)))))));
+    // alle reeksen per groep
+    for (const [g, icon, title] of v.groups) {
+      const list = v.series.filter(x => x.group === g);
+      if (g === 'speciaal') {
+        box.append(h('h3', { class: 'sub' }, icon + ' ' + title), h('div', { class: 'bdg-special' }, v.special.map(b =>
+          h('div', { class: 'bdg-sp' + (b.earned ? ' on' : '') },
+            medal(b.icon, 2, b.earned ? 1 : 0, b.earned ? 2 : null),
+            h('b', null, b.name), h('small', { class: 'muted' }, b.earned ? (b.at ? '✓ ' + fmtDate(b.at, { day: 'numeric', month: 'short' }) : '✓ behaald') : b.tip)))));
+        continue;
+      }
+      if (!list.length) continue;
+      box.append(h('h3', { class: 'sub' }, icon + ' ' + title), h('div', { class: 'bdg-grid' }, list.map(x => seriesCard(x))));
+    }
+    return box;
+  }
+  function seriesCard(x) {
+    const n = x.next, top = x.top, lv = x.id === 'levels';
+    const ringTier = n ? n.tier : top.tier;
+    const d = h('details', { class: 'bdg-series card' + (n ? '' : ' all'), id: 'bdg-' + x.id },
+      h('summary', null,
+        medal(top ? top.icon : x.icon, ringTier, n ? n.frac : 1, top ? top.tier : null),
+        h('div', { class: 'grow' },
+          h('div', { class: 'bdg-title' }, h('b', null, x.name), h('small', { class: 'muted' }, x.got + '/' + x.tiers.length)),
+          h('div', { class: 'bdg-pips' }, x.tiers.map(t => h('i', { class: 'pip t' + Math.min(t.tier, 4) + (t.earned ? ' on' : t === n ? ' next' : ''), title: t.name }, lv ? t.id : t.earned ? '✓' : ''))),
+          n ? [h('small', { class: 'bdg-next' }, 'Volgende: ', h('b', null, n.name)), bar(n.frac, 'var(--gold)'),
+            h('small', { class: 'bdg-left' }, h('b', null, n.left), x.now ? ' · ' + x.now : '')]
+            : h('small', { class: 'bdg-next ok' }, '✓ Alles behaald! 🎉')),
+        h('span', { class: 'fold-chev', 'aria-hidden': 'true' }, '›')),
+      h('div', { class: 'bdg-body' },
+        h('p', { class: 'muted small' }, x.tip),
+        h('ul', { class: 'bdg-tiers' }, x.tiers.map(t => h('li', { class: t.earned ? 'on' : '' },
+          medal(t.icon, t.tier, t.frac, t.earned ? t.tier : null, 'sm'),
+          h('div', { class: 'grow' }, h('b', null, t.name), h('small', { class: 'muted' }, t.desc)),
+          h('small', { class: 'bdg-st' }, t.earned ? (t.at ? '✓ ' + fmtDate(t.at, { day: 'numeric', month: 'short' }) : '✓ behaald') : t.left))))));
+    return d;
+  }
   routes.perfil = function () {
     if (S.Life && S.Life.adoptMe(st())) save();
     const s = st(); const wrap = h('div', { class: 'page profile' });
@@ -1596,8 +1672,9 @@
       h('h3', { class: 'sub' }, 'Je oefenkalender'), heatmap(),
       h('h3', { class: 'sub' }, 'Herhaling komende 7 dagen'), h('div', { class: 'card forecast' }, fc.map((n, i) => h('div', { class: 'fc' }, h('i', { style: { height: Math.max(3, n / mx * 70) + 'px' } }), h('b', null, n), h('small', null, i === 0 ? 'vandaag' : ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'][new Date(Date.now() + i * 864e5).getDay()]))))));
     // ---- badges en gegevens ----
-    const nb = s.badges.filter(b => BADGES[b]).length;
-    wrap.append(fold('badges', '🏅', 'Badges', false, nb + ' van ' + Object.keys(BADGES).length, h('div', { class: 'badges' }, Object.entries(BADGES).map(([id, b]) => h('div', { class: 'badge' + (s.badges.includes(id) ? ' on' : ''), title: b[2] }, h('span', null, b[0]), h('small', null, b[1]))))));
+    checkBadges(true);
+    const bv = S.Badges.view(st(), badgeEnv()), nb = bv.earned;
+    wrap.append(fold('badges', '🏅', 'Badges', false, nb + ' van ' + bv.total, badgeBoard(bv)));
     wrap.append(fold('gegevens', '💾', 'Je gegevens', false, 'opslaan en terugzetten', dataTools()));
     navAt.replaceWith(profNav([
       ['📋', 'Rapport van Lupe', '#/rapport', repN ? U.plural(repN, 'fout', 'fouten') : 'fouten en advies', 'hot'],
@@ -1611,7 +1688,7 @@
       ['🎯', 'Vaardigheden', 'vaardigheden', 'luisteren, spreken…'],
       ['🎲', 'Spellen', 'spellen', played ? U.plural(played, 'spel', 'spellen') : 'scores'],
       ['📅', 'Activiteit', 'activiteit', 'kalender en reeks'],
-      ['🏅', 'Badges', 'badges', nb + '/' + Object.keys(BADGES).length],
+      ['🏅', 'Badges', 'badges', nb + '/' + bv.total],
       ['💾', 'Gegevens', 'gegevens', 'back-up'],
       ['⚙️', 'Instellingen', '#/ajustes', 'stem, AI, profielen']
     ].filter(Boolean)));

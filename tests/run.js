@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js']) {
+for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -1382,6 +1382,46 @@ await micTests();
   }
   { const K = load('nl-es'), U = K.Uitz, w = 'uitzondering nl-es: ';
     ok(has(U.forWord('het meisje'), /siempre de het/) && has(U.forWord('de kinderen'), /-eren/) && has(U.forItem({ kind: 'type', sentence: 'Ik ___ naar huis.', answers: ['ging'] }, { expected: 'ging' }), /verbo irregular/), w + 'meisje, kinderen, ging');
+  }
+}
+{ // badges: reeksen met trappen en voortgang, uit de opgeslagen voortgang berekend
+  const B = S.Badges, w = 'badges: ';
+  const st = { units: {}, srs: {}, days: {}, xp: 0, streak: { cur: 0, best: 0 }, badges: [], done: {}, tests: [], skills: {}, settings: { goal: 20 }, placement: {} };
+  const env = { streak: 0, levels: [{ id: 'A1', total: 10, done: 0, passed: false }, { id: 'A2', total: 10, done: 0, passed: false }], places: { total: 22, stamps: 0 }, units: 40 };
+  let v = B.view(st, env);
+  ok(v.earned === 0 && v.total > 60 && v.series.length >= 14, w + 'leeg profiel: 0 van ' + v.total);
+  const ids = v.series.flatMap(x => x.tiers.map(t => t.id)).concat(v.special.map(x => x.id));
+  ok(new Set(ids).size === ids.length, w + 'unieke ids');
+  ['first', 'placement', 'streak3', 'streak7', 'streak30', 'words50', 'words250', 'words500', 'unit1', 'perfect', 'A1', 'A2', 'ai', 'goal', 'game', 'games10', 'plan', 'plan7', 'plan30', 'early', 'night']
+    .forEach(id => ok(ids.includes(id) && B.info(id), w + 'oude badge blijft: ' + id));
+  ok(v.series.every(x => x.tiers.every(t => t.left && /^nog |^doe /.test(t.left))), w + 'elke trap zegt wat je nog moet doen');
+  // 7 lessen gedaan, 2 units, 1 foutloos, 48 woorden
+  st.units = { a: { steps: { vocab1: true, vocab2: true, grammar: true, dialogue: true, read: true, apply: true, test: true }, done: true, best: 1 }, b: { steps: {}, tested: true, best: .85 } };
+  for (let i = 0; i < 48; i++) st.srs['w|x' + i] = { i: i < 3 ? 30 : 2 };
+  st.streak.best = 5; env.streak = 2; env.levels[0].done = 2;
+  v = B.view(st, env);
+  const se = id => v.series.find(x => x.id === id);
+  ok(se('lessons').next.id === 'les10' && se('lessons').next.left === 'nog 3 lessen' && se('lessons').got === 1, w + 'nog 3 lessen: ' + se('lessons').next.left);
+  ok(se('words').next.id === 'words50' && se('words').next.left === 'nog 2 woorden' && Math.abs(se('words').next.frac - .96) < 1e-9, w + 'nog 2 woorden');
+  ok(se('streak').got === 1 && se('streak').next.id === 'streak7' && se('streak').next.left === 'nog 5 dagen op rij', w + 'reeks: record telt, voortgang vanaf nu: ' + se('streak').next.left);
+  ok(se('levels').next.id === 'A1' && /nog 8 units in A1/.test(se('levels').next.left), w + 'niveau: ' + se('levels').next.left);
+  ok(se('units').got === 1 && se('perfect').got === 1 && se('travel').tiers[se('travel').tiers.length - 1].goal === 22, w + 'units, foutloos, alle 22 landen');
+  ok(se('skills').next.left === 'nog woordenschat, grammatica, luisteren, spreken, lezen, schrijven', w + 'allrounder noemt wat ontbreekt');
+  ok(B.view(st, Object.assign({}, env, { places: null })).series.every(x => x.id !== 'travel'), w + 'geen landen = geen reisbadges');
+  const earn = B.earnable(st, env);
+  ok(['first', 'unit1', 'perfect', 'streak3'].every(id => earn.includes(id)) && !earn.includes('les10') && !earn.includes('words50'), w + 'verdienbaar: ' + earn.join(','));
+  ok(v.near[0].frac >= v.near[v.near.length - 1].frac && v.near[0].id === 'words50', w + 'bijna binnen: dichtstbij eerst (' + v.near[0].id + ')');
+  // weekend: zaterdag 2026-11-21 en zondag 2026-11-22
+  st.days = { '2026-11-21': { min: 5 }, '2026-11-22': { min: 3 } };
+  ok(B.view(st, env).special.find(x => x.id === 'weekend').earned, w + 'weekendkrijger');
+  // badges die je al had, blijven behaald (ook als de teller lager is)
+  st.badges = ['words50']; ok(se('words') && B.view(st, env).series.find(x => x.id === 'words').got === 1, w + 'oude badge blijft behaald');
+  // samenvoegen: datum = eerste keer, tellers = hoogste
+  {
+    const base = () => JSON.parse(JSON.stringify(S.Store.state)), p = base(), q = base();
+    Object.assign(p, { updated: 2, badges: ['ai'], badgeAt: { ai: 200 }, done: { ai: 3, games: 9 } }); Object.assign(q, { updated: 1, badges: ['game'], badgeAt: { ai: 100, game: 50 }, done: { ai: 7, games: 2 } });
+    const x = S.Store.mergeStates(p, q);
+    ok(x.badgeAt.ai === 100 && x.badgeAt.game === 50 && x.done.ai === 7 && x.done.games === 9, w + 'samenvoegen: datum en tellers');
   }
 }
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
