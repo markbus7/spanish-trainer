@@ -58,7 +58,7 @@
     if (!notes || !notes.length) return null;
     const box = h('div', { class: 'xi-box' + (opt.open ? '' : ' hidden') },
       opt.head ? h('div', { class: 'xi-head' }, opt.head) : null,
-      notes.map(n => h('div', { class: 'xi-note' }, n.t ? h('div', { class: 'xi-t', lang: 'es' }, n.t) : null, h('div', { html: n.html }))));
+      notes.map(n => n.uz ? uitzBox([n]) : h('div', { class: 'xi-note' }, n.t ? h('div', { class: 'xi-t', lang: 'es' }, n.t) : null, h('div', { html: n.html }))));
     const btn = h('button', { class: opt.label ? 'btn small ghost xi-more' : 'xi-btn', type: 'button', title: 'Uitleg (gratis, zonder AI)', 'aria-label': 'Uitleg bij deze zin', 'aria-expanded': String(!!opt.open), onclick: e => {
       e.stopPropagation();
       const open = box.classList.toggle('hidden') === false;
@@ -78,7 +78,19 @@
     S.Gloss.decorate(el, S.Gloss.phrases(el.textContent), Object.assign({ lessonFirst: true }, opt));
     el.classList.add('tw-soft');
   }
-  const findNotes = (text, opt) => (S.Uitleg ? S.Uitleg.find(text, opt) : []);
+  const findNotes = (text, opt = {}) => {
+    const out = S.Uitleg ? S.Uitleg.find(text, opt) : [];
+    // ⚠️ uitzonderingen in deze zin (woorden en constructies) komen er herkenbaar bij
+    if (!opt.noUitz && S.Uitz) S.Uitz.forText(text, opt.seen).forEach(u => out.push({ uz: true, t: u.t, html: u.html }));
+    return out;
+  };
+  /* ⚠️ Uitzondering: herkenbaar blok met de reden (js/uitzonderingen.js). Mark wil uitzonderingen altijd duidelijk benoemd zien. */
+  function uitzBox(list) {
+    if (!list || !list.length) return null;
+    return h('div', { class: 'uitz', role: 'note' }, h('div', { class: 'uz-head' }, S.Uitz ? S.Uitz.label() : '⚠️ Uitzondering'),
+      list.map(u => h('div', { class: 'uz-item' }, u.t ? h('div', { class: 'uz-t', lang: S.course.target }, u.t) : null, h('div', { class: 'uz-html', html: u.html }))));
+  }
+  S.uitzBox = uitzBox;
 
   // Speciale tekens van de doeltaal. Engels heeft ze niet nodig: dan blijft de balk leeg en verborgen.
   const ACCENTS = { es: ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü', '¿', '¡'], en: [], nl: ['é', 'ë', 'ï', 'ö', 'ü', 'è'] };
@@ -284,6 +296,7 @@
       h('div', { class: 'big-es', lang: 'es' }, w.es, speakBtn(w.es)),
       h('div', { class: 'big-nl' }, w.nl),
       w.note ? h('div', { class: 'note' }, '🌎 ' + w.note) : null,
+      S.Uitz ? uitzBox(S.Uitz.forWord(w.es)) : null,
       h('div', { class: 'row gap center' }, speakBtn(w.es, { slow: true })));
   };
 
@@ -303,12 +316,16 @@
     const sumEl = () => S.Tutor.coach({ es: g.sum, lang: S.course.target, nl: es ? '' : 'Kort samengevat, in het Spaans. Tik om het te horen.' }, { size: 54, label: 'Profe Lupe vat samen', cls: 'lc-sum' }) || h('div', { class: 'sum', lang: S.course.target }, (S.course.target === 'es' ? '🇪🇸 ' : S.course.flag + ' ') + g.sum);
     if (g.sum && es) wrap.append(sumEl());
     const body = h('div', { class: 'prose', html: g.html });
+    // alinea's die met «Uitzondering» beginnen krijgen de herkenbare uitzonderingsstijl
+    body.querySelectorAll('p, li').forEach(p => { if (/^\s*(?:⚠️|⚠|📌)?\s*(?:uitzondering|excepción|excepcion)/iu.test(p.textContent)) p.classList.add('uz-p'); });
     if (es && !EN) { const d = h('details', null, h('summary', null, 'Uitleg in het Nederlands'), body); wrap.append(d); } else wrap.append(body); // Engels voor Nederlanders: de uitleg blijft altijd open
     if (g.table) {
       const tb = h('table', { class: 'gtable' });
       g.table.forEach((row, ri) => tb.append(h('tr', null, row.map(c => h(ri === 0 ? 'th' : 'td', { html: c })))));
       wrap.append(h('div', { class: 'table-wrap' }, tb));
     }
+    const gu = S.Uitz ? S.Uitz.grammar(g) : [];
+    if (gu.length) wrap.append(uitzBox(gu.map(x => ({ html: x }))));
     const seen = new Set();
     if (g.ex) wrap.append(h('div', { class: 'examples' }, g.ex.map(([e, n, x]) => {
       const nt = noteToggle(findNotes(e, { extra: x, seen }));
@@ -1074,10 +1091,11 @@
     /* Vooraf geschreven uitleg bij de zin van deze oefening (niet bij losse woorden). */
     function feedbackNotes(it, r) {
       if (it.word || it.conj || it.kind === 'match') return it.i ? [{ html: it.i }] : [];
+      // de uitzonderingen staan al in hun eigen blok (uitzBox)
       const exp = r.expected || it.answer || '';
       const text = it.sentence ? it.sentence.replace('___', exp) : (it.target || it.text || (it.translate ? exp : ''));
       if (!text && !it.i) return [];
-      return findNotes(text, { extra: it.i });
+      return findNotes(text, { extra: it.i, noUitz: true });
     }
 
     function renderFeedback(it, r) {
@@ -1124,6 +1142,8 @@
       // Luistervraag met een woord («Wat hoor je?»): ook bij een goed antwoord zien wat het betekent
       else if (it.word && it.audio && it.word.nl) fb.append(h('div', { class: 'small muted fb-tr' }, (S.course.ui === 'es' ? '🌎 ' : '🇳🇱 '), h('b', { lang: S.course.target }, it.word.es), ' = ' + it.word.nl));
       if (r.x) fb.append(h('div', { class: 'fb-x' }, '💡 ' + r.x));
+      // ⚠️ Uitzondering: altijd zichtbaar (goed én fout), met de reden
+      if (S.Uitz && !r.matchMistakes) { const uz = uitzBox(S.Uitz.forItem(it, r)); if (uz) fb.append(uz); }
       const notes = feedbackNotes(it, r);
       if (notes.length) {
         // fout: uitleg staat meteen open; goed: klap hem zelf open als je wilt

@@ -137,12 +137,12 @@
   const FUT = ['é','ás','á','emos','án'];
   const COND = ['ía','ías','ía','íamos','ían'];
 
-  function parse(inf) {
+  function parse(inf, plain) {
     let refl = false, base = inf;
     if (inf.endsWith('se') && inf.length > 4 && /[aeií]r$/.test(inf.slice(0, -2))) { refl = true; base = inf.slice(0, -2); }
     const cls = base.endsWith('ar') ? 'ar' : (base.endsWith('er') ? 'er' : 'ir'); // ír (oír) → ir
     const stem = base.slice(0, -2);
-    const data = VERBS[inf] || VERBS[base] || {};
+    const data = plain ? {} : (VERBS[inf] || VERBS[base] || {});
     return { inf, base, refl, cls, stem, data };
   }
 
@@ -234,8 +234,8 @@
   }
 
   /** Geeft 5 vormen terug (of null als niet van toepassing). */
-  function table(inf, tense) {
-    const v = parse(inf);
+  function table(inf, tense, plain) {
+    const v = parse(inf, plain);
     switch (tense) {
       case 'pres': return withRefl(v, presente(v));
       case 'pret': return withRefl(v, preterito(v));
@@ -289,5 +289,7 @@
   function personNl(tense, p) { return (tense === 'imper' || tense === 'neg' ? PERSONS_NL_IMPER : PERSONS_NL)[p] || ''; }
   function info(inf) { return VERBS[inf] || VERBS[parse(inf).base] || null; }
 
-  S.conj = { table, conj, alternatives, PERSONS, TENSES, VERBS, personsFor, personLabel, personNl, PERSONS_NL, info, gerundio: inf => gerundio(parse(inf)), participio: inf => participio(parse(inf)) };
+  S.conj = { table, conj, alternatives, PERSONS, TENSES, VERBS, personsFor, personLabel, personNl, PERSONS_NL, info, gerundio: inf => gerundio(parse(inf)), participio: inf => participio(parse(inf)),
+    /* zoals een volledig regelmatig werkwoord het zou doen (voor «⚠️ Uitzondering», js/uitzonderingen.js) */
+    plainTable: (inf, tense) => table(inf, tense, true), plainGerundio: inf => gerundio(parse(inf, true)), plainParticipio: inf => participio(parse(inf, true)) };
 })(typeof window !== 'undefined' ? (window.SPT = window.SPT || {}) : (globalThis.SPT = globalThis.SPT || {}));
