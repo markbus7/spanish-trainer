@@ -600,7 +600,7 @@
     const nb0 = S.Badges.view(s, badgeEnv()).near.find(x => x.frac >= 0.5);
     if (nb0) wrap.append(section(null, h('button', { class: 'bdg-row bdg-hoy card', type: 'button', onclick: () => { badgeFocus = nb0.series.id; location.hash = '#/perfil'; } },
       medal(nb0.icon, nb0.tier, nb0.frac, nb0.series.top ? nb0.series.top.tier : null),
-      h('div', { class: 'grow' }, h('small', { class: 'muted' }, '🏅 Bijna een badge'), h('b', null, nb0.name),
+      h('div', { class: 'grow' }, h('small', { class: 'muted' }, '🏅 Bijna een badge'), h('b', null, nb0.name), h('small', { class: 'bdg-how' }, nb0.desc),
         bar(nb0.frac, 'var(--gold)'), h('small', { class: 'bdg-left' }, h('b', null, nb0.left), ' · ' + pct(nb0.frac))),
       h('span', { class: 'fold-chev', 'aria-hidden': 'true' }, '›'))));
 
@@ -1485,7 +1485,7 @@
         box.append(h('h3', { class: 'sub' }, icon + ' ' + title), h('div', { class: 'bdg-special' }, v.special.map(b =>
           h('div', { class: 'bdg-sp' + (b.earned ? ' on' : '') },
             medal(b.icon, 2, b.earned ? 1 : 0, b.earned ? 2 : null),
-            h('b', null, b.name), h('small', { class: 'muted' }, b.earned ? (b.at ? '✓ ' + fmtDate(b.at, { day: 'numeric', month: 'short' }) : '✓ behaald') : b.tip)))));
+            h('b', null, b.name), h('small', { class: 'muted' }, b.desc), b.earned ? h('small', { class: 'bdg-ok' }, b.at ? '✓ ' + fmtDate(b.at, { day: 'numeric', month: 'short' }) : '✓ behaald') : null))));
         continue;
       }
       if (!list.length) continue;
@@ -1502,12 +1502,12 @@
         h('div', { class: 'grow' },
           h('div', { class: 'bdg-title' }, h('b', null, x.name), h('small', { class: 'muted' }, x.got + '/' + x.tiers.length)),
           h('div', { class: 'bdg-pips' }, x.tiers.map(t => h('i', { class: 'pip t' + Math.min(t.tier, 4) + (t.earned ? ' on' : t === n ? ' next' : ''), title: t.name }, lv ? t.id : t.earned ? '✓' : ''))),
-          n ? [h('small', { class: 'bdg-next' }, 'Volgende: ', h('b', null, n.name)), bar(n.frac, 'var(--gold)'),
+          n ? [h('small', { class: 'bdg-next' }, 'Volgende: ', h('b', null, n.name)), h('small', { class: 'bdg-how' }, n.desc), bar(n.frac, 'var(--gold)'),
             h('small', { class: 'bdg-left' }, h('b', null, n.left), x.now ? ' · ' + x.now : '')]
             : h('small', { class: 'bdg-next ok' }, '✓ Alles behaald! 🎉')),
         h('span', { class: 'fold-chev', 'aria-hidden': 'true' }, '›')),
       h('div', { class: 'bdg-body' },
-        h('p', { class: 'muted small' }, x.tip),
+        h('p', { class: 'bdg-tip small' }, 'ⓘ ' + x.tip),
         h('ul', { class: 'bdg-tiers' }, x.tiers.map(t => h('li', { class: t.earned ? 'on' : '' },
           medal(t.icon, t.tier, t.frac, t.earned ? t.tier : null, 'sm'),
           h('div', { class: 'grow' }, h('b', null, t.name), h('small', { class: 'muted' }, t.desc)),

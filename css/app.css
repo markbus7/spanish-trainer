@@ -481,7 +481,10 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .bdg-series[open] .fold-chev { transform: rotate(90deg); }
 .bdg-series.all { background: linear-gradient(135deg, var(--gold-soft), var(--card) 70%); }
 .bdg-title { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
-.bdg-next { font-size: .85rem; color: var(--ink2); } .bdg-next.ok { color: var(--teal); font-weight: 600; }
+.bdg-next { font-size: .85rem; color: var(--ink2); }
+.bdg-how { font-size: .84rem; line-height: 1.35; color: var(--ink); }
+.bdg-tip { color: var(--ink2); background: var(--bg2); border-radius: 10px; padding: .5rem .65rem; }
+.bdg-ok { color: var(--teal); font-weight: 600; font-size: .8rem; } .bdg-next.ok { color: var(--teal); font-weight: 600; }
 .bdg-series small.bdg-left { font-size: .84rem; }
 .bdg-pips { display: flex; gap: 4px; flex-wrap: wrap; }
 .pip { font-style: normal; min-width: 22px; height: 22px; padding: 0 4px; border-radius: 11px; display: inline-grid; place-items: center; font-size: .66rem; font-weight: 700;
