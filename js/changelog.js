@@ -4,9 +4,12 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
-  { v: '1.67.0', date: '2026-11-25',
+  { v: '1.68.0', date: '2026-11-25',
     nl: ['Nieuw: 📖 Grammaticabegrippen in Práctica. Wat is een lidwoord, een bijvoeglijk naamwoord, het onderwerp of de subjuntivo? 51 begrippen in gewone taal, met Latijns-Amerikaanse voorbeelden en uitzonderingen met de reden.', 'In de uitleg van je lessen, bij ⓘ-notities en uitzonderingen staan grammaticale woorden nu onderstreept: tik erop voor de uitleg, ook midden in een oefening.'],
-    es: [] },
+    es: ['Nuevo: 📖 Términos de gramática en Práctica: qué es un artículo, un adjetivo, el sujeto o el subjuntivo, con ejemplos y excepciones explicadas.', 'En las explicaciones de tus lecciones, las palabras de gramática están subrayadas: tócalas para ver qué significan.'] },
+  { v: '1.67.0', date: '2026-11-25',
+    nl: ['Fout bij een typvraag (of «Ik weet het niet»)? Typ eerst het juiste antwoord over, dan pas Verder. Bij een zin staan de goede woorden er al. Geen zin? Tik op Overslaan (Ctrl+O).'],
+    es: ['¿Un error al escribir (o «No lo sé»)? Primero copia la respuesta correcta y después sigues. En una frase, las palabras correctas ya están. ¿No tienes ganas? Toca Saltar (Ctrl+O).'] },
   { v: '1.66.0', date: '2026-11-25',
     nl: ['Badges vernieuwd: 16 reeksen met trappen (brons, zilver, goud, platina, diamant), samen ruim 70 badges.', 'Bij elke badge zie je hoe dichtbij je bent en wat je nog moet doen, bijvoorbeeld «nog 3 lessen» of «nog 8 units in A1, dan het examen».', 'Op Hoy staat de badge die je bijna hebt; tik erop en je ziet hem in Perfil.'],
     es: ['Insignias renovadas: 16 series con niveles (bronce, plata, oro, platino, diamante), en total unas 70 insignias.', 'En cada insignia ves cuánto te falta y qué debes hacer, por ejemplo «faltan 3 lecciones» o «faltan 8 unidades en A1, luego el examen».', 'En Hoy aparece la insignia que casi tienes; tócala y la ves en Perfil.'] },

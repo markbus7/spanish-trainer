@@ -1647,3 +1647,12 @@ details.fold[open] > .fold-sum .fold-chev { transform: rotate(90deg); }
 .bg-link small { display: block; margin-top: .1rem; line-height: 1.35; }
 .bg-link-ic { font-size: 1.5rem; }
 .bg-link .fold-chev { font-size: 1.3rem; color: var(--muted); }
+/* Na een fout het juiste antwoord overtypen (js/lesson.js retype) */
+.retype { margin-top: 1rem; padding: .75rem .9rem .8rem; border: 2px dashed var(--accent); border-radius: 14px; background: var(--accent-soft); }
+.retype.ok { border-style: solid; border-color: var(--ok); background: var(--ok-soft); }
+.retype-lbl { font-weight: 700; }
+.retype .answer-input, .retype .partial { margin-top: .45rem; }
+.retype .accent-bar { margin-top: .4rem; }
+.retype-st { margin-top: .4rem; }
+.answer-input.bad { border-color: var(--bad); animation: shake .3s; }
+.ls-actions .kbd-hint { font-family: inherit; }
