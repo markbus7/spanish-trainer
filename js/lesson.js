@@ -19,7 +19,7 @@
     check: 'Check', next: 'Continue', skip: 'Skip', gotit: 'Got it', choose: 'Choose the right answer', fill: 'Fill in the gap', translate: 'Translate into English',
     aslesson: 'Translate as in the lesson', order: 'Put the sentence in order', match: 'Match the pairs', listen: 'Listen and type what you hear', speak: 'Say it out loud',
     conj: 'Conjugate the verb', type: 'Type in English', meaning: 'What does this mean?', howsay: 'How do you say this in English?', hear: 'What do you hear?',
-    newword: 'New word', correct: 'Correct answer', write: 'Writing task'
+    newword: 'New word', correct: 'Correct answer', retype: 'Type the correct answer', write: 'Writing task'
   };
 
   function esMode() {
@@ -36,7 +36,7 @@
     order: ['Zet de zin in de juiste volgorde', 'Ordena la frase'], match: ['Koppel de paren', 'Une las parejas'], listen: ['Luister en typ wat je hoort', 'Escucha y escribe'],
     speak: ['Zeg het hardop', 'Dilo en voz alta'], conj: ['Vervoeg het werkwoord', 'Conjuga el verbo'], type: ['Typ in het Spaans', 'Escribe en español'],
     meaning: ['Wat betekent dit?', '¿Qué significa?'], howsay: ['Hoe zeg je dit in het Spaans?', '¿Cómo se dice en español?'], hear: ['Wat hoor je?', '¿Qué escuchas?'],
-    newword: ['Nieuw woord', 'Palabra nueva'], correct: ['Juiste antwoord', 'Respuesta correcta'], write: ['Schrijfopdracht', 'Tarea de escritura']
+    newword: ['Nieuw woord', 'Palabra nueva'], correct: ['Juiste antwoord', 'Respuesta correcta'], retype: ['Typ het juiste antwoord over', 'Copia la respuesta correcta'], write: ['Schrijfopdracht', 'Tarea de escritura']
   };
   function T(k) { const v = T_[k]; return v ? (esMode() ? (EN ? T_EN[k] || v[1] : v[1]) : v[0]) : k; }
   const Q_MAP = { 'Wat betekent dit?': 'meaning', 'Hoe zeg je dit in het Spaans?': 'howsay', 'Wat hoor je?': 'hear', 'Typ in het Spaans': 'type', 'Vertaal naar het Spaans': 'translate', 'Vertaal zoals in de les': 'aslesson', 'Vervoeg': 'conj' };
@@ -143,7 +143,7 @@
     return { text, max: Math.max(1, ...lens.map(l => l - 1)) };
   }
   // sneltoetsen: Ctrl+H = hint, Ctrl+I = ik weet het niet (werkt ook tijdens het typen, ook op een iPad-toetsenbord)
-  const KEY_HINT = 'h', KEY_DK = 'i';
+  const KEY_HINT = 'h', KEY_DK = 'i', KEY_SKIP = 'o'; // Ctrl+O = overtypen na een fout overslaan
   function typeHelp(inp, ctx, answer, onDontKnow) {
     let n = 0;
     const kbd = k => h('kbd', { class: 'kbd-hint', 'aria-hidden': 'true' }, '⌃' + k.toUpperCase());
@@ -1064,7 +1064,8 @@
       renderFeedback(it, r);
       mainBtn.hidden = false; mainBtn.disabled = false; mainBtn.textContent = T('next');
       mainBtn.onclick = () => { touch(); idx++; show(); };
-      setTimeout(() => mainBtn.focus({ preventScroll: true }), 50);
+      retypeCur = null;
+      if (wantsRetype(it, r)) retype(it, r); else setTimeout(() => mainBtn.focus({ preventScroll: true }), 50);
       const sayIt = r.expected && (it.speakAnswer || it.sentence || it.kind === 'listen' || it.word);
       if (sayIt && S.Store.state.settings.autoSpeak && it.kind !== 'speak') {
         let txt = it.sentence ? it.sentence.replace('___', (r.ok ? r.user : r.expected)) : (it.kind === 'mc' && it.word && it.q === 'Wat betekent dit?' ? it.word.es : r.expected);
@@ -1072,6 +1073,71 @@
         if (it.sentence && r.ok && !Speech.hasClip(txt) && Speech.hasClip(it.sentence.replace('___', r.expected))) txt = it.sentence.replace('___', r.expected);
         setTimeout(() => Speech.say(txt), 150);
       }
+    }
+
+    /* Na een fout (ook na «Ik weet het niet») bij een typvraag: eerst het juiste antwoord zelf overtypen, dan pas Verder.
+       Overtypen telt niet als goed antwoord en verandert de herhaling (SRS) niet. Bij een zin staan de woorden die je al
+       goed had er al; je typt alleen de rest. Echt geen zin in? «Overslaan» (sneltoets Ctrl+O) gaat meteen door. */
+    let retypeCur = null;
+    function wantsRetype(it, r) {
+      return !r.ok && !!r.expected && !r.self && r.matchMistakes == null && (it.kind === 'type' || it.kind === 'listen')
+        && (session.mode === 'learn' || session.mode === 'review') && !session.timer && S.Store.state.settings.retype !== false;
+    }
+    function retype(it, r) {
+      const target = r.expected;
+      const wrap = body.firstElementChild || body;
+      // de tekenbalk van het eerste antwoord hoort bij het (nu dichte) invulveld: die maakt plaats voor een nieuwe
+      wrap.querySelectorAll('.accent-bar').forEach(b => { b.hidden = true; });
+      const keep = r.parts && S.check.partsUsable(r.parts) ? { a: r.parts.a, k: r.parts.k } : null;
+      const answers = keep && keep.a !== target ? [target, keep.a] : [target];
+      let done = false;
+      const part = keep ? partialInput(keep, { can() {} }) : null;
+      const inp = part ? null : textInput(esMode() ? (EN ? 'Type the correct answer…' : 'Escribe la respuesta correcta…') : 'Typ het juiste antwoord…');
+      const value = () => (part ? part.value() : inp.value).trim();
+      const focus = () => { if (part) part.focus(); else inp.focus({ preventScroll: true }); };
+      const status = h('div', { class: 'retype-st small muted', 'aria-live': 'polite' }, part
+        ? '🟩 De groene woorden had je al goed. Typ alleen de rest over.'
+        : '👀 Kijk naar het juiste antwoord hieronder en typ het over.');
+      const box = h('div', { class: 'retype' },
+        h('div', { class: 'retype-lbl' }, '✍️ ' + T('retype')),
+        part ? part.el : inp, accentBar(() => part ? part.current() : inp), status);
+      const kbd = h('kbd', { class: 'kbd-hint', 'aria-hidden': 'true' }, '⌃' + KEY_SKIP.toUpperCase());
+      const finish = () => {
+        done = true; skipBtn.hidden = true; skipBtn.onclick = null;
+        mainBtn.disabled = false;
+      };
+      const success = () => {
+        if (done) return; finish();
+        if (part) part.mark(value(), answers); else inp.classList.remove('bad');
+        if (part) part.disabled = true; else inp.disabled = true;
+        box.classList.add('ok'); box.querySelectorAll('.accent-bar').forEach(b => { b.hidden = true; }); status.className = 'retype-st small'; status.textContent = '✅ Goed overgetypt! Zo onthoud je hem beter.';
+        setTimeout(() => mainBtn.focus({ preventScroll: true }), 50);
+      };
+      const test = () => { const v = value(); return !!v && answers.some(a => S.check.check(v, [a], { noTypo: true }).ok); };
+      const onInput = () => { if (done) return; if (inp) inp.classList.remove('bad'); if (test()) success(); };
+      (part ? part.inputs : [inp]).forEach(x => x.addEventListener('input', onInput));
+      // Enter met een fout: laat zien wat nog niet klopt
+      box.addEventListener('keydown', e => {
+        if (e.key !== 'Enter' || done) return;
+        if (part && !part.inputs.every(x => x.value.trim())) return; // partialInput springt naar het volgende vakje
+        e.preventDefault(); e.stopPropagation();
+        if (test()) { success(); return; }
+        if (part) { part.inputs.forEach(x => x.classList.remove('ok', 'bad')); part.mark(value(), answers); }
+        else { inp.classList.remove('bad'); void inp.offsetWidth; inp.classList.add('bad'); }
+        status.className = 'retype-st small'; status.textContent = '🔎 Nog niet precies hetzelfde. Kijk nog eens goed naar het juiste antwoord.';
+      });
+      const skip = () => { if (done || !box.isConnected) return; finish(); touch(); idx++; show(); };
+      mainBtn.disabled = true;
+      skipBtn.hidden = false; skipBtn.replaceChildren(T('skip'), kbd); skipBtn.title = 'Overtypen overslaan (sneltoets: Ctrl+O)'; skipBtn.onclick = skip;
+      const onKey = e => {
+        if (!e.ctrlKey || e.metaKey || e.altKey || done || (e.key || '').toLowerCase() !== KEY_SKIP) return;
+        e.preventDefault(); e.stopPropagation(); skip();
+      };
+      document.addEventListener('keydown', onKey, true);
+      leaveFns.push(() => document.removeEventListener('keydown', onKey, true));
+      wrap.append(box);
+      retypeCur = { cancel: () => { if (done) return; finish(); box.remove(); wrap.querySelectorAll('.accent-bar').forEach(b => { b.hidden = false; }); } };
+      setTimeout(() => { box.scrollIntoView({ block: 'nearest' }); focus(); }, 60);
     }
 
     /* Tegelstap vóór een lastige zin: geen punten, geen herhaling; alleen laten zien hoe de zin in elkaar zit. */
@@ -1181,6 +1247,7 @@
               fb.querySelectorAll('.fb-wrong').forEach(x => x.remove());
               const fe = fb.querySelector('.fb-exp'); if (fe && fe.firstChild) fe.firstChild.textContent = esMode() ? (EN ? 'The lesson says: ' : 'En la lección dice: ') : 'In de les staat: ';
               graded.set(it.orig || it, true);
+              if (retypeCur) retypeCur.cancel(); // toch goed: niets over te typen
               // de herkansing blijft: dan oefen je de zin zoals hij in de les staat
               const rq = queue.find((q, i) => i > idx && q.orig === (it.orig || it) && q.retry);
               if (rq) { mainOnlyCopy(rq); fb.append(h('div', { class: 'small' }, it.translate ? '🔁 Leer ook de zin uit de les: je krijgt hem straks nog een keer.' : '🔁 Leer ook het woord uit de les: je krijgt het straks nog een keer.')); }
