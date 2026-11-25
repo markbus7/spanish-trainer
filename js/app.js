@@ -922,7 +922,7 @@
     }) }, ico('skip', 'Ik ken dit al → direct de toets') === 'Ik ken dit al → direct de toets' ? '⏭️ Ik ken dit al → direct de toets' : ico('skip', 'Ik ken dit al → direct de toets')), s.best ? h('span', { class: 'muted small' }, 'Beste toets: ' + Math.round(s.best * 100) + '%') : null));
 
     // naslag
-    const tabs = [[ico('grammar', 'Grammatica'), () => h('div', null, u.grammar.map(g => S.Lesson.grammarBlock(g)))],
+    const tabs = [[ico('grammar', 'Grammatica'), () => h('div', null, begrippenLink(), u.grammar.map(g => S.Lesson.grammarBlock(g)))],
       [ico('vocab', 'Woorden'), () => wordList(u)],
       [ico('dialogue', 'Dialoog'), () => dialogueRead(u)],
       [ico('read', 'Lezen'), () => u.reading ? readingRead(u) : h('p', null, '—')],
@@ -940,6 +940,14 @@
     return wrap;
   };
   routes.unit.tab = 'ruta';
+  /* 📖 Grammaticabegrippen (js/begrippen.js): lijst van alle begrippen + link vanuit de naslag */
+  function begrippenLink() {
+    if (!S.Begrippen || !S.Begrippen.enabled()) return null;
+    return h('a', { class: 'bg-link card', href: '#/begrippen' }, h('span', { class: 'bg-link-ic', 'aria-hidden': 'true' }, '📖'),
+      h('span', { class: 'grow' }, h('b', null, 'Grammaticabegrippen'), h('small', { class: 'muted' }, 'Wat is een lidwoord, een onderwerp, de persoonsvorm? Tik op een onderstreept woord of bekijk de hele lijst.')), h('span', { class: 'fold-chev', 'aria-hidden': 'true' }, '›'));
+  }
+  routes.begrippen = arg => S.Begrippen ? S.Begrippen.page(arg) : routes.practica();
+  routes.begrippen.tab = 'practica';
   function wordList(u) {
     const list = h('div', { class: 'word-list' });
     C.words(u).forEach(w => {
@@ -1006,6 +1014,7 @@
       S.Games.GAMES.map(g => quick(g.id, g.es, g.nl + ' · ±' + g.min + ' min', () => S.Games.start(g.id), null, g.tip)),
       quick('🗂️', 'Alle spellen', 'kies je woorden', () => { location.hash = '#/juegos'; }, null, 'Kies eerst uit welke unit de woorden komen'))));
     wrap.append(section('Meer', h('div', { class: 'quick' },
+      S.Begrippen && S.Begrippen.enabled() ? quick('📖', 'Grammatica\u00ADbegrippen', S.Begrippen.list().length + ' begrippen uitgelegd', () => { location.hash = '#/begrippen'; }, null, 'Wat is een lidwoord, een onderwerp of een bijvoeglijk naamwoord?') : null,
       quick('📚', 'Woordenboek', 'zoeken + eigen woorden', () => { location.hash = '#/woorden'; }, null, 'Zoek een woord op of voeg je eigen woorden toe'),
       quick('⚡', 'Woordensprint', '2 min of zelf kiezen', () => { location.hash = '#/woordtoets'; }, null, 'Zoveel mogelijk woorden op tijd, of test nieuwe woorden'),
       quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10)), null, 'Luister naar een zin en typ wat je hoort'),

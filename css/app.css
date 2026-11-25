@@ -1605,3 +1605,45 @@ details.fold[open] > .fold-sum .fold-chev { transform: rotate(90deg); }
 .grammar > .uitz { margin: .8rem 0; }
 .prose p.uz-p, .prose li.uz-p { background: var(--gold-soft); border-left: 5px solid var(--gold); border-radius: 10px; padding: .5rem .75rem; }
 .ls-fb .uitz { max-height: 36vh; overflow-y: auto; }
+
+/* ===== 📖 Grammaticabegrippen (js/begrippen.js) ===== */
+.bg-term { color: inherit; text-decoration: underline dotted color-mix(in srgb, var(--teal) 75%, transparent); text-decoration-thickness: 2px; text-underline-offset: 3px; cursor: help; border-radius: 4px; -webkit-tap-highlight-color: transparent; }
+.bg-term:hover, .bg-term:focus-visible { background: var(--teal-soft); outline: none; }
+.bg-term:active { background: color-mix(in srgb, var(--teal) 25%, transparent); }
+.bg-term.demo { cursor: default; }
+.bg-page .bg-tip { display: flex; gap: .65rem; align-items: flex-start; font-size: .92rem; line-height: 1.45; margin: .2rem 0 1rem; }
+.bg-tip-ic { font-size: 1.3rem; line-height: 1.2; }
+.bg-search { width: 100%; margin-bottom: .6rem; }
+.bg-cats { margin-bottom: .4rem; }
+.bg-cat-sub { margin: -.35rem 0 .55rem; }
+.bg-item { padding: 0; margin-bottom: .55rem; overflow: hidden; scroll-margin-top: 72px; }
+.bg-item > summary { list-style: none; display: flex; align-items: center; gap: .6rem; padding: .75rem .95rem; cursor: pointer; }
+.bg-item > summary::-webkit-details-marker { display: none; }
+.bg-item > summary .fold-chev { transition: transform .15s; font-size: 1.3rem; color: var(--muted); }
+.bg-item[open] > summary .fold-chev { transform: rotate(90deg); }
+.bg-item[open] > summary { border-bottom: 1px solid var(--line); }
+.bg-n { font-size: .88rem; font-style: italic; }
+.bg-sum-k { margin-top: .1rem; }
+.bg-body { padding: .7rem .95rem .9rem; }
+.bg-modal .bg-body { padding: 0; }
+.bg-body .prose p:first-child { margin-top: 0; }
+.bg-gen { line-height: 1.5; }
+.bg-tl { margin-top: .75rem; padding: .7rem .85rem; border-radius: 14px; background: var(--teal-soft); line-height: 1.5; }
+.bg-tl-head { font-weight: 800; font-size: .82rem; letter-spacing: .03em; text-transform: uppercase; color: var(--teal); margin-bottom: .3rem; }
+.bg-tl-n { text-transform: none; letter-spacing: 0; font-weight: 700; font-style: italic; }
+.bg-tl .table-wrap { margin: .55rem 0; }
+.bg-tl .examples { margin-top: .55rem; }
+.bg-tl .ex-line { background: var(--card); }
+.bg-rel { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; margin-top: .75rem; }
+.bg-rel-chip { font-size: .85rem; }
+.bg-modal { max-width: 560px; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; text-align: left; }
+.bg-m-top { display: flex; align-items: flex-start; gap: .5rem; }
+.bg-m-top h3 { margin: .1rem 0 0; font-family: var(--serif); font-size: 1.35rem; }
+.bg-m-n { font-style: italic; }
+.bg-x { flex: none; color: var(--muted); }
+.bg-k { margin: .5rem 0 .7rem; font-weight: 600; }
+.bg-m-foot { margin-top: 1rem; }
+.bg-link { display: flex; align-items: center; gap: .7rem; text-decoration: none; color: inherit; margin-bottom: .8rem; padding: .7rem .9rem; }
+.bg-link small { display: block; margin-top: .1rem; line-height: 1.35; }
+.bg-link-ic { font-size: 1.5rem; }
+.bg-link .fold-chev { font-size: 1.3rem; color: var(--muted); }

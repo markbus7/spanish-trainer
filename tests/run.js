@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js']) {
+for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -1423,6 +1423,40 @@ await micTests();
     const x = S.Store.mergeStates(p, q);
     ok(x.badgeAt.ai === 100 && x.badgeAt.game === 50 && x.done.ai === 7 && x.done.games === 9, w + 'samenvoegen: datum en tellers');
   }
+}
+{ // 📖 grammaticabegrippen (js/begrippen.js): elk begrip uitgelegd, met LatAm-Spaanse voorbeelden; uitzonderingen met reden
+  const G = S.Begrippen, w = 'begrippen: ';
+  ok(G && G.B.length >= 40, w + 'aantal ' + (G && G.B.length));
+  const ids = new Set(G.B.map(b => b.id)), cats = new Set(G.CATS.map(c => c[0]));
+  ok(ids.size === G.B.length, w + 'dubbele id');
+  ['lidwoord', 'bn', 'zn', 'ww', 'vervoegen', 'onderwerp', 'vnw', 'pv', 'subjuntivo', 'gerundio', 'deelwoord'].forEach(id => ok(ids.has(id), w + 'mist ' + id));
+  G.B.forEach(b => {
+    const at = w + b.id + ' ';
+    ok(b.t && b.k && b.html && cats.has(b.c) && Array.isArray(b.a) && b.a.length, at + 'velden');
+    ok(b.es && b.es.n && b.es.html && b.es.ex && b.es.ex.length >= 1, at + 'Spaans blok met voorbeelden');
+    (b.rel || []).forEach(r => ok(ids.has(r), at + 'verwant bestaat niet: ' + r));
+    ['es', 'en'].forEach(l => (b[l] && b[l].uz || []).forEach(([t, html]) => ok(t && /waarom|reden/i.test(html), at + l + ' uitzondering zonder reden: ' + t)));
+    const txt = JSON.stringify(b.es).replace(/<[^>]+>/g, '');
+    ok(!/(?<!\p{L})(?:vosotros|vosotras|os|habláis|tenéis|coméis|ordenador|coche|móvil|zumo|vale)(?!\p{L})/iu.test(txt), at + 'geen Spanje-vormen');
+    ok(b.es.ex.every(([e, n]) => e && n), at + 'voorbeeld met vertaling');
+    ok(b.a.every(p => { try { new RegExp(p, 'iu'); return true; } catch (e) { return false; } }), at + 'patroon geldig');
+  });
+  // tikbare woorden vinden in Nederlandse uitleg (langste eerst, elk begrip één keer)
+  const m = G.match('Het voltooid deelwoord komt na haber; het lidwoord past bij het zelfstandig naamwoord. Weer een lidwoord.');
+  ok(m.map(x => x.id).join() === 'deelwoord,lidwoord,zn', w + 'match: ' + m.map(x => x.id + '=' + x.s).join(', '));
+  ok(G.match('lidwoorden en bijvoeglijke naamwoorden').map(x => x.id).join() === 'lidwoord,bn', w + 'meervoudsvormen');
+  ok(!G.match('hulpwerkwoorden').some(x => x.id === 'ww') && G.match('hulpwerkwoorden')[0].id === 'hulpww', w + 'geen werkwoord binnen hulpwerkwoord');
+  ok(G.match('de pretérito imperfecto en de pretérito indefinido').map(x => x.id).join() === 'imperfecto,indefinido', w + 'Spaanse tijdnamen');
+  ok(!G.match('Ik oefen regelmatig en dat is wijs.').length, w + 'gewone woorden niet onderstrepen');
+  ok(G.search('gerundio').length === 1 && G.search('lidwoord')[0].id === 'lidwoord' && G.search('el artículo')[0].id === 'lidwoord', w + 'zoeken');
+  // de uitleg in de lesstof gebruikt de begrippen echt: in de meeste grammaticablokken staat er minstens één
+  const gr = units.flatMap(u => u.grammar || []);
+  const hit = gr.filter(g => G.match(String(g.html).replace(/<[^>]+>/g, ' ')).length).length;
+  ok(hit / gr.length > 0.6, w + 'begrippen in grammaticauitleg: ' + hit + '/' + gr.length);
+  const files = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  ok(files.indexOf('js/begrippen.js') > 0 && files.indexOf('js/begrippen.js') < files.indexOf('js/lesson.js') && fs.readFileSync(path.join(root, 'sw.js'), 'utf8').includes('js/begrippen.js'), w + 'in index.html (vóór lesson.js) en sw.js');
+  // Engels: begrippen zonder Engels blok (por/para, stamklinkerwisseling) horen niet bij de Engelse cursus
+  ok(!G.fits(G.get('por-para'), 'en') && G.fits(G.get('lidwoord'), 'en') && G.list('en').length < G.list('es').length, w + 'per doeltaal');
 }
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
