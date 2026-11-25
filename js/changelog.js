@@ -4,9 +4,12 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
-  { v: '1.63.4', date: '2026-11-24',
+  { v: '1.64.1', date: '2026-11-25',
     nl: ['Geluid luider: alle opnames (lesstof, dialogen, Lupe) zijn ±5 dB harder en even luid gemaakt, tikgeluidjes iets harder, en op iPhone/iPad klinkt het na de microfoon niet meer zacht (geluidskanaal terug op afspelen). Opnames worden één keer opnieuw opgehaald.'],
     es: [] },
+  { v: '1.64.0', date: '2026-11-25',
+    nl: ['Na de unittoets zie je per onderdeel (woordenschat, grammatica met de onderwerpen, vervoegen, luisteren, lezen) wat er misging, met je fouten erbij. Knoppen brengen je meteen naar de les, de uitleg of een gerichte oefening met precies die stof; daarna kun je de toets direct opnieuw doen.', 'Ook na het niveau-examen: welke units je het beste kunt herhalen.'],
+    es: ['Después del examen de la unidad ves por cada parte (vocabulario, gramática con sus temas, conjugación, comprensión auditiva, lectura) qué salió mal, con tus errores. Los botones te llevan directo a la lección, la explicación o una práctica enfocada en justo ese tema; después puedes repetir el examen enseguida.', 'También después del examen de nivel: qué unidades te conviene repasar.'] },
   { v: '1.63.3', date: '2026-11-24',
     nl: ['Vijfde ronde voorstellen van Lupe: gemengd vervoegen (ser, estar, ir, vivir, tener) in Mi ciudad, meervoud (-s, -es, -z → -ces) in Personas y profesiones en mi/tu/su/nuestro in Mi familia.'],
     es: [] },

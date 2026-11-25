@@ -186,6 +186,7 @@
     if (d.kind === 'step') { const u = C.get(d.unit); if (!u) { Paused.clear(); render(); return; } startStep(u, d.step, session); }
     else if (d.kind === 'review') startReview(d.limit, session);
     else if (d.kind === 'exam') startLevelExam(d.lvl, session);
+    else if (d.kind === 'focus' && C.get(d.unit)) startFocus(C.get(d.unit), null, session);
     else if (d.kind === 'woordtoets') S.WordTest.resume(session, d);
     else if (d.kind === 'place' && S.Mundo) S.Mundo.resume(session, d);
     else runSession(session, { desc: d });
@@ -236,6 +237,145 @@
     }
   };
 
+  /* ================= Oefenadvies na een toets =================
+     Elke toetsvraag hoort bij een onderdeel: woordenschat, een grammaticaonderwerp (tag), vervoegen, luisteren of lezen.
+     Het eindscherm laat per onderdeel zien hoeveel er goed ging, welke vragen fout gingen, en geeft knoppen naar
+     gericht oefenen (precies die stof, uit deze unit) en naar de les die erbij hoort. */
+  const ADV = {
+    vocab: { icon: 'vocab', nl: 'Woordenschat' }, conj: { icon: 'grammar', nl: 'Vervoegen' },
+    listen: { icon: 'listen', nl: 'Luisteren' }, read: { icon: 'read', nl: 'Lezen' }, grammar: { icon: 'grammar', nl: 'Grammatica' }
+  };
+  function advGroup(it) {
+    if (it.conj) return 'conj';
+    if (it.skill === 'listen' || it.kind === 'listen') return 'listen';
+    if (it.skill === 'read') return 'read';
+    if (it.word || !it.tag || it.tag === 'vocab') return 'vocab';
+    return 'g:' + it.tag;
+  }
+  function unitOf(it) {
+    if (it.u) return it.u;
+    if (it.word && it.word.unit) return it.word.unit;
+    const m = String(it.srsId || '').match(/^x\|(.+)\|\d+$/); return m ? m[1] : null;
+  }
+  /* Naar de naslag van een unit, op een bepaald tabblad (0 grammatica, 1 woorden, 2 dialoog, 3 lezen). */
+  function openUnitTab(u, tab) {
+    try { sessionStorage.setItem('spt.utab', tab); } catch (e) { /* */ }
+    const want = '#/unit/' + u.id;
+    if (location.hash === want) render(); else location.hash = want;
+    setTimeout(() => { const p = document.querySelector('.tab-pane'), el = p && (p.closest('section') || p); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 250);
+  }
+  /* Gericht oefenen na de toets; daarna kun je de toets meteen opnieuw doen. */
+  function startFocus(u, f, resumed) {
+    const ses = resumed || Gen.focusSession(u, f);
+    if (!ses.items.length && !ses.resume) { S.toast('Geen oefeningen gevonden.'); return; }
+    runSession(ses, { desc: { kind: 'focus', unit: u.id }, onFinish: sum => ({
+      emoji: sum.score >= 0.8 ? '💪' : '🎯', title: sum.score >= 0.8 ? 'Klaar voor de toets!' : 'Goed geoefend',
+      text: sum.score >= 0.8 ? 'Dit ging een stuk beter. Probeer de unittoets nu nog eens.' : 'Dit blijft nog lastig. Doe de les nog eens rustig, of oefen dit later opnieuw. De fouten komen ook terug in je herhaling.',
+      nextLabel: '🏁 Unittoets opnieuw', next: () => startStep(u, 'test'),
+      alt: { label: 'Terug naar de unit', fn: () => { location.hash = '#/unit/' + u.id; } } }) });
+  }
+  function advGroups(sum) {
+    const groups = new Map();
+    (sum.results || []).forEach(({ it, ok }) => {
+      let k = advGroup(it), tag = null;
+      if (k.startsWith('g:')) { tag = k.slice(2); k = 'grammar'; }
+      const g = groups.get(k) || { key: k, n: 0, ok: 0, items: [], wrong: [], tags: new Map() };
+      g.n++; if (ok) g.ok++; else g.wrong.push(it);
+      if (tag) { const t = g.tags.get(tag) || { n: 0, ok: 0 }; t.n++; if (ok) t.ok++; g.tags.set(tag, t); }
+      g.items.push(it); groups.set(k, g);
+    });
+    return [...groups.values()];
+  }
+  function advCard(g, title, iconName, mistakes, actions, extraNode) {
+    const pct = g.n ? g.ok / g.n : 1;
+    const lvl = pct >= 0.8 ? 'ok' : pct >= 0.5 ? 'mid' : 'low';
+    return h('div', { class: 'adv-card adv-' + lvl },
+      h('div', { class: 'adv-head' },
+        h('span', { class: 'adv-ic' }, S.Icons && S.Icons.has(iconName) ? S.Icons.el(iconName) : '•'),
+        h('b', { class: 'grow' }, title),
+        h('span', { class: 'adv-score' }, `${g.ok} van ${g.n}`)),
+      h('div', { class: 'adv-bar' }, h('i', { style: { width: Math.round(pct * 100) + '%' } })),
+      extraNode || null,
+      mistakes.length ? h('div', { class: 'adv-mis' }, mistakes.slice(0, 5).map(S.Lesson.mistakeRow),
+        mistakes.length > 5 ? h('div', { class: 'small muted' }, '+ ' + U.plural(mistakes.length - 5, 'andere fout', 'andere fouten')) : null) : null,
+      h('div', { class: 'adv-acts' }, actions));
+  }
+  function advBtn(label, fn, primary) { return h('button', { class: 'btn small ' + (primary ? 'primary' : 'ghost'), type: 'button', onclick: fn }, label); }
+
+  /* Na de unittoets: wat moet je oefenen, per onderdeel. */
+  function unitAdvice(u, sum, passed) {
+    const groups = advGroups(sum);
+    const weak = groups.filter(g => g.wrong.length).sort((a, b) => a.ok / a.n - b.ok / b.n);
+    if (!weak.length) return null;
+    const good = groups.filter(g => !g.wrong.length);
+    return (go, mistakes) => {
+      const misOf = g => mistakes.filter(m => g.wrong.includes(m.it));
+      const cards = weak.map(g => {
+        const f = { redo: g.wrong };
+        let title, icon, acts, extraNode = null;
+        const practice = advBtn('🎯 Oefen dit', () => go(() => startFocus(u, f)), true);
+        if (g.key === 'vocab') {
+          const ws = g.wrong.filter(it => it.word).map(it => it.word); f.words = ws;
+          const ids = new Set(ws.map(w => w.id));
+          const halves = [1, 2].filter(n => Gen.half(u, n).some(w => ids.has(w.id)));
+          title = ADV.vocab.nl; icon = ADV.vocab.icon;
+          acts = [practice, ...(halves.length ? halves : [1]).map(n => advBtn('🃏 Les: ' + Gen.STEPS[n - 1].nl, () => go(() => startStep(u, 'vocab' + n)))),
+            advBtn('📋 Woordenlijst', () => go(() => openUnitTab(u, 1)))];
+        } else if (g.key === 'conj') {
+          f.conj = [...new Map(g.wrong.map(it => [it.conj.verb + '|' + it.conj.tense, [it.conj.verb, it.conj.tense]])).values()];
+          title = ADV.conj.nl; icon = ADV.conj.icon;
+          acts = [practice, advBtn('🧩 Les: Grammatica', () => go(() => startStep(u, 'grammar'))),
+            ES ? advBtn('📋 Vervoegingstabellen', () => go(() => { location.hash = '#/tablas'; })) : null];
+        } else if (g.key === 'listen') {
+          f.listen = true; title = ADV.listen.nl; icon = ADV.listen.icon;
+          acts = [practice, advBtn('💬 Les: Dialoog', () => go(() => startStep(u, 'dialogue')))];
+        } else if (g.key === 'read') {
+          f.read = true; title = ADV.read.nl; icon = ADV.read.icon;
+          acts = [practice, advBtn('📖 Les: Lezen', () => go(() => startStep(u, 'read'))), advBtn('📄 Tekst nalezen', () => go(() => openUnitTab(u, 3)))];
+        } else {
+          // grammatica: één kaart, met per onderwerp hoeveel er goed ging (zwakste eerst)
+          const weakTags = [...g.tags.entries()].filter(([, t]) => t.ok < t.n).sort((a, b) => a[1].ok / a[1].n - b[1].ok / b[1].n);
+          f.tags = weakTags.map(([tag]) => tag);
+          title = ADV.grammar.nl; icon = ADV.grammar.icon;
+          extraNode = h('div', { class: 'adv-topics' }, weakTags.map(([tag, t]) => h('span', { class: 'adv-topic' }, h('span', null, C.tag(tag)), ' ', h('b', null, t.ok + '/' + t.n))));
+          acts = [practice, advBtn('🧩 Les: Grammatica', () => go(() => startStep(u, 'grammar'))), advBtn('📘 Uitleg lezen', () => go(() => openUnitTab(u, 0)))];
+        }
+        return advCard(g, title, icon, misOf(g), acts.filter(Boolean), extraNode);
+      });
+      // alles in één gerichte oefening
+      const all = { redo: weak.flatMap(g => g.wrong), words: [], tags: [], conj: [] };
+      weak.forEach(g => {
+        if (g.key === 'vocab') all.words = g.wrong.filter(it => it.word).map(it => it.word);
+        else if (g.key === 'conj') all.conj = [...new Map(g.wrong.map(it => [it.conj.verb + '|' + it.conj.tense, [it.conj.verb, it.conj.tense]])).values()];
+        else if (g.key === 'listen') all.listen = true;
+        else if (g.key === 'read') all.read = true;
+        else all.tags.push(...[...g.tags.entries()].filter(([, t]) => t.ok < t.n).map(([tag]) => tag));
+      });
+      return h('div', { class: 'tadv' },
+        h('h3', null, passed ? 'Hier kun je nog winnen' : 'Dit moet je nog oefenen'),
+        h('p', { class: 'small muted' }, passed ? 'Je hebt de toets gehaald. Deze onderdelen gingen nog niet foutloos.' : 'Op basis van je toets: per onderdeel wat er misging, met de les of oefening die je het meest helpt. Het zwakste onderdeel staat bovenaan.'),
+        !passed && weak.length > 1 ? h('button', { class: 'btn primary wide adv-all', type: 'button', onclick: () => go(() => startFocus(u, all)) }, '🎯 Oefen al je fouten in één keer') : null,
+        cards,
+        good.length ? h('p', { class: 'adv-good small' }, '✓ Goed gegaan: ', good.map((g, i) => [i ? ', ' : '', h('span', null, ADV[g.key].nl)])) : null);
+    };
+  }
+  /* Na het niveau-examen: welke units je het beste kunt herhalen. */
+  function examAdvice(sum) {
+    const by = new Map();
+    (sum.results || []).forEach(({ it, ok }) => {
+      const id = unitOf(it); const u = id && C.get(id); if (!u) return;
+      const g = by.get(id) || { u, n: 0, ok: 0, wrong: [] }; g.n++; if (ok) g.ok++; else g.wrong.push(it); by.set(id, g);
+    });
+    const weak = [...by.values()].filter(g => g.wrong.length).sort((a, b) => a.ok / a.n - b.ok / b.n);
+    if (!weak.length) return null;
+    return (go, mistakes) => h('div', { class: 'tadv' },
+      h('h3', null, 'Deze units kun je het beste herhalen'),
+      h('p', { class: 'small muted' }, 'Per unit hoeveel vragen goed gingen. Het zwakste staat bovenaan.'),
+      weak.slice(0, 6).map(g => advCard(g, uTitle(g.u), 'review', mistakes.filter(m => g.wrong.includes(m.it)),
+        [advBtn('🎯 Oefen dit', () => go(() => startFocus(g.u, { redo: g.wrong, words: g.wrong.filter(it => it.word).map(it => it.word), tags: [...new Set(g.wrong.filter(it => !it.word && it.tag && it.tag !== 'vocab').map(it => it.tag))] })), true),
+          advBtn('Naar de unit', () => go(() => { location.hash = '#/unit/' + g.u.id; }))])));
+  }
+
   function startStep(u, stepId, resumed) {
     const session = resumed || Gen.stepSession(u, stepId);
     if (!session || (!session.items.length && !session.resume)) { S.toast('Deze stap heeft geen oefeningen.'); return; }
@@ -255,7 +395,7 @@
             const nxt = C.next(u.id);
             if (st().current === u.id && nxt) st().current = nxt.id;
             const lvlDone = C.unitsOf(u.level).every(x => P.unitState(x.id).done || P.unitState(x.id).tested);
-            const res = { passed: true, unitDone: true, bonusXP: 100 + (sum.score === 1 ? 50 : 0), emoji: '🏅', title: '¡Unidad completada!',
+            const res = { advice: unitAdvice(u, sum, true), passed: true, unitDone: true, bonusXP: 100 + (sum.score === 1 ? 50 : 0), emoji: '🏅', title: '¡Unidad completada!',
               text: lvlDone ? `Alle units van ${u.level} zijn klaar. Tijd voor het niveau-examen! 🎓` : (nxt ? 'Volgende unit ontgrendeld: ' + nxt.icon + ' ' + nxt.title : ''),
               nextLabel: nxt && !lvlDone ? 'Naar de volgende unit' : 'Klaar', next: () => { location.hash = nxt && !lvlDone ? '#/unit/' + nxt.id : '#/ruta'; } };
             // gaat het heel goed? stel voor om sneller door de stof te gaan
@@ -269,7 +409,7 @@
             }
             return res;
           }
-          return { passed: false, emoji: '💪', title: 'Bijna!', text: `Je had ${Math.round(sum.score * 100)}%. Je hebt 80% nodig. Bekijk je fouten, herhaal de lastige stappen en probeer het opnieuw.`, nextLabel: 'Terug naar de unit', next: () => { location.hash = '#/unit/' + u.id; }, alt: { label: '🔁 Opnieuw', fn: () => startStep(u, 'test') } };
+          return { passed: false, emoji: '💪', title: 'Bijna!', text: `Je had ${Math.round(sum.score * 100)}%. Je hebt 80% nodig. Hieronder zie je wat er misging en wat je het beste kunt oefenen. Daarna probeer je het opnieuw.`, advice: unitAdvice(u, sum, false), nextLabel: 'Terug naar de unit', next: () => { location.hash = '#/unit/' + u.id; }, alt: { label: '🔁 Opnieuw', fn: () => startStep(u, 'test') } };
         }
         us.steps[stepId] = true;
         if (!st().current || P.unitState(st().current).done) st().current = u.id;
@@ -743,7 +883,7 @@
         }
         return res;
       }
-      return { passed: false, title: 'Nog niet…', text: `Je had ${Math.round(sum.score * 100)}%. Je hebt 80% nodig. Oefen je zwakke punten (Perfil) en probeer het opnieuw.`, next: () => { location.hash = '#/perfil'; } };
+      return { passed: false, title: 'Nog niet…', text: `Je had ${Math.round(sum.score * 100)}%. Je hebt 80% nodig. Hieronder zie je welke units je het beste kunt herhalen. Daarna probeer je het opnieuw.`, advice: examAdvice(sum), next: () => { location.hash = '#/ruta'; } };
     } });
   }
 

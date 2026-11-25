@@ -209,7 +209,7 @@
     (u.verbs || []).forEach(v => (u.tenses || []).forEach(t => { if (S.conj.table(v, t)) conj.push([v, t]); }));
     U.sample(conj, 3).forEach(([v, t]) => { const it = conjItem(v, t); if (it) items.push(it); });
     const sl = U.shuffle(shortLines(u));
-    if (sl[0]) items.push(listenItem(sl[0].l[1], sl[0].l[2]));
+    if (sl[0]) items.push({ ...listenItem(sl[0].l[1], sl[0].l[2]), u: u.id });
     // leesvraag: de tekst gaat mee (src), zodat je hem tijdens de toets kunt openen met 📖 Tekst
     if (u.reading) { const q = U.pick(u.reading.q); items.push({ ...normEx(q, null, null, { noSrs: true, skill: 'read' }), q: '«' + u.reading.t + '» — ' + q.q, skill: 'read', tag: 'vocab', src: { kind: 'reading', reading: u.reading } }); }
     return { title: u.title + ' · Unittoets', items: mix(U.shuffle(items.filter(Boolean))), mode: 'test', pass: 0.8 };
@@ -236,6 +236,34 @@
     }
   }
 
+  /* ---------- na een toets: gericht oefenen wat fout ging ----------
+     f: { words: [woord], tags: [onderwerp], conj: [[werkwoord, tijd]], listen, read, redo: [fout beantwoorde vragen] }
+     De fout beantwoorde vragen komen opnieuw (vers gemaakt), plus extra oefening van hetzelfde soort uit deze unit. */
+  function fresh(it) {
+    const c = Object.assign({}, it); delete c.retry; delete c.orig; delete c.support;
+    if (c.options) c.options = U.shuffle(c.options.slice());
+    return c;
+  }
+  function focusSession(u, f = {}) {
+    const first = [], rest = [], seen = new Set();
+    const push = it => { if (!it) return; const k = it.conj ? 'c|' + it.conj.verb + '|' + it.conj.tense + '|' + it.conj.person : it.srsId || (it.kind + '|' + (it.text || it.q || it.prompt || it.sentence || it.target || '')); if (seen.has(k)) return; seen.add(k); rest.push(it); };
+    const words = (f.words || []).slice(0, 8);
+    words.forEach(w => first.push(wordItem(w, 'card', u)));
+    words.forEach((w, j) => push({ ...wordItem(w, j % 2 ? 'mc-es' : 'mc-nl', u), srsId: null }));
+    words.forEach(w => push(wordItem(w, 'type', u)));
+    (f.redo || []).forEach(it => push(fresh(it)));
+    (f.tags || []).forEach(tag => {
+      let ex = u.ex.map((e, i) => (e.tag || 'vocab') === tag && e.t !== 'match' ? normEx(e, u, i) : null).filter(Boolean);
+      if (ex.length < 4) learnedUnits().filter(x => x !== u).forEach(x => x.ex.forEach((e, i) => { if (e.tag === tag && e.t !== 'match') ex.push(normEx(e, x, i)); }));
+      U.sample(ex.filter(Boolean), Math.max(3, Math.ceil(8 / (f.tags.length || 1)))).forEach(push);
+    });
+    (f.conj || []).forEach(([v, t]) => U.sample(S.conj.personsFor(t), 3).forEach(p => push(conjItem(v, t, p))));
+    if (f.listen) U.sample(shortLines(u), 3).forEach(({ l }) => push(listenItem(l[1], l[2], l[3])));
+    if (f.read && u.reading) u.reading.q.forEach(q => push({ ...normEx(q, null, null, { noSrs: true, skill: 'read' }), q: '«' + u.reading.t + '» — ' + q.q, skill: 'read', tag: 'vocab', src: { kind: 'reading', reading: u.reading } }));
+    const cards = first.filter(Boolean);
+    return { title: u.title + ' · Gericht oefenen', items: cards.concat(mix(U.shuffle(rest).slice(0, Math.max(6, 22 - cards.length)))), mode: 'learn' };
+  }
+
   /* ---------- niveau-examen ---------- */
   function levelExam(lvl) {
     const us = C.unitsOf(lvl); const items = [];
@@ -247,7 +275,7 @@
     const conj = []; us.forEach(u => (u.verbs || []).forEach(v => (u.tenses || []).forEach(t => conj.push([v, t]))));
     U.sample(conj, 5).forEach(([v, t]) => { const it = conjItem(v, t); if (it) items.push(it); });
     const u2 = U.sample(us, 2);
-    u2.forEach(u => { const sl = shortLines(u); if (sl.length) { const l = U.pick(sl).l; items.push(listenItem(l[1], l[2])); } });
+    u2.forEach(u => { const sl = shortLines(u); if (sl.length) { const l = U.pick(sl).l; items.push({ ...listenItem(l[1], l[2]), u: u.id }); } });
     return { title: 'Niveau-examen ' + lvl, items: mix(U.shuffle(items).slice(0, 36)), mode: 'test', pass: 0.8 };
   }
 
@@ -466,5 +494,5 @@
     return { level, next, nextFrac: nb && nb.n ? nb.ok / nb.n : 0 };
   }
 
-  S.Gen = { attachSrc, difficulty, isHard, mix, easeNext, STEPS, stepSession, reviewSession, reviewCount, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, sprintPick, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART, forms, wordSynonyms, checkType };
+  S.Gen = { focusSession, half, attachSrc, difficulty, isHard, mix, easeNext, STEPS, stepSession, reviewSession, reviewCount, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, sprintPick, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART, forms, wordSynonyms, checkType };
 })(window.SPT);

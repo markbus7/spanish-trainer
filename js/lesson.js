@@ -1205,7 +1205,7 @@
       const vals = [...graded.values()];
       const okN = vals.filter(Boolean).length;
       // newXp/newMinutes: wat nog niet bij een eerdere pauze is bijgeschreven
-      return { total: vals.length, ok: okN, score: vals.length ? okN / vals.length : 1, xp, minutes: activeMs / 60000, newXp: xp - paidXp, newMinutes: Math.max(0, activeMs - paidMs) / 60000, mistakes, bestStreak, mode: session.mode };
+      return { total: vals.length, ok: okN, score: vals.length ? okN / vals.length : 1, xp, minutes: activeMs / 60000, newXp: xp - paidXp, newMinutes: Math.max(0, activeMs - paidMs) / 60000, mistakes, bestStreak, mode: session.mode, results: [...graded.entries()].map(([it, ok]) => ({ it, ok })) };
     }
     function finish() {
       touch(); if (tick) clearInterval(tick);
@@ -1231,12 +1231,10 @@
           statBox(Math.max(1, Math.round(sum.minutes)) + ' min', 'tijd'),
           sum.bestStreak >= 3 ? statBox('🔥 ' + sum.bestStreak, 'op rij') : null),
         typeof extra.plan === 'function' ? extra.plan(() => close(true)) : null,
-        sum.mistakes.length ? h('div', { class: 'mistakes' }, h('h3', null, 'Om te onthouden'),
-          dedupe(sum.mistakes).slice(0, 8).map(m => {
-            const es = m.it.word ? m.it.word.es : m.it.sentence ? m.it.sentence.replace('___', m.r.expected) : m.it.conj ? m.it.person + ' ' + m.r.expected : m.r.expected;
-            const sub = m.it.word ? m.it.word.nl : m.it.conj ? m.it.prompt + ' · ' + m.it.sub : (m.it.prompt || m.it.nl || m.it.q || '');
-            return h('div', { class: 'mistake' }, speakBtn(m.it.word || m.it.sentence || m.it.speakAnswer || m.it.kind !== 'mc' ? es : null), h('div', null, h('div', { class: 'es', lang: 'es' }, es), h('div', { class: 'small muted' }, sub)));
-          })) : null));
+        // na een toets: per onderdeel wat er misging en wat je het beste kunt oefenen (met knoppen)
+        typeof extra.advice === 'function' ? extra.advice(fn => { close(true); fn(); }, dedupe(sum.mistakes)) : null,
+        !extra.advice && sum.mistakes.length ? h('div', { class: 'mistakes' }, h('h3', null, 'Om te onthouden'),
+          dedupe(sum.mistakes).slice(0, 8).map(mistakeRow)) : null));
       mainBtn.hidden = false; mainBtn.disabled = false; mainBtn.textContent = extra.nextLabel || 'Klaar';
       mainBtn.onclick = () => { close(true); extra.next && extra.next(); };
       if (extra.note) { footNote.textContent = extra.note; footNote.hidden = false; }
@@ -1274,5 +1272,12 @@
     show();
   }
 
-  S.Lesson = { run, grammarBlock, speakBtn, accentBar, T, esMode, conjTable, noteToggle, findNotes, wordTaps };
+  /* Eén fout op het eindscherm: het goede antwoord (met luisterknop) en waar het over ging. */
+  function mistakeRow(m) {
+    const es = m.it.word ? m.it.word.es : m.it.sentence ? m.it.sentence.replace('___', m.r.expected) : m.it.conj ? m.it.person + ' ' + m.r.expected : m.r.expected;
+    const sub = m.it.word ? m.it.word.nl : m.it.conj ? m.it.prompt + ' · ' + m.it.sub : (m.it.prompt || m.it.nl || m.it.q || '');
+    return h('div', { class: 'mistake' }, speakBtn(m.it.word || m.it.sentence || m.it.speakAnswer || m.it.kind !== 'mc' ? es : null), h('div', null, h('div', { class: 'es', lang: 'es' }, es), h('div', { class: 'small muted' }, sub)));
+  }
+
+  S.Lesson = { mistakeRow, run, grammarBlock, speakBtn, accentBar, T, esMode, conjTable, noteToggle, findNotes, wordTaps };
 })(window.SPT);
