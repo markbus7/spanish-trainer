@@ -657,7 +657,7 @@
           rej();
         };
         this._end = end; // stop() rondt het lopende fragment af
-        this.mlog('♪ opname');
+        this.mlog('♪ opname'); this.session('playback');
         a.src = 'audio/' + this.clipKey(text, this.nsOf(opt.clipNs)) + '.mp3' + (direct ? '?direct=1' : '');
         a.preservesPitch = true; a.webkitPreservesPitch = true;
         // Op normale snelheid speelt de opname onbewerkt af: versnellen of vertragen met behoud van toonhoogte
@@ -809,7 +809,7 @@
           const parts = this.chunks(String(text).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, '').replace(/[*_#`>→]+/g, ' '));
           if (!parts.length) return res();
           const v = this.voice(opt);
-          this.mlog('♪ apparaatstem');
+          this.mlog('♪ apparaatstem'); this.session('playback');
           if (this.last) this.last.voice = v ? v.name : null;
           parts.forEach((p, i) => {
             const u = new SpeechSynthesisUtterance(p);
@@ -840,6 +840,22 @@
         this.retries = (this.retries || 0) + 1; this.mlog('dove start → nog een keer');
         return new Promise(r => setTimeout(r, 350)).then(() => this._listen(Object.assign({}, opt, { _retried: true, _fresh: true })));
       });
+    },
+    /* Geluidskanaal van iPhone/iPad (navigator.audioSession, iOS 16.4+, ook in Edge). Na de microfoon (spraakherkenning)
+       blijft iOS op «opnemen en afspelen» staan: dan klinkt alles via de luidspreker veel zachter (stemverwerking,
+       echo-onderdrukking). Daarom zetten we het bij afspelen ná een microfoonbeurt op 'playback' (vol volume), en vlak
+       voor het luisteren weer op 'auto'. Geeft true terug als het echt veranderd is. */
+    session(type) {
+      try {
+        const as = navigator.audioSession;
+        if (!as || !this.isIOS()) return false;
+        if (type === 'playback' && (!this._lastEnd || this.isListening())) return false; // nog nooit geluisterd: niets aan de hand
+        if (type === 'auto' && !this._sessionSet) return false;
+        if (as.type === type) return false;
+        as.type = type; this._sessionSet = type === 'playback';
+        this.mlog('♪ geluidskanaal → ' + type);
+        return true;
+      } catch (e) { return false; }
     },
     /* Laat al het afspelen echt los, zodat de microfoon het geluidskanaal krijgt. Pauzeren alleen is op iPad niet genoeg:
        een gepauzeerde <audio> en een AudioContext (ook 'suspended') houden het kanaal op afspelen, en dan hoort de
@@ -881,6 +897,9 @@
           wait();
         }).then(() => { this.mlog(prev.ended ? 'vorige klaar na ' + (Date.now() - prev.t) + 'ms' : 'vorige reageert niet, toch starten'); prev.ended = true; return this._listen(opt); });
       }
+      // Stond het geluidskanaal op «alleen afspelen» (na een vorige microfoonbeurt, zie session())? Eerst terug naar
+      // automatisch, en iOS even de tijd geven om om te schakelen, anders hoort de microfoon niets.
+      if (this.session('auto')) return new Promise(r => setTimeout(r, 250)).then(() => this._listen(opt));
       // Lupe, een opname of een tikgeluidje mag niet meer klinken: op iPad deelt de microfoon het geluidskanaal met het afspelen.
       this.releaseAudio();
       const t0 = Date.now(); let heardAny = false;
@@ -1032,7 +1051,7 @@
 
   /* ================= Geluid ================= */
   let actx = null;
-  function tone(freqs, dur = 0.09, type = 'sine', vol = 0.06) {
+  function tone(freqs, dur = 0.09, type = 'sine', vol = 0.15) {
     if (!Store.state.settings.sound) return;
     // Niet tijdens het luisteren, en vlak erna even wachten tot iPad de microfoon heeft losgelaten.
     if (Speech.isListening()) return;
@@ -1055,9 +1074,9 @@
   }
   S.Sound = {
     good: () => tone([660, 880], 0.08, 'sine'),
-    bad: () => tone([220, 180], 0.11, 'triangle', 0.05),
-    win: () => tone([523, 659, 784, 1047], 0.1, 'sine', 0.06),
-    tap: () => tone([440], 0.03, 'sine', 0.025),
+    bad: () => tone([220, 180], 0.11, 'triangle', 0.13),
+    win: () => tone([523, 659, 784, 1047], 0.1, 'sine', 0.15),
+    tap: () => tone([440], 0.03, 'sine', 0.06),
     pause: () => { try { if (actx && actx.state === 'running' && actx.suspend) actx.suspend(); } catch (e) { /* */ } },
     /* Helemaal sluiten (vóór de microfoon): het volgende tikgeluidje maakt vanzelf een nieuwe. */
     release: () => { const c = actx; actx = null; try { c && c.close && c.close(); } catch (e) { /* */ } }

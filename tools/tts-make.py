@@ -5,6 +5,9 @@ import asyncio, json, os, sys
 
 import edge_tts
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+loud = __import__('tts-loud').loud  # nieuwe opnames meteen op dezelfde luidheid
+
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 AUDIO = os.path.join(ROOT, 'audio')
 FALLBACK = 'es-MX-DaliaNeural'
@@ -19,6 +22,7 @@ async def make(item, sem, stats):
                     await edge_tts.Communicate(item.get('say') or item['text'], voice, rate=item.get('rate', '+0%'), pitch=item.get('pitch', '+0Hz')).save(path + '.tmp')
                     if os.path.getsize(path + '.tmp') > 500:
                         os.replace(path + '.tmp', path)
+                        await asyncio.to_thread(loud, path)
                         stats['ok'] += 1
                         return
                 except Exception as e:  # netwerk of onbekende stem: opnieuw, daarna de standaardstem

@@ -2372,7 +2372,7 @@
       h('p', { class: 'small muted' }, 'Na een update zie je hier een hoger versienummer. Staat er nog het oude nummer? Tik dan op «Controleren op updates».'));
   }
   /* Opnames per niveau downloaden, zodat ze ook zonder internet werken (sw.js bewaart ze in een vaste cache). */
-  const AUDIO_CACHE = 'espanol-latino-audio';
+  const AUDIO_CACHE = 'espanol-latino-audio-2'; // zelfde naam als in sw.js
   const LV_NAMES = { A1: 'A1', A2: 'A2', B1: 'B1', B2: 'B2', C1: 'C1', C2: 'C2', X: 'Overig (zinnen, regio’s)' };
   function offlineCard() {
     const url = k => new URL('audio/' + k + '.mp3', location.href).href;
