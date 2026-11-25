@@ -1262,6 +1262,18 @@
     card.append(h('a', { class: 'btn primary wide', href: '#/rapport' }, '📋 Bekijk het hele rapport'));
     return card;
   }
+  /** Staat er een nieuwere versie klaar? Dan eerst bijwerken (met knop) en true teruggeven. Offline of geen antwoord: gewoon doorgaan. */
+  async function needsUpdate(box, btn, label) {
+    let L = null;
+    try { L = await latestVersion(); } catch (e) { return false; }
+    if (!L || !newer(L.number, V.number)) return false;
+    const old = box.querySelector('.upd-first'); if (old) old.remove();
+    box.append(h('div', { class: 'card upd-first', role: 'status' },
+      h('p', { class: 'small' }, '🆕 Versie ' + L.number + ' staat klaar (jij hebt ' + V.number + '). Werk eerst bij: daarin zitten misschien al verbeteringen, en dan stelt Lupe die niet opnieuw voor.'),
+      h('button', { class: 'btn primary wide', type: 'button', onclick: e => { e.target.disabled = true; e.target.textContent = 'Bijwerken…'; updateNow(); } }, 'Nu bijwerken')));
+    btn.disabled = false; btn.textContent = label;
+    return true;
+  }
   async function shareReport(text, how) {
     if (how === 'share' && navigator.share) { try { await navigator.share({ title: 'Rapport van Profe Lupe', text }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
     let done = false;
@@ -1395,7 +1407,10 @@
       if (S.AI.enabled()) {
         const btn = h('button', { class: 'btn ghost wide', type: 'button' }, u && u.text ? '✨ Nieuwe voorstellen' : '✨ Wat moet er in de volgende update?');
         btn.onclick = async () => {
-          btn.disabled = true; btn.textContent = 'Lupe denkt na…';
+          btn.disabled = true; btn.textContent = 'Nieuwste versie controleren…';
+          // eerst bijwerken: anders stelt Lupe dingen voor die in de nieuwste versie al verwerkt zijn
+          if (await needsUpdate(box, btn, '✨ Nieuwe voorstellen')) return;
+          btn.textContent = 'Lupe denkt na…';
           try { const x = await M().proposeUpdate(); save(); draw(x); refreshTxt(); }
           catch (e) { btn.disabled = false; btn.textContent = '✨ Probeer opnieuw'; S.toast('⚠️ ' + e.message, 4000); }
         };
