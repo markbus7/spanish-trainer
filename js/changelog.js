@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.68.1', date: '2026-11-25',
+    nl: ['Badges duidelijker: elke badge zegt nu precies wat je moet doen, bijvoorbeeld «Rond 7 keer je hele dagplan op Hoy af: alle taken afvinken en de kist openen. De dagen hoeven niet achter elkaar.»', 'Namen zeggen wat ze betekenen (7 dagplannen, 3 dagen op rij, 1 uur geoefend) en elke reeks heeft een ⓘ-uitleg over hoe het telt.'],
+    es: ['Insignias más claras: cada insignia dice exactamente qué hacer, por ejemplo «Completa 7 veces todo tu plan del día en Hoy: marca todas las tareas y abre el cofre. No tienen que ser días seguidos.»', 'Los nombres dicen lo que significan (7 planes del día, 3 días seguidos, 1 hora de práctica) y cada serie tiene una explicación ⓘ de cómo cuenta.'] },
   { v: '1.68.0', date: '2026-11-25',
     nl: ['Nieuw: 📖 Grammaticabegrippen in Práctica. Wat is een lidwoord, een bijvoeglijk naamwoord, het onderwerp of de subjuntivo? 51 begrippen in gewone taal, met Latijns-Amerikaanse voorbeelden en uitzonderingen met de reden.', 'In de uitleg van je lessen, bij ⓘ-notities en uitzonderingen staan grammaticale woorden nu onderstreept: tik erop voor de uitleg, ook midden in een oefening.'],
     es: ['Nuevo: 📖 Términos de gramática en Práctica: qué es un artículo, un adjetivo, el sujeto o el subjuntivo, con ejemplos y excepciones explicadas.', 'En las explicaciones de tus lecciones, las palabras de gramática están subrayadas: tócalas para ver qué significan.'] },

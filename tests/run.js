@@ -1395,6 +1395,8 @@ await micTests();
   ['first', 'placement', 'streak3', 'streak7', 'streak30', 'words50', 'words250', 'words500', 'unit1', 'perfect', 'A1', 'A2', 'ai', 'goal', 'game', 'games10', 'plan', 'plan7', 'plan30', 'early', 'night']
     .forEach(id => ok(ids.includes(id) && B.info(id), w + 'oude badge blijft: ' + id));
   ok(v.series.every(x => x.tiers.every(t => t.left && /^nog |^doe /.test(t.left))), w + 'elke trap zegt wat je nog moet doen');
+  ok(v.series.every(x => x.tip && typeof x.name === 'string' && !/=>/.test(x.name) && x.tiers.every(t => t.name && !/Infinity|undefined|NaN/.test(t.name + t.desc) && /^(Rond|Haal|Doe|Leer|Krijg|Oefen|Verdien|Speel|Stuur|Geef)\b.*\.$/.test(t.desc))) && v.special.every(b => /\.$/.test(b.desc)), w + 'elke badge legt concreet uit wat je moet doen');
+  ok(/7 keer je hele dagplan.*niet achter elkaar/.test(v.series.find(x => x.id === 'plans').tiers[1].desc) && /Alle 22 landen/.test(v.series.find(x => x.id === 'travel').tiers.slice(-1)[0].name), w + 'dagplannen en landen duidelijk');
   // 7 lessen gedaan, 2 units, 1 foutloos, 48 woorden
   st.units = { a: { steps: { vocab1: true, vocab2: true, grammar: true, dialogue: true, read: true, apply: true, test: true }, done: true, best: 1 }, b: { steps: {}, tested: true, best: .85 } };
   for (let i = 0; i < 48; i++) st.srs['w|x' + i] = { i: i < 3 ? 30 : 2 };
