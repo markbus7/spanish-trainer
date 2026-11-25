@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.64.2', date: '2026-11-25',
+    nl: ['Zesde ronde voorstellen van Lupe, nu op basis van je nieuwe fouten: beslisregel está of hay (el/la/mi/naam → está, un/una/getal/geen lidwoord → hay) met woordtegels en vertaalzinnen; «¿Dónde queda el baño?» telt goed; al/del in het meervoud (de los, a las); tabel estar + llamarse met invuloefeningen; «¿puede ayudarme?» telt goed; getallen met de uitzondering un vóór een zelfstandig naamwoord (ochenta y un años).'],
+    es: [] },
   { v: '1.64.1', date: '2026-11-25',
     nl: ['Geluid luider: alle opnames (lesstof, dialogen, Lupe) zijn ±5 dB harder en even luid gemaakt, tikgeluidjes iets harder, en op iPhone/iPad klinkt het na de microfoon niet meer zacht (geluidskanaal terug op afspelen). Opnames worden één keer opnieuw opgehaald.'],
     es: [] },

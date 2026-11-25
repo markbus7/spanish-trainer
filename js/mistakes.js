@@ -205,7 +205,8 @@
   /* Wat in een eerdere update al verwerkt is (S.reworked in de lesstof), zodat Lupe het niet opnieuw voorstelt. */
   function reworked(tag, id) {
     const R = S.reworked || [];
-    return R.find(x => (tag && x.tag === tag) || (id && x.ids && x.ids.includes(id))) || null;
+    // de nieuwste update over dit onderwerp/woord telt
+    return R.filter(x => (tag && x.tag === tag) || (id && x.ids && x.ids.includes(id))).sort((a, b) => since(b) - since(a))[0] || null;
   }
   function since(rw) { return rw ? new Date(/T/.test(rw.date) ? rw.date : rw.date + 'T00:00:00').getTime() : 0; }
   /** Fouten (gesprekken + oefeningen) ná de update waarin dit onderwerp/woord verwerkt is. */

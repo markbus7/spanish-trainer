@@ -258,7 +258,7 @@
       ['el autobús / el bus', 'de bus', 'MX: el camión · AR: el colectivo · Caribe: la guagua'], ['el baño', 'de wc / de badkamer'],
       ['aquí', 'hier'], ['allí / allá', 'daar'], ['cerca de', 'dichtbij'], ['lejos de', 'ver van'], ['al lado de', 'naast'],
       ['enfrente de', 'tegenover'], ['entre', 'tussen'], ['a la derecha', 'rechts'], ['a la izquierda', 'links'], ['derecho', 'rechtdoor', 'ES: recto'],
-      ['¿dónde?', 'waar?'], ['hay', 'er is / er zijn'], ['disculpe', 'pardon (u) — om iets te vragen']
+      ['¿dónde?', 'waar?'], ['hay', 'er is / er zijn', 'altijd hay, ook bij meervoud: hay un banco · hay dos bancos'], ['disculpe', 'pardon (u) — om iets te vragen']
     ],
     grammar: [
       { t: 'Het werkwoord estar', es: 'El verbo estar',
@@ -310,7 +310,7 @@
       { t: 'mc', q: 'Hoe noemen Mexicanen de stadsbus?', o: ['el camión', 'la guagua', 'el bondi'], tag: 'vocab' },
       { t: 'tr', nl: 'Is er een apotheek in de buurt?', a: ['¿Hay una farmacia cerca?', '¿Hay una farmacia por aquí?', '¿Hay una farmacia cerca de aquí?'], tag: 'hay-estar' },
       { t: 'tr', nl: 'Het station is ver van hier.', a: ['La estación está lejos de aquí.', 'La estación está lejos.'], tag: 'hay-estar' },
-      { t: 'tr', nl: 'Waar is de wc?', a: ['¿Dónde está el baño?'], tag: 'hay-estar' },
+      { t: 'tr', nl: 'Waar is de wc?', a: ['¿Dónde está el baño?', '¿Dónde queda el baño?'], tag: 'hay-estar' },
       { t: 'order', s: 'El banco está enfrente de la iglesia.', nl: 'De bank is tegenover de kerk.' }
     ],
     say: [['Disculpe, ¿hay un banco por aquí?', 'Pardon, is er hier ergens een bank?'], ['La plaza está a dos cuadras.', 'Het plein is twee blokken verder.'], ['¿Dónde está la estación?', 'Waar is het station?']],

@@ -19,6 +19,7 @@
     'perdón': ['disculpa', 'disculpe', 'lo siento'],
     'disculpe': ['perdón', 'perdone'],
     'de nada': ['no hay de qué'],
+    '¿me puede ayudar?': ['¿puede ayudarme?', '¿me podría ayudar?', '¿podría ayudarme?'],
     'el profesor / la profesora': ['el maestro', 'la maestra'],
     'el / la maestro/a': ['el profesor', 'la profesora'],
     'el médico / la médica': ['el doctor', 'la doctora'],
