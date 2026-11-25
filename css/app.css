@@ -369,6 +369,32 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .mistakes { text-align: left; margin-top: 1rem; }
 .mistake { display: flex; gap: .6rem; align-items: flex-start; padding: .55rem 0; border-bottom: 1px solid var(--line); }
 .mistake .icon-btn { margin: 0; }
+.tadv { text-align: left; margin-top: 1.2rem; }
+.tadv > h3 { margin: 0 0 .2rem; }
+.tadv > p { margin: 0 0 .8rem; }
+.adv-topics { display: flex; flex-wrap: wrap; gap: .35rem; margin: .45rem 0 .1rem; }
+.adv-topic { font-size: .8rem; padding: .2rem .55rem; border-radius: 999px; background: var(--bg2); color: var(--ink2); }
+.adv-topic b { color: var(--bad); font-weight: 700; }
+.adv-all { margin: 0 0 .8rem; }
+.adv-card { background: var(--card); border: 1px solid var(--line); border-left: 5px solid var(--gold); border-radius: var(--r-sm); padding: .75rem .85rem; margin-bottom: .7rem; box-shadow: var(--shadow); }
+.adv-card.adv-low { border-left-color: var(--bad); }
+.adv-card.adv-ok { border-left-color: var(--ok); }
+.adv-head { display: flex; align-items: center; gap: .55rem; }
+.adv-head .grow { flex: 1; min-width: 0; }
+.adv-ic { width: 30px; height: 30px; flex: none; display: grid; place-items: center; }
+.adv-ic svg, .adv-ic img { width: 30px; height: 30px; }
+.adv-score { font-weight: 700; font-size: .85rem; padding: .15rem .55rem; border-radius: 999px; background: var(--gold-soft); color: var(--ink); white-space: nowrap; }
+.adv-low .adv-score { background: var(--bad-soft); color: var(--bad); }
+.adv-ok .adv-score { background: var(--ok-soft); color: var(--ok); }
+.adv-bar { height: 6px; border-radius: 3px; background: var(--bg2); margin: .5rem 0 .2rem; overflow: hidden; }
+.adv-bar i { display: block; height: 100%; background: var(--gold); border-radius: 3px; }
+.adv-low .adv-bar i { background: var(--bad); }
+.adv-ok .adv-bar i { background: var(--ok); }
+.adv-mis .mistake:last-child { border-bottom: 0; }
+.adv-mis .mistake { padding: .4rem 0; }
+.adv-acts { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .5rem; }
+.adv-acts .btn { flex: 0 1 auto; }
+.adv-good { color: var(--ok); margin: .2rem 0 0; }
 
 /* ---------- praktijk & docent ---------- */
 .weak-row, .skill-row { display: flex; align-items: center; gap: .7rem; padding: .45rem 0; }
