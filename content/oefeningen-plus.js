@@ -200,6 +200,11 @@
     { tag: 'conj', unit: 'a1-04', v: '1.63.3', date: '2026-11-24T21:36:00Z', what: '8 typoefeningen gemengd vervoegen (ser, estar, ir, vivir, tener) in een stad-context' },
     { tag: 'plural', unit: 'a1-02', v: '1.63.3', date: '2026-11-24T21:36:00Z', what: '6 typoefeningen meervoud (-s, -es, -z → -ces) met beroepen en personen' },
     { tag: 'possessive', unit: 'a1-03', v: '1.63.3', date: '2026-11-24T21:36:00Z', what: '6 oefeningen mi/tu/su/nuestro, su = zijn/haar/uw/hun' },
+    { tag: 'hay-estar', unit: 'a1-04', v: '1.64.2', date: '2026-11-25T00:40:00Z', what: 'beslisregel bepaald (el/la/mi/ese/naam) → está, onbepaald (un/una/geen lidwoord/getal) → hay; woordtegels en vertaalzinnen; ¿Dónde queda…? goed' },
+    { tag: 'contractions', unit: 'a1-04', v: '1.64.2', date: '2026-11-25T00:40:00Z', what: 'meervoud zonder samentrekking (de los, a las) en al centro, 7 oefeningen' },
+    { tag: 'conj', unit: 'a1-04', v: '1.64.2', date: '2026-11-25T00:40:00Z', what: 'tabel estar + llamarse (me/te/se) en 8 invuloefeningen met de persoon in de zin' },
+    { ids: ['w|a1-04|48', 'w|a1-04|29'], v: '1.64.2', date: '2026-11-25T00:40:00Z', what: '¿puede ayudarme? telt goed; hay blijft hay bij meervoud; zinnen met enfrente de' },
+    { tag: 'numbers', unit: 'a1-03', v: '1.64.2', date: '2026-11-25T00:40:00Z', what: 'uitzondering un vóór een zelfstandig naamwoord (ochenta y un años), 5 typoefeningen' },
     { tag: 'articles', unit: 'a1-02', v: '1.63.1', date: '2026-11-24T21:19:00Z', what: 'uitleg wél/géén lidwoord (beroep na ser, na gustar), ±15 oefeningen in a1-02 en a1-06' },
     { tag: 'gender', unit: 'a1-02', v: '1.63.1', date: '2026-11-24T21:19:00Z', what: 'lijstje woorden op -ma (el problema, el idioma…) met oefeningen' },
     { tag: 'adj-agree', unit: 'a1-03', v: '1.62.0', date: '2026-11-24T20:57:00Z', what: 'uitleg bijvoeglijke naamwoorden in het meervoud, 8 oefeningen' },
@@ -521,4 +526,70 @@
     { t: 'cloze', s: 'Ellos visitan a ___ tíos.', h: 'hun', a: ['sus'], nl: 'Zij bezoeken hun ooms en tantes.', tag: 'possessive' },
     { t: 'tr', nl: 'Is dat jouw hond?', a: ['¿Ese es tu perro?', '¿Es tu perro?'], tag: 'possessive' }
   ] });
+  /* ---------- Lupe-rapport 25 nov (op basis van nieuwe fouten) ---------- */
+  X('a1-04', {
+    grammar: [
+      { t: 'Beslisregel: está of hay?', es: '¿Está o hay? La regla',
+        html: `<p>Kijk naar het woordje <b>vóór</b> het ding:</p>
+<p>📍 <b>bepaald</b>: <i>el, la, los, las, mi, tu, ese, esa</i> of een <b>naam</b> → <b>está / están</b><br><i>El banco está cerca. Mis llaves están en la mesa. ¿Dónde está el museo Frida Kahlo?</i></p>
+<p>✨ <b>onbepaald</b>: <i>un, una, unos</i>, een <b>getal</b>, <i>mucho/muchos</i> of <b>geen lidwoord</b> → <b>hay</b><br><i>Hay un banco cerca. Hay dos hoteles. ¿Hay baños aquí?</i></p>
+<p>⚠️ <b>Uitzondering:</b> <i>hay</i> verandert nooit, ook niet bij meervoud: <i>hay un hotel · hay dos hoteles</i> (nooit <s>han</s> of <s>están dos hoteles</s>).</p>`,
+        table: [['bepaald → está(n)', 'onbepaald → hay'], ['¿Dónde está el banco?', 'Hay un banco cerca.'], ['El museo está en el centro.', 'Hay un museo en el centro.'], ['Mis llaves están en la mesa.', 'Hay unas llaves en la mesa.'], ['Los baños están allí.', '¿Hay baños aquí?']],
+        sum: 'El/la/mi + cosa → está. Un/una/número/nada → hay.' },
+      { t: 'De los, a las: geen samentrekking in het meervoud', es: 'De los, a las',
+        html: `<p>Samentrekken doe je <b>alleen bij el</b> (mannelijk enkelvoud): <i>al centro, del parque</i>.</p>
+<p>⚠️ <b>Uitzondering</b> waar het vaak misgaat: in het <b>meervoud</b> blijft alles los: <i>cerca <b>de los</b> mercados · vamos <b>a las</b> playas</i> (nooit <s>dels</s> of <s>als</s>).</p>`,
+        table: [['', 'enkelvoud', 'meervoud'], ['mannelijk', 'al centro · del parque', 'a los parques · de los mercados'], ['vrouwelijk', 'a la playa · de la plaza', 'a las playas · de las plazas']],
+        sum: 'Al y del solo con «el». De los, de las, a los, a las: separados.' },
+      { t: 'estar en llamarse in de presente', es: 'Estar y llamarse',
+        html: `<p>Kijk naar de persoon in de zin en kies de vorm. Bij <b>llamarse</b> hoort er altijd een klein woordje vóór: <b>me, te, se, nos</b>.</p>
+<p>⚠️ <b>Uitzondering</b> om op te letten: <i>usted</i> en <i>ustedes</i> krijgen de vorm van <i>él</i> en <i>ellos</i>: <i>usted está, usted se llama · ustedes están, ustedes se llaman</i>.</p>`,
+        table: [['persoon', 'estar', 'llamarse'], ['yo', 'estoy', 'me llamo'], ['tú', 'estás', 'te llamas'], ['él / ella / usted', 'está', 'se llama'], ['nosotros', 'estamos', 'nos llamamos'], ['ellos / ellas / ustedes', 'están', 'se llaman']],
+        sum: '¿Cómo te llamas? — Me llamo Mark. ¿Dónde estás? — Estoy en la plaza.' }
+    ],
+    ex: [
+      // hay / está: woordtegels en vertalen
+      { t: 'order', s: '¿Dónde está el banco?', nl: 'Waar is de bank?', tag: 'hay-estar' },
+      { t: 'order', s: 'Hay un banco cerca.', nl: 'Er is een bank in de buurt.', tag: 'hay-estar' },
+      { t: 'order', s: 'Mis llaves están en la mesa.', nl: 'Mijn sleutels liggen op tafel.', tag: 'hay-estar' },
+      { t: 'tr', nl: 'Zijn er hier toiletten?', a: ['¿Hay baños aquí?', '¿Hay baños por aquí?', '¿Aquí hay baños?'], tag: 'hay-estar' },
+      { t: 'tr', nl: 'Het museum is in het centrum.', a: ['El museo está en el centro.'], x: 'El museo (bepaald) → está.', tag: 'hay-estar' },
+      { t: 'tr', nl: 'Er zijn twee hotels.', a: ['Hay dos hoteles.'], x: 'Hay blijft hay, ook bij meervoud.', tag: 'hay-estar' },
+      { t: 'tr', nl: 'Er is een apotheek tegenover de bank.', a: ['Hay una farmacia enfrente del banco.', 'Enfrente del banco hay una farmacia.'], tag: 'hay-estar' },
+      // al / del: meervoud en centro
+      { t: 'cloze', s: 'Vamos ___ centro.', a: ['al'], nl: 'We gaan naar het centrum.', tag: 'contractions' },
+      { t: 'cloze', s: 'La farmacia está lejos ___ parque.', a: ['del'], nl: 'De apotheek is ver van het park.', tag: 'contractions' },
+      { t: 'cloze', s: 'Vamos ___ playas de Cartagena.', a: ['a las'], nl: 'We gaan naar de stranden van Cartagena.', x: 'Meervoud: geen samentrekking, a las.', tag: 'contractions' },
+      { t: 'cloze', s: 'Es la casa ___ señor López.', a: ['del'], nl: 'Het is het huis van meneer López.', x: 'De + el señor = del señor.', tag: 'contractions' },
+      { t: 'cloze', s: 'El hostal está cerca ___ museos.', a: ['de los'], nl: 'Het hostel is dicht bij de musea.', tag: 'contractions' },
+      { t: 'cloze', s: 'Voy ___ tiendas del centro.', a: ['a las'], nl: 'Ik ga naar de winkels in het centrum.', tag: 'contractions' },
+      { t: 'cloze', s: 'La catedral está enfrente ___ plaza.', a: ['de la'], nl: 'De kathedraal is tegenover het plein.', tag: 'contractions' },
+      // estar / llamarse
+      { t: 'cloze', s: 'Tú ___ en la plaza.', h: 'estar', a: ['estás'], nl: 'Jij bent op het plein.', tag: 'conj' },
+      { t: 'cloze', s: 'Ellos ___ en el hotel.', h: 'estar', a: ['están'], nl: 'Zij zijn in het hotel.', tag: 'conj' },
+      { t: 'cloze', s: 'Usted ___ cerca del banco.', h: 'estar', a: ['está'], nl: 'U bent dicht bij de bank.', x: 'Usted → vorm van él/ella: está.', tag: 'conj' },
+      { t: 'cloze', s: 'Nosotros ___ en el centro.', h: 'estar', a: ['estamos'], nl: 'Wij zijn in het centrum.', tag: 'conj' },
+      { t: 'cloze', s: '¿Cómo ___ (tú)?', h: 'llamarse', a: ['te llamas'], nl: 'Hoe heet je?', x: 'Llamarse heeft altijd me/te/se: te llamas.', tag: 'conj' },
+      { t: 'cloze', s: 'Yo me ___ Mark.', h: 'llamarse', a: ['llamo'], nl: 'Ik heet Mark.', tag: 'conj' },
+      { t: 'cloze', s: '¿Cómo ___ usted?', h: 'llamarse', a: ['se llama'], nl: 'Hoe heet u?', tag: 'conj' },
+      { t: 'cloze', s: 'Mis amigas ___ Ana y Lucía.', h: 'llamarse', a: ['se llaman'], nl: 'Mijn vriendinnen heten Ana en Lucía.', tag: 'conj' },
+      // hulp vragen
+      { t: 'tr', nl: 'Pardon, kunt u me helpen?', a: ['Disculpe, ¿me puede ayudar?', 'Disculpe, ¿puede ayudarme?', 'Perdón, ¿me puede ayudar?', 'Perdón, ¿puede ayudarme?', 'Disculpe, ¿me podría ayudar?'], tag: 'vocab' }
+    ]
+  });
+  X('a1-03', {
+    grammar: [
+      { t: 'Uno wordt un vóór een zelfstandig naamwoord', es: 'Ochenta y un años',
+        html: `<p>Getallen bouw je met <b>tiental + y + eenheid</b>: <i>cuarenta y siete, setenta y seis</i>.</p>
+<p>⚠️ <b>Uitzondering:</b> eindigt het getal op <b>uno</b> en komt er een (mannelijk) zelfstandig naamwoord achter, dan wordt het <b>un</b>: <i>ochenta y <b>un</b> años, veinti<b>ún</b> años, sesenta y <b>un</b> días</i>. Bij een vrouwelijk woord: <i>treinta y <b>una</b> casas</i>. Los getal (bij tellen): <i>ochenta y uno</i>.</p>`,
+        sum: 'Ochenta y un años, treinta y una casas, contar: ochenta y uno.' }
+    ],
+    ex: [
+      { t: 'cloze', s: 'Mi tío tiene ___ años. (47)', a: ['cuarenta y siete'], nl: 'Mijn oom is 47 jaar.', tag: 'numbers' },
+      { t: 'cloze', s: 'Mi abuela tiene ___ años. (81)', a: ['ochenta y un'], nl: 'Mijn oma is 81 jaar.', x: 'Uitzondering: vóór años wordt uno → un.', tag: 'numbers' },
+      { t: 'cloze', s: 'Mi padre tiene ___ años. (61)', a: ['sesenta y un'], nl: 'Mijn vader is 61 jaar.', x: 'Uitzondering: vóór años wordt uno → un.', tag: 'numbers' },
+      { t: 'cloze', s: 'Mi tía tiene ___ años. (76)', a: ['setenta y seis'], nl: 'Mijn tante is 76 jaar.', tag: 'numbers' },
+      { t: 'cloze', s: 'En mi calle hay ___ casas. (31)', a: ['treinta y una'], nl: 'In mijn straat staan 31 huizen.', x: 'Vrouwelijk woord (casas) → una.', tag: 'numbers' }
+    ]
+  });
 })(window.SPT);

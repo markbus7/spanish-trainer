@@ -846,6 +846,8 @@ await micTests();
 /* ---------- fouten uit gesprekken met Lupe ---------- */
 {
   const Mi = S.Mistakes, St = S.Store;
+  // tijdsonafhankelijk testen: alle «al verwerkt»-updates op een vast moment in het verleden
+  const RW0 = S.reworked; S.reworked = (RW0 || []).map(x => Object.assign({}, x, { date: '2026-11-24T20:00:00Z' }));
   const saved = JSON.stringify(St.state);
   St.state = St.mergeStates({}, {});
   const reply = '¡Claro! ¿Y tú?\n---\n❌ soy cansado → ✅ estoy cansado — toestand\n<log>[{"w":"soy cansado","c":"estoy cansado","why":"toestand = estar","tag":"ser-estar"},{"w":"el coche","c":"el carro","why":"in Latijns-Amerika","tag":"vocab","es":"el carro","nl":"de auto"},{"w":"x","c":"y","tag":"bestaat-niet"}]</log>';
