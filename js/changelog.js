@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.65.1', date: '2026-11-25',
+    nl: ['Zevende ronde voorstellen van Lupe: woorden op -ma in zinnen (el problema, un tema complicado); beroepen mannelijk/vrouwelijk (-o → -a, -or → -ora, -ista gelijk, ⚠️ uitzondering actor → actriz) met spelling en woordtegels (El señor López es ingeniero); está of hay met plaatsvoorzetsels (El libro está encima de la mesa); nieuwe dicteezinnen in Práctica › Luisteren (Sí, hay una enfrente del banco).', '«✨ Nieuwe voorstellen» kijkt eerst of je de nieuwste versie hebt. Zo niet, dan vraagt de app je eerst bij te werken, zodat Lupe geen dingen voorstelt die al verwerkt zijn.'],
+    es: [] },
   { v: '1.65.0', date: '2026-11-25',
     nl: ['Uitzonderingen worden nu altijd duidelijk benoemd: een oranje blok «⚠️ Uitzondering» met de reden, bij goed én fout antwoord, bij nieuwe woorden, in de uitleg en in de grammatica. Bijvoorbeeld el tema (mannelijk op -ma), la mano, el agua, ¿Dónde es la fiesta? en onregelmatige werkwoordsvormen als tengo of hizo. Werkt in alle cursussen.'],
     es: [] },

@@ -205,6 +205,10 @@
     { tag: 'conj', unit: 'a1-04', v: '1.64.2', date: '2026-11-25T00:40:00Z', what: 'tabel estar + llamarse (me/te/se) en 8 invuloefeningen met de persoon in de zin' },
     { ids: ['w|a1-04|48', 'w|a1-04|29'], v: '1.64.2', date: '2026-11-25T00:40:00Z', what: '¿puede ayudarme? telt goed; hay blijft hay bij meervoud; zinnen met enfrente de' },
     { tag: 'numbers', unit: 'a1-03', v: '1.64.2', date: '2026-11-25T00:40:00Z', what: 'uitzondering un vóór een zelfstandig naamwoord (ochenta y un años), 5 typoefeningen' },
+    { tag: 'gender', unit: 'a1-02', v: '1.65.1', date: '2026-11-25T00:52:00Z', what: '-ma-woorden in zinnen (el/un + mannelijk bijv. nw. typen) en vrouwelijke beroepen: -o → -a, -or → -ora, ⚠ -tor → -triz, -ista/-e gelijk' },
+    { tag: 'articles', unit: 'a1-02', v: '1.65.1', date: '2026-11-25T00:52:00Z', what: 'beroepszinnen als woordtegels, vertalen en dictee (el señor López es ingeniero, soy cocinero), spelling beroepen' },
+    { tag: 'prepositions', unit: 'a1-04', v: '1.65.1', date: '2026-11-25T00:52:00Z', what: 'está of hay met plaatsvoorzetsels (encima de, detrás de, al lado de, enfrente de), 5 meerkeuze' },
+    { ids: ['w|a1-04|48', 'w|a1-04|29', 'w|a1-04|37'], v: '1.65.1', date: '2026-11-25T00:52:00Z', what: 'dicteezinnen met hay una enfrente del banco, la catedral en ¿me puede ayudar?' },
     { tag: 'articles', unit: 'a1-02', v: '1.63.1', date: '2026-11-24T21:19:00Z', what: 'uitleg wél/géén lidwoord (beroep na ser, na gustar), ±15 oefeningen in a1-02 en a1-06' },
     { tag: 'gender', unit: 'a1-02', v: '1.63.1', date: '2026-11-24T21:19:00Z', what: 'lijstje woorden op -ma (el problema, el idioma…) met oefeningen' },
     { tag: 'adj-agree', unit: 'a1-03', v: '1.62.0', date: '2026-11-24T20:57:00Z', what: 'uitleg bijvoeglijke naamwoorden in het meervoud, 8 oefeningen' },
@@ -591,5 +595,48 @@
       { t: 'cloze', s: 'Mi tía tiene ___ años. (76)', a: ['setenta y seis'], nl: 'Mijn tante is 76 jaar.', tag: 'numbers' },
       { t: 'cloze', s: 'En mi calle hay ___ casas. (31)', a: ['treinta y una'], nl: 'In mijn straat staan 31 huizen.', x: 'Vrouwelijk woord (casas) → una.', tag: 'numbers' }
     ]
+  });
+  /* ---------- Lupe-rapport 25 nov, tweede ronde ---------- */
+  X('a1-02', {
+    grammar: [
+      { t: 'Beroepen: mannelijk en vrouwelijk', es: 'Profesiones: masculino y femenino',
+        html: `<p>De regel: <b>-o → -a</b> (<i>ingeniero → ingeniera</i>) en <b>-or → -ora</b> (<i>doctor → doctora, profesor → profesora</i>).</p>
+<p>Woorden op <b>-ista</b> en <b>-e</b> blijven gelijk, alleen het lidwoord verandert: <i>el / la dentista, el / la periodista, el / la estudiante</i>.</p>
+<p>⚠️ <b>Uitzondering:</b> <b>-tor → -triz</b> bij een paar woorden: <i>el actor → la actriz</i> (net als <i>el emperador → la emperatriz</i>). Niet <s>la actora</s>.</p>
+<p>✍️ Spelling: <i>ingeniero</i> (niet <s>ingenieur</s>), <i>cocinero</i>, <i>abogado</i>, <i>médico</i>. Over iemand: <i><b>el</b> señor López es ingeniero</i>; over jezelf: <i>Soy cocinero</i> (zonder lidwoord).</p>`,
+        table: [['mannelijk', 'vrouwelijk', ''], ['el ingeniero', 'la ingeniera', '-o → -a'], ['el doctor', 'la doctora', '-or → -ora'], ['el dentista', 'la dentista', '-ista: gelijk'], ['el estudiante', 'la estudiante', '-e: gelijk'], ['el actor', 'la actriz', '⚠️ -tor → -triz']],
+        sum: 'Doctor → doctora; dentista no cambia; ¡ojo! actor → actriz.' }
+    ],
+    ex: [
+      // -ma-woorden in een zin: lidwoord + woord samen
+      { t: 'cloze', s: '___ problema es difícil.', a: ['El'], nl: 'Het probleem is moeilijk.', x: '-ma = bijna altijd el: el problema.', tag: 'gender' },
+      { t: 'cloze', s: 'Es ___ tema interesante.', a: ['un'], nl: 'Het is een interessant onderwerp.', x: 'El tema → un tema.', tag: 'gender' },
+      { t: 'cloze', s: '___ idioma español es bonito.', a: ['El'], nl: 'De Spaanse taal is mooi.', tag: 'gender' },
+      { t: 'cloze', s: 'Es un tema muy ___.', h: 'complicado / complicada', a: ['complicado'], nl: 'Het is een heel ingewikkeld onderwerp.', x: 'Tema is mannelijk (-ma), dus ook het bijvoeglijk naamwoord: complicado.', tag: 'gender' },
+      { t: 'cloze', s: '___ programa de hoy es corto.', a: ['El'], nl: 'Het programma van vandaag is kort.', tag: 'gender' },
+      // vrouwelijke beroepen
+      { t: 'mc', q: 'Vrouwelijke vorm van «el doctor»:', o: ['la doctora', 'la doctriz', 'la doctor'], x: '-or → -ora.', tag: 'gender' },
+      { t: 'mc', q: 'Vrouwelijke vorm van «el dentista»:', o: ['la dentista', 'la dentisto', 'la dentistra'], x: '-ista blijft gelijk.', tag: 'gender' },
+      { t: 'mc', q: '«Zij is actrice.»', o: ['Es actriz.', 'Es actora.', 'Es una actor.'], x: '⚠️ Uitzondering: actor → actriz.', tag: 'gender' },
+      { t: 'mc', q: 'Vrouwelijke vorm van «el profesor»:', o: ['la profesora', 'la profesriz', 'la profesor'], tag: 'gender' },
+      // beroepszinnen: woordtegels en vertalen
+      { t: 'order', s: 'El señor López es ingeniero.', nl: 'Meneer López is ingenieur.', tag: 'articles' },
+      { t: 'order', s: 'La señora Díaz es doctora.', nl: 'Mevrouw Díaz is dokter.', tag: 'articles' },
+      { t: 'tr', nl: 'Mijn moeder is advocaat.', a: ['Mi madre es abogada.', 'Mi mamá es abogada.'], x: 'Vrouw → abogada, zonder lidwoord.', tag: 'articles' },
+      { t: 'tr', nl: 'Ik ben kok.', a: ['Soy cocinero.', 'Soy cocinera.', 'Yo soy cocinero.', 'Yo soy cocinera.'], tag: 'articles' }
+    ],
+    say: [['El señor López es ingeniero.', 'Meneer López is ingenieur.'], ['Mi madre es abogada.', 'Mijn moeder is advocaat.'], ['La señora Díaz es doctora.', 'Mevrouw Díaz is dokter.']]
+  });
+  X('a1-04', {
+    ex: [
+      { t: 'cloze', s: 'El libro ___ encima de la mesa.', a: ['está'], o: ['está', 'hay', 'es'], nl: 'Het boek ligt op tafel.', x: 'El libro (bepaald) → está, ook met een voorzetsel erna.', tag: 'prepositions' },
+      { t: 'cloze', s: '___ un banco cerca de aquí.', a: ['Hay'], o: ['Hay', 'Está', 'Es'], nl: 'Er is hier dichtbij een bank.', tag: 'prepositions' },
+      { t: 'cloze', s: 'Mi carro ___ detrás del hotel.', a: ['está'], o: ['está', 'hay', 'es'], nl: 'Mijn auto staat achter het hotel.', tag: 'prepositions' },
+      { t: 'cloze', s: 'La catedral ___ al lado del parque.', a: ['está'], o: ['está', 'hay', 'es'], nl: 'De kathedraal ligt naast het park.', tag: 'prepositions' },
+      { t: 'cloze', s: '___ una farmacia enfrente del banco.', a: ['Hay'], o: ['Hay', 'Está', 'Es'], nl: 'Er is een apotheek tegenover de bank.', tag: 'prepositions' },
+      { t: 'order', s: 'Hay un hotel enfrente de la catedral.', nl: 'Er is een hotel tegenover de kathedraal.', tag: 'prepositions' }
+    ],
+    // ook als dictee (Práctica › Luisteren) en spreekoefening
+    say: [['Sí, hay una enfrente del banco.', 'Ja, er is er een tegenover de bank.'], ['La catedral está enfrente del parque.', 'De kathedraal ligt tegenover het park.'], ['¿Me puede ayudar, por favor?', 'Kunt u me helpen, alstublieft?'], ['Hay un hotel enfrente de la catedral.', 'Er is een hotel tegenover de kathedraal.']]
   });
 })(window.SPT);
