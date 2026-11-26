@@ -329,6 +329,9 @@ WORD GLOSS (required, invisible): right after the <fix> line, add one line <glos
     const fill = (r, note) => {
       body.innerHTML = '';
       body.append(h('div', { class: 'gp-m' }, r.m));
+      // 🗺️ regiowoord: vlaggetjes + waar ze het zo zeggen
+      const rw = S.Regio && (S.Regio.lookup(r.t || '') || S.Regio.lookup(word));
+      if (rw) body.append(h('div', { class: 'gp-rg small' }, S.Regio.chip(rw), S.Regio.info(rw).std ? h('span', { class: 'muted' }, (S.course.ui === 'es' ? ' · estándar: ' : ' · standaard: '), h('b', { lang: S.course.target }, S.Regio.info(rw).std)) : null));
       if (r.w && bare(r.t) !== bare(word)) body.append(h('div', { class: 'gp-w small muted' }, h('span', { lang: S.course.target }, word), ' = ' + r.w));
       const add = S.Words && r.m ? h('button', { class: 'btn link small gp-add', type: 'button', onclick: ev => {
         ev.stopPropagation(); const res = S.Words.addMine(r.t, r.m.replace(/\s*\([^)]*\)\s*$/, ''));

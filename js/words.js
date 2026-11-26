@@ -107,7 +107,7 @@
       return h('div', { class: 'words-row' },
         S.Lesson.speakBtn(w.es),
         h('div', { class: 'grow' },
-          h('div', null, h('b', { lang: 'es' }, w.es), w.note ? h('small', { class: 'muted' }, ' · ' + w.note) : null),
+          h('div', null, h('b', { lang: 'es' }, w.es), w.note && S.Regio && S.Regio.chip(w) ? S.Regio.chip(w) : w.note ? h('small', { class: 'muted' }, ' · ', S.Regio ? S.Regio.noteEl(w.note) : w.note) : null),
           h('div', { class: 'small' }, w.nl),
           h('small', { class: 'muted' }, w.unit === 'my' ? 'eigen woord' + (inSrs ? ' · ' + STATUS[s][1] : '') : w.level + '.' + w.unitNo + ' ' + w.icon + ' ' + w.unitTitle)),
         tail);

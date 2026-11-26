@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js']) {
+for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -1459,6 +1459,31 @@ await micTests();
   ok(files.indexOf('js/begrippen.js') > 0 && files.indexOf('js/begrippen.js') < files.indexOf('js/lesson.js') && fs.readFileSync(path.join(root, 'sw.js'), 'utf8').includes('js/begrippen.js'), w + 'in index.html (vóór lesson.js) en sw.js');
   // Engels: begrippen zonder Engels blok (por/para, stamklinkerwisseling) horen niet bij de Engelse cursus
   ok(!G.fits(G.get('por-para'), 'en') && G.fits(G.get('lidwoord'), 'en') && G.list('en').length < G.list('es').length, w + 'per doeltaal');
+}
+{ // 🗺️ regiowoorden met landvlaggetjes (js/regio.js): Mark kende «hermana» en kreeg zonder land «la ñaña»
+  const R = S.Regio, w = 'regio: ';
+  const n = R.info({ es: 'la ñaña', nl: 'de zus', note: 'EC (informeel) · ñaño = broer' });
+  ok(n && n.codes.join() === 'EC' && n.informal && n.std === 'la hermana' && n.names === 'Ecuador' && n.extra === 'ñaño = broer', w + 'la ñaña → Ecuador, informeel, standaard la hermana: ' + JSON.stringify(n));
+  ok(R.parse('AR · UY').codes.join() === 'AR,UY' && R.parse('BO · PE · EC').codes.length === 3 && R.parse('Andes').groups[0] === 'andes', w + 'meerdere landen en regio');
+  ok(R.parse('Mexico').codes[0] === 'MX' && R.parse('MX, informeel').informal && R.parse('informeel, o.a. CO · PE · CL').codes.join() === 'CO,PE,CL', w + 'landnaam en informeel');
+  ['ES: la patata', 'MX ook: güero / güera', 'MX informeel: la panza', 'ES vaker: añadir', 'LatAm', 'in LatAm vaak = het weer', 'ook: rosa', 'AR/PE/UY: el mozo · ES: el camarero', 'arriendo: CO · CL; MX: la renta']
+    .forEach(x => ok(!R.parse(x), w + 'geen regiowoord: ' + x));
+  ok(R.parse('CO; MX: el embotellamiento') && R.parse('AR · ook: la micro (CL)'), w + 'regiowoord met alternatieven in de notitie');
+  ok(R.places({ codes: ['MX', 'CO', 'VE'], groups: [] }) === 'Mexico, Colombia en Venezuela', w + 'namen in een zin');
+  // elke landcode heeft een vlag-afbeelding
+  Object.values(R.LAND).forEach(l => ok(fs.existsSync(path.join(root, 'icons/vlaggen', l[0] + '.png')), w + 'vlag ' + l[0]));
+  // elk standaardwoord hoort bij een echt regiowoord in de lesstof (geen tikfouten in de sleutel)
+  const reg = new Map(); units.forEach(u => u.vocab.forEach(v => { if (v[2] && R.parse(v[2])) reg.set(v[0], v); }));
+  Object.keys(S.regioStd.es).forEach(k => ok(reg.has(k), w + 'standaardwoord zonder regiowoord: ' + k));
+  ok(reg.size > 100, w + 'regiowoorden gevonden: ' + reg.size);
+  // vraag naar een regiowoord: het standaardwoord is nooit een foute keuze en bij typen ook goed
+  const u3 = units.find(u => u.id === 'a1-03'), i = u3.vocab.findIndex(v => v[0] === 'la ñaña'), wd = S.C.word(u3, i);
+  for (let k = 0; k < 30; k++) { const it = S.Gen.wordItem(wd, 'mc-nl', u3); ok(!it.options.some(o => /hermana/.test(o)), w + 'hermana geen afleider'); }
+  const ty = S.Gen.wordItem(wd, 'type', u3);
+  ok(S.Gen.checkType('la hermana', ty).ok && S.Gen.checkType('hermana', ty).ok && S.Gen.checkType('la ñaña', ty).ok, w + 'typvraag: hermana én ñaña goed');
+  ok(R.lookup('ñaña') && R.lookup('¡Qué chido!') && !R.lookup('hermana'), w + 'tikvertaling vindt regiowoord');
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8'), sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  ok(['content/regiowoorden.js', 'js/regio.js'].every(f => html.includes(f) && sw.includes(f)) && html.indexOf('js/regio.js') < html.indexOf('js/lesson.js'), w + 'in index.html (vóór lesson.js) en sw.js');
 }
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);

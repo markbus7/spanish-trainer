@@ -298,7 +298,8 @@
       h('div', { class: 'eyebrow' }, '✨ ' + T('newword')),
       h('div', { class: 'big-es', lang: 'es' }, w.es, speakBtn(w.es)),
       h('div', { class: 'big-nl' }, w.nl),
-      w.note ? h('div', { class: 'note' }, '🌎 ' + w.note) : null,
+      // 🗺️ regiowoord: vlaggetjes + waar, standaardwoord en waarom; anders de notitie met vlaggetjes i.p.v. landcodes
+      S.Regio && S.Regio.info(w) ? S.Regio.box(w) : w.note ? h('div', { class: 'note' }, '🌎 ', S.Regio ? S.Regio.noteEl(w.note) : w.note) : null,
       S.Uitz ? uitzBox(S.Uitz.forWord(w.es)) : null,
       h('div', { class: 'row gap center' }, speakBtn(w.es, { slow: true })));
   };
@@ -555,6 +556,7 @@
       wrap.append(h('div', { class: 'row gap center' }, speakBtn(it.audio, { big: true }), speakBtn(it.audio, { slow: true })));
     }
     if (it.prompt) wrap.append(h('div', { class: 'prompt' + (it.speakPrompt ? ' es' : '') }, it.prompt, it.speakPrompt ? speakBtn(it.prompt) : null));
+    if (it.prompt) regioChip(it, wrap);
     if (it.speakPrompt) setTimeout(() => Speech.say(it.prompt), 250);
     let sent = null;
     if (it.sentence) { sent = sentenceEl(it.sentence); wrap.append(h('div', { class: 'sent-row' }, sent, gapSpeak(it, sent, ctx))); }
@@ -576,6 +578,12 @@
     return wrap;
   };
 
+  /* 🗺️ Vraag naar een regiowoord: meteen zien in welk land ze het zo zeggen (Mark kende «hermana», niet «ñaña»). */
+  function regioChip(it, wrap) {
+    const c = it.word && !it.conj && S.Regio ? S.Regio.chip(it.word, { lead: true }) : null;
+    if (c) wrap.append(h('div', { class: 'rg-q' }, c));
+  }
+
   /** Mag de AI dit typantwoord herbeoordelen? Vrije vertalingen en woorden (Typ in het Spaans), niet vervoegen of invullen. */
   function canRegrade(it) { return !!(it && it.kind === 'type' && it.prompt && (it.translate || (it.word && !it.conj && !it.sentence))); }
 
@@ -585,7 +593,7 @@
     wrap.append(h('div', { class: 'instr' }, it.sentence ? T('fill') : it.conj ? T('conj') : (qKey ? T(qKey) : T('type'))));
     let sent = null;
     if (it.conj) { const c = conjCard(it, ctx); sent = c.frame; wrap.append(c.el); }
-    else if (it.prompt) wrap.append(h('div', { class: 'prompt' }, it.prompt));
+    else if (it.prompt) { wrap.append(h('div', { class: 'prompt' }, it.prompt)); regioChip(it, wrap); }
     if (it.mainOnly) wrap.append(h('div', { class: 'p-note' }, it.translate ? '🔁 Je eigen zin was ook goed. Typ nu de zin zoals hij in de les staat.' : '🔁 Je eigen antwoord was ook goed. Typ nu het woord zoals het in de les staat.'));
     if (it.sentence) { sent = sentenceEl(it.sentence); wrap.append(h('div', { class: 'sent-row' }, sent, gapSpeak(it, sent, ctx))); }
     if (it.h) wrap.append(h('div', { class: 'hint' }, '(' + it.h + ')'));
@@ -1214,6 +1222,8 @@
       if (r.x) fb.append(S.Begrippen ? S.Begrippen.decorate(h('div', { class: 'fb-x' }, '💡 ' + r.x)) : h('div', { class: 'fb-x' }, '💡 ' + r.x));
       // ⚠️ Uitzondering: altijd zichtbaar (goed én fout), met de reden
       if (S.Uitz && !r.matchMistakes) { const uz = uitzBox(S.Uitz.forItem(it, r)); if (uz) fb.append(uz); }
+      // 🗺️ regiowoord: waar je het zegt + het standaardwoord, ook bij goed
+      if (S.Regio && it.word && !it.conj) { const rb = S.Regio.box(it.word); if (rb) fb.append(rb); }
       const notes = feedbackNotes(it, r);
       if (notes.length) {
         // fout: uitleg staat meteen open; goed: klap hem zelf open als je wilt

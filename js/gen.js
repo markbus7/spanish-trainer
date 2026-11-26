@@ -80,15 +80,18 @@
   function wordItem(w, kind, unit) {
     const base = { srsId: w.id, tag: 'vocab', skill: 'vocab', word: w };
     const seenNl = new Set([w.nl]), seenEs = new Set([w.es]);
+    // 🗺️ regiowoord (js/regio.js): het standaardwoord mag geen «foute» keuze zijn, en bij typen is het ook goed
+    const std = S.Regio ? S.Regio.accept(w) : '';
+    if (std) forms(std).forEach(x => seenEs.add(x));
     const distract = U.shuffle(C.words(unit)).filter(x => {
-      if (x.id === w.id || seenNl.has(x.nl) || seenEs.has(x.es)) return false;
+      if (x.id === w.id || seenNl.has(x.nl) || seenEs.has(x.es) || (std && forms(x.es).some(f => seenEs.has(f)))) return false;
       seenNl.add(x.nl); seenEs.add(x.es); return true;
     }).slice(0, 3);
     if (kind === 'card') return { kind: 'card', word: w };
     if (kind === 'mc-es') return { ...base, kind: 'mc', prompt: w.es, speakPrompt: w.es, q: 'Wat betekent dit?', options: U.shuffle([w.nl, ...distract.map(d => d.nl)]), answer: w.nl };
     if (kind === 'mc-nl') return { ...base, kind: 'mc', prompt: w.nl, q: 'Hoe zeg je dit in het Spaans?', options: U.shuffle([w.es, ...distract.map(d => d.es)]), answer: w.es, speakAnswer: true };
     if (kind === 'listen-mc') return { ...base, kind: 'mc', audio: w.es, q: 'Wat hoor je?', options: U.shuffle([w.es, ...distract.map(d => d.es)]), answer: w.es, skill: 'listen' };
-    if (kind === 'type') return { ...base, kind: 'type', prompt: w.nl, q: 'Typ in het Spaans', answers: wordAnswers(w), syn: wordSynonyms(w), articleOptional: true, note: w.note, speakAnswer: true };
+    if (kind === 'type') return { ...base, kind: 'type', prompt: w.nl, q: 'Typ in het Spaans', answers: wordAnswers(w), syn: std ? [...new Set(wordSynonyms(w).concat(forms(std)))] : wordSynonyms(w), articleOptional: true, note: w.note, speakAnswer: true };
     return null;
   }
   function matchItem(words) {
