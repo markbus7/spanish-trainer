@@ -1087,13 +1087,24 @@
       return !r.ok && !!r.expected && !r.self && r.matchMistakes == null && (it.kind === 'type' || it.kind === 'listen')
         && (session.mode === 'learn' || session.mode === 'review') && !session.timer && S.Store.state.settings.retype !== false;
     }
+    /* Overgetypt antwoord goed? Zelfde controle als bij een gewone vraag (hoofdletters, leestekens, haakjes), maar zonder
+       typfout-marge. Extra of ontbrekende spaties en schuine strepen tellen niet: «animado/animada» = «animado / animada». */
+    function retypeOk(v, answers) {
+      if (!v) return false;
+      if (answers.some(a => S.check.check(v, [a], { noTypo: true }).ok)) return true;
+      const strict = S.Store.state.settings.strictAccents;
+      const sq = s => (strict ? S.check.norm(s) : S.check.bare(s)).replace(/[\s/]+/g, '');
+      const u = sq(v);
+      return !!u && answers.some(a => sq(a) === u);
+    }
     function retype(it, r) {
       const target = r.expected;
       const wrap = body.firstElementChild || body;
       // de tekenbalk van het eerste antwoord hoort bij het (nu dichte) invulveld: die maakt plaats voor een nieuwe
       wrap.querySelectorAll('.accent-bar').forEach(b => { b.hidden = true; });
       const keep = r.parts && S.check.partsUsable(r.parts) ? { a: r.parts.a, k: r.parts.k } : null;
-      const answers = keep && keep.a !== target ? [target, keep.a] : [target];
+      // alle goede vormen tellen: bij «animado / animada» is «animado» óf «animada» óf beide samen goed
+      const answers = [...new Set([target, ...(keep ? [keep.a] : []), ...(it.kind === 'type' && Array.isArray(r.alts) ? r.alts : [])].filter(Boolean))];
       let done = false;
       const part = keep ? partialInput(keep, { can() {} }) : null;
       const inp = part ? null : textInput(esMode() ? (EN ? 'Type the correct answer…' : 'Escribe la respuesta correcta…') : 'Typ het juiste antwoord…');
@@ -1117,7 +1128,7 @@
         box.classList.add('ok'); box.querySelectorAll('.accent-bar').forEach(b => { b.hidden = true; }); status.className = 'retype-st small'; status.textContent = '✅ Goed overgetypt! Zo onthoud je hem beter.';
         setTimeout(() => mainBtn.focus({ preventScroll: true }), 50);
       };
-      const test = () => { const v = value(); return !!v && answers.some(a => S.check.check(v, [a], { noTypo: true }).ok); };
+      const test = () => retypeOk(value(), answers);
       const onInput = () => { if (done) return; if (inp) inp.classList.remove('bad'); if (test()) success(); };
       (part ? part.inputs : [inp]).forEach(x => x.addEventListener('input', onInput));
       // Enter met een fout: laat zien wat nog niet klopt

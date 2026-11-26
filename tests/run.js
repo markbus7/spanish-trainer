@@ -1460,6 +1460,20 @@ await micTests();
   // Engels: begrippen zonder Engels blok (por/para, stamklinkerwisseling) horen niet bij de Engelse cursus
   ok(!G.fits(G.get('por-para'), 'en') && G.fits(G.get('lidwoord'), 'en') && G.list('en').length < G.list('es').length, w + 'per doeltaal');
 }
+{
+  // overtypen na een fout: één van de vormen is goed, spaties en schuine strepen tellen niet
+  const w = 'overtypen: ';
+  const lsrc = fs.readFileSync(path.join(root, 'js/lesson.js'), 'utf8');
+  const fnSrc = lsrc.match(/function retypeOk\(v, answers\) \{[\s\S]*?\n    \}/)[0];
+  const retypeOk = vm.runInContext('(function(){ const S = SPT; return ' + fnSrc + '; })()', ctx);
+  const ans = S.Gen.forms('animado / animada');
+  ok(retypeOk('animado', ans) && retypeOk('animada', ans) && retypeOk('Animado / animada', ans), w + 'één vorm of beide');
+  ok(retypeOk('animado/animada', ans) && retypeOk('animado /animada', ans) && retypeOk('animado  /  animada', ans), w + 'spaties rond / maken niet uit');
+  ok(!retypeOk('animad', ans) && !retypeOk('animados', ans) && !retypeOk('', ans), w + 'echt anders blijft fout');
+  ok(retypeOk('me llamo', ['(yo) me llamo']) && retypeOk('yo me llamo', ['(yo) me llamo']) && retypeOk('¿Cómo estás', ['¿Cómo estás?']), w + 'haakjes en leestekens');
+  ok(retypeOk('levendig gezellig', ['levendig, gezellig']) && retypeOk('Cómo  estás?', ['¿Cómo estás?']), w + 'komma en dubbele spaties');
+  ok(/answers = \[\.\.\.new Set\(\[target[^\n]*r\.alts/.test(lsrc), w + 'alle vormen (r.alts) tellen mee');
+}
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);
