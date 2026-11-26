@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.69.1', date: '2026-11-26',
+    nl: ['Lupe-voorstellen verwerkt: «¿Cómo estás?» telt goed bij «hoe is het?»', 'Mi ciudad: al lado del / al, hay of está, a la derecha, debajo de en enfrente de als hele uitdrukking typen', 'Wie alleen «derecha» typt, krijgt de hint «a la …»', 'Meer oefeningen met nosotros/ustedes: somos, son, nos llamamos, se llaman'],
+    es: ['Propuestas de Lupe: «¿Cómo estás?» cuenta como correcto para «hoe is het?»', 'Mi ciudad: al lado del / al, hay o está, a la derecha, debajo de y enfrente de para escribir completos', 'Si escribes solo «derecha», recibes la pista «a la …»', 'Más ejercicios con nosotros/ustedes: somos, son, nos llamamos, se llaman'] },
   { v: '1.69.0', date: '2026-11-26',
     nl: ['Regiowoorden met vlaggetjes: woorden die maar in een paar landen gebruikt worden (zoals la ñaña in Ecuador) krijgen overal het vlaggetje en de landnaam: bij de vraag («Zo zeggen ze het in Ecuador»), op de woordkaart, in de feedback, in Mijn woordenschat, het woordenboek en de tikvertaling.', 'Een blok «🗺️ Regiowoord» zegt waar je het woord gebruikt, wat het standaardwoord is (bijv. la hermana) en waarom het apart staat. Bij een typvraag is het standaardwoord ook goed, en bij meerkeuze is het standaardwoord nooit een foute keuze.'],
     es: [] },
