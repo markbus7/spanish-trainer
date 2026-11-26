@@ -12,6 +12,8 @@
     /* ── A1 ── */
     'el idioma': ['la lengua'],
     'buenos días': ['buen día'],
+    '¿qué tal?': ['¿cómo estás?'], // Lupe-rapport 27 nov: «hoe is het?» = ook ¿cómo estás?
+    '¿cómo estás?': ['¿qué tal?'],
     'buen día': ['buenos días'],
     'mucho gusto': ['encantado', 'encantada'],
     'encantado / encantada': ['mucho gusto'], // Lupe-rapport 24 nov: «mucho gusto» bij «aangenaam (man / vrouw zegt)» is ook goed

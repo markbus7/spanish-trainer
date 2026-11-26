@@ -1500,6 +1500,17 @@ await micTests();
   ok(/answers = \[\.\.\.new Set\(\[target[^\n]*r\.alts/.test(lsrc), w + 'alle vormen (r.alts) tellen mee');
 }
 const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((a, u) => a + u.ex.length, 0);
+/* ---------- Lupe 27 nov: ¿cómo estás? en hint bij een half getypte uitdrukking ---------- */
+{
+  const u1 = S.C.get('a1-01'), wi = S.Gen.wordItem(S.C.word(u1, 6), 'type', u1);
+  ok(S.Gen.checkType('¿Cómo estás?', wi).ok && S.Gen.checkType('como estas', wi).ok, '«¿cómo estás?» goed bij «hoe is het?»');
+  const u4 = S.C.get('a1-04'), der = S.Gen.wordItem(S.C.word(u4, 25), 'type', u4);
+  const r1 = S.Gen.checkType('derecha', der);
+  ok(!r1.ok && r1.warn === 'incomplete' && r1.hint === 'a la …', '«derecha» is fout met hint «a la …»: ' + JSON.stringify(r1));
+  const r2 = S.Gen.checkType('debajo', S.Gen.wordItem(S.C.word(u4, 41), 'type', u4));
+  ok(!r2.ok && r2.hint === '… de', '«debajo» krijgt hint «… de»');
+  ok(!S.Gen.checkType('izquierda', der).hint, 'een ander woord krijgt geen hint');
+}
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);
 })();

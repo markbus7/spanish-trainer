@@ -656,4 +656,74 @@
     ],
     say: [['Sí, hay uno enfrente de la plaza.', 'Ja, er is er een tegenover het plein.'], ['¿Dónde están los taxis?', 'Waar zijn de taxi\'s?']]
   });
+  /* ---------- Lupe-rapport 27 nov, achtste ronde ---------- */
+  S.reworked = S.reworked.concat([
+    { tag: 'contractions', unit: 'a1-04', v: '1.69.1', date: '2026-11-26T23:51:00Z', what: 'tip «lado de» → al lado del, «a» → al; 9 typoefeningen waarin je de hele combinatie typt (al lado del, al, del, al lado de la)' },
+    { tag: 'hay-estar', unit: 'a1-04', v: '1.69.1', date: '2026-11-26T23:51:00Z', what: '5 typoefeningen hay of está met het lidwoord als hint (un/una → hay, el/la → está), «centro» (niet centrum) en ¿Dónde está…? met accent' },
+    { tag: 'conj', unit: 'a1-04', v: '1.69.1', date: '2026-11-26T23:51:00Z', what: 'ser en llamarse met nosotros/ustedes/usted in de zin: somos/son, nos llamamos/se llaman/se llama, 9 oefeningen in a1-01 en a1-04' },
+    { tag: 'ser', unit: 'a1-01', v: '1.69.1', date: '2026-11-26T23:51:00Z', what: 'nosotros somos ↔ ustedes son, ustedes se llaman ↔ usted se llama, 6 invuloefeningen' },
+    { tag: 'prepositions', unit: 'a1-04', v: '1.69.1', date: '2026-11-26T23:51:00Z', what: 'a la derecha / a la izquierda / debajo de / enfrente de als hele uitdrukking: uitleg, 8 typoefeningen; alleen «derecha» typen geeft de hint «a la …»' },
+    { ids: ['w|a1-04|25', 'w|a1-04|41'], v: '1.69.1', date: '2026-11-26T23:51:00Z', what: 'voorbeeldzinnen a la derecha en debajo de, hint «a la …» / «… de» als een stukje ontbreekt' },
+    { ids: ['w|a1-01|6'], v: '1.69.1', date: '2026-11-26T23:51:00Z', what: '«¿Cómo estás?» telt goed bij «hoe is het?» (ook zonder accenten en vraagtekens)' }
+  ]);
+  X('a1-01', { ex: [
+    // het onderwerp staat in de zin: kies/typ de goede vorm
+    { t: 'cloze', s: 'Nosotros ___ de Perú.', a: ['somos'], o: ['somos', 'son', 'es'], nl: 'Wij komen uit Peru.', x: 'Nosotros (wij) → somos. Son hoort bij ustedes / ellos.', tag: 'ser' },
+    { t: 'cloze', s: 'Ustedes ___ de Chile, ¿no?', a: ['son'], o: ['son', 'somos', 'eres'], nl: 'Jullie komen uit Chili, toch?', x: 'Ustedes gebruikt dezelfde vorm als ellos: son. In Latijns-Amerika is ustedes zowel «jullie» als «u» (meervoud).', tag: 'ser' },
+    { t: 'cloze', s: 'Nosotros nos ___ Ana y Luis.', h: 'llamarse', a: ['llamamos'], nl: 'Wij heten Ana en Luis.', x: 'Nosotros → nos llamamos (de uitgang -amos, niet «llamos»).', tag: 'ser' },
+    { t: 'cloze', s: 'Ella se ___ Marta.', h: 'llamarse', a: ['llama'], nl: 'Zij heet Marta.', tag: 'ser' },
+    { t: 'cloze', s: 'Ustedes se ___ López, ¿verdad?', a: ['llaman'], o: ['llaman', 'llama', 'llamamos'], nl: 'Jullie heten López, toch?', x: 'Ustedes = meer personen → se llaman. Eén persoon met usted → se llama.', tag: 'ser' },
+    { t: 'cloze', s: 'Usted se ___ Daniel, ¿verdad?', h: 'llamarse', a: ['llama'], nl: 'U heet Daniel, toch?', x: 'Usted is één persoon en krijgt de vorm van él/ella: se llama.', tag: 'tu-usted' }
+  ] });
+  X('a1-04', {
+    grammar: [
+      { t: 'Tip: al lado del en al', es: 'Al lado del banco',
+        html: `<p>Kijk wat er <b>vóór el</b> staat:</p>
+<p>👉 <b>lado de</b> + el → <b>al lado del</b>: <i>La panadería está <b>al lado del</b> banco.</i> Hier zitten er dus twee in: <i>al</i> (vast in <i>al lado</i>) en <i>del</i> (de + el).</p>
+<p>👉 <b>a</b> + el → <b>al</b>: <i>Voy <b>al</b> mercado.</i> En <b>de</b> + el → <b>del</b>: <i>después <b>del</b> trabajo.</i></p>
+<p>Bij <b>la</b> trek je niets samen, maar <i>al lado</i> blijft: <i>al lado <b>de la</b> plaza</i>.</p>`,
+        ex: [['La panadería está al lado del banco.', 'De bakkerij is naast de bank.'], ['Vamos al cine después del trabajo.', 'We gaan na het werk naar de bioscoop.']],
+        sum: 'Lado de + el = al lado del. A + el = al.' },
+      { t: 'Plaatswoorden: altijd de hele uitdrukking', es: 'A la derecha, debajo de, enfrente de',
+        html: `<p>Deze woorden hebben vaste kleine woordjes erbij. Leer ze <b>als één geheel</b>:</p>
+<p>✅ <b>a la</b> derecha / <b>a la</b> izquierda (niet alleen <s>derecha</s>), <b>debajo de</b> (onder, met <i>de</i>; <s>abajo</s> = beneden), <b>enfrente de</b> (tegenover, aan elkaar).</p>
+<p>Komt er <i>el</i> achter, dan wordt <i>de + el</i> weer <b>del</b>: <i>debajo <b>del</b> carro, enfrente <b>del</b> hotel</i>.</p>`,
+        table: [['uitdrukking', 'betekenis', 'voorbeeld'], ['a la derecha', 'rechts', 'El banco está a la derecha.'], ['a la izquierda', 'links', 'Gire a la izquierda.'], ['debajo de', 'onder', 'El gato está debajo de la mesa.'], ['enfrente de', 'tegenover', 'Hay una tienda enfrente del hotel.']],
+        sum: 'A la derecha, a la izquierda, debajo de, enfrente de: siempre completos.' }
+    ],
+    ex: [
+      // al / del: de hele combinatie zelf typen
+      { t: 'cloze', s: 'La panadería está ___ banco.', h: 'naast', a: ['al lado del'], nl: 'De bakkerij is naast de bank.', x: 'Al lado de + el banco → al lado del banco.', tag: 'contractions' },
+      { t: 'cloze', s: 'Voy ___ mercado.', h: 'naar de', a: ['al'], nl: 'Ik ga naar de markt.', x: 'A + el = al.', tag: 'contractions' },
+      { t: 'cloze', s: 'El hotel está ___ museo.', h: 'naast', a: ['al lado del'], nl: 'Het hotel is naast het museum.', tag: 'contractions' },
+      { t: 'cloze', s: 'La parada está ___ plaza.', h: 'naast', a: ['al lado de la'], nl: 'De halte is naast het plein.', x: 'La plaza is vrouwelijk: de la, géén samentrekking. Al lado blijft wel al.', tag: 'contractions' },
+      { t: 'tr', nl: 'De bakkerij is naast de bank.', a: ['La panadería está al lado del banco.'], x: 'Lado de + el → al lado del.', tag: 'contractions' },
+      { t: 'tr', nl: 'Ik ga naar de markt.', a: ['Voy al mercado.'], x: 'A + el = al.', tag: 'contractions' },
+      { t: 'tr', nl: 'Het hotel is naast het museum.', a: ['El hotel está al lado del museo.'], tag: 'contractions' },
+      { t: 'tr', nl: 'De halte is naast het park.', a: ['La parada está al lado del parque.'], tag: 'contractions' },
+      { t: 'tr', nl: 'We gaan na het werk naar de bioscoop.', a: ['Vamos al cine después del trabajo.', 'Después del trabajo vamos al cine.'], x: 'Al cine (a + el) en después del trabajo (de + el).', tag: 'contractions' },
+      // hay of está: het lidwoord is de hint
+      { t: 'cloze', s: '¿___ una farmacia por aquí?', h: 'hay / está · let op: una', a: ['Hay'], nl: 'Is er hier een apotheek?', x: 'Una = onbepaald (iets nieuws) → hay.', tag: 'hay-estar' },
+      { t: 'cloze', s: 'El mercado ___ en el centro.', h: 'hay / está · let op: el', a: ['está'], nl: 'De markt is in het centrum.', x: 'El mercado = bepaald → está. Let op: centro, niet «centrum».', tag: 'hay-estar' },
+      { t: 'cloze', s: '¿Dónde ___ la parada de bus?', h: 'hay / está · let op: la', a: ['está'], nl: 'Waar is de bushalte?', x: '¿Dónde está + el/la …? Dónde en está allebei met accent.', tag: 'hay-estar' },
+      { t: 'cloze', s: '___ un banco cerca del parque.', h: 'hay / está · let op: un', a: ['Hay'], nl: 'Er is een bank bij het park.', x: 'Un = onbepaald → hay.', tag: 'hay-estar' },
+      { t: 'cloze', s: 'La catedral ___ enfrente del museo.', h: 'hay / está · let op: la', a: ['está'], nl: 'De kathedraal is tegenover het museum.', tag: 'hay-estar' },
+      { t: 'tr', nl: 'Er is een markt in het centrum.', a: ['Hay un mercado en el centro.', 'En el centro hay un mercado.'], x: 'Un mercado → hay. In het Spaans: el centro (niet «centrum»).', tag: 'hay-estar' },
+      { t: 'tr', nl: 'Waar is de markt?', a: ['¿Dónde está el mercado?'], x: 'Dónde krijgt in een vraag altijd een accent.', tag: 'ser-estar' },
+      // ser / llamarse met het onderwerp in de zin
+      { t: 'cloze', s: 'Nosotros ___ turistas holandeses.', h: 'ser', a: ['somos'], nl: 'Wij zijn Nederlandse toeristen.', x: 'Nosotros → somos. Son is voor ustedes / ellos.', tag: 'conj' },
+      { t: 'cloze', s: 'Ustedes ___ de aquí, ¿verdad?', h: 'ser', a: ['son'], nl: 'Jullie zijn van hier, toch?', tag: 'conj' },
+      { t: 'cloze', s: 'Nosotros nos ___ Mark y Ana.', h: 'llamarse', a: ['llamamos'], nl: 'Wij heten Mark en Ana.', x: 'Nos llamamos: -amos bij nosotros.', tag: 'conj' },
+      // plaatswoorden: de hele uitdrukking typen
+      { t: 'cloze', s: 'El banco está ___.', h: 'rechts', a: ['a la derecha'], nl: 'De bank is rechts.', x: 'Altijd met a la: a la derecha.', tag: 'prepositions' },
+      { t: 'cloze', s: 'El gato está ___ la mesa.', h: 'onder', a: ['debajo de'], nl: 'De kat zit onder de tafel.', x: 'Debajo de = onder (met de). Abajo = beneden.', tag: 'prepositions' },
+      { t: 'cloze', s: 'Hay una tienda ___ hotel.', h: 'tegenover', a: ['enfrente del'], nl: 'Er is een winkel tegenover het hotel.', x: 'Enfrente de (aan elkaar) + el hotel → enfrente del hotel.', tag: 'prepositions' },
+      { t: 'tr', nl: 'De bank is rechts.', a: ['El banco está a la derecha.'], x: 'Rechts = a la derecha, de hele uitdrukking.', tag: 'prepositions' },
+      { t: 'tr', nl: 'De kat zit onder de tafel.', a: ['El gato está debajo de la mesa.'], tag: 'prepositions' },
+      { t: 'tr', nl: 'Er is een winkel tegenover het hotel.', a: ['Hay una tienda enfrente del hotel.', 'Enfrente del hotel hay una tienda.'], tag: 'prepositions' },
+      { t: 'tr', nl: 'Ga links af. (u)', a: ['Gire a la izquierda.', 'Doble a la izquierda.', 'Voltee a la izquierda.'], x: 'Links = a la izquierda. Voltee hoor je vooral in Mexico.', tag: 'prepositions' },
+      { t: 'tr', nl: 'De hond ligt onder de auto.', a: ['El perro está debajo del carro.', 'El perro está debajo del auto.'], x: 'Debajo de + el carro → debajo del carro. In Latijns-Amerika: el carro (of el auto).', tag: 'prepositions' }
+    ],
+    say: [['La panadería está al lado del banco.', 'De bakkerij is naast de bank.'], ['El banco está a la derecha.', 'De bank is rechts.'], ['El perro está debajo del carro.', 'De hond ligt onder de auto.']]
+  });
 })(window.SPT);

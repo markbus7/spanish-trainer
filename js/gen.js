@@ -66,7 +66,26 @@
     }
     if (it.syn && it.syn.includes(r.best)) { r.synonym = true; if (r.ok && !r.warn) r.warn = 'synonym'; }
     if (!r.ok && !r.warn) r.best = it.answers[0];
+    // een stukje van een vaste uitdrukking vergeten («derecha» bij «a la derecha»): fout, maar met een gerichte hint
+    if (!r.ok && !r.warn && it.word) { const m = missingPart(user, it.answers); if (m) { r.warn = 'incomplete'; r.best = m.full; r.hint = m.hint; } }
     return r;
+  }
+  /** Staan alle getypte woorden aaneen in een antwoord, maar ontbreken er woorden? → { full, hint: 'a la …' } */
+  function missingPart(user, answers) {
+    const W = s => S.check.bare(S.check.norm(s)).split(' ').filter(Boolean);
+    const uw = W(user); if (!uw.length) return null;
+    for (const a of answers) {
+      const aw = W(a), raw = String(a).replace(/[¿?¡!.,]/g, '').trim().split(/\s+/);
+      if (aw.length <= uw.length || raw.length !== aw.length) continue;
+      for (let i = 0; i + uw.length <= aw.length; i++) {
+        if (uw.every((w, j) => w === aw[i + j])) {
+          const hint = raw.map((w, j) => j >= i && j < i + uw.length ? null : w)
+            .reduce((o, w) => (w === null ? (o[o.length - 1] === '…' ? o : o.concat('…')) : o.concat(w)), []).join(' ');
+          return { full: a, hint };
+        }
+      }
+    }
+    return null;
   }
   function genderOf(full) {
     if (TGT === 'nl') { const a = (String(full).match(ART) || [])[1]; return a && a.toLowerCase() === 'het' ? 'een het-woord' : a && a.toLowerCase() === 'de' ? 'een de-woord' : ''; }

@@ -638,7 +638,7 @@
       if (part) { part.mark(user, it.answers); const w = wrap.querySelector('.p-whole'); if (w) w.remove(); }
       if (sent) { const bl = sent.querySelector('.blank'); if (bl) { bl.textContent = r.ok ? user : (r.best || it.answers[0]); bl.classList.add('filled'); } }
       const parts = it.translate && !r.ok ? S.check.parts(user, it.answers) : null;
-      return { ok: r.ok, user, expected: r.best || it.answers[0], warn: r.warn, gender: r.gender, synonym: r.synonym, main: it.word ? it.word.es : it.answers[0], x: it.x, alts: it.answers, hinted: help.hints(), alt: r.alt, parts };
+      return { ok: r.ok, user, expected: r.best || it.answers[0], warn: r.warn, gender: r.gender, synonym: r.synonym, main: it.word ? it.word.es : it.answers[0], x: it.x, alts: it.answers, hinted: help.hints(), alt: r.alt, parts, hint: r.hint };
     };
     return wrap;
   };
@@ -1215,6 +1215,7 @@
           fb.append(h('div', { class: 'small fb-wrong' }, 'Per woord: ', wordDiff(r.parts), h('span', { class: 'muted' }, ' (groen goed' + (r.parts.st.includes('accent') ? ' · geel: let op het accent' : '') + ' · rood fout)')));
           if (r.keepLater && !r.tilesLater) fb.append(h('div', { class: 'small fb-wrong' }, '🔁 Straks staan de groene woorden er al en vul je alleen de rode opnieuw in.'));
         }
+        if (r.warn === 'incomplete' && r.hint) fb.append(h('div', { class: 'fb-incomplete' }, '🧩 Bijna! Je mist een stukje: «', h('b', { lang: 'es' }, r.hint), '». Leer de hele uitdrukking.'));
         if (r.warn === 'article-wrong') {
           const noun = r.expected.replace(S.Gen.ART, '');
           fb.append(h('div', null, '📌 Let op het lidwoord: ', h('b', { lang: 'es' }, r.expected), r.gender ? ' (' + noun + ' is ' + r.gender + ')' : ''));
