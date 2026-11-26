@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.69.0', date: '2026-11-26',
+    nl: ['Regiowoorden met vlaggetjes: woorden die maar in een paar landen gebruikt worden (zoals la ñaña in Ecuador) krijgen overal het vlaggetje en de landnaam: bij de vraag («Zo zeggen ze het in Ecuador»), op de woordkaart, in de feedback, in Mijn woordenschat, het woordenboek en de tikvertaling.', 'Een blok «🗺️ Regiowoord» zegt waar je het woord gebruikt, wat het standaardwoord is (bijv. la hermana) en waarom het apart staat. Bij een typvraag is het standaardwoord ook goed, en bij meerkeuze is het standaardwoord nooit een foute keuze.'],
+    es: [] },
   { v: '1.68.2', date: '2026-11-26',
     nl: ['Overtypen na een fout: één van de vormen is genoeg (bijv. «animado» bij «animado / animada»), en spaties of schuine strepen hoeven niet precies te kloppen.'],
     es: [] },

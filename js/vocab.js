@@ -143,7 +143,7 @@
     // uitspraak
     const say = x.type === 'x' && x.kind === 'match' ? null : x.es;
     if (say && S.Speech.canSpeak()) box.append(h('div', { class: 'row gap wrap voc-say' }, S.Lesson.speakBtn(say), S.Lesson.speakBtn(say, { slow: true }), h('span', { class: 'small muted' }, 'Uitspraak: normaal en langzaam')));
-    if (x.note) box.append(h('p', { class: 'small' }, '💡 ' + x.note));
+    if (x.note) box.append(S.Regio && S.Regio.info(x) ? S.Regio.box(x) : h('p', { class: 'small' }, '💡 ', S.Regio ? S.Regio.noteEl(x.note) : x.note));
     if (x.type === 'x') {
       if (x.kind === 'mc' || x.kind === 'cloze') box.append(h('p', { class: 'small' }, h('span', { class: 'muted' }, x.kind === 'mc' ? 'Vraag: ' : 'Opgave: '), h('span', { lang: x.kind === 'cloze' ? 'es' : null }, x.q), h('br'), h('span', { class: 'muted' }, 'Antwoord: '), h('b', { lang: 'es' }, x.answer)));
       if (x.alts && x.alts.length) box.append(h('p', { class: 'small' }, h('span', { class: 'muted' }, 'Ook goed: '), h('span', { lang: 'es' }, x.alts.join(' · '))));
@@ -165,7 +165,7 @@
       h('summary', null,
         h('span', { class: 'voc-st', title: STATUS[x.group][1] }, STATUS[x.group][0]),
         h('div', { class: 'grow' },
-          h('div', { class: 'voc-es', lang: 'es' }, x.es),
+          h('div', { class: 'voc-es', lang: 'es' }, x.es, x.note && S.Regio ? S.Regio.chip(x) : null),
           h('div', { class: 'small voc-nl' }, x.nl),
           h('small', { class: 'muted' }, sub + (x.card.l ? ' · ' + U.plural(x.card.l, 'keer', 'keer') + ' fout' : ''))),
         sbar(x.strength)));

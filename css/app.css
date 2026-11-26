@@ -1659,3 +1659,24 @@ details.fold[open] > .fold-sum .fold-chev { transform: rotate(90deg); }
 .retype-st { margin-top: .4rem; }
 .answer-input.bad { border-color: var(--bad); animation: shake .3s; }
 .ls-actions .kbd-hint { font-family: inherit; }
+
+/* 🗺️ Regiowoorden (js/regio.js): vlaggetjes + waar ze het zo zeggen */
+.rg-flags { display: inline-flex; align-items: center; gap: 3px; vertical-align: middle; }
+.rg-flag { display: inline-block; width: 1.35em; height: 1em; object-fit: cover; border-radius: 2px; box-shadow: 0 0 0 1px rgba(0,0,0,.14); vertical-align: middle; }
+.rg-globe { font-size: 1em; line-height: 1; }
+.rg-chip { display: inline-flex; align-items: center; gap: .4em; padding: .15em .6em .15em .35em; border-radius: 999px; background: var(--teal-soft);
+  color: var(--ink); font-size: .82rem; font-weight: 600; line-height: 1.3; vertical-align: middle; white-space: normal; }
+.rg-chip .rg-where { color: var(--ink2); }
+.rg-q { margin: -.2rem 0 .7rem; }
+.voc-es .rg-chip, .words-row .rg-chip { margin-left: .45em; font-size: .72rem; padding: .05em .5em .05em .3em; }
+.rg-code { display: inline-flex; align-items: center; gap: .2em; white-space: nowrap; }
+.rg-code .rg-flag { width: 1.15em; height: .86em; }
+.regio { margin-top: .55rem; background: var(--teal-soft); border: 1.5px solid color-mix(in srgb, var(--teal) 45%, transparent); border-left: 5px solid var(--teal);
+  border-radius: 12px; padding: .55rem .8rem; font-size: .92rem; line-height: 1.45; color: var(--ink); text-align: left; }
+.regio .rg-head { font-weight: 800; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: color-mix(in srgb, var(--teal) 70%, var(--ink)); margin-bottom: .15rem; }
+.regio .rg-line .rg-flags { margin-right: .15em; }
+.regio .rg-std { margin-top: .25rem; }
+.regio .rg-extra, .regio .rg-why { color: var(--ink2); margin-top: .2rem; }
+.card-word .regio { max-width: 34rem; margin: .8rem auto 0; }
+.voc-detail .regio { margin: .2rem 0 .6rem; }
+.gp-rg { margin-top: .35rem; }
