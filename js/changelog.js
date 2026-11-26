@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.68.2', date: '2026-11-26',
+    nl: ['Overtypen na een fout: één van de vormen is genoeg (bijv. «animado» bij «animado / animada»), en spaties of schuine strepen hoeven niet precies te kloppen.'],
+    es: [] },
   { v: '1.68.1', date: '2026-11-25',
     nl: ['Badges duidelijker: elke badge zegt nu precies wat je moet doen, bijvoorbeeld «Rond 7 keer je hele dagplan op Hoy af: alle taken afvinken en de kist openen. De dagen hoeven niet achter elkaar.»', 'Namen zeggen wat ze betekenen (7 dagplannen, 3 dagen op rij, 1 uur geoefend) en elke reeks heeft een ⓘ-uitleg over hoe het telt.'],
     es: ['Insignias más claras: cada insignia dice exactamente qué hacer, por ejemplo «Completa 7 veces todo tu plan del día en Hoy: marca todas las tareas y abre el cofre. No tienen que ser días seguidos.»', 'Los nombres dicen lo que significan (7 planes del día, 3 días seguidos, 1 hora de práctica) y cada serie tiene una explicación ⓘ de cómo cuenta.'] },
