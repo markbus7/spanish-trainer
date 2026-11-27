@@ -644,7 +644,7 @@
   /* ---------- opzoeken en matchen (puur, zonder DOM) ---------- */
   const BY = {}; B.forEach(b => { BY[b.id] = b; });
   // een begrip hoort bij de doeltaal als het een blok voor die taal heeft (of voor geen enkele taal)
-  const LANGS = ['es', 'en', 'nl', 'de', 'fr'];
+  const LANGS = ['es', 'en', 'nl', 'de', 'fr', 'tr'];
   const fits = (b, tl) => !!b[tl] || !LANGS.some(l => b[l]);
   const target = () => (S.course && S.course.target) || 'es';
   const ui = () => (S.course && S.course.ui) || 'nl';
@@ -652,6 +652,17 @@
   const enabled = () => ui() === 'nl';
   const list = (tl = target()) => B.filter(b => fits(b, tl));
   const get = id => BY[id] || null;
+  // per doeltaal mag een blok de naam (t), korte omschrijving (k), algemene uitleg (gen) en extra zoekpatronen (a) vervangen/aanvullen
+  const blkOf = (b, tl = target()) => (b && b[tl]) || {};
+  const T = (b, tl) => blkOf(b, tl).t || b.t;
+  const K = (b, tl) => blkOf(b, tl).k || b.k;
+  /** Blokken voor één doeltaal toevoegen vanuit een eigen bestand (js/begrippen-<taal>.js).
+      blocks = { begripId: { n, html, ex, uz, table, a?, t?, k?, gen? } }; extra = [begrippen die alleen in die taal bestaan]. */
+  function add(tl, blocks, extra) {
+    Object.keys(blocks || {}).forEach(id => { if (BY[id]) BY[id][tl] = blocks[id]; });
+    (extra || []).forEach(b => { if (b && b.id && !BY[b.id]) { B.push(b); BY[b.id] = b; } });
+    RX = null;
+  }
 
   const L = '\\p{L}\\p{M}';
   let RX = null, RXT = null;
@@ -659,7 +670,7 @@
     const tl = target();
     if (RX && RXT === tl) return RX;
     const parts = [];
-    list(tl).forEach(b => b.a.forEach(p => parts.push({ id: b.id, src: p })));
+    list(tl).forEach(b => b.a.concat(blkOf(b, tl).a || []).forEach(p => parts.push({ id: b.id, src: p })));
     // langste patroon eerst, zodat «voltooid deelwoord» wint van «deelwoord»
     parts.sort((x, y) => y.src.length - x.src.length);
     RX = parts.map(p => ({ id: p.id, re: new RegExp('(?<![' + L + '])(?:' + p.src + ')(?![' + L + '])', 'giu') }));
@@ -688,7 +699,7 @@
     const w = n(q).trim(); if (!w) return list(tl);
     return list(tl).filter(b => {
       const blk = b[tl] || {};
-      return [b.t, b.k, blk.n].some(x => n(x).includes(w)) || b.a.some(p => { try { return new RegExp(p, 'iu').test(q.trim()); } catch (e) { return false; } });
+      return [b.t, b.k, blk.n, blk.t, blk.k].some(x => n(x).includes(w)) || b.a.concat(blk.a || []).some(p => { try { return new RegExp(p, 'iu').test(q.trim()); } catch (e) { return false; } });
     });
   }
 
@@ -701,7 +712,7 @@
   /** Inhoud van één begrip. onRel(id) = wat er gebeurt bij een tik op een verwant begrip. */
   function body(b, onRel) {
     const tl = target(), blk = b[tl];
-    const wrap = h('div', { class: 'bg-body' }, h('div', { class: 'prose bg-gen', html: b.html }));
+    const wrap = h('div', { class: 'bg-body' }, h('div', { class: 'prose bg-gen', html: (blk && blk.gen) || b.html }));
     if (blk) {
       const part = h('div', { class: 'bg-tl' }, h('div', { class: 'bg-tl-head' }, tlFlag() + ' In het ' + tlName(), blk.n ? h('span', { class: 'bg-tl-n', lang: tl }, ' · ' + blk.n) : null),
         blk.html ? h('div', { class: 'prose', html: blk.html }) : null);
@@ -717,7 +728,7 @@
     }
     const rel = (b.rel || []).map(get).filter(r => r && fits(r, tl));
     if (rel.length) wrap.append(h('div', { class: 'bg-rel' }, h('span', { class: 'small muted' }, 'Zie ook: '),
-      rel.map(r => h('button', { class: 'chip toggle bg-rel-chip', type: 'button', onclick: e => { e.stopPropagation(); onRel(r.id); } }, r.t))));
+      rel.map(r => h('button', { class: 'chip toggle bg-rel-chip', type: 'button', onclick: e => { e.stopPropagation(); onRel(r.id); } }, T(r)))));
     return wrap;
   }
 
@@ -731,10 +742,10 @@
     document.addEventListener('keydown', esc, true);
     const inLesson = !!(document.getElementById('lesson') && !document.getElementById('lesson').hidden);
     const blk = b[target()];
-    const card = h('div', { class: 'modal bg-modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': b.t },
-      h('div', { class: 'bg-m-top' }, h('div', { class: 'grow' }, h('div', { class: 'eyebrow' }, '📖 Grammaticabegrip'), h('h3', null, b.t), blk && blk.n ? h('div', { class: 'bg-m-n muted', lang: target() }, blk.n) : null),
+    const card = h('div', { class: 'modal bg-modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': T(b) },
+      h('div', { class: 'bg-m-top' }, h('div', { class: 'grow' }, h('div', { class: 'eyebrow' }, '📖 Grammaticabegrip'), h('h3', null, T(b)), blk && blk.n ? h('div', { class: 'bg-m-n muted', lang: target() }, blk.n) : null),
         h('button', { class: 'icon-btn bg-x', type: 'button', 'aria-label': 'Sluiten', onclick: close }, '✕')),
-      h('p', { class: 'bg-k' }, b.k),
+      h('p', { class: 'bg-k' }, K(b)),
       body(b, rid => open(rid)),
       h('div', { class: 'row gap end bg-m-foot' },
         inLesson ? null : h('a', { class: 'btn ghost', href: '#/begrippen/' + b.id, onclick: close }, '📖 Alle begrippen'),
@@ -765,7 +776,7 @@
         skip.add(m.id);
         if (m.i > pos) frag.append(n.nodeValue.slice(pos, m.i));
         const b = BY[m.id];
-        frag.append(h('span', { class: 'bg-term', role: 'button', tabindex: '0', 'data-b': m.id, title: b.t + ': ' + b.k,
+        frag.append(h('span', { class: 'bg-term', role: 'button', tabindex: '0', 'data-b': m.id, title: T(b) + ': ' + K(b),
           onclick: e => { e.stopPropagation(); e.preventDefault(); open(m.id); },
           onkeydown: e => { if (e.key === 'Enter') { e.stopPropagation(); e.preventDefault(); open(m.id); } } }, m.s));
         pos = m.i + m.n;
@@ -791,7 +802,7 @@
     const items = {};
     const item = b => {
       const d = h('details', { class: 'bg-item card', id: 'bg-' + b.id },
-        h('summary', null, h('div', { class: 'grow' }, h('b', null, b.t), b[target()] && b[target()].n ? h('span', { class: 'bg-n muted', lang: target() }, ' · ' + b[target()].n) : null, h('div', { class: 'small muted bg-sum-k' }, b.k)), h('span', { class: 'fold-chev', 'aria-hidden': 'true' }, '›')));
+        h('summary', null, h('div', { class: 'grow' }, h('b', null, T(b)), b[target()] && b[target()].n ? h('span', { class: 'bg-n muted', lang: target() }, ' · ' + b[target()].n) : null, h('div', { class: 'small muted bg-sum-k' }, K(b))), h('span', { class: 'fold-chev', 'aria-hidden': 'true' }, '›')));
       let filled = false;
       d.addEventListener('toggle', () => {
         if (d.open && !filled) { filled = true; const bd = body(b, go); d.append(bd); decorate(bd, { skip: new Set([b.id]) }); }
@@ -822,5 +833,5 @@
     return wrap;
   }
 
-  S.Begrippen = { B, CATS, list, get, match, search, decorate, open, page, enabled, fits };
+  S.Begrippen = { B, CATS, list, get, match, search, decorate, open, page, enabled, fits, add, title: T };
 })(window.SPT);

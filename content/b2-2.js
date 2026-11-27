@@ -396,22 +396,22 @@
     dialogue: {
       t: 'Clase de surf en El Tunco', place: 'Playa El Tunco 🇸🇻',
       lines: [
-        ['Xiomara', '¡Buenas, Mark! ¿Listo para la clase? Hoy todo depende de la marea.', 'Hoi Mark! Klaar voor de les? Vandaag hangt alles af van het getij.'],
+        ['Yesenia', '¡Buenas, Mark! ¿Listo para la clase? Hoy todo depende de la marea.', 'Hoi Mark! Klaar voor de les? Vandaag hangt alles af van het getij.'],
         ['Mark', 'Listo, aunque no me atrevo a meterme muy adentro. Todavía no confío en la tabla.', 'Klaar, al durf ik niet zo ver het water in. Ik vertrouw de plank nog niet.'],
-        ['Xiomara', 'Tranquilo, vos contá conmigo. Fijate en las olas: ¿te das cuenta de que vienen de tres en tres?', 'Rustig maar, reken op mij. Let op de golven: merk je dat ze met drie tegelijk komen?'],
+        ['Yesenia', 'Tranquilo, vos contá conmigo. Fijate en las olas: ¿te das cuenta de que vienen de tres en tres?', 'Rustig maar, reken op mij. Let op de golven: merk je dat ze met drie tegelijk komen?'],
         ['Mark', 'Ahora que lo dices, sí. ¿Y en qué tengo que pensar cuando viene la ola?', 'Nu je het zegt, ja. En waar moet ik aan denken als de golf komt?'],
-        ['Xiomara', 'En nada, ja, ja. Tratá de remar fuerte y acordate de mirar hacia la playa.', 'Nergens aan, haha. Probeer hard te peddelen en denk eraan naar het strand te kijken.'],
+        ['Yesenia', 'En nada, ja, ja. Tratá de remar fuerte y acordate de mirar hacia la playa.', 'Nergens aan, haha. Probeer hard te peddelen en denk eraan naar het strand te kijken.'],
         ['Mark', 'Me acuerdo de la última vez: tardé una hora en ponerme de pie.', 'Ik herinner me de vorige keer: ik deed er een uur over om te gaan staan.'],
-        ['Xiomara', 'Es normal. Yo me enamoré del surf a los doce años y al principio me quejaba de todo.', 'Dat is normaal. Ik werd op mijn twaalfde verliefd op het surfen en in het begin klaagde ik over alles.'],
+        ['Yesenia', 'Es normal. Yo me enamoré del surf a los doce años y al principio me quejaba de todo.', 'Dat is normaal. Ik werd op mijn twaalfde verliefd op het surfen en in het begin klaagde ik over alles.'],
         ['Mark', '¿Y nunca te arrepentiste de dejar la ciudad?', 'En heb je er nooit spijt van gehad dat je de stad verliet?'],
-        ['Xiomara', 'Jamás. Soñaba con vivir frente al mar y aquí estoy. Eso sí: me encargo de la escuela y casi me quedo sin tiempo para surfear.', 'Nooit. Ik droomde ervan aan zee te wonen en hier ben ik. Wel is het zo: ik run de school en houd bijna geen tijd over om te surfen.'],
+        ['Yesenia', 'Jamás. Soñaba con vivir frente al mar y aquí estoy. Eso sí: me encargo de la escuela y casi me quedo sin tiempo para surfear.', 'Nooit. Ik droomde ervan aan zee te wonen en hier ben ik. Wel is het zo: ik run de school en houd bijna geen tijd over om te surfen.'],
         ['Mark', 'Pues yo sueño con una pupusa después de la clase.', 'Nou, ik droom van een pupusa na de les.'],
-        ['Xiomara', '¡Cabal! De eso también me encargo yo. Conozco una pupusería que queda a dos cuadras.', 'Precies! Daar zorg ik ook voor. Ik ken een pupusería twee straten verderop.']
+        ['Yesenia', '¡Cabal! De eso también me encargo yo. Conozco una pupusería que queda a dos cuadras.', 'Precies! Daar zorg ik ook voor. Ik ken een pupusería twee straten verderop.']
       ],
       q: [
         { t: 'mc', q: '¿De qué depende la clase de hoy?', o: ['De la marea', 'De la tabla', 'Del precio'] },
         { t: 'mc', q: '¿Cuánto tardó Mark en ponerse de pie la última vez?', o: ['Una hora', 'Doce años', 'Tres olas'] },
-        { t: 'mc', q: '¿Con qué soñaba Xiomara?', o: ['Con vivir frente al mar', 'Con tener una pupusería', 'Con volver a la ciudad'] }
+        { t: 'mc', q: '¿Con qué soñaba Yesenia?', o: ['Con vivir frente al mar', 'Con tener una pupusería', 'Con volver a la ciudad'] }
       ]
     },
     culture: { t: 'El Salvador, klein land met grote golven', html: `<p>🌊 El Salvador is het kleinste land van het Amerikaanse vasteland; de dichter Gabriela Mistral noemde het liefkozend <b>el Pulgarcito de América</b>, het Klein Duimpje. De Pacifische kust staat bekend om lange, regelmatige golven. <b>El Tunco</b> dankt zijn naam aan een rots in zee die op een varken lijkt: <i>tunco</i> is het Salvadoraanse woord voor varken.</p>
@@ -440,7 +440,7 @@
     ],
     say: [['Sueño con vivir frente al mar.', 'Ik droom ervan aan zee te wonen.'], ['Todo depende del tiempo.', 'Alles hangt af van het weer.'], ['Me di cuenta de que era tarde.', 'Ik merkte dat het laat was.'], ['¿En qué piensas?', 'Waar denk je aan?']],
     task: { nl: 'Schrijf 6 tot 8 zinnen over iets wat je hebt leren doen (een sport, een instrument, een taal). Gebruik minstens zes werkwoorden met een vast voorzetsel: soñar con, atreverse a, tardar en, quejarse de, darse cuenta de, acostumbrarse a, arrepentirse de, depender de…', model: 'De niño soñaba con tocar la guitarra, pero no me atrevía a pedir una. A los quince años mi abuelo se dio cuenta de que siempre miraba la suya y me la regaló. Tardé meses en aprender mi primera canción y me quejaba de que me dolían los dedos. Poco a poco me acostumbré a practicar todos los días. Hoy sé que todo depende de la paciencia. No me arrepiento de haber insistido en seguir. Y cuento con mi abuelo: sigue siendo mi mejor público.' },
-    scenario: { nl: 'Xiomara geeft je surfles in El Tunco. Ze wil weten waar je van droomt, wat je durft en waar je tegenop ziet.', role: 'Eres Xiomara, una salvadoreña de 28 años, instructora de surf en la playa El Tunco. Eres alegre, directa y muy paciente con los principiantes. Le das una clase al estudiante y conversas sobre sus sueños y miedos. Usas muchos verbos con preposición («depender de», «fijarse en», «atreverse a», «soñar con», «darse cuenta de», «contar con») y haces preguntas con la preposición delante («¿Con qué soñás?», «¿De qué te quejás?», «¿En qué pensás?»). Usas el voseo salvadoreño («contá conmigo», «fijate») y palabras como «chivo», «chero» y «¡cabal!». Si el estudiante se equivoca de preposición, repites la frase correcta con naturalidad.', goal: 'Vertel waar je van droomt, wat je niet durft en waar je op rekent, met de juiste voorzetsels.' },
+    scenario: { nl: 'Yesenia geeft je surfles in El Tunco. Ze wil weten waar je van droomt, wat je durft en waar je tegenop ziet.', role: 'Eres Yesenia, una salvadoreña de 28 años, instructora de surf en la playa El Tunco. Eres alegre, directa y muy paciente con los principiantes. Le das una clase al estudiante y conversas sobre sus sueños y miedos. Usas muchos verbos con preposición («depender de», «fijarse en», «atreverse a», «soñar con», «darse cuenta de», «contar con») y haces preguntas con la preposición delante («¿Con qué soñás?», «¿De qué te quejás?», «¿En qué pensás?»). Usas el voseo salvadoreño («contá conmigo», «fijate») y palabras como «chivo», «chero» y «¡cabal!». Si el estudiante se equivoca de preposición, repites la frase correcta con naturalidad.', goal: 'Vertel waar je van droomt, wat je niet durft en waar je op rekent, met de juiste voorzetsels.' },
     reading: {
       t: 'Lo que aprendí del mar', type: 'Blog',
       p: [
@@ -455,7 +455,7 @@
       ],
       gl: [['crecer', 'opgroeien'], ['pesar', 'wegen'], ['rendirse (i)', 'opgeven'], ['la fuerza', 'de kracht'], ['valer la pena', 'de moeite waard zijn']],
       q: [
-        { t: 'mc', q: '¿Con qué soñaba Xiomara de niña?', o: ['Con ser arquitecta', 'Con tener una escuela de surf', 'Con vivir en San Salvador'] },
+        { t: 'mc', q: '¿Con qué soñaba Yesenia de niña?', o: ['Con ser arquitecta', 'Con tener una escuela de surf', 'Con vivir en San Salvador'] },
         { t: 'mc', q: '¿De qué se quejaba al principio?', o: ['Del agua fría y de la tabla', 'De su tío', 'De la escuela'] },
         { t: 'mc', q: 'Según ella, ¿de qué depende el surf?', o: ['De la paciencia', 'De la fuerza', 'De la tabla'] },
         { t: 'mc', q: '¿Se arrepiente de haber dejado la ciudad?', o: ['No, piensa que valió la pena', 'Sí, extraña San Salvador', 'A veces, cuando hace frío'] }

@@ -3,7 +3,11 @@
    Werkt voor elke doeltaal: elke cursus heeft een eigen landenlijst (S.places + S.placeGroups + S.placeMeta, bijv.
    content/landen.js voor Spaans, content/en-nl/landen.js voor Engels) en een kaart S.MAPS[doeltaal] (content/kaarten/<taal>.js,
    gemaakt met tools/kaart-maken.mjs). Nieuwe taal = die twee bestanden plus stemmen per land in tools/tts-texts.js (PLACE_VOICES).
-   Voortgang: Store.state.places[id] = { v: eerste bezoek, n: keer geoefend, best: beste toetsscore 0–1, stamp: datum stempel }.
+   Verdieping per land (content/landen-praten.js, content/<cursus>/landen-praten.js): p.dialog = een eigen dialoog in het land
+   (zelfde vorm als de dialoog van een unit, plus who = { naam: 'f' | 'm' } voor de stemmen) en p.talk = een eigen gesprek met de
+   docent van de taal in dat land ({ title, place, nl, goal, role, local }), waarin de docent het lokale taalgebruik spreekt en uitlegt.
+   Voortgang: Store.state.places[id] = { v: eerste bezoek, n: keer geoefend, best: beste toetsscore 0–1, stamp: datum stempel,
+   d: dialoog gedaan, t: gesprek met de docent begonnen }.
    Opnames per land in naamruimte 'pl-<id>' (Spaans) of 'pl-<taal>-<id>' (andere talen), zie tools/tts-texts.js;
    Speech.placeNs zet die tijdens een oefening. */
 (function (S) {
@@ -69,8 +73,24 @@
       return !k || fold(es).includes(k) || fold(nl).includes(k);
     });
   }
+  /* De dialoog van een land: eerst lezen en luisteren (stemmen van het land), dan de vragen erover. */
+  function dialogSession(p) {
+    const d = p.dialog;
+    const items = [{ kind: 'dialogue', dialogue: d, clipNs: ns(p) }];
+    (d.q || []).forEach(q => items.push({ ...S.Gen.normEx(q, null, null, { noSrs: true, skill: 'read' }), skill: 'read', tag: null }));
+    return { title: p.name + ' · ' + d.t, items, mode: 'learn' };
+  }
+  /* Het gesprek met de docent in dit land: een rollenspel-situatie voor de AI (js/ai.js, roleplaySystem).
+     De docent krijgt de woorden van het land mee (zonder de grove) en legt elk lokaal woord uit dat ze gebruikt. */
+  function talkScenario(p) {
+    const t = p.talk; if (!t) return null;
+    const m = meta();
+    return { id: 'pais-' + m.target + '-' + p.id, icon: '🗺️', title: t.title, place: t.place || p.city, role: t.role, goal: t.goal, nl: t.nl, pais: p.id,
+      local: { country: t.country || p.name, how: t.local || '', words: p.words.filter(w => w[2] !== 'g').slice(0, 18).map(w => w[0] + ' = ' + w[1]), neutral: p.voice === m.base } };
+  }
   function finish(p, kind, sum) {
     const g = progOf(p.id); g.v = g.v || Date.now(); g.n = (g.n || 0) + 1;
+    if (kind === 'dialog') { g.d = g.d || Date.now(); return { first: false, score: 1 }; }
     const score = sum.total ? sum.ok / sum.total : 0;
     if (kind === 'quiz') {
       g.best = Math.max(g.best || 0, score);
@@ -194,6 +214,7 @@
       h('div', { class: 'pl-tools' }, input, h('div', { class: 'row gap wrap' }, chips)), info, box, other));
     draw();
     if (p.fact) wrap.append(h('div', { class: 'card pl-fact' }, h('b', null, '💡 Wist je dat?'), h('p', null, p.fact)));
+    if (p.dialog || p.talk) wrap.append(talkSection(p, g));
     const unit = p.unit && S.C.get(p.unit);
     wrap.append(h('section', { class: 'sec' }, h('h2', { class: 'sec-title' }, '🎯 Oefenen'),
       h('div', { class: 'card pl-act' },
@@ -204,8 +225,35 @@
         unit ? h('a', { class: 'btn ghost wide', href: '#/unit/' + unit.id }, unit.icon + ' Meer in de route: ' + unit.level + ' · ' + unit.title) : null)));
     return wrap;
   }
+  /* «Praten in <land>»: de dialoog met de personages van het land, en het gesprek met de docent. */
+  function talkSection(p, g) {
+    const T = S.Tutor, Cast = S.Cast, d = p.dialog, t = p.talk;
+    const sec = h('section', { class: 'sec pl-talk' }, h('h2', { class: 'sec-title' }, '🗣️ Praten in ' + p.name));
+    if (d) {
+      const who = [...new Set(d.lines.map(l => l[0]))];
+      const faces = who.map(w => { const c = Cast && (w === 'Mark' ? st().me && Cast.get(st().me) : Cast.forSpeaker(w, d.place)); return c ? Cast.avatar(c.id, 54, 'pl-face', { look: c.player ? st().meLook : null }) : null; }).filter(Boolean);
+      sec.append(h('div', { class: 'card pl-talk-card' },
+        h('div', { class: 'pl-talk-head' }, faces.length ? h('div', { class: 'pl-faces' }, faces) : h('span', { class: 'pl-talk-ic' }, '💬'),
+          h('div', { class: 'grow' }, h('div', { class: 'eyebrow' }, 'Dialoog · ' + d.place.replace(/\s*[\u{1F1E6}-\u{1F1FF}]{2}/u, '')), h('b', { lang: meta().target }, d.t), h('small', { class: 'muted' }, d.nl || '')),
+          g.d ? h('span', { class: 'chip ok' }, '✓ gedaan') : null),
+        h('button', { class: 'btn primary wide', type: 'button', onclick: () => run(p, 'dialog') }, g.d ? '💬 Dialoog opnieuw' : '💬 Naar de dialoog')));
+    }
+    if (t) {
+      const on = S.AI && S.AI.enabled();
+      sec.append(h('div', { class: 'card pl-talk-card' },
+        h('div', { class: 'pl-talk-head' }, T && T.avatar ? T.avatar(58, 'pl-tutor') : h('span', { class: 'pl-talk-ic' }, '🎭'),
+          h('div', { class: 'grow' }, h('div', { class: 'eyebrow' }, 'Gesprek met ' + ((T && T.title) || 'je docent') + ' · ' + (t.place || p.city)), h('b', null, t.title), h('small', { class: 'muted' }, t.nl)),
+          g.t ? h('span', { class: 'chip ok' }, '✓ gedaan') : null),
+        h('p', { class: 'small pl-goal' }, '🎯 ' + t.goal),
+        on ? h('button', { class: 'btn primary wide', type: 'button', onclick: () => { g.t = g.t || Date.now(); S.Store.save({ quiet: true }); S.startRoleplay(talkScenario(p)); location.hash = '#/docente'; } }, '🎭 Begin het gesprek')
+          : h('a', { class: 'btn wide', href: '#/ajustes' }, '🔑 AI-sleutel instellen'),
+        on ? null : h('p', { class: 'small muted' }, 'Voor een echt gesprek heb je een AI-sleutel nodig (Instellingen). De dialoog hierboven werkt altijd, ook zonder.')));
+    }
+    return sec;
+  }
   function run(p, kind, resumed) {
-    const ses = resumed || (kind === 'quiz' ? quiz(p) : practice(p));
+    if (kind === 'dialog' && !p.dialog) return;
+    const ses = resumed || (kind === 'quiz' ? quiz(p) : kind === 'dialog' ? dialogSession(p) : practice(p));
     S.Speech.placeNs = ns(p);
     const off = () => { S.Speech.placeNs = null; };
     S.runSession(ses, {
@@ -214,6 +262,7 @@
       onFinish: sum => {
         const r = finish(p, kind, sum); off();
         S.Store.save();
+        if (kind === 'dialog') return { emoji: '💬', title: '¡Muy bien!', text: 'Je hebt de dialoog van ' + p.name + ' gedaan.' + (p.talk ? ' Nu zelf praten?' : ''), nextLabel: 'Terug naar ' + p.name, next: () => { location.hash = '#/pais/' + p.id; } };
         if (kind !== 'quiz') return { emoji: '🎉', title: '¡Bien hecho!', text: 'Je hebt de woorden van ' + p.name + ' geoefend. Klaar voor je stempel?', nextLabel: '🛂 Naar de stempeltoets', next: () => run(p, 'quiz'), alt: { label: 'Terug naar ' + p.name, fn: () => { location.hash = '#/pais/' + p.id; } } };
         if (r.score >= PASS) return { passed: true, emoji: '🛂', title: r.first ? '¡Sello! Stempel gehaald' : '¡Muy bien!', text: (r.first ? 'Je paspoort heeft een nieuwe stempel: ' + p.name + '. ' : '') + 'Score: ' + Math.round(r.score * 100) + '%.', nextLabel: '🗺️ Naar de kaart', next: () => { location.hash = '#/mundo'; } };
         return { passed: false, emoji: '💪', title: 'Bijna!', text: 'Je had ' + Math.round(r.score * 100) + '%. Voor een stempel heb je ' + Math.round(PASS * 100) + '% nodig. Oefen de woorden nog eens en probeer het opnieuw.', nextLabel: 'Woorden oefenen', next: () => run(p, 'practice'), alt: { label: 'Terug naar ' + p.name, fn: () => { location.hash = '#/pais/' + p.id; } } };
@@ -223,5 +272,5 @@
   /* Onderbroken oefening van een land hervatten (vanuit «Verder waar je was»). */
   function resume(session, d) { const p = get(d.id); if (p) run(p, d.what, session); else S.runSession(session, { desc: d }); }
 
-  S.Mundo = { flagImg, search, list, get, meta, ns, nsFor, status, stamps, words, practice, quiz, finish, page, placePage, resume, PASS };
+  S.Mundo = { flagImg, dialogSession, talkScenario, talks: () => list().filter(p => p.talk).map(talkScenario), search, list, get, meta, ns, nsFor, status, stamps, words, practice, quiz, finish, page, placePage, resume, PASS };
 })(window.SPT);
