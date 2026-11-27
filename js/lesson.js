@@ -111,7 +111,7 @@
     el.classList.add('tw-soft');
   }
   const findNotes = (text, opt = {}) => {
-    const out = S.Uitleg ? S.Uitleg.find(text, opt) : [];
+    const out = S.Uitleg ? S.Uitleg.find(text, opt) : opt.extra ? [{ html: opt.extra }] : []; // andere cursussen: alleen de uitleg uit de lesstof zelf
     // ⚠️ uitzonderingen in deze zin (woorden en constructies) komen er herkenbaar bij
     if (!opt.noUitz && S.Uitz) S.Uitz.forText(text, opt.seen).forEach(u => out.push({ uz: true, t: u.t, html: u.html }));
     return out;
@@ -383,7 +383,7 @@
     let showAll = false;
     const seen = new Set();
     /* Personages: elke spreker is een getekend dier uit de vaste cast (js/cast.js). Mark (de leerling) staat altijd rechts. */
-    const Cast = S.Cast, me = speakers.includes('Mark') ? 'Mark' : null;
+    const Cast = S.Cast, me = speakers.includes(d.me || 'Mark') ? d.me || 'Mark' : null; // de bezoeker: Mark, of dialogue.me in een andere cursus
     const mine = Cast && S.Store.state.me && Cast.get(S.Store.state.me); // jouw eigen personage (Perfil)
     const charOf = who => Cast && (who === me ? mine : Cast.forSpeaker(who, d.place));
     const side = who => me ? (who === me ? 'right' : 'left') : (speakers.indexOf(who) % 2 ? 'right' : 'left');

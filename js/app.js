@@ -1048,7 +1048,7 @@
   function dialogueRead(u) {
     const d = u.dialogue, seen = new Set();
     return h('div', { class: 'dl-list read' }, h('p', { class: 'muted small' }, d.place + ' — ' + d.t),
-      d.lines.map(([who, es, nl, x]) => { const nt = S.Lesson.noteToggle(S.Lesson.findNotes(es, { extra: x, seen })); const ch = S.Cast && (who === 'Mark' ? st().me && S.Cast.get(st().me) : S.Cast.forSpeaker(who, d.place));
+      d.lines.map(([who, es, nl, x]) => { const nt = S.Lesson.noteToggle(S.Lesson.findNotes(es, { extra: x, seen })); const ch = S.Cast && (who === (d.me || 'Mark') ? st().me && S.Cast.get(st().me) : S.Cast.forSpeaker(who, d.place));
         return h('div', { class: 'dl-read' }, ch ? S.Cast.avatar(ch.id, 36, 'dl-read-av', { look: ch.player ? st().meLook : null }) : null, S.Lesson.speakBtn(es, { clipNs: S.course.ns ? undefined : 'ch' }), h('div', { class: 'grow' }, h('b', null, who + ': '), tapEs(es, nl), h('div', { class: 'small muted' }, nl), nt && nt.box), nt && nt.btn); }));
   }
 
