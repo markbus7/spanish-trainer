@@ -379,7 +379,7 @@
     const set = S.Store.state.settings;
     const speakers = [...new Set(d.lines.map(l => l[0]))];
     // dialoogzinnen hebben eigen opnames met de stem die bij de spreker past (naamruimte 'ch' = vaste stem per personage uit js/cast.js, tools/tts-texts.js)
-    const say = { clipNs: S.course.ns ? undefined : 'ch' };
+    const say = { clipNs: it.clipNs !== undefined ? it.clipNs : S.course.ns ? undefined : 'ch' }; // een dialoog van «Op reis» heeft opnames in de naamruimte van het land
     let showAll = false;
     const seen = new Set();
     /* Personages: elke spreker is een getekend dier uit de vaste cast (js/cast.js). Mark (de leerling) staat altijd rechts. */

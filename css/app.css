@@ -561,6 +561,15 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .lab.grof { background: var(--bad-soft); color: var(--bad); }
 .pl-fact p { margin: .3rem 0 0; color: var(--ink2); }
 .pl-act { display: flex; flex-direction: column; gap: .55rem; } .pl-act p { margin: 0; }
+/* «Praten in <land>»: de dialoog van het land en het gesprek met de docent */
+.pl-talk-card { display: flex; flex-direction: column; gap: .6rem; } .pl-talk-card + .pl-talk-card { margin-top: .6rem; }
+.pl-talk-head { display: flex; align-items: center; gap: .8rem; }
+.pl-talk-head .grow { display: flex; flex-direction: column; gap: .12rem; min-width: 0; } .pl-talk-head small { font-size: .88rem; }
+.pl-talk-head .chip { align-self: flex-start; white-space: nowrap; }
+.pl-faces { display: flex; flex: none; } .pl-faces > * + * { margin-left: -14px; }
+.pl-talk-ic { font-size: 2rem; flex: none; } .pl-talk-head > .lupe, .pl-talk-head > .pl-tutor { flex: none; }
+.pl-talk-card .pl-goal { margin: 0; color: var(--ink2); } .pl-talk-card .btn.wide { margin-top: 0; }
+.scen-mundo { text-decoration: none; color: var(--ink); margin-top: .5rem; border-style: dashed; box-shadow: none; }
 @media (max-width: 520px) { .pl-hero { flex-direction: column; gap: .4rem; } .pl-flag { font-size: 2.6rem; } }
 
 /* ---------- formulieren ---------- */

@@ -404,7 +404,7 @@
       const o = O.places[id], n = out.places[id];
       if (!n) { out.places[id] = clone(o); continue; }
       const first = (x, y) => x && y ? Math.min(x, y) : x || y || undefined;
-      n.v = first(n.v, o.v); n.stamp = first(n.stamp, o.stamp); n.n = max(n.n, o.n); n.best = max(n.best, o.best);
+      n.v = first(n.v, o.v); n.stamp = first(n.stamp, o.stamp); n.d = first(n.d, o.d); n.t = first(n.t, o.t); if (!n.d) delete n.d; if (!n.t) delete n.t; n.n = max(n.n, o.n); n.best = max(n.best, o.best);
       if (!n.stamp) delete n.stamp;
     }
     for (const k in O.skills) {
