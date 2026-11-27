@@ -13,19 +13,25 @@
     const a = [x + sd * r * .62, y - ry * .78], b = [x + sd * r * .95, y - ry * .3];
     return `<path d="M${f(a[0])} ${f(a[1])}l${f(sd * 2.4)} -2.6M${f(b[0])} ${f(b[1])}l${f(sd * 3)} -1.4" stroke="${col}" stroke-width="1.6" stroke-linecap="round" fill="none"/>`;
   }
-  // grote glanzende ogen zoals Lupe; o.ring = gekleurde ring eromheen, o.lid = slaperige oogleden
+  // grote glanzende ogen zoals Lupe: gekleurde iris met pupil, twee lichtjes en een ooglidlijntje.
+  // o.ring = gekleurde ring eromheen, o.lid = slaperige oogleden, o.iris2 = andere kleur voor het rechteroog
   function eyes(o = {}) {
     const y = o.y || 64, dx = o.dx || 18, r = o.r || 7.2, ry = +(r * 1.06).toFixed(2), col = o.col || '#2a1a22', iris = o.iris || '#5a2c42';
-    const one = x => `${o.ring ? `<ellipse cx="${x}" cy="${y}" rx="${r + 3.2}" ry="${ry + 3.2}" fill="${o.ring}"/>` : ''}
+    const f = v => +v.toFixed(2);
+    const one = (x, ir) => `${o.ring ? `<ellipse cx="${x}" cy="${y}" rx="${r + 3.2}" ry="${ry + 3.2}" fill="${o.ring}"/>` : ''}
       <ellipse cx="${x}" cy="${y}" rx="${r}" ry="${ry}" fill="${col}"/>
-      <ellipse cx="${x}" cy="${+(y + r * .43).toFixed(2)}" rx="${+(r * .62).toFixed(2)}" ry="${+(r * .4).toFixed(2)}" fill="${iris}" opacity=".7"/>
-      <circle cx="${+(x + r * .35).toFixed(2)}" cy="${+(y - r * .4).toFixed(2)}" r="${+(r * .38).toFixed(2)}" fill="#fff"/>
-      <circle cx="${+(x - r * .32).toFixed(2)}" cy="${+(y + r * .4).toFixed(2)}" r="${+(r * .16).toFixed(2)}" fill="#fff" opacity=".8"/>
+      <ellipse cx="${x}" cy="${f(y + r * .26)}" rx="${f(r * .76)}" ry="${f(r * .68)}" fill="${ir}" opacity=".9"/>
+      <ellipse cx="${x}" cy="${f(y + r * .04)}" rx="${f(r * .47)}" ry="${f(r * .52)}" fill="${col}"/>
+      <path d="M${f(x - r * .5)} ${f(y + r * .6)}Q${x} ${f(y + r * .98)} ${f(x + r * .5)} ${f(y + r * .6)}" fill="none" stroke="#fff" stroke-width="${f(r * .15)}" stroke-linecap="round" opacity=".38"/>
+      <circle cx="${f(x + r * .36)}" cy="${f(y - r * .4)}" r="${f(r * .37)}" fill="#fff"/>
+      <circle cx="${f(x - r * .36)}" cy="${f(y + r * .36)}" r="${f(r * .17)}" fill="#fff" opacity=".9"/>
+      <path d="M${f(x - r * 1.04)} ${f(y - r * .3)}Q${x} ${f(y - ry * 1.42)} ${f(x + r * 1.04)} ${f(y - r * .3)}" fill="none" stroke="${col}" stroke-width="1.5" stroke-linecap="round"/>
       ${o.lid ? `<path d="M${x - r - .8} ${y - r * .1}Q${x} ${y - r * .5} ${x + r + .8} ${y - r * .1}A${r + .8} ${ry + .8} 0 0 0 ${x - r - .8} ${y - r * .1}Z" fill="${o.lid}"/><path d="M${x - r - .6} ${y - r * .1}Q${x} ${y - r * .5} ${x + r + .6} ${y - r * .1}" fill="none" stroke="${col}" stroke-width="1.3" stroke-linecap="round"/>` : ''}
       ${o.lash ? lashes(x, y, r, ry, col) : ''}`;
-    return `<g class="c-eyes">${one(60 - dx)}${one(60 + dx)}</g>`;
+    return `<g class="c-eyes">${one(60 - dx, iris)}${one(60 + dx, o.iris2 || iris)}</g>`;
   }
-  const blush = (y = 76, dx = 29.5, col = '#f0789f', op = .5) => `<ellipse cx="${60 - dx}" cy="${y}" rx="6.6" ry="4" fill="${col}" opacity="${op}"/><ellipse cx="${60 + dx}" cy="${y}" rx="6.6" ry="4" fill="${col}" opacity="${op}"/>`;
+  // blosjes: zacht uitlopend, met twee lichte streepjes
+  const blush = (y = 76, dx = 29.5, col = '#f0789f', op = .5) => [60 - dx, 60 + dx].map(x => `<ellipse cx="${x}" cy="${y}" rx="7.4" ry="4.6" fill="${col}" opacity="${+(op * .45).toFixed(2)}"/><ellipse cx="${x}" cy="${y}" rx="5.2" ry="3" fill="${col}" opacity="${+(op * .8).toFixed(2)}"/><path d="M${x - 2.6} ${y + 1.2}l1.6-2.6M${x + .6} ${y + 1.2}l1.6-2.6" stroke="#fff" stroke-width=".9" stroke-linecap="round" opacity=".45"/>`).join('');
   // mondje: dicht = glimlach, open = rond mondje met tongetje
   function mouth(y = 81, o = {}) {
     const w = o.w || 7, line = o.line || '#7a3b2e', inside = o.inside || '#7a2e3c', tongue = o.tongue || '#f37fa6';
@@ -297,10 +303,10 @@
         const fronds = side => { const x = side < 0 ? 25 : 95; return [-38, -78, -118].map((a, i) => `<g transform="translate(${x} 57) rotate(${a * -side}) scale(${i === 1 ? .9 : .82})"><path d="M0 0C-9.5-5-11-23 0-33C11-23 9.5-5 0 0Z" fill="${u('g')}"/><path d="M0-3V-28" stroke="#ffe6ef" stroke-width="1.6" stroke-linecap="round" opacity=".9"/></g>`).join(''); };
         return `
   <path d="${SH}" fill="${u('o')}"/>
-  <g stroke="#f2b134" stroke-width="1.4" opacity=".7"><path d="M22 106Q60 118 98 106M20 113Q60 125 100 113"/></g>
+  <!--w--><g stroke="#f2b134" stroke-width="1.4" opacity=".7"><path d="M22 106Q60 118 98 106M20 113Q60 125 100 113"/></g>
   <g fill="#fff4e6" opacity=".75">${Array.from({ length: 9 }, (_, i) => `<circle cx="${26 + i * 8.5}" cy="${109 + Math.sin(i / 8 * Math.PI) * 6}" r=".9"/>`).join('')}</g>
   <path d="M36 92L60 118L84 92" fill="#c9733a" opacity=".7"/>
-  <g stroke="#6e2a1c" stroke-width="1" stroke-linecap="round">${Array.from({ length: 7 }, (_, i) => `<path d="M${43 + i * 5.7} ${98 + Math.abs(3 - i) * -1.4 + 4} v4"/>`).join('')}</g>
+  <g stroke="#6e2a1c" stroke-width="1" stroke-linecap="round">${Array.from({ length: 7 }, (_, i) => `<path d="M${43 + i * 5.7} ${98 + Math.abs(3 - i) * -1.4 + 4} v4"/>`).join('')}</g><!--/w-->
   <g class="gills-l">${fronds(-1)}</g><g class="gills-r">${fronds(1)}</g>
   <path d="M60 34C88 34 105 47 105 66C105 87 87 99 60 99C33 99 15 87 15 66C15 47 32 34 60 34Z" fill="${u('f')}"/>
   ${shine(43, 45, 11, 5)}
@@ -419,7 +425,7 @@
     return {
       defs: fur(a, b, c) + lin('o', w.a, w.b),
       draw: u => `
-  <path d="${SH}" fill="${u('o')}"/>${(WEAR[w.kind] || WEAR.tee)(w)}${o.under || ''}
+  <path d="${SH}" fill="${u('o')}"/><!--w-->${(WEAR[w.kind] || WEAR.tee)(w)}<!--/w-->${o.under || ''}
   ${(EARS[o.ears || 'round'])(u('f'), o.earIn || '#e9b7c4')}${o.back || ''}
   <path d="${o.head || HEAD}" fill="${u('f')}"/>
   ${shine(42, 41)}
@@ -432,19 +438,21 @@
   ${blush(o.by || 78, o.bdx || 30, '#f0789f', .45)}
   ${(NOSE[o.nose || 'bear'])(o.noseCol || '#2a1a12', o.ny || 75)}
   ${mouth(o.mouthY || 85, { w: o.mw || 6, line: o.line || '#6e4b2e' })}
-  ${o.top || ''}`
+  ${o.top || ''}`.replace(/URL_F/g, u('f'))
     };
   }
   function bird(o) {
     const [a, b, c] = o.fur, w = o.wear || { kind: 'tee', a: '#5aa0d8', b: '#3f7fb8' }, k = o.beak || '#ffd23f', k2 = o.beak2 || '#e8a21a';
     const beak = o.hook
       ? { closed: `<path d="M50 72Q60 64 70 72Q72 82 64 90Q62 84 56 82Q50 79 50 72Z" fill="${k}"/><path d="M53 82Q60 80 64 84Q62 88 58 88Q54 86 53 82Z" fill="${k2}"/><ellipse cx="56" cy="71" rx="2" ry="1" fill="#fff" opacity=".6"/>`, open: `<path d="M50 70Q60 62 70 70Q72 79 65 85Q62 80 56 79Q50 76 50 70Z" fill="${k}"/><path d="M53 84Q60 82 64 86Q62 92 58 92Q54 89 53 84Z" fill="${k2}"/><path d="M54 80Q60 79 64 84Q60 84 54 83Z" fill="#7a2e3c"/>` }
+      : o.long
+      ? { closed: `<path d="M53.5 72Q60 68.5 66.5 72L61.6 103Q60 105 58.4 103Z" fill="${k}" stroke="${k2}" stroke-width=".9" stroke-linejoin="round"/><path d="M60 74V101" stroke="${k2}" stroke-width="1" stroke-linecap="round" opacity=".8"/><path d="M56.5 73.5L58.6 92" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity=".45"/>`, open: `<path d="M53.5 71Q60 67.5 66.5 71L64 99Q62.6 101 61.4 99L58 78Z" fill="${k}" stroke="${k2}" stroke-width=".9" stroke-linejoin="round"/><path d="M54 76L60 80 57.4 104Q56 106 55 104Z" fill="${k}" stroke="${k2}" stroke-width=".9" stroke-linejoin="round"/><path d="M57 79L60 81 59 92Z" fill="#7a2e3c"/>` }
       : { closed: `<path d="M53 74Q60 71 67 74L60 84Z" fill="${k}"/><path d="M56 79.5H64" stroke="${k2}" stroke-width="1" stroke-linecap="round"/>`, open: `<path d="M53 73Q60 70 67 73L60 79Z" fill="${k}"/><path d="M55 80.5H65L60 87Z" fill="${k2}"/><path d="M56.5 79.2H63.5L60 82Z" fill="#7a2e3c"/>` };
     return {
       kind: 'bird',
       defs: fur(a, b, c) + lin('o', w.a, w.b),
       draw: u => `
-  <path d="${SH}" fill="${u('o')}"/>${(WEAR[w.kind] || WEAR.tee)(w)}
+  <path d="${SH}" fill="${u('o')}"/><!--w-->${(WEAR[w.kind] || WEAR.tee)(w)}<!--/w-->
   ${o.back || ''}
   <path d="${HEAD}" fill="${u('f')}"/>
   ${shine(42, 41)}
@@ -452,7 +460,7 @@
   ${eyes(Object.assign({ dx: 18, y: 63, r: 7.2, col: '#1a1018', iris: '#40243a' }, o.eyes || {}))}
   ${blush(78, 30, '#f0789f', .4)}
   <g class="m-closed">${beak.closed}</g><g class="m-open">${beak.open}</g>
-  ${o.front || ''}`
+  ${o.front || ''}`.replace(/URL_F/g, u('f'))
     };
   }
   function frog(o) {
@@ -461,7 +469,7 @@
       kind: 'frog',
       defs: fur(a, b, c) + lin('o', w.a, w.b),
       draw: u => `
-  <path d="${SH}" fill="${u('o')}"/>${(WEAR[w.kind] || WEAR.tee)(w)}
+  <path d="${SH}" fill="${u('o')}"/><!--w-->${(WEAR[w.kind] || WEAR.tee)(w)}<!--/w-->
   <circle cx="40" cy="46" r="16" fill="${u('f')}"/><circle cx="80" cy="46" r="16" fill="${u('f')}"/>
   <path d="M60 44C88 44 104 56 104 73C104 91 86 101 60 101C34 101 16 91 16 73C16 56 32 44 60 44Z" fill="${u('f')}"/>
   ${shine(36, 36, 7, 3.4, -30)}${o.marks || ''}
@@ -585,6 +593,110 @@
       }))
   ];
 
+  /* ---------- meer keuze: dieren die passen bij de landen van de cursussen ----------
+     group = bij welke taal/streek het dier hoort (Perfil toont de groep van je cursus bovenaan). */
+  const mir = d => d + `<g transform="translate(120 0) scale(-1 1)">${d}</g>`; // spiegelen: links tekenen, rechts erbij
+  const flop = (col, ink) => mir(`<path d="M26 40C14 44 10 64 16 78C22 84 30 80 32 70C34 58 34 48 30 40Z" fill="${col}" stroke="${ink}" stroke-width="1.3" stroke-linejoin="round"/><path d="M19 56C17 64 18 72 21 77" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".18"/>`);
+  const brow = (col, y = 52) => `<path d="M34 ${y + .5}Q41 ${y - 3} 48 ${y}M86 ${y + .5}Q79 ${y - 3} 72 ${y}" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round"/>`;
+  const spikes = (() => {
+    const ring = (R1, R2, n) => Array.from({ length: n + 1 }, (_, i) => { const a = (166 + i * (208 / n)) * Math.PI / 180, R = i % 2 ? R1 : R2; return `${(60 + R * Math.cos(a)).toFixed(1)} ${(66 + R * Math.sin(a) * .98).toFixed(1)}`; }).join('L');
+    return `<path d="M${ring(55, 45, 26)}Z" fill="#6e4a30" stroke="#3e2818" stroke-width="1.2" stroke-linejoin="round"/><path d="M${ring(47, 40, 22)}Z" fill="#8f6642"/><path d="M${ring(40, 35, 18)}Z" fill="#b08a5e"/>`;
+  })();
+  const fluff = (pts, extra = '') => `<g fill="URL_F">${pts.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')}</g>` + extra;
+  const curls = pts => `<g fill="none" stroke="#000" stroke-width="1" stroke-linecap="round" opacity=".13">${pts.map(([x, y]) => `<path d="M${x - 4} ${y}a4.5 4.5 0 0 1 8-2"/>`).join('')}</g>`;
+  const rosette = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="#4a2e14" stroke-width="2" opacity=".8"/><circle cx="${x}" cy="${y}" r="${(r * .3).toFixed(1)}" fill="#a8641c" opacity=".7"/>`;
+  PLAYERS.push(
+    // Latijns-Amerika
+    me({ group: 'latam', look: { hat: 'chullo' }, id: 'p-llama', name: 'Lama', animal: 'llama', nl: 'lama', color: '#e84a7f', trait: 'Nieuwsgierig en trots, uit de Andes.' },
+      beast({ fur: ['#fffaf0', '#f4e4cc', '#d8bf9a'], ears: 'big', earIn: '#e8c4a8', muzzle: '#fff8ee', mrx: 15, mry: 12.5, nose: 'rabbit', noseCol: '#5a3a2a', line: '#8a4a3a', eyes: { lash: true, iris: '#6a3a22' },
+        wear: { kind: 'poncho', a: '#e84a7f', b: '#b8306a', trim: '#2fa79a', trim2: '#ffd23f' },
+        marks: fluff([[42, 38, 10], [54, 31, 11], [67, 31, 11], [79, 38, 10], [60, 41, 11]]) + curls([[47, 31], [60, 26], [73, 31], [60, 40]]) })),
+    me({ group: 'latam', id: 'p-capibara', name: 'Capibara', animal: 'capibara', nl: 'capibara', color: '#5aa0d8', trait: 'De rust zelve. Met een capibara erbij is alles tranquilo.' },
+      beast({ fur: ['#d8b48a', '#ae8660', '#80603e'], ears: 'none', back: '<g fill="URL_F"><circle cx="31" cy="35" r="8"/><circle cx="89" cy="35" r="8"/></g><circle cx="31.5" cy="36" r="4" fill="#5c4028"/><circle cx="88.5" cy="36" r="4" fill="#5c4028"/>',
+        head: 'M60 29C82 29 95 36 97 52C100 70 99 84 94 91C87 100 74 101 60 101C46 101 33 100 26 91C21 84 20 70 23 52C25 36 38 29 60 29Z',
+        muzzle: '#c29c74', mrx: 21, mry: 15, my: 83, nose: 'dots', noseCol: '#3a2414', ny: 74, mouthY: 88, mw: 5, line: '#3a2414', eyes: { y: 56, dx: 21, r: 6.2 }, by: 70, bdx: 33,
+        marks: '<path d="M49 71Q60 66 71 71Q72 77 60 78Q48 77 49 71Z" fill="#6a4a30"/><ellipse cx="60" cy="70.6" rx="7" ry="1.6" fill="#fff" opacity=".16"/>', noseCol2: 1, front: ACC.whisk('#5a4028'),
+        wear: { kind: 'tee', a: '#7ec0ee', b: '#4f95cf', trim: '#fff' } })),
+    me({ group: 'latam', tail: 'ringed', id: 'p-jaguar', name: 'Jaguar', animal: 'jaguar', nl: 'jaguar', color: '#d9a020', trait: 'Sterk en stil. De koning van de jungle.' },
+      beast({ fur: ['#ffe6a8', '#f4be52', '#cf8c24'], ears: 'round', earIn: '#3a2a1a', cheeks: '#fff8ec', nose: 'cat', noseCol: '#c9576a', wear: { kind: 'tee', a: '#2fa79a', b: '#1d7a70', trim: '#ffd23f' },
+        marks: rosette(34, 48, 3.6) + rosette(86, 48, 3.6) + rosette(26, 64, 3) + rosette(94, 64, 3) + rosette(47, 38, 3) + rosette(73, 38, 3) + SPOTS('#4a2e14', [[60, 40], [53, 45, 1.3], [67, 45, 1.3], [24, 76, 1.3], [96, 76, 1.3], [38, 58, 1.2], [82, 58, 1.2]]), front: ACC.whisk('#7a5a30') })),
+    // Duitsland, Oostenrijk, Zwitserland
+    me({ group: 'de', look: { hat: 'tirol' }, id: 'p-teckel', name: 'Teckel', animal: 'perro salchicha', nl: 'teckel', color: '#3f6b3a', trait: 'Klein, eigenwijs en dapper: een echte Dackel.' },
+      beast({ fur: ['#e6a878', '#bd7040', '#8c4a24'], ears: 'none', back: flop('#7a3c1c', '#3e1e0e'), muzzle: '#f4d2ac', mrx: 13.5, mry: 13, my: 85, mouthY: 87, ny: 76, noseCol: '#22140e',
+        marks: '<ellipse cx="42" cy="52" rx="4" ry="2.6" fill="#f4d2ac"/><ellipse cx="78" cy="52" rx="4" ry="2.6" fill="#f4d2ac"/>', wear: { kind: 'shirt', a: '#f6f1e6', b: '#ddd4c2', trim: '#fff', inner: '#3f6b3a', btn: '#8a7a5a' } })),
+    me({ group: 'de', id: 'p-egel', name: 'Egel', animal: 'erizo', nl: 'egel', color: '#8f6642', trait: 'Een beetje stekelig van buiten, heel zacht van binnen.' },
+      beast({ fur: ['#fdeed2', '#efd4a6', '#c9a470'], ears: 'tiny', earIn: '#e8a8a0', under: spikes, muzzle: '#fff8ea', mrx: 12.5, mry: 11, noseCol: '#2a1a12',
+        marks: '<path d="M24 56C26 38 44 30 60 30C76 30 94 38 96 56C90 46 82 43 76 46C72 40 66 38 60 42C54 38 48 40 44 46C38 43 30 46 24 56Z" fill="#8f6642"/><path d="M36 40l3-5 2 6M50 35l3-5 2 6M65 35l3-5 2 6M79 40l3-5 2 6" fill="none" stroke="#5a3a22" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>',
+        wear: { kind: 'tee', a: '#c9283b', b: '#a01f30', trim: '#fff4e6' } })),
+    me({ group: 'de', id: 'p-beer', name: 'Beer', animal: 'oso pardo', nl: 'bruine beer', color: '#7a5030', trait: 'Groot, goedmoedig en dol op honing. Het wapendier van Berlijn.' },
+      beast({ fur: ['#b88860', '#86583a', '#5a3824'], ears: 'round', earIn: '#d9a882', muzzle: '#ecd0a8', mrx: 16, mry: 12.5, noseCol: '#22140e', marks: brow('#5a3824'), wear: { kind: 'stripes', a: '#2a2a33', b: '#18181f', trim: '#c9283b', trim2: '#ffd23f' } })),
+    me({ group: 'de', id: 'p-marmot', name: 'Marmot', animal: 'marmota', nl: 'marmot', color: '#a88a68', trait: 'Fluit vrolijk over de alpenweide en houdt van een lang dutje.' },
+      beast({ fur: ['#e0c8a6', '#b0906a', '#7e6446'], ears: 'tiny', earIn: '#5a4430', cheeks: '#f6e8d2', nose: 'rabbit', noseCol: '#3a2a20', ny: 76, mouthY: 84, mw: 5,
+        marks: '<path d="M30 46C38 32 82 32 90 46C80 40 70 38 60 38C50 38 40 40 30 46Z" fill="#6a5038" opacity=".55"/>', front: ACC.whisk('#6a5038'),
+        top: '<g class="m-closed"><path d="M56.6 87.6h6.8v4.2q0 1.4-1.4 1.4h-4q-1.4 0-1.4-1.4Z" fill="#fff" stroke="#b8a890" stroke-width=".7"/><path d="M60 87.6v5.4" stroke="#b8a890" stroke-width=".7"/></g>',
+        wear: { kind: 'vest', a: '#f6f1e6', b: '#ddd4c2', trim: '#3f6b3a' } })),
+    me({ group: 'de', look: { neck: 'barrel' }, id: 'p-bernard', name: 'Sint-bernard', animal: 'san bernardo', nl: 'sint-bernard', color: '#a85a2a', trait: 'Reddingshond uit de Alpen: groot, zacht en altijd bij je in de buurt.' },
+      beast({ fur: ['#ffffff', '#f6f1ea', '#d8cec2'], ears: 'none', back: flop('#8a4a22', '#4a2410'), muzzle: '#ffffff', mrx: 17, mry: 13.5, my: 85, mouthY: 87, ny: 75, noseCol: '#1e1410',
+        marks: mir('<path d="M21 62C19 46 30 33 50 31C56 36 56 48 53 60C51 72 44 80 34 81C27 80 22 72 21 62Z" fill="#a85a2a"/><path d="M33 46C38 42 46 42 50 46" fill="none" stroke="#7a3c18" stroke-width="1.4" stroke-linecap="round" opacity=".5"/>'),
+        wear: { kind: 'tee', a: '#c9283b', b: '#a01f30', trim: '#fff' } })),
+    me({ group: 'de', id: 'p-steenbok', name: 'Steenbok', animal: 'íbice', nl: 'steenbok', color: '#80603a', trait: 'Klimt overal tegenop: geen berg is te steil.' },
+      beast({ fur: ['#e0c09a', '#b48e60', '#84623c'], ears: 'side', earIn: '#f0d8c0', muzzle: '#f6e8d4', mrx: 13, mry: 13, my: 86, mouthY: 88, ny: 77, noseCol: '#2a1a12',
+        under: '<path d="M52 96Q60 116 68 96Z" fill="#84623c" stroke="#4a3420" stroke-width="1.1" stroke-linejoin="round"/>',
+        back: mir('<path d="M46 36C44 22 36 8 18 2C16 4 16 6 18 8C28 14 32 26 34 40Z" fill="#9a8a74" stroke="#4a4034" stroke-width="1.3" stroke-linejoin="round"/><path d="M24 7l-2.5 4M30 12l-3.5 3.5M35 19l-4 2.6M38.5 27l-4.6 1.8" stroke="#4a4034" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>'),
+        marks: '<path d="M60 31C56 42 56 52 58 62H62C64 52 64 42 60 31Z" fill="#84623c" opacity=".4"/>', wear: { kind: 'tee', a: '#c9283b', b: '#a01f30', trim: '#fff' } })),
+    // Frankrijk
+    me({ group: 'fr', look: { neck: 'scarf' }, id: 'p-haan', name: 'Haan', animal: 'gallo', nl: 'haan', color: '#1f4f9e', trait: 'Vroeg op en trots: cocorico! Het symbool van Frankrijk.' },
+      bird({ fur: ['#fffaf0', '#f8e6c6', '#e0bc8c'], beak: '#ffc93a', beak2: '#d9940e', wear: { kind: 'tee', a: '#3a78d6', b: '#1f4f9e', trim: '#fff' },
+        back: '<g fill="#e02c3c" stroke="#8e1420" stroke-width="1.2"><circle cx="46" cy="27" r="8.5"/><circle cx="74" cy="27" r="8.5"/><circle cx="60" cy="20" r="11"/></g><ellipse cx="56" cy="15" rx="4" ry="2.2" fill="#fff" opacity=".3" transform="rotate(-20 56 15)"/>',
+        front: '<g fill="#e02c3c" stroke="#8e1420" stroke-width="1"><path d="M55.5 84C51 86 50 93 54 96C58 95 59 89 58 85Z"/><path d="M64.5 84C69 86 70 93 66 96C62 95 61 89 62 85Z"/></g>', eyes: { iris: '#b8621a' } })),
+    me({ group: 'fr', id: 'p-bulldog', name: 'Franse bulldog', animal: 'bulldog francés', nl: 'Franse bulldog', color: '#5a4a52', trait: 'Klein, stoer en een beetje koppig. Snurkt tijdens de les.' },
+      beast({ fur: ['#efe2cf', '#d2bea2', '#a48e74'], ears: 'big', earIn: '#f2b6b8', muzzle: '#4a3c3c', mrx: 19, mry: 12.5, my: 84, mouthY: 87, ny: 74, noseCol: '#151010', line: '#e8c8c0',
+        marks: '<path d="M60 31C57 42 57 56 59 68H61C63 56 63 42 60 31Z" fill="#fff" opacity=".75"/><path d="M53 66Q60 62 67 66" fill="none" stroke="#8a765e" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>',
+        wear: { kind: 'stripes', a: '#fbfbfd', b: '#dfe2ea', trim: '#26375e', trim2: '#26375e' } })),
+    me({ group: 'fr', look: { hat: 'bow' }, id: 'p-poedel', name: 'Poedel', animal: 'caniche', nl: 'poedel', color: '#f0789f', trait: 'Chic gekapt en slimmer dan je denkt.' },
+      beast({ fur: ['#ffffff', '#f8eef2', '#e0cfd8'], ears: 'none', muzzle: '#ffffff', mrx: 13, mry: 12, noseCol: '#2a1a22', eyes: { lash: true },
+        back: fluff([[20, 60, 11], [17, 74, 10], [24, 85, 9], [100, 60, 11], [103, 74, 10], [96, 85, 9]]) + curls([[19, 60], [18, 74], [101, 60], [102, 74]]),
+        marks: fluff([[44, 33, 10], [60, 24, 13], [76, 33, 10], [52, 38, 9], [68, 38, 9]]) + curls([[48, 29], [60, 19], [72, 29], [60, 34]]),
+        wear: { kind: 'tee', a: '#f0789f', b: '#d14f8a', trim: '#fff' } })),
+    // Turkije
+    me({ group: 'tr', tail: 'cat', id: 'p-vankat', name: 'Van-kat', animal: 'gato Van', nl: 'Van-kat', color: '#c9743a', trait: 'Witte kat uit Van met één blauw en één goudkleurig oog. Houdt zelfs van zwemmen.' },
+      beast({ fur: ['#ffffff', '#f6f3ee', '#dad3c8'], ears: 'point', earIn: '#f6b6c4', cheeks: '#ffffff', nose: 'cat', noseCol: '#e87a98', eyes: { iris: '#3a9be0', iris2: '#e0a020', r: 7.6 },
+        back: mir('<path d="M27 50C22 36 22 22 29 14C38 17 47 26 51 34Z" fill="#c9743a"/><path d="M30 44C27 34 27 25 31 20C37 23 42 28 45 34Z" fill="#f6b6c4"/>'),
+        marks: mir('<path d="M27 50C28 40 36 33 50 31C52 36 50 42 44 46C38 49 32 51 27 50Z" fill="#c9743a"/>'), front: ACC.whisk('#a89e90'),
+        wear: { kind: 'tee', a: '#e02c3c', b: '#b01c2a', trim: '#fff' } })),
+    me({ group: 'tr', look: { neck: 'nazar' }, id: 'p-kangal', name: 'Kangal', animal: 'kangal', nl: 'kangal', color: '#b08c5a', trait: 'Trouwe herdershond uit Anatolië. Groot, kalm en waakzaam.' },
+      beast({ fur: ['#f6e2c0', '#dcbe90', '#b49060'], ears: 'none', back: flop('#3e3230', '#1a1414'), muzzle: '#40332f', mrx: 16, mry: 13, my: 84, mouthY: 87, ny: 75, noseCol: '#120c0c', line: '#e8c8b8',
+        marks: brow('#b49060', 51), wear: { kind: 'vest', a: '#f6f1e6', b: '#ddd4c2', trim: '#1d8a9a' } })),
+    // Engelstalige landen
+    me({ group: 'en', id: 'p-arend', name: 'Zeearend', animal: 'águila calva', nl: 'zeearend', color: '#26375e', trait: 'Scherpe blik, groot hart. Het nationale dier van de VS.' },
+      bird({ fur: ['#ffffff', '#f4f1ec', '#d4cdc2'], hook: true, beak: '#ffc93a', beak2: '#d9940e', wear: { kind: 'tee', a: '#3a4a7a', b: '#26375e', trim: '#c9283b' },
+        back: '<g fill="URL_F"><path d="M44 36L40 16 52 30Z"/><path d="M53 33L56 10 64 30Z"/><path d="M66 32L76 14 76 34Z"/></g>', marks: brow('#8a7c68', 53), eyes: { iris: '#e0a020' } })),
+    me({ group: 'en', tail: 'ringed', id: 'p-wasbeer', name: 'Wasbeer', animal: 'mapache', nl: 'wasbeer', color: '#6e6a64', trait: 'Slim boefje met een maskertje. Wast alles netjes voor het eten.' },
+      beast({ fur: ['#d2cfca', '#a09a92', '#726d66'], ears: 'point', earIn: '#3a3632', muzzle: '#f8f6f2', mrx: 15, mry: 12, noseCol: '#1e1a18',
+        marks: '<path d="M24 62C30 54 50 54 60 62C70 54 90 54 96 62C92 72 76 74 66 68L60 66 54 68C44 74 28 72 24 62Z" fill="#2e2a26"/><path d="M38 50Q60 44 82 50" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".7" fill="none"/>', eyes: { iris: '#7a5a3a' }, front: ACC.whisk('#5a544c'),
+        wear: { kind: 'shirt', a: '#c9283b', b: '#a01f30', trim: '#e8344e', inner: '#fff' } })),
+    me({ group: 'en', id: 'p-roodborst', name: 'Roodborstje', animal: 'petirrojo', nl: 'roodborstje', color: '#f2793a', trait: 'Klein, rond en nieuwsgierig. De lievelingsvogel van de Britten.' },
+      bird({ fur: ['#d6b890', '#a47e58', '#74563a'], beak: '#4a3a30', beak2: '#2a1e18', wear: { kind: 'tee', a: '#3a9d5d', b: '#2a7a44', trim: '#fff4e6' },
+        marks: '<path d="M27 62C29 48 44 43 60 48C76 43 91 48 93 62C96 80 84 98 60 99.5C36 98 24 80 27 62Z" fill="#f58a44"/><path d="M36 86C44 95 76 95 84 86C78 97 70 99.5 60 99.5C50 99.5 42 97 36 86Z" fill="#fff3e0" opacity=".8"/>' })),
+    me({ group: 'en', look: { hat: 'crown' }, id: 'p-corgi', name: 'Corgi', animal: 'corgi', nl: 'corgi', color: '#f09a44', trait: 'Korte pootjes, grote oren en een koninklijke glimlach.' },
+      beast({ fur: ['#ffcf94', '#f2a04c', '#cc742c'], ears: 'big', earIn: '#f8d2bc', muzzle: '#ffffff', mrx: 16, mry: 13, noseCol: '#1e1410',
+        marks: '<path d="M60 30.5C54 40 53 54 55 68H65C67 54 66 40 60 30.5Z" fill="#fff"/>', wear: { kind: 'tee', a: '#9a6ad8', b: '#7046b0', trim: '#ffd23f' } })),
+    // Nederland
+    me({ group: 'nl', look: { shoes: 'klompen' }, id: 'p-koe', name: 'Koe', animal: 'vaca', nl: 'koe', color: '#3a78d6', trait: 'Zwartbont en kalm. Staat het liefst in de wei, met uitzicht op een molen.' },
+      beast({ fur: ['#ffffff', '#f6f3ef', '#d8d2ca'], ears: 'side', earIn: '#f6b8c4', muzzle: '#f8c2cc', mrx: 19, mry: 12.5, my: 85, mouthY: 87, nose: 'dots', noseCol: '#b8627a', ny: 78, line: '#a84a66',
+        back: mir('<path d="M40 35C34 32 28 24 29 14C36 16 43 23 47 31Z" fill="#f4e8cc" stroke="#9a8a68" stroke-width="1.2" stroke-linejoin="round"/>'),
+        marks: '<path d="M22 60C20 46 30 34 48 31C56 36 58 48 54 60C50 70 42 76 32 76C26 74 23 68 22 60Z" fill="#2e2a30"/><path d="M78 31.5C88 34 96 42 99 54C94 56 86 54 82 48C78 42 76 36 78 31.5Z" fill="#2e2a30"/><path d="M52 31C56 26 64 26 68 31C64 34 56 34 52 31Z" fill="URL_F"/>',
+        wear: { kind: 'tee', a: '#f28c1b', b: '#d96a0a', trim: '#fff' } })),
+    me({ group: 'nl', id: 'p-zeehond', name: 'Zeehond', animal: 'foca', nl: 'zeehond', color: '#7e8c9a', trait: 'Ligt graag op een zandbank in de Waddenzee te zonnen.' },
+      beast({ fur: ['#e6ecf2', '#b4c0cc', '#8290a0'], ears: 'none', muzzle: '#f2f5f8', mrx: 18, mry: 12.5, my: 83, ny: 74, noseCol: '#2a2e36', eyes: { r: 8.2, dx: 18.5, col: '#16141c', iris: '#3e3a52' },
+        marks: SPOTS('#6a7888', [[40, 40, 2.2], [52, 36, 1.5], [72, 38, 2], [84, 44, 1.5], [28, 56, 1.6], [92, 58, 1.8], [62, 44, 1.3]]) + brow('#6a7888', 50), front: ACC.whisk('#5a6672'),
+        wear: { kind: 'stripes', a: '#fbfbfd', b: '#dfe2ea', trim: '#3a78d6', trim2: '#3a78d6' } })),
+    me({ group: 'nl', id: 'p-ooievaar', name: 'Ooievaar', animal: 'cigüeña', nl: 'ooievaar', color: '#e8472e', trait: 'Bouwt elk jaar hetzelfde nest en brengt geluk.' },
+      bird({ fur: ['#ffffff', '#f6f4f0', '#d6d0c8'], long: true, beak: '#f0552e', beak2: '#b8361a', wear: { kind: 'tee', a: '#3a3a46', b: '#22222b', trim: '#fff' },
+        back: '<g fill="URL_F"><path d="M50 34L46 18 58 30Z"/><path d="M60 31L64 12 70 32Z"/></g>', eyes: { r: 6.6, iris: '#6a3a2a' } }))
+  );
+  const GROUPS = [['', 'Klassiekers', null], ['latam', '🌎 Latijns-Amerika', 'es'], ['de', '🇩🇪 Duitsland, Oostenrijk en Zwitserland', 'de'], ['fr', '🇫🇷 Frankrijk', 'fr'], ['tr', '🇹🇷 Turkije', 'tr'], ['en', '🇬🇧 🇺🇸 Engelstalige landen', 'en'], ['nl', '🇳🇱 Nederland', 'nl']];
+
   /* Vaste stem per personage (edge-tts, gebruikt door tools/tts-texts.js voor de dialoogopnames): stem, toonhoogte, tempo. */
   const V = (v, pitch = 0, rate = 0) => ({ v: v + 'Neural', pitch, rate });
   const VOICE = {
@@ -623,38 +735,71 @@
 
   /* ---------- jouw personage aanpassen: hoedje, bril, iets om je hals, shirtkleur ---------- */
   const LOOKS = {
-    hat: [['', 'Geen'], ['cap', 'Pet'], ['sun', 'Zonnehoed'], ['beret', 'Baret'], ['chullo', 'Muts'], ['sombrero', 'Sombrero'], ['party', 'Feesthoedje'], ['flower', 'Bloem'], ['bow', 'Strik']],
-    glasses: [['', 'Geen'], ['round', 'Brilletje'], ['sun', 'Zonnebril'], ['star', 'Sterrenbril']],
-    neck: [['', 'Niets'], ['scarf', 'Sjaal'], ['bowtie', 'Vlinderdas'], ['beads', 'Ketting']],
+    hat: [['', 'Geen'], ['cap', 'Pet'], ['sun', 'Zonnehoed'], ['beret', 'Baret'], ['chullo', 'Muts'], ['sombrero', 'Sombrero'], ['party', 'Feesthoedje'], ['flower', 'Bloem'], ['bow', 'Strik'],
+      ['tirol', 'Tiroler hoedje'], ['boater', 'Strohoed'], ['fez', 'Fez'], ['bowler', 'Bolhoed'], ['cowboy', 'Cowboyhoed'], ['crown', 'Kroontje'], ['beanie', 'Oranje muts']],
+    glasses: [['', 'Geen'], ['round', 'Brilletje'], ['sun', 'Zonnebril'], ['star', 'Sterrenbril'], ['heart', 'Hartjesbril'], ['monocle', 'Monocle']],
+    neck: [['', 'Niets'], ['scarf', 'Sjaal'], ['bowtie', 'Vlinderdas'], ['beads', 'Ketting'], ['tie', 'Stropdas'], ['bandana', 'Bandana'], ['bell', 'Koebel'], ['barrel', 'Vaatje'], ['nazar', 'Nazar-kraal']],
     build: [['slim', 'Slank'], ['', 'Normaal'], ['stout', 'Stevig']],
     shirt: [['', 'Standaard'], ['orange', '#f28c1b', '#d96a0a'], ['red', '#e8344e', '#b51d3a'], ['pink', '#f0789f', '#d14f8a'], ['purple', '#9a6ad8', '#7046b0'],
-      ['blue', '#3a78d6', '#1f4f9e'], ['teal', '#2fa79a', '#1d7a70'], ['green', '#3a9d5d', '#2a7a44'], ['yellow', '#ffd23f', '#f2a81d'], ['black', '#3a3a46', '#22222b']]
+      ['blue', '#3a78d6', '#1f4f9e'], ['teal', '#2fa79a', '#1d7a70'], ['green', '#3a9d5d', '#2a7a44'], ['yellow', '#ffd23f', '#f2a81d'], ['black', '#3a3a46', '#22222b'], ['white', '#fbfbfd', '#dfe2ea']],
+    print: [['', 'Standaard'], ['stripes', 'Bretonse streep'], ['check', 'Ruitje'], ['braces', 'Bretels'], ['tulips', 'Tulpen'], ['stars', 'Sterren'], ['kilim', 'Kelim'], ['hearts', 'Hartjes']],
+    shoes: [['', 'Standaard'], ['sneakers', 'Sneakers'], ['boots', 'Laarzen'], ['klompen', 'Klompen']]
   };
   const shirtOf = k => LOOKS.shirt.find(x => x[0] === k && k);
+  const star = (x, y, r, col, op = 1) => `<path d="M${x} ${y - r}L${(x + r * .29).toFixed(1)} ${(y - r * .31).toFixed(1)}L${x + r} ${(y - r * .27).toFixed(1)}L${(x + r * .46).toFixed(1)} ${(y + r * .23).toFixed(1)}L${(x + r * .65).toFixed(1)} ${y + r}L${x} ${(y + r * .54).toFixed(1)}L${(x - r * .65).toFixed(1)} ${y + r}L${(x - r * .46).toFixed(1)} ${(y + r * .23).toFixed(1)}L${x - r} ${(y - r * .27).toFixed(1)}L${(x - r * .29).toFixed(1)} ${(y - r * .31).toFixed(1)}Z" fill="${col}" opacity="${op}"/>`;
+  const heart = (x, y, r, col, op = 1) => `<path d="M${x} ${y + r}C${x - r * 1.5} ${y - r * .1} ${x - r * .7} ${y - r * 1.2} ${x} ${y - r * .35}C${x + r * .7} ${y - r * 1.2} ${x + r * 1.5} ${y - r * .1} ${x} ${y + r}Z" fill="${col}" opacity="${op}"/>`;
+  /* Opdruk op het shirt: wordt in de vorm van het shirt geknipt (ook in het hele lijf), loopt daarom door tot y=160. */
+  const SPOTS_AT = [[30, 104], [48, 110], [72, 110], [90, 104], [38, 122], [60, 124], [82, 122], [30, 138], [50, 140], [70, 140], [90, 138]];
+  const PRINTS = {
+    stripes: (ink) => `<g fill="none" stroke="${ink}" stroke-width="3">${Array.from({ length: 9 }, (_, i) => `<path d="M10 ${98 + i * 7.4}Q60 ${109 + i * 7.4} 110 ${98 + i * 7.4}"/>`).join('')}</g>`,
+    check: (ink) => `<g stroke="${ink}" opacity=".5"><g stroke-width="4.6">${[26, 37.4, 48.8, 60.2, 71.6, 83, 94.4].map(x => `<path d="M${x} 90V162"/>`).join('')}</g><g stroke-width="4.6" fill="none">${Array.from({ length: 6 }, (_, i) => `<path d="M10 ${99 + i * 11.4}Q60 ${107 + i * 11.4} 110 ${99 + i * 11.4}"/>`).join('')}</g></g>`,
+    braces: () => `<g fill="none" stroke="#5a3a1c" stroke-width="7"><path d="M43 92C41 110 42 130 44 152M77 92C79 110 78 130 76 152"/></g><g fill="none" stroke="#8a5c2c" stroke-width="4.4"><path d="M43 92C41 110 42 130 44 152M77 92C79 110 78 130 76 152"/></g><rect x="40" y="110" width="40" height="10" rx="3" fill="#8a5c2c" stroke="#5a3a1c" stroke-width="1.3"/><g transform="translate(60 115)">${[0, 60, 120, 180, 240, 300].map(d => `<ellipse cx="0" cy="-2.6" rx="1.3" ry="2.4" transform="rotate(${d})" fill="#fff"/>`).join('')}<circle r="1.4" fill="#f2c14e"/></g><g fill="#f2c14e"><circle cx="43.6" cy="143" r="1.6"/><circle cx="76.4" cy="143" r="1.6"/></g>`,
+    tulips: () => SPOTS_AT.map(([x, y], i) => { const c = ['#e8344e', '#ffd23f', '#f0789f', '#fff'][i % 4]; return `<path d="M${x} ${y + 1}v6.5M${x} ${y + 5.5}q-3.4 -.6 -3.6 -3.2" fill="none" stroke="#2a8a48" stroke-width="1.3" stroke-linecap="round"/><path d="M${x - 3} ${y - 3.4}Q${x - 1.6} ${y - 1.6} ${x} ${y - 4.4}Q${x + 1.6} ${y - 1.6} ${x + 3} ${y - 3.4}Q${x + 3.6} ${y + 2} ${x} ${y + 2.2}Q${x - 3.6} ${y + 2} ${x - 3} ${y - 3.4}Z" fill="${c}"/>`; }).join(''),
+    stars: (ink) => SPOTS_AT.map(([x, y], i) => star(x, y, i % 2 ? 3 : 4.2, ink, .95)).join(''),
+    hearts: (ink) => SPOTS_AT.map(([x, y], i) => heart(x, y - 1, i % 2 ? 2.6 : 3.4, ink, .95)).join(''),
+    kilim: () => [104, 134].map(y => `<path d="M8 ${y - 5}Q60 ${y + 5} 112 ${y - 5}V${y + 6}Q60 ${y + 16} 8 ${y + 6}Z" fill="#b01c2a"/><g fill="none" stroke-linejoin="round"><path d="M${Array.from({ length: 14 }, (_, i) => `${12 + i * 7.4} ${(y + (i % 2 ? 9 : 1) + 5 * Math.sin((12 + i * 7.4 - 8) / 104 * Math.PI)).toFixed(1)}`).join('L')}" stroke="#f6e7c4" stroke-width="1.8"/><path d="M8 ${y - 5}Q60 ${y + 5} 112 ${y - 5}M8 ${y + 6}Q60 ${y + 16} 112 ${y + 6}" stroke="#1d8a9a" stroke-width="2.2"/></g><g fill="#f2b134">${[34, 60, 86].map(x => { const yy = y + 5.2 + 5 * Math.sin((x - 8) / 104 * Math.PI) - 1; return `<path d="M${x} ${(yy - 2.6).toFixed(1)}l2.6 2.6-2.6 2.6-2.6-2.6Z"/>`; }).join('')}</g>`).join('')
+  };
   function lookParts(look, c) {
     look = Object.assign({}, c.look || {}, look || {});
     const sh = shirtOf(look.shirt), col = sh ? sh[1] : c.color || '#e2603a', col2 = sh ? sh[2] : '#ffd23f';
     const acc = ['red', 'pink', 'orange'].includes(look.shirt) ? '#ffd23f' : '#e8344e'; // sjaal en strikje: altijd goed zichtbaar op het shirt
+    const light = ['white', 'yellow'].includes(look.shirt); // opdruk: donkerblauw op een licht shirt, anders wit
     const HATS = {
       cap: () => HAT.cap(col), sun: () => `<g transform="translate(0 -6)">${HAT.sun()}</g>`, sombrero: () => `<g transform="translate(0 -4)">${HAT.sombrero()}</g>`,
-      beret: () => `<path d="M26 40C30 22 90 22 94 40C84 34 36 34 26 40Z" fill="#26375e"/><path d="M25 41C38 32 82 32 95 41C94 45 90 46 86 44C74 39 46 39 34 44C30 46 26 45 25 41Z" fill="#1d2a4a"/><circle cx="60" cy="24" r="2.6" fill="#26375e"/>`,
+      beret: () => `<path d="M26 40C30 22 90 22 94 40C84 34 36 34 26 40Z" fill="#26375e"/><path d="M25 41C38 32 82 32 95 41C94 45 90 46 86 44C74 39 46 39 34 44C30 46 26 45 25 41Z" fill="#1d2a4a"/><circle cx="60" cy="24" r="2.6" fill="#26375e"/><path d="M36 33Q48 27 62 27" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".18"/>`,
       chullo: () => HAT.chullo(col, col2),
       party: () => `<path d="M44 36L60 2 76 36Z" fill="${col}"/><path d="M48 28L72 28M52 19H68" stroke="#fff" stroke-width="2.4" opacity=".8"/><circle cx="60" cy="3" r="4.2" fill="${col2}"/><path d="M42 36Q60 42 78 36" fill="none" stroke="${col2}" stroke-width="3" stroke-linecap="round"/>`,
       flower: () => hib(84, 38, 1.1, col === '#f28c1b' ? '#e8344e' : col),
-      bow: () => `<g transform="translate(16 2) scale(1.4)">${ACC.bow(col)}</g>`
+      bow: () => `<g transform="translate(16 2) scale(1.4)">${ACC.bow(col)}</g>`,
+      tirol: () => `<path d="M17 45Q60 30 103 45Q97 52.5 60 46.5Q23 52.5 17 45Z" fill="#2f5230" stroke="#1c3220" stroke-width="1.1" stroke-linejoin="round"/><path d="M31 43C29 26 40 13 54 14Q60 18 66 14C80 13 91 26 89 43Q60 36 31 43Z" fill="#40703e" stroke="#1c3220" stroke-width="1.1" stroke-linejoin="round"/><path d="M31 38.4Q60 31.4 89 38.4L89 43Q60 36 31 43Z" fill="#e8e0cc"/><path d="M31 40.6Q60 33.6 89 40.6" fill="none" stroke="#c9283b" stroke-width="1.4"/><path d="M40 22Q50 16 58 18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".2"/>
+        <path d="M82 39C84 26 90 14 100 7C101 18 97 30 88 40Z" fill="#fbf6ea" stroke="#9a8f78" stroke-width="1"/><path d="M84 38C88 28 93 18 99 9" fill="none" stroke="#9a8f78" stroke-width="1"/><circle cx="83.5" cy="39.5" r="2.6" fill="#f2c14e" stroke="#9a7418" stroke-width=".8"/>`,
+      boater: () => `<path d="M14 43Q60 30 106 43Q100 51 60 45.5Q20 51 14 43Z" fill="#ecd48c" stroke="#9a7c2c" stroke-width="1.1" stroke-linejoin="round"/><path d="M36 41.5L37 22Q60 15 83 22L84 41.5Q60 35 36 41.5Z" fill="#f8e6ac" stroke="#9a7c2c" stroke-width="1.1" stroke-linejoin="round"/><ellipse cx="60" cy="21" rx="23" ry="4.6" fill="#fdf0c4" stroke="#9a7c2c" stroke-width="1"/><path d="M36.4 33Q60 26.6 83.6 33L84 41.5Q60 35 36 41.5Z" fill="#26375e"/><path d="M36.3 36.6Q60 30.2 83.7 36.6" fill="none" stroke="#e02c3c" stroke-width="1.8"/><g stroke="#c9a84a" stroke-width=".8" opacity=".6"><path d="M22 44.5l5-3M34 47l4-4M82 44l4 3M94 42l4 2.6"/></g>`,
+      fez: () => `<path d="M41 39L45.5 13Q60 9 74.5 13L79 39Q60 33 41 39Z" fill="#cf2436" stroke="#7e1220" stroke-width="1.1" stroke-linejoin="round"/><ellipse cx="60" cy="12.4" rx="14.6" ry="3.4" fill="#e4495a" stroke="#7e1220" stroke-width="1"/><path d="M47 17L44.5 34" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".2"/><path d="M60 12.4Q76 13 81 24V33" fill="none" stroke="#1e1e28" stroke-width="1.7" stroke-linecap="round"/><path d="M79 32.5h4l1.6 10.5h-7.2Z" fill="#1e1e28"/><path d="M79.6 36v6M81 36v6.6M82.4 36v6" stroke="#5a5a6a" stroke-width=".6"/><circle cx="60" cy="12.4" r="1.6" fill="#1e1e28"/>`,
+      bowler: () => `<path d="M20 43Q60 30 100 43Q98 51 60 45.5Q22 51 20 43Z" fill="#22222b" stroke="#0e0e14" stroke-width="1.1" stroke-linejoin="round"/><path d="M32 42C29 20 44 11 60 11S91 20 88 42Q60 35 32 42Z" fill="#30303c" stroke="#0e0e14" stroke-width="1.1" stroke-linejoin="round"/><path d="M32 36.6Q60 29.6 88 36.6L88 42Q60 35 32 42Z" fill="#55556a"/><path d="M39 26C42 18 50 15 58 15" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".22"/>`,
+      cowboy: () => `<path d="M5 37C10 49 34 49 60 45C86 49 110 49 115 37C108 31 98 35 88 40.5Q60 34 32 40.5C22 35 12 31 5 37Z" fill="#a06c36" stroke="#5a3a1a" stroke-width="1.1" stroke-linejoin="round"/><path d="M35 41C32 24 40 12 51 14Q60 21 69 14C80 12 88 24 85 41Q60 34.5 35 41Z" fill="#b98548" stroke="#5a3a1a" stroke-width="1.1" stroke-linejoin="round"/><path d="M34.6 35.8Q60 29.4 85.4 35.8L85 41Q60 34.5 35 41Z" fill="#5a3a1a"/>${star(60, 34.4, 3.4, '#f2c14e')}<path d="M41 24Q46 17 52 17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".22"/>`,
+      crown: () => `<path d="M38 39L35 15 48 26 60 9 72 26 85 15 82 39Q60 33 38 39Z" fill="#f6bd3a" stroke="#a87410" stroke-width="1.2" stroke-linejoin="round"/><path d="M37.4 33Q60 27 82.6 33L82 39Q60 33 38 39Z" fill="#e09a1a"/><circle cx="60" cy="9" r="2.8" fill="#e8344e" stroke="#a87410" stroke-width=".8"/><circle cx="35" cy="15" r="2.2" fill="#3a9be0" stroke="#a87410" stroke-width=".8"/><circle cx="85" cy="15" r="2.2" fill="#3a9be0" stroke="#a87410" stroke-width=".8"/><circle cx="60" cy="33" r="2.4" fill="#e8344e"/><circle cx="46" cy="34.6" r="1.7" fill="#2fa79a"/><circle cx="74" cy="34.6" r="1.7" fill="#2fa79a"/><path d="M43 26l5 5M55 18l3 8" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".4"/>`,
+      beanie: () => `<circle cx="60" cy="10" r="7.6" fill="#fff" stroke="#b8b0a8" stroke-width="1"/><path d="M56 7q2-3 5-2M55 12q1 2 4 2" fill="none" stroke="#b8b0a8" stroke-width=".9" stroke-linecap="round"/><path d="M28 44C26 24 42 13 60 13S94 24 92 44Q60 34 28 44Z" fill="#f58a1e" stroke="#a84e08" stroke-width="1.1" stroke-linejoin="round"/><g stroke="#a84e08" stroke-width="1" opacity=".35"><path d="M44 17L40 36M54 14L52 34M66 14L68 34M76 17L80 36"/></g><path d="M25.6 47Q60 35 94.4 47L93.4 38Q60 26 26.6 38Z" fill="#fff" stroke="#b8b0a8" stroke-width="1" stroke-linejoin="round"/><g stroke="#b8b0a8" stroke-width="1" opacity=".7"><path d="M36 35.4v8.6M46 32.6v8.6M56 31.2v8.6M66 31.4v8.6M76 33v8.6M86 36v8.6"/></g>`
     };
     const GL = {
-      round: () => ACC.glasses('#3b2a20'),
+      round: () => ACC.glasses('#3b2a20') + `<path d="M35 58l4-3M71 58l4-3" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".6"/>`,
       sun: () => `<g><rect x="29" y="55" width="26" height="18" rx="8" fill="#1e1e28"/><rect x="65" y="55" width="26" height="18" rx="8" fill="#1e1e28"/><path d="M55 61Q60 58 65 61M29 60 22 58M91 60 98 58" stroke="#1e1e28" stroke-width="2.4" fill="none"/><path d="M33 59l7 0M69 59l7 0" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/></g>`,
-      star: () => { const st = (x, y) => `<path d="M${x} ${y - 13}L${x + 3.8} ${y - 4}L${x + 13} ${y - 3.5}L${x + 6} ${y + 3}L${x + 8.5} ${y + 12}L${x} ${y + 7}L${x - 8.5} ${y + 12}L${x - 6} ${y + 3}L${x - 13} ${y - 3.5}L${x - 3.8} ${y - 4}Z" fill="${col}" fill-opacity=".35" stroke="${col}" stroke-width="2.4" stroke-linejoin="round"/>`; return st(42, 64) + st(78, 64) + `<path d="M53 62Q60 59 67 62" stroke="${col}" stroke-width="2.2" fill="none"/>`; }
+      star: () => { const st = (x, y) => `<path d="M${x} ${y - 13}L${x + 3.8} ${y - 4}L${x + 13} ${y - 3.5}L${x + 6} ${y + 3}L${x + 8.5} ${y + 12}L${x} ${y + 7}L${x - 8.5} ${y + 12}L${x - 6} ${y + 3}L${x - 13} ${y - 3.5}L${x - 3.8} ${y - 4}Z" fill="${col}" fill-opacity=".35" stroke="${col}" stroke-width="2.4" stroke-linejoin="round"/>`; return st(42, 64) + st(78, 64) + `<path d="M53 62Q60 59 67 62" stroke="${col}" stroke-width="2.2" fill="none"/>`; },
+      heart: () => { const ht = x => `<path d="M${x} 76C${x - 17} 66 ${x - 12} 50 ${x} 58C${x + 12} 50 ${x + 17} 66 ${x} 76Z" fill="#e8344e" fill-opacity=".3" stroke="#e8344e" stroke-width="2.4" stroke-linejoin="round"/><path d="M${x - 6.5} 59.5q-2.4 1.6-2.4 4.6" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity=".7"/>`; return ht(42) + ht(78) + `<path d="M53 61Q60 58 67 61" stroke="#e8344e" stroke-width="2.2" fill="none"/>`; },
+      monocle: () => `<circle cx="78" cy="64" r="11.6" fill="#fff" fill-opacity=".14" stroke="#c9982a" stroke-width="2.2"/><path d="M71 57.5q2.6-2.8 6-3" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".7"/><path d="M88.6 69C96 76 98 88 94 100" fill="none" stroke="#c9982a" stroke-width="1.1" stroke-dasharray="2 1.4"/>`
     };
     const NECK = {
-      scarf: () => `<path d="M34 96Q60 110 86 96L88 104Q60 118 32 104Z" fill="${acc}"/><path d="M72 106L80 124H68Z" fill="${acc}"/><path d="M38 101Q60 112 82 101" stroke="#fff" stroke-width="1.6" stroke-dasharray="3 3" opacity=".7" fill="none"/>`,
-      bowtie: () => `<path d="M60 101L48 95V107ZM60 101L72 95V107Z" fill="${acc}"/><circle cx="60" cy="101" r="2.6" fill="${acc}" stroke="#0002"/>`,
-      beads: () => `<g fill="#f2b134">${Array.from({ length: 11 }, (_, i) => `<circle cx="${40 + i * 4}" cy="${98 + Math.sin(i / 10 * Math.PI) * 7}" r="2.1"/>`).join('')}</g><circle cx="60" cy="107" r="3" fill="#e8344e"/>`
+      scarf: () => `<path d="M34 96Q60 110 86 96L88 104Q60 118 32 104Z" fill="${acc}" stroke="${mix(acc, INK, .45)}" stroke-width="1" stroke-linejoin="round"/><path d="M72 106L80 124H68Z" fill="${acc}" stroke="${mix(acc, INK, .45)}" stroke-width="1" stroke-linejoin="round"/><path d="M38 101Q60 112 82 101" stroke="#fff" stroke-width="1.6" stroke-dasharray="3 3" opacity=".7" fill="none"/>`,
+      bowtie: () => `<path d="M60 101L48 95V107ZM60 101L72 95V107Z" fill="${acc}" stroke="${mix(acc, INK, .45)}" stroke-width="1" stroke-linejoin="round"/><circle cx="60" cy="101" r="2.6" fill="${acc}" stroke="${mix(acc, INK, .45)}"/>`,
+      beads: () => `<g fill="#f2b134" stroke="#a87410" stroke-width=".6">${Array.from({ length: 11 }, (_, i) => `<circle cx="${40 + i * 4}" cy="${98 + Math.sin(i / 10 * Math.PI) * 7}" r="2.1"/>`).join('')}</g><circle cx="60" cy="107" r="3" fill="#e8344e" stroke="#8e1420" stroke-width=".6"/>`,
+      tie: () => `<path d="M55.6 98H64.4L62.6 103.4 66.4 117 60 123.4 53.6 117 57.4 103.4Z" fill="${acc}" stroke="${mix(acc, INK, .45)}" stroke-width="1" stroke-linejoin="round"/><path d="M57.4 103.4H62.6" stroke="${mix(acc, INK, .45)}" stroke-width="1"/><path d="M56 110l8 4M55 114.6l7 3.6" stroke="#fff" stroke-width="1.4" opacity=".55"/>`,
+      bandana: () => `<path d="M35 95.4Q60 108 85 95.4L60 122Z" fill="${acc}" stroke="${mix(acc, INK, .45)}" stroke-width="1" stroke-linejoin="round"/><g fill="#fff" opacity=".85"><circle cx="50" cy="104.6" r="1.2"/><circle cx="60" cy="106.6" r="1.2"/><circle cx="70" cy="104.6" r="1.2"/><circle cx="55" cy="111" r="1.2"/><circle cx="65" cy="111" r="1.2"/><circle cx="60" cy="116" r="1.2"/></g>`,
+      bell: () => `<path d="M37 96.4Q60 109 83 96.4" fill="none" stroke="#6a3a18" stroke-width="5" stroke-linecap="round"/><path d="M37 96.4Q60 109 83 96.4" fill="none" stroke="#a8642c" stroke-width="2.6" stroke-linecap="round"/><path d="M53 105.6H67L70.6 119.4Q60 122.6 49.4 119.4Z" fill="#f6bd3a" stroke="#a87410" stroke-width="1.1" stroke-linejoin="round"/><rect x="56" y="103" width="8" height="3.6" rx="1.4" fill="#a8642c" stroke="#6a3a18" stroke-width=".8"/><circle cx="60" cy="121.6" r="2.2" fill="#a87410"/><path d="M55.4 108.6L53.4 117" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".5"/>`,
+      barrel: () => `<path d="M37 96.4Q60 109 83 96.4" fill="none" stroke="#6a3a18" stroke-width="4.4" stroke-linecap="round"/><rect x="48" y="104" width="24" height="15" rx="6.4" fill="#b8763a" stroke="#6a3a18" stroke-width="1.1"/><path d="M54 104.4V118.6M66 104.4V118.6" stroke="#e6e2da" stroke-width="2.2"/><path d="M52 108Q60 106.4 68 108" fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" opacity=".4"/><circle cx="60" cy="111.6" r="1.6" fill="#6a3a18"/>`,
+      nazar: () => `<path d="M38 96Q60 108 82 96" fill="none" stroke="#3a3a46" stroke-width="1.5" stroke-linecap="round"/><circle cx="60" cy="108.6" r="7" fill="#1f4fbf" stroke="#12307a" stroke-width="1"/><circle cx="60" cy="108.6" r="4.6" fill="#fff"/><circle cx="60" cy="108.6" r="3" fill="#6ac4f0"/><circle cx="60" cy="108.6" r="1.5" fill="#16161e"/><path d="M55.4 105.4q1.6-2 4-2.4" fill="none" stroke="#fff" stroke-width="1.1" stroke-linecap="round" opacity=".7"/>`
     };
     return {
       shirt: sh, neck: look.neck && NECK[look.neck] ? NECK[look.neck]() : '',
+      print: look.print && PRINTS[look.print] ? PRINTS[look.print](light ? '#26375e' : '#ffffff') : '',
       hat: look.hat && HATS[look.hat] ? HATS[look.hat]() : '', glasses: look.glasses && GL[look.glasses] ? GL[look.glasses]() : ''
     };
   }
@@ -680,28 +825,71 @@
       belly: '<path d="M22 138Q60 160 98 138" fill="none" stroke="#000" stroke-width="3" opacity=".08"/><ellipse cx="52" cy="124" rx="16" ry="8" fill="#fff" opacity=".07"/>' }
   };
   const buildOf = (c, look) => BUILD[(c.player && look && look.build) || ''] || BUILD[''];
-  function fullBody(c, u, look, cloth) {
+  // kleuren mengen (voor omlijning en schaduw: een donkere tint van de vacht of de kleding)
+  function mix(a, b, t) {
+    if (!/^#[0-9a-f]{6}$/i.test(a || '')) return b;
+    const px = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), A = px(a), B = px(b);
+    return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join('');
+  }
+  const INK = '#221620';
+  /* Schoenen (alleen bij het hele lijf). x = midden van het been, i = 0 links, 1 rechts. */
+  const SHOES = {
+    '': (x, i, col) => { const a = x - (i ? 7 : 11), b = x + (i ? 11 : 7), ink = mix(col, INK, .5); return `<path d="M${a} 171Q${a} 164.5 ${x} 164.5Q${b} 164.5 ${b} 171.5Q${x} 176 ${a} 171Z" fill="${col}" stroke="${ink}" stroke-width="1.1" stroke-linejoin="round"/>
+      <path d="M${a + .6} 171.6Q${x} 176 ${b - .6} 171.9" fill="none" stroke="${mix(col, '#f6ead8', .75)}" stroke-width="1.7" stroke-linecap="round"/>
+      <path d="M${x - 3} 167.2h6M${x - 2.4} 169.4h4.8" stroke="#fff" stroke-width=".9" stroke-linecap="round" opacity=".6"/><ellipse cx="${x + (i ? 5 : -5)}" cy="167.4" rx="2.6" ry="1.3" fill="#fff" opacity=".22"/>`; },
+    klompen: (x, i) => { const sd = i ? 1 : -1, t = x + sd * 13; return `<path d="M${x - sd * 7} 171.5C${x - sd * 8} 163 ${x + sd * 2} 162 ${x + sd * 7} 165.5C${x + sd * 10} 167 ${t} 165 ${t + sd * 1.5} 162.5C${t + sd * 2.5} 168 ${t - sd * 2} 175 ${x + sd * 2} 175.5C${x - sd * 4} 176 ${x - sd * 7} 174.5 ${x - sd * 7} 171.5Z" fill="#f6cf52" stroke="#a87a18" stroke-width="1.1" stroke-linejoin="round"/>
+      <path d="M${x - sd * 5} 166.5Q${x} 163.5 ${x + sd * 5} 166.5" fill="none" stroke="#a87a18" stroke-width="1" stroke-linecap="round"/><circle cx="${x + sd * 6.5}" cy="169.6" r="1.7" fill="#e8344e"/><path d="M${x + sd * 6.5} 171.2v2.2" stroke="#3a9d5d" stroke-width="1" stroke-linecap="round"/><path d="M${x - sd * 5} 172.6Q${x + sd * 2} 174.4 ${x + sd * 9} 172" fill="none" stroke="#fff" stroke-width=".9" opacity=".5" stroke-linecap="round"/>`; },
+    sneakers: (x, i, col, acc) => { const a = x - (i ? 7 : 11), b = x + (i ? 11 : 7), sd = i ? 1 : -1; return `<path d="M${a} 170.5Q${a} 163.5 ${x} 163.5Q${b} 164 ${b} 171Q${x} 174.5 ${a} 170.5Z" fill="#fbfbfd" stroke="#8d8d9c" stroke-width="1.1" stroke-linejoin="round"/>
+      <path d="M${a + .3} 171.2Q${x} 176.6 ${b - .3} 171.6" fill="none" stroke="${acc}" stroke-width="2.4" stroke-linecap="round"/><path d="M${x - sd * 1} 164.6L${x + sd * 5} 170.6" stroke="${acc}" stroke-width="2" stroke-linecap="round"/>
+      <path d="M${x - sd * 5.5} 166.4l3.4 1.2M${x - sd * 6} 168.6l3.4 1" stroke="#8d8d9c" stroke-width=".9" stroke-linecap="round"/>`; },
+    boots: (x, i) => { const a = x - (i ? 7.5 : 11), b = x + (i ? 11 : 7.5); return `<path d="M${x - 7.6} 154.5H${x + 7.6}V166Q${b} 166 ${b} 171.5Q${x} 176 ${a} 171.4Q${a} 166 ${x - 7.6} 165.5Z" fill="#9a5c2e" stroke="#5a3214" stroke-width="1.1" stroke-linejoin="round"/>
+      <path d="M${x - 7.6} 157.6H${x + 7.6}" stroke="#f2c14e" stroke-width="1.6"/><path d="M${a + .6} 172Q${x} 176.4 ${b - .6} 172.2" fill="none" stroke="#5a3214" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M${x - 3} 161.5l3 2.6 3-2.6" fill="none" stroke="#f6dfae" stroke-width=".9" stroke-linecap="round" opacity=".8"/><ellipse cx="${x + (i ? 5 : -5)}" cy="168" rx="2.6" ry="1.3" fill="#fff" opacity=".2"/>`; }
+  };
+  function fullBody(c, u, look, cloth, ink) {
     const bird = c.kind === 'bird', fem = !!c.female && !c.player;
     const B = buildOf(c, look);
     const pants = c.pants || (c.player ? '#3a4a6a' : fem ? null : '#4a3e36');
     const shoe = c.shoe || '#4a2e22';
+    const cInk = mix(cloth, INK, .5), pInk = pants ? mix(pants, INK, .55) : ink;
     const tail = TAILS[c.tail || TAIL_OF[c.id]];
+    const lk = Object.assign({}, c.look, look), shoeKind = c.player && SHOES[lk.shoes] ? lk.shoes : '';
     const [lx, rx, hw] = B.leg;
-    const legs = [lx, rx].map((x, i) => `<path d="M${x - hw} 146V170Q${x} 174 ${x + hw} 170V146Z" fill="${pants || u('f')}"/>
-      <path d="M${x - (i ? 7 : 11)} 171Q${x - (i ? 7 : 11)} 165 ${x} 165Q${x + (i ? 11 : 7)} 165 ${x + (i ? 11 : 7)} 172Q${x} 176 ${x - (i ? 7 : 11)} 171Z" fill="${shoe}"/>
-      <ellipse cx="${x - 2}" cy="167.5" rx="3.4" ry="1.4" fill="#fff" opacity=".25"/>`).join('');
-    const torso = `<path d="${B.sil}" fill="${cloth}"/>`
-      + (fem ? `<path d="M26 134Q60 142 94 134L104 160Q60 170 16 160Z" fill="${cloth}"/><path d="M17 158Q60 168 103 158" fill="none" stroke="#fff" stroke-width="2" opacity=".55"/><path d="M38 141 34 162M60 143V166M82 141 86 162" stroke="#000" stroke-width="1" opacity=".12"/>`
-        : `<path d="${B.belt}" fill="${pants}"/>`);
+    const legs = [lx, rx].map((x, i) => `<path d="M${x - hw} 146V170Q${x} 174 ${x + hw} 170V146Z" fill="${pants || u('f')}" stroke="${pInk}" stroke-width="1.1" stroke-linejoin="round"/>
+      ${pants ? `<path d="M${x - hw + 1.6} 150V168" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".12"/><path d="M${x - hw + .6} 165.6Q${x} 168 ${x + hw - .6} 165.6" fill="none" stroke="${pInk}" stroke-width="1" opacity=".7"/>` : ''}
+      ${SHOES[shoeKind](x, i, shoe, cloth)}`).join('');
+    const torso = `<path d="${B.sil}" fill="${cloth}" stroke="${cInk}" stroke-width="2.2" stroke-linejoin="round"/>`
+      + (fem ? `<path d="M26 134Q60 142 94 134L104 160Q60 170 16 160Z" fill="${cloth}" stroke="${cInk}" stroke-width="1.1" stroke-linejoin="round"/><path d="M17 158Q60 168 103 158" fill="none" stroke="#fff" stroke-width="2" opacity=".55"/><path d="M38 141 34 162M60 143V166M82 141 86 162" stroke="${cInk}" stroke-width="1" opacity=".3"/><path d="M27 135Q60 143 93 135" fill="none" stroke="${cInk}" stroke-width="1.2" opacity=".45"/>`
+        : `<path d="${B.belt}" fill="${pants}" stroke="${pInk}" stroke-width="1.1" stroke-linejoin="round"/><rect x="56" y="${B.belt === BUILD.stout.belt ? 148.6 : 146.6}" width="8" height="5" rx="1.4" fill="#f2c14e" stroke="${pInk}" stroke-width=".8"/><path d="M60 ${B.belt === BUILD.stout.belt ? 154 : 152}v4" stroke="${pInk}" stroke-width="1" opacity=".6"/>`);
     const [ax, hx0, hy, aw, hr] = B.arm;
     const arm = side => {
       const sx = side < 0 ? ax : 120 - ax, hx = side < 0 ? hx0 : 120 - hx0;
       const d = `M${sx} 103Q${hx + (sx - hx) * .15} 114 ${hx} ${hy}`;
-      const sleeve = `<path d="${d}" fill="none" stroke="${cloth}" stroke-width="${aw}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#fff" stroke-width="${aw}" stroke-linecap="round" opacity=".08"/>`;
-      const hand = bird ? `<path d="M${hx - hr} ${hy - 4}Q${hx} ${hy + 16} ${hx + hr} ${hy - 4}Z" fill="${u('f')}"/>` : `<circle cx="${hx}" cy="${hy + 4}" r="${hr}" fill="${u('f')}"/><path d="M${hx - 2.5} ${hy + 7}h5" stroke="#000" stroke-width="1" opacity=".18" stroke-linecap="round"/>`;
-      return `<g class="c-arm ${side < 0 ? 'c-arm-l' : 'c-arm-r'}"${side > 0 ? ` style="transform-origin:${sx}px 103px"` : ''}>${sleeve}${hand}</g>`;
+      const hand = bird ? `<path d="M${hx - hr} ${hy - 4}Q${hx} ${hy + 16} ${hx + hr} ${hy - 4}Z" fill="${u('f')}" stroke="${ink}" stroke-width="1.1" stroke-linejoin="round"/><path d="M${hx} ${hy + 1}V${hy + 8}M${hx - hr * .45} ${hy}V${hy + 5}M${hx + hr * .45} ${hy}V${hy + 5}" stroke="${ink}" stroke-width=".9" stroke-linecap="round" opacity=".45"/>`
+        : `<circle cx="${hx}" cy="${+(hy + 6.5).toFixed(1)}" r="${hr}" fill="${u('f')}" stroke="${ink}" stroke-width="1.1"/><ellipse cx="${hx - side * hr * .3}" cy="${hy + 5.5}" rx="${+(hr * .42).toFixed(2)}" ry="${+(hr * .3).toFixed(2)}" fill="#fff" opacity=".3"/><path d="M${hx - 2.6} ${hy + 10}q1.3 1.6 2.6 0q1.3 1.6 2.6 0" fill="none" stroke="${ink}" stroke-width=".9" opacity=".55" stroke-linecap="round"/>`;
+      const sleeve = `<path d="${d}" fill="none" stroke="${cInk}" stroke-width="${aw + 2.2}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${cloth}" stroke-width="${aw}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#fff" stroke-width="${+(aw * .35).toFixed(2)}" stroke-linecap="round" opacity=".13" transform="translate(${-1.2} -.6)"/>`;
+      const ex = hx + (sx - hx) * .05, cw = aw / 2 + .4;
+      const cuff = `<path d="M${+(ex - cw).toFixed(2)} ${hy - .6}Q${+ex.toFixed(2)} ${hy + 2.2} ${+(ex + cw).toFixed(2)} ${hy - .6}" fill="none" stroke="${mix(cloth, '#ffffff', .3)}" stroke-width="2.2" stroke-linecap="round"/>`;
+      return `<g class="c-arm ${side < 0 ? 'c-arm-l' : 'c-arm-r'}"${side > 0 ? ` style="transform-origin:${sx}px 103px"` : ''}>${hand}${sleeve}${cuff}</g>`;
     };
-    return { sil: B.sil, back: (tail ? `<g transform="translate(5 8)">${tail.replace(/URL_F/g, u('f'))}</g>` : '') + legs + torso, mid: B.belly || '', front: arm(-1) + arm(1) };
+    return { sil: B.sil, back: `<ellipse cx="60" cy="175" rx="36" ry="4.6" fill="#000" opacity=".13"/>` + (tail ? `<g transform="translate(5 8)">${tail.replace(/<path d="([^"]+)" fill="URL_F"\/>/, `<path d="$1" fill="URL_F" stroke="${ink}" stroke-width="1.2" stroke-linejoin="round"/>`).replace(/URL_F/g, u('f'))}</g>` : '') + legs + torso, mid: B.belly || '', front: arm(-1) + arm(1) };
+  }
+
+  /* Afwerking van een borstbeeld: één doorlopende omlijning om alle vachtvormen samen (hoofd, oren, kuif), zachte schaduw
+     onderaan en rechts op de vacht, en omlijning en kinschaduw op de kleding. Zo krijgt elk personage meer definitie. */
+  function polish(art, n, ink, cInk) {
+    const shapes = [];
+    const one = new RegExp(`<(path|circle|ellipse)\\b([^>]*?) fill="url\\(#${n}-f\\)"([^>]*?)/>`, 'g');
+    const grp = new RegExp(`<g fill="url\\(#${n}-f\\)">((?:(?!<g\\b)[^])*?)</g>`, 'g');
+    let first = -1;
+    const note = at => { if (first < 0 || at < first) first = at; };
+    art.replace(grp, (m, inner, at) => { note(at); shapes.push(inner); return m; });
+    art.replace(one, (m, tag, a, b, at) => { if (/stroke=/.test(a + b)) return m; note(at); shapes.push(`<${tag}${a}${b}/>`); return m; });
+    let out = art;
+    if (first >= 0) out = art.slice(0, first) + `<g fill="none" stroke="${ink}" stroke-width="2.7" stroke-linejoin="round" stroke-linecap="round">${shapes.join('')}</g>` + art.slice(first);
+    out = out.replace(one, (m, tag, a, b) => /stroke=/.test(a + b) ? m : m + `<${tag}${a} fill="url(#${n}-sh)"${b}/>`);
+    const sh = `<path d="${SH}" fill="url(#${n}-o)"/>`;
+    return out.replace(sh, `<path d="${SH}" fill="url(#${n}-o)" /><path d="M17 121C19 101 36 92 60 92S101 101 103 121" fill="none" stroke="${cInk}" stroke-width="2.4" stroke-linecap="round"/><path d="M19 119C21 104 34 96 46 94" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".16"/><path d="M29 98C40 92 80 92 91 98C84 109 36 109 29 98Z" fill="${cInk}" opacity=".3"/>`);
   }
 
   const CUT = 93; // boven de hals: daaronder neemt het silhouet van het postuur het over
@@ -711,21 +899,27 @@
     const full = !!opt.full;
     const L = c.player ? lookParts(opt.look, c) : null;
     // gekozen shirtkleur: een eigen kleurverloop 'o' vóór dat van het personage (het eerste met een id telt)
-    const defs = (L && L.shirt ? lin('o', L.shirt[1], L.shirt[2]) : '') + c.defs;
     // kleur van de kleding onderaan het kleurverloop: daarin lopen romp en mouwen naadloos door
     const m = c.defs.match(/id="ID-o"[^]*?stop-color="([^"]+)"[^]*?stop-color="([^"]+)"/);
+    const fm = c.defs.match(/id="ID-f"[^]*?stop-color="[^"]+"[^]*?stop-color="[^"]+"[^]*?stop-color="([^"]+)"/);
     const cloth = L && L.shirt ? L.shirt[2] : m ? m[2] : '#888';
-    const body = full ? fullBody(c, u, opt.look, cloth) : null;
+    const ink = mix(fm ? fm[1] : '#6a5a50', INK, .5), cInk = mix(cloth, INK, .5);
+    const defs = (L && L.shirt ? lin('o', L.shirt[1], L.shirt[2]) : '') + c.defs
+      + `<radialGradient id="ID-sh" gradientUnits="userSpaceOnUse" cx="50" cy="46" r="64"><stop offset=".56" stop-color="${ink}" stop-opacity="0"/><stop offset="1" stop-color="${ink}" stop-opacity=".4"/></radialGradient>`
+      + `<clipPath id="ID-sc"><path d="${SH}"/>${opt.full ? '<rect x="-10" y="119" width="140" height="70"/>' : ''}</clipPath>`; // opdruk: in het borstbeeld alleen binnen de schouders
+    const body = full ? fullBody(c, u, opt.look, cloth, ink) : null;
     const h = full ? 182 : 120, w = Math.round(size * 120 / h);
-    const top = c.draw(u) + (L ? L.neck + L.hat + L.glasses : '');
+    let top = c.draw(u);
+    if (L && L.print) top = top.replace(/<!--w-->[^]*?<!--\/w-->/, '').replace(`<path d="${SH}" fill="${u('o')}"/>`, x => x + `<g clip-path="${u('sc')}">${L.print}</g>`);
+    top = polish(top, n, ink, cInk) + (L ? L.neck + L.hat + L.glasses : '');
     let art = top;
     if (full) {
       // het borstbeeld twee keer: het hoofd (alles boven de hals plus de onderkant van het hoofd) en het shirt, geknipt in het silhouet van het postuur
-      art = `<clipPath id="${n}-hi"><rect x="-20" y="-20" width="160" height="${CUT + 20}"/><ellipse cx="60" cy="80" rx="40" ry="21"/></clipPath><clipPath id="${n}-lo"><path d="${body.sil}"/></clipPath>`
+      art = `<clipPath id="${n}-hi"><rect x="-20" y="-20" width="160" height="${CUT + 20}"/><ellipse cx="60" cy="80" rx="42" ry="23"/></clipPath><clipPath id="${n}-lo"><path d="${body.sil}"/></clipPath>`
         + body.back + `<g clip-path="url(#${n}-lo)">${top}</g>` + body.mid + `<g clip-path="url(#${n}-hi)">${top}</g>` + body.front;
     }
     return `<svg class="cast-svg${full ? ' cast-full' : ''}" viewBox="0 0 120 ${h}" width="${full ? w : size}" height="${size}" role="img" aria-label="${c.player ? 'Jij' : c.name}, ${(S.course && S.course.target !== 'es' && S.course.ui === 'nl' ? c.nl : null) || c.animal}" xmlns="http://www.w3.org/2000/svg">
-  <defs>${defs.replace(/ID-/g, n + '-')}</defs>${art}
+  <defs>${defs.replace(/ID-/g, n + '-')}</defs>${art.replace(/URL_SH/g, u('sh'))}
 </svg>`;
   }
   function avatar(id, size = 64, cls = '', opt) {
@@ -748,5 +942,5 @@
     return () => { talkers.delete(fn); fn(false, null); };
   }
 
-  S.Cast = { list: CAST, players: PLAYERS, LOOKS, get: id => BY[id], SPEAKERS, forSpeaker, svg, avatar, country, onTalk };
+  S.Cast = { list: CAST, players: PLAYERS, GROUPS, LOOKS, get: id => BY[id], SPEAKERS, forSpeaker, svg, avatar, country, onTalk };
 })(window.SPT = window.SPT || {});

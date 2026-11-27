@@ -1318,6 +1318,9 @@ h3.sub { font-family: var(--font); font-size: .95rem; font-weight: 700; margin: 
 .me-preview { flex: none; margin: 0 auto; padding: .4rem 1.2rem; border-radius: 22px; background: radial-gradient(circle at 50% 70%, var(--accent-soft), transparent 70%); }
 .me-side { flex: 1 1 300px; min-width: 0; }
 .me-grid { grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); }
+.me-grp-t { font-size: .8rem; font-weight: 700; color: var(--muted); margin: .5rem 0 .3rem; }
+.me-side > .me-grp-t:first-child { margin-top: 0; }
+.me-opt span { text-align: center; line-height: 1.15; overflow-wrap: anywhere; }
 .me-rows { display: flex; flex-direction: column; gap: .55rem; margin-top: .4rem; }
 .me-row-t { font-size: .8rem; font-weight: 700; color: var(--muted); margin-bottom: .25rem; }
 .me-chips { display: flex; flex-wrap: wrap; gap: .35rem; }

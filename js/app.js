@@ -1632,10 +1632,14 @@
         h('div', { class: 'me-studio' },
           cur ? h('div', { class: 'me-preview' }, S.Cast.avatar(cur.id, 230, 'me-big', { full: true, look: L })) : null,
           h('div', { class: 'me-side' },
-            h('div', { class: 'me-grid' }, S.Cast.players.map(c => h('button', { class: 'me-opt' + (s.me === c.id ? ' on' : ''), type: 'button', 'aria-pressed': String(s.me === c.id), onclick: () => {
-              s.me = c.id; Store.save(); fillPicker(); refreshHead();
-            } }, S.Cast.avatar(c.id, 60, '', { look: L }), h('span', null, c.nl)))),
-            cur ? h('div', { class: 'me-rows' }, row('build', '🧍 Postuur'), row('hat', '🎩 Hoedje'), row('glasses', '👓 Bril'), row('neck', '🧣 Om je hals'), row('shirt', '👕 Shirtkleur')) : null)),
+            // dieren per streek: eerst de dieren die bij de taal van deze cursus horen, dan de klassiekers, dan de rest
+            (S.Cast.GROUPS || [['', '', null]]).slice().sort((x, y) => (y[2] === S.course.target) - (x[2] === S.course.target)).map(([g, title]) => {
+              const list = S.Cast.players.filter(c => (c.group || '') === g);
+              return list.length ? [title ? h('div', { class: 'me-grp-t' }, title) : null, h('div', { class: 'me-grid' }, list.map(c => h('button', { class: 'me-opt' + (s.me === c.id ? ' on' : ''), type: 'button', title: c.trait || '', 'aria-pressed': String(s.me === c.id), onclick: () => {
+                s.me = c.id; Store.save(); fillPicker(); refreshHead();
+              } }, S.Cast.avatar(c.id, 60, '', { look: L }), h('span', S.course.ui === 'es' ? { 'data-notr': '' } : null, S.course.ui === 'es' ? c.animal : c.nl))))] : null;
+            }),
+            cur ? h('div', { class: 'me-rows' }, row('build', '🧍 Postuur'), row('hat', '🎩 Hoedje'), row('glasses', '👓 Bril'), row('neck', '🧣 Om je hals'), row('shirt', '👕 Shirtkleur'), row('print', '🎨 Opdruk'), row('shoes', '👟 Schoenen')) : null)),
         s.me ? h('button', { class: 'btn ghost small', type: 'button', onclick: () => { s.me = ''; Store.save(); render(); } }, 'Geen personage (alleen «Jij»)') : '');
     }
     const headAv = mine ? S.Cast.avatar(mine.id, 76, 'prof-cast', { look: look() }) : h('div', { class: 'avatar' }, initial);

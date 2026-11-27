@@ -644,6 +644,22 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   const nid = v => v.replace(/cs\d+/g, 'X');
   ok(nid(K.svg('p-zorro', 120, { full: true, look: { build: 'slim' } })) !== nid(K.svg('p-zorro', 120, { full: true, look: { build: 'stout' } })), 'cast: postuur verandert de tekening');
   ok(K.players.length >= 6 && K.players.every(x => x.player), 'cast: keuze uit eigen personages voor je profiel');
+  // uitbreiding: dieren en kleding per land; oude keuzes blijven werken
+  ok(['p-zorro', 'p-gato', 'p-perro', 'p-conejo', 'p-panda', 'p-tortuga', 'p-loro', 'p-ajolote'].every(id => K.get(id) && K.get(id).player), 'cast: de eerste acht eigen personages bestaan nog (opgeslagen keuzes blijven werken)');
+  ok(K.players.length >= 28 && K.GROUPS.every(([g]) => K.players.some(x => (x.group || '') === g)) && K.players.every(x => K.GROUPS.some(([g]) => g === (x.group || ''))), 'cast: elke streek heeft eigen dieren en elk dier hoort bij een streek');
+  ok(['es', 'de', 'fr', 'tr', 'en', 'nl'].every(l => K.GROUPS.some(g => g[2] === l)), 'cast: voor elke doeltaal is er een groep dieren');
+  ok(K.players.every(x => x.nl && x.animal && x.trait), 'cast: elk eigen personage heeft een Nederlandse en Spaanse naam');
+  const badLook = [];
+  Object.keys(K.LOOKS).forEach(k => K.LOOKS[k].forEach(([v]) => ['p-zorro', 'p-loro', 'p-ajolote', 'p-koe'].forEach(id => [false, true].forEach(full => {
+    const x = K.svg(id, 100, { full, look: { [k]: v } }); if (!x.startsWith('<svg') || /NaN|undefined|null/.test(x) || !x.includes('m-open')) badLook.push(id + '/' + k + '=' + v);
+  }))));
+  ok(!badLook.length, 'cast: elke hoed, bril, halsding, opdruk en schoen geeft een geldige tekening' + (badLook.length ? ': ' + badLook.slice(0, 5).join(', ') : ''));
+  ['hat', 'glasses', 'neck', 'print'].forEach(k => { const base = nid(K.svg('p-gato', 100, { look: {} })), same = K.LOOKS[k].filter(([v]) => v && nid(K.svg('p-gato', 100, { look: { [k]: v } })) === base).map(x => x[0]);
+    ok(!same.length, 'cast: elke keuze bij ' + k + ' is zichtbaar op de tekening' + (same.length ? ': ' + same.join(', ') : '')); });
+  { const base = nid(K.svg('p-gato', 100, { full: true, look: {} })), same = K.LOOKS.shoes.filter(([v]) => v && nid(K.svg('p-gato', 100, { full: true, look: { shoes: v } })) === base);
+    ok(!same.length, 'cast: elke schoen is zichtbaar in het hele lijf'); }
+  ok(K.svg('p-gato', 100, { look: { hat: 'bestaat-niet', print: 'x', shoes: 'y', neck: 'z', glasses: 'q' }, full: true }).startsWith('<svg'), 'cast: een onbekende keuze (uit een nieuwere versie) breekt de tekening niet');
+  ok([...K.list, ...K.players].every(x => { const v = K.svg(x.id, 60); return (v.match(/<svg/g) || []).length === 1 && v.includes('-sh"'); }), 'cast: elk personage krijgt de afwerking (omlijning en schaduw)');
   // Jouw leven: fase volgt uit punten (alle talen samen), elke fase heeft een tekening
   vm.runInContext(fs.readFileSync(path.join(root, 'js/life.js'), 'utf8'), c, { filename: 'js/life.js' });
   const LF = c.window.SPT.Life;
