@@ -50,7 +50,23 @@
     { lv: 'A2', q: 'Yat___ önce dişlerimi fırçalarım.', o: ['madan', 'tıktan', 'ınca'], nl: 'Voor het slapengaan poets ik mijn tanden.' },
     { lv: 'A2', q: 'Otele var___ seni ararım.', o: ['ınca', 'ırken', 'madan'], nl: 'Zodra ik in het hotel ben, bel ik je.' },
     { lv: 'A2', q: 'Bu mesaj ___ için.', o: ['senin', 'sen', 'sana'], nl: 'Dit bericht is voor jou.' },
-    { lv: 'A2', q: 'Hiç kimse gel___.', o: ['medi', 'di', 'ir'], nl: 'Er is niemand gekomen.' }
+    { lv: 'A2', q: 'Hiç kimse gel___.', o: ['medi', 'di', 'ir'], nl: 'Er is niemand gekomen.' },
+    { lv: 'B1', q: 'Ali yarın gelecek___, ama emin değilim.', o: ['miş', 'ti', 'se'], nl: 'Ali schijnt morgen te komen, maar ik weet het niet zeker.' },
+    { lv: 'B1', q: 'Kapıda bekle___ adam kim?', o: ['yen', 'diği', 'yor'], nl: 'Wie is de man die bij de deur wacht?' },
+    { lv: 'B1', q: 'Dün izle___ film çok güzeldi.', o: ['diğim', 'yen', 'dim'], nl: 'De film die ik gisteren heb gezien, was erg mooi.' },
+    { lv: 'B1', q: 'Onun gel___ biliyorum.', o: ['diğini', 'mesini', 'diği'], nl: 'Ik weet dat hij gekomen is.' },
+    { lv: 'B1', q: 'Senin de gel___ istiyorum.', o: ['meni', 'diğini', 'mek'], nl: 'Ik wil dat jij ook komt.' },
+    { lv: 'B1', q: 'Yağmur yağ___ evde kalırız.', o: ['arsa', 'sa', 'ınca'], nl: 'Als het regent, blijven we thuis.' },
+    { lv: 'B1', q: 'Vaktim ol___ gelirim.', o: ['ursa', 'sa', 'saydı'], nl: 'Als ik tijd heb, kom ik.' },
+    { lv: 'B1', q: 'Zengin ol___ dünyayı gezerdim.', o: ['sam', 'ursam', 'dum'], nl: 'Als ik rijk was, zou ik de wereld rondreizen.' },
+    { lv: 'B1', q: 'Keşke dün gel___!', o: ['seydin', 'irsen', 'din'], nl: 'Was je gisteren maar gekomen!' },
+    { lv: 'B1', q: 'Bu köprü 1973’te yap___.', o: ['ıldı', 'tı', 'ıyor'], nl: 'Deze brug is in 1973 gebouwd.' },
+    { lv: 'B1', q: 'Biletler gişeden al___.', o: ['ınır', 'ılır', 'ır'], nl: 'De kaartjes worden bij de kassa gekocht.' },
+    { lv: 'B1', q: 'Dün saçımı kes___.', o: ['tirdim', 'ildim', 'tim'], nl: 'Gisteren heb ik mijn haar laten knippen.' },
+    { lv: 'B1', q: 'Geç kal___ için özür dilerim.', o: ['dığım', 'mak', 'dım'], nl: 'Sorry dat ik te laat ben.' },
+    { lv: 'B1', q: 'Yağmur___ rağmen yürüdük.', o: ['a', 'u', 'dan'], nl: 'Ondanks de regen hebben we gelopen.' },
+    { lv: 'B1', q: 'Kahvaltı yap___ çıktı.', o: ['madan', 'arak', 'ıp'], nl: 'Hij vertrok zonder te ontbijten.' },
+    { lv: 'B1', q: 'Geç kalmayayım ___ taksiye bindim.', o: ['diye', 'için', 'gibi'], nl: 'Ik nam een taxi om niet te laat te komen.' }
   ];
 
   /* Vrije gesprekken met Profe Lupe. */
@@ -66,7 +82,13 @@
     { id: 'tr-nl-daire', icon: '🏠', lv: 'A2', title: 'Een appartement bekijken', place: 'İzmir 🇹🇷', role: 'You are Hakan Bey, an estate agent in İzmir showing a 2+1 flat. Describe the rooms, the rent, the deposit and the neighbours, say whose the furniture is (ev sahibinin) and ask what the learner is looking for. Use simple A2 Turkish.', goal: 'Vraag naar de kamers, de huur en de borg.' },
     { id: 'tr-nl-otel', icon: '🎈', lv: 'A2', title: 'Inchecken in Cappadocië', place: 'Kapadokya 🇹🇷', role: 'You are the receptionist of a cave hotel in Göreme. Check the guest in, confirm the room and breakfast, and explain the balloon tour using -meden önce, -dikten sonra and -ince. Use simple A2 Turkish with the polite siz form.', goal: 'Check in en vraag naar het ontbijt en de ballonvaart.' },
     { id: 'tr-nl-telefon', icon: '📞', lv: 'A2', title: 'Een afspraak verzetten', place: 'İstanbul 🇹🇷', role: 'You are the secretary of an office in İstanbul. Answer the phone, ask who is calling (Kiminle görüşüyorum?), say the person they want is in a meeting, take a message and help reschedule (Perşembe size uygun mu?). Use simple A2 Turkish with the polite siz form.', goal: 'Zeg wie je bent en verzet de afspraak.' },
-    { id: 'tr-nl-hikaye', icon: '📖', lv: 'A2', title: 'Vertel wat er gebeurde', place: 'İstanbul 🇹🇷', role: 'You are Selin, a curious friend in İstanbul. Ask the learner to tell something funny or strange that happened to them, keep the story going with Eee, sonra? Olamaz! Gerçekten mi?, and tell a short mishap of your own with -iyordu and -di. Use simple A2 Turkish.', goal: 'Vertel een kort verhaal met achtergrond en gebeurtenis.' }
+    { id: 'tr-nl-hikaye', icon: '📖', lv: 'A2', title: 'Vertel wat er gebeurde', place: 'İstanbul 🇹🇷', role: 'You are Selin, a curious friend in İstanbul. Ask the learner to tell something funny or strange that happened to them, keep the story going with Eee, sonra? Olamaz! Gerçekten mi?, and tell a short mishap of your own with -iyordu and -di. Use simple A2 Turkish.', goal: 'Vertel een kort verhaal met achtergrond en gebeurtenis.' },
+    { id: 'tr-nl-dedikodu', icon: '🗣️', lv: 'B1', title: 'Roddels uit de buurt', place: 'İzmir 🇹🇷', role: 'You are Zeynep, a neighbour in İzmir who loves gossip. Tell the learner news about the neighbours that you only heard from others, using -miş and -mişmiş (Duydun mu? Üst kattaki komşu taşınıyormuş!), ask what they have heard, and react with Yok artık! Sahi mi? Use B1 Turkish.', goal: 'Vertel iets wat je gehoord hebt met -miş en reageer verbaasd.' },
+    { id: 'tr-nl-film', icon: '🎬', lv: 'B1', title: 'Welke film gaan we kijken?', place: 'İstanbul 🇹🇷', role: 'You are Can, a film-loving friend in İstanbul. Discuss which film to watch tonight, describe films with relative clauses (geçen hafta izlediğim film, Oscar kazanan oyuncu), ask about the last film or series the learner saw and what they thought of it (Sence nasıldı?). Use B1 Turkish.', goal: 'Beschrijf een film met -en of -diği en geef je mening.' },
+    { id: 'tr-nl-iklim', icon: '🌍', lv: 'B1', title: 'Als het zo doorgaat…', place: 'Antalya 🇹🇷', role: 'You are Deniz, an environmentally conscious friend in Antalya during a heatwave. Talk about climate with real conditionals (Böyle devam ederse…, Herkes bir şey yaparsa…), ask what people do in the Netherlands and what the learner does at home, and suggest plans with -irse and yoksa. Use B1 Turkish.', goal: 'Zeg wat er gebeurt als we niets doen en stel iets voor.' },
+    { id: 'tr-nl-piyango', icon: '✨', lv: 'B1', title: 'Als je de loterij won…', place: 'İstanbul 🇹🇷', role: 'You are Emre, a daydreaming friend in İstanbul who just bought a lottery ticket. Ask what the learner would do if they won (Kazansan ne yapardın?), share your own dreams with -sem … -erdim, ask about a regret (Keşke ne yapsaydın?) and give advice with Senin yerinde olsam. Use B1 Turkish.', goal: 'Vertel wat je zou doen en noem een wens of spijt met keşke.' },
+    { id: 'tr-nl-berber', icon: '✂️', lv: 'B1', title: 'Bij de kapper', place: 'İzmir 🇹🇷', role: 'You are a talkative barber/hairdresser in İzmir. Ask what the customer wants (Nasıl kestirmek istersiniz?), chat about what else they are having done before a wedding (Takım elbisenizi diktirdiniz mi?), mention price and time, and end with Sıhhatler olsun. Use B1 Turkish with causative forms.', goal: 'Zeg wat je wilt laten doen en vraag wat het kost.' },
+    { id: 'tr-nl-gorusme', icon: '💼', lv: 'B1', title: 'Het sollicitatiegesprek', place: 'Ankara 🇹🇷', role: 'You are Murat Bey, a polite HR manager in Ankara interviewing the learner (formal siz). Ask why they applied (Neden bu işe başvurdunuz?), about experience, strengths and weaknesses, salary expectation, and answer their questions about hours and leave. Encourage answers with -mek için, -diğim için and rağmen. Use B1 Turkish.', goal: 'Leg uit waarom je solliciteert en stel zelf een vraag.' }
   ];
 
   /* Uitdrukking van de dag: [Turks, Nederlands, vlag]. */

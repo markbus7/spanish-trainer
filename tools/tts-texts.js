@@ -197,7 +197,9 @@ for (const [course, [vf, vm_]] of Object.entries(OTHER)) {
   put(S.course.hello);
   // Lupes vaste zinnen in deze cursus: in en-nl praat ze Engels (Amerikaanse stem, met unit-titels en grammaticasamenvattingen),
   // anders haar Spaanse zinnen (bijv. «tu profe de inglés») met haar Mexicaanse stem
-  const lupeV = LUPE_BY[S.Tutor.lineLang] || LUPE;
+  // de docent van een cursus met Spaanse uitleg kan een eigen stem voor haar Spaanse zinnen hebben (js/docenten.js: voice)
+  const dv = S.Docent && S.Docent.voice;
+  const lupeV = LUPE_BY[S.Tutor.lineLang] || (dv ? { girl: { voice: dv, pitch: '+30Hz', rate: '+6%' }, woman: { voice: dv, pitch: '+0Hz', rate: '+0%' } } : LUPE);
   for (const es of S.Tutor.lines.every(S.Tutor.lineLang !== 'es' ? S.C.all() : [])) for (const [v, o] of Object.entries(lupeV)) {
     const lns = 'lupe-' + v, k = S.Speech.clipKey(es, lns);
     if (!out.has(k)) out.set(k, { k, ns: lns, text: S.Speech.clean(es), voice: o.voice, pitch: o.pitch, rate: o.rate, lv: ['X'] });

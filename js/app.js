@@ -18,6 +18,7 @@
     tr: { greet: ['Günaydın', 'İyi günler', 'İyi akşamlar'], welcome: 'Hoş geldin!', phrase: 'Günün ifadesi', hi: 'Merhaba! Ben Lupe 👋',
       ask: 'Merhaba! Ben Lupe, Türkçe öğretmenin. Bugün ne öğrenmek istiyorsun?', write: 'Hadi yazalım! Metnini yaz, ben de düzeltmene yardım edeyim.' }
   })[S.course.target] || null;
+  if (DOEL) ['hi', 'ask'].forEach(k => { DOEL[k] = S.docentNaam(DOEL[k]); }); // de docent van deze taal stelt zich voor met haar eigen naam
   const save = U.debounce(() => Store.save(), 300);
 
   /* ================= kleine UI-helpers ================= */
@@ -1154,8 +1155,10 @@
     if (!S.AI.enabled()) {
       wrap.append(h('h1', null, 'Docente'));
       wrap.append(h('div', { class: 'card tutor-intro' },
-        h('div', { class: 'row gap' }, S.Tutor.avatar(150, 'big', { full: true, wave: true }), h('div', null, h('h3', null, NLX ? (DOEL ? DOEL.hi : 'Hallo! Ik ben Lupe 👋') : '¡Hola! Soy Lupe 👋'), h('p', { class: 'small muted' }, S.Tutor.tagline))),
-        h('p', null, NLX ? 'Ik ben een axolotl uit de kanalen van Xochimilco (Mexico-Stad) en ik wil graag je persoonlijke docent zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.'
+        h('div', { class: 'row gap' }, S.Tutor.avatar(150, 'big', { full: true, wave: true }), h('div', null, h('h3', null, S.Tutor.hi ? S.Tutor.hi + ' 👋' : NLX ? (DOEL ? DOEL.hi : 'Hallo! Ik ben Lupe 👋') : '¡Hola! Soy Lupe 👋'), h('p', { class: 'small muted' }, S.Tutor.tagline))),
+        h('p', null, S.Docent ? (S.course.ui === 'es' ? 'Soy ' + S.Tutor.what + ' y quiero ser tu profe personal. Conmigo puedes platicar de verdad, y digo mis respuestas en voz alta.'
+          : 'Ik ben ' + S.Tutor.what + ' en ik wil graag je persoonlijke docent zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.')
+          : NLX ? 'Ik ben een axolotl uit de kanalen van Xochimilco (Mexico-Stad) en ik wil graag je persoonlijke docent zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.'
           : 'Ik ben een ajolote uit de kanalen van Xochimilco (Mexico-Stad) en ik wil graag je persoonlijke docente zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.'),
         h('p', null, !NLX ? 'Voer echte gesprekken (rollenspellen in Mexico, Colombia, Argentinië…). Je krijgt direct correcties in het Nederlands, kunt alles over grammatica vragen en krijgt feedback op je teksten.'
           : 'Voer echte gesprekken (rollenspellen in alledaagse situaties). Je krijgt direct correcties in het Nederlands, kunt alles over grammatica vragen en krijgt feedback op je teksten.'),
@@ -1260,7 +1263,7 @@
     ask: '**' + DOEL.ask + '**\n\n*Vraag me alles over grammatica, woorden, uitspraak of cultuur. Nederlands mag ook.*',
     write: '**' + DOEL.write + '**\n\n*Schrijf een e-mail, appje of dagboekstukje. Ik verbeter het en leg uit waarom.*'
   } : {
-    ask: '**¡Hola! Soy Lupe, tu profe de ' + S.course.name.es + '. ¿Qué quieres saber hoy?**\n\n*Vraag me alles over grammatica, woorden, uitspraak of cultuur. Nederlands mag ook.*',
+    ask: '**¡Hola! Soy ' + S.Tutor.name + ', tu profe de ' + S.course.name.es + '. ¿Qué quieres saber hoy?**\n\n*Vraag me alles over grammatica, woorden, uitspraak of cultuur. Nederlands mag ook.*',
     write: '**¡Órale, a escribir! Escribe tu texto y yo te ayudo a corregirlo.**\n\n*Schrijf een e-mail, appje of dagboekstukje. Ik verbeter het en leg uit waarom.*'
   };
   // Teksten in het chatvenster per doeltaal (de Spaanse cursus en de cursussen met Spaanse uitleg gebruiken CHAT.es).
@@ -1387,7 +1390,7 @@
     return true;
   }
   async function shareReport(text, how) {
-    if (how === 'share' && navigator.share) { try { await navigator.share({ title: 'Rapport van Profe Lupe', text }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+    if (how === 'share' && navigator.share) { try { await navigator.share({ title: S.docentNaam('Rapport van Profe Lupe'), text }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
     let done = false;
     try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); done = true; } } catch (e) { /* hieronder */ }
     if (!done) { const ta = h('textarea', { style: { position: 'fixed', top: '-1000px' } }); ta.value = text; document.body.append(ta); ta.select(); try { done = document.execCommand('copy'); } catch (e) { /* */ } ta.remove(); }
@@ -2275,6 +2278,38 @@
   const NOTR = (text, tag) => h(tag || 'span', { 'data-notr': '' }, text);
   const CDESC = c => ({ 'es-nl': 'uitleg in het Nederlands', 'en-nl': 'A1–C2 · uitleg in het Nederlands', 'fr-nl': 'uitleg in het Nederlands', 'de-nl': 'A1–B1 · uitleg in het Nederlands', 'tr-nl': 'uitleg in het Nederlands', 'en-es': 'explicaciones en español', 'nl-es': 'explicaciones en español' })[c] || '';
   const CLONG = { 'es-nl': 'Spaans leren · uitleg in het Nederlands', 'en-nl': 'Engels leren (A1–C2) · uitleg in het Nederlands', 'fr-nl': 'Frans leren · uitleg in het Nederlands', 'de-nl': 'Duits leren (A1–B1) · uitleg in het Nederlands', 'tr-nl': 'Turks leren · uitleg in het Nederlands', 'en-es': 'Inglés · explicaciones en español', 'nl-es': 'Neerlandés · explicaciones en español' };
+  /* Eigen keuzelijst voor cursussen. Een gewone <select> tekent op Windows geen vlaggen in zijn lijst; hier wel.
+     Gedraagt zich als een select: .value lezen/zetten en .onchange. isNew(c) zet er het label «nieuw» bij. */
+  function coursePick({ value, ariaLabel, isNew }) {
+    const es = S.course.ui === 'es', ids = Object.keys(S.COURSES);
+    let val = value, open = false;
+    const cur = h('span'), list = h('div', { class: 'cpick-list', role: 'listbox', 'aria-label': ariaLabel, hidden: true });
+    const btn = h('button', { class: 'input cpick-btn', type: 'button', 'aria-haspopup': 'listbox', 'aria-expanded': 'false', 'aria-label': ariaLabel }, cur, h('span', { class: 'cpick-car', 'aria-hidden': 'true' }, '▼'));
+    const box = h('div', { class: 'cpick', 'data-notr': '' }, btn, list);
+    const setOpen = o => { open = o; list.hidden = !o; box.classList.toggle('open', o); btn.setAttribute('aria-expanded', o ? 'true' : 'false'); if (o) { const s = list.querySelector('[aria-selected=true]'); if (s) s.focus(); } };
+    const paint = () => {
+      cur.textContent = CNAME(val) + ' · ' + CDESC(val);
+      list.innerHTML = '';
+      ids.forEach(c => list.append(h('button', { class: 'cpick-opt', type: 'button', role: 'option', 'aria-selected': c === val ? 'true' : 'false', 'data-course': c,
+        onclick: () => { const ch = c !== val; val = c; paint(); setOpen(false); btn.focus(); if (ch && box.onchange) box.onchange(); } },
+        h('span', null, h('b', null, CNAME(c)), h('small', null, CDESC(c))),
+        isNew && isNew(c) ? h('span', { class: 'cpick-new' }, es ? 'nuevo' : 'nieuw') : null,
+        c === val ? h('span', { class: 'cpick-chk', 'aria-hidden': 'true' }, '✓') : null)));
+    };
+    btn.onclick = e => { e.preventDefault(); setOpen(!open); };
+    box.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && open) { e.stopPropagation(); setOpen(false); btn.focus(); return; }
+      if (!open || (e.key !== 'ArrowDown' && e.key !== 'ArrowUp')) return;
+      const os = [...list.children], i = os.indexOf(document.activeElement); e.preventDefault();
+      os[Math.max(0, Math.min(os.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1)))].focus();
+    });
+    // tik buiten de lijst = dicht (geen focusout: Safari geeft knoppen geen focus bij een tik)
+    const outside = e => { if (!box.isConnected) { document.removeEventListener('pointerdown', outside, true); return; } if (open && !box.contains(e.target)) setOpen(false); };
+    document.addEventListener('pointerdown', outside, true);
+    Object.defineProperty(box, 'value', { get: () => val, set: v => { val = v; paint(); } });
+    paint();
+    return box;
+  }
   function profilesCard() {
     const Pr = P_(); const card = h('div', { class: 'card form prof-card' });
     const draw = () => {
@@ -2292,13 +2327,13 @@
       card.append(list);
       // cursus van dit profiel: wisselen of er een bij nemen
       const me = Pr.active();
-      const csel = h('select', { class: 'input', 'aria-label': 'Cursus', 'data-notr': '' }, Object.keys(S.COURSES).map(c => h('option', { value: c, selected: c === me.course ? true : null }, CNAME(c) + ' · ' + CDESC(c) + (me.courses.includes(c) ? '' : (S.course.ui === 'es' ? ' (nuevo)' : ' (nieuw)')))));
+      const csel = coursePick({ value: me.course, ariaLabel: 'Cursus', isNew: c => !me.courses.includes(c) });
       csel.onchange = () => {
         const c = csel.value; if (c === me.course) return;
         if (me.courses.includes(c)) { Pr.switchCourse(me.id, c); return; }
         S.confirm('Nieuwe cursus?', Pr.label(me.id) + ' begint met ' + CLONG[c] + ', met een eigen, lege voortgang. De voortgang van de andere cursus blijft bewaard; je kunt altijd terugwisselen.', 'Begin', () => Pr.switchCourse(me.id, c), 'Annuleren', () => { csel.value = me.course; });
       };
-      card.append(label('Cursus van ' + Pr.label(me.id), csel));
+      card.append(h('div', { class: 'field' }, h('span', null, 'Cursus van ' + Pr.label(me.id)), csel));
       // cursussen van dit profiel: een extra cursus die je niet gebruikt, kun je weghalen; de hoofdcursus blijft altijd
       if (me.courses.length > 1) card.append(h('div', { class: 'course-list' }, h('b', { class: 'small' }, 'Cursussen van ' + Pr.label(me.id)),
         h('small', { class: 'muted' }, 'Tik op een cursus om ernaar te wisselen.'),
@@ -2314,8 +2349,8 @@
       const nameIn = h('input', { class: 'input', placeholder: 'Naam', maxlength: '30' });
       const avs = h('div', { class: 'chips prof-avs' }, Pr.AVATARS.map(a => h('button', { class: 'chip toggle' + (a === av ? ' on' : ''), type: 'button', 'aria-label': 'Kies ' + a, onclick: e => { av = a; avs.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === e.currentTarget)); } }, a)));
       const out = h('p', { class: 'small warn', role: 'status' });
-      const ncs = h('select', { class: 'input', 'data-notr': '' }, Object.keys(S.COURSES).map(c => h('option', { value: c }, CNAME(c) + ' · ' + CDESC(c))));
-      const form = h('div', { class: 'prof-new', hidden: true }, label('Naam van het nieuwe profiel', nameIn), avs, label('Wat wil deze persoon leren?', ncs), out,
+      const ncs = coursePick({ value: Object.keys(S.COURSES)[0], ariaLabel: 'Cursus voor het nieuwe profiel' });
+      const form = h('div', { class: 'prof-new', hidden: true }, label('Naam van het nieuwe profiel', nameIn), avs, h('div', { class: 'field' }, h('span', null, 'Wat wil deze persoon leren?'), ncs), out,
         h('div', { class: 'row gap wrap' },
           h('button', { class: 'btn primary', type: 'button', onclick: () => { try { const id = Pr.add(nameIn.value, av, ncs.value); S.confirm('Profiel gemaakt', 'Wil je nu naar het profiel van ' + Pr.label(id) + ' gaan? Daar begin je met een lege voortgang en de niveautest.', 'Ga naar ' + Pr.label(id), () => Pr.switchTo(id), 'Later', () => { draw(); updateProfileChip(); }); } catch (e) { out.textContent = '⚠️ ' + e.message; } } }, 'Profiel maken'),
           h('button', { class: 'btn link', type: 'button', onclick: () => { form.hidden = true; addBtn.hidden = false; } }, 'Annuleren')));

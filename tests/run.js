@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/zwak.js']) {
+for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/zwak.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -707,6 +707,17 @@ ok(!S.conj.PERSONS.some(p => /vosotros/.test(p)), 'vosotros hoort niet in Latijn
   ok(html.indexOf('js/unit-art.js') > html.indexOf('js/icons.js') && html.indexOf('js/unit-art.js') < html.indexOf('js/app.js') && sw.includes("'js/unit-art.js'"), 'unittekening: script geladen en in de offline-cache');
 }
 
+/* ---------- eigen docent per taal: Spaans houdt Lupe, elke andere doeltaal heeft een rij in js/docenten.js ---------- */
+{
+  ok(!S.Docent && S.Tutor.name === 'Lupe' && S.Tutor.title === 'Profe Lupe' && /axolotl/.test(S.Tutor.persona) && S.Tutor.svg(100, { full: true }).includes('class="gill"'), 'docent: in de Spaanse cursus blijft Lupe de axolotl');
+  ok(S.docentNaam('Rapport van Profe Lupe') === 'Rapport van Profe Lupe' && S.t('Vraag het Lupe') === 'Vraag het Lupe', 'docent: Spaanse cursus houdt de naam Lupe');
+  const targets = [...new Set(Object.values(S.COURSES).map(c => c.target))].filter(t => t !== 'es');
+  ok(targets.every(t => S.Docenten[t]), 'docent: elke doeltaal heeft een eigen docent: ' + targets.filter(t => !S.Docenten[t]).join(', '));
+  const names = Object.values(S.Docenten).map(d => d.name);
+  ok(new Set(names).size === names.length && Object.values(S.Docenten).every(d => d.title.includes(d.name) && d.hi.includes(d.name) && d.mic.includes(d.name) && d.nl.what && d.es.what && d.icon && d.art && typeof d.persona === 'function'), 'docent: elke docent heeft naam, aanspreekvorm, begroeting, karakter en tekening');
+  ok(fs.readFileSync(path.join(root, 'sw.js'), 'utf8').includes("'js/docenten.js'") && fs.readFileSync(path.join(root, 'index.html'), 'utf8').indexOf('js/docenten.js') < fs.readFileSync(path.join(root, 'index.html'), 'utf8').indexOf('js/tutor.js'), 'docent: script geladen vóór tutor.js en in de offline-cache');
+}
+
 /* ---------- Profe Lupe als begeleider: elke situatie heeft een Spaanse zin, Latijns-Amerikaans ---------- */
 {
   const L = S.Tutor.lines, out = [];
@@ -1365,6 +1376,18 @@ await micTests();
       ok(lupeLines.every(t => !/[¡¿ñ]|\b(Hoy|tienes|Llevas|Ya conoces|seguidas)\b/.test(t)), w + 'geen Spaanse Lupe-zinnen meer: ' + lupeLines.filter(t => /[¡¿ñ]/.test(t)).slice(0, 3).join(' | '));
       ok(lupeLines.every(t => have.has(K.Speech.clipKey(t, 'lupe-girl')) && have.has(K.Speech.clipKey(t, 'lupe-woman'))), w + 'alle Lupe-zinnen worden ingesproken');
     } else ok(K.Tutor.lineLang === 'es', w + 'Lupe praat Spaans (geen vertaling)');
+    // eigen docent per doeltaal (js/docenten.js): naam, tekening en AI-karakter; nergens meer «Lupe»
+    const Dc = K.Docent;
+    ok(Dc && K.Tutor.name === Dc.name && K.Tutor.title === Dc.title && Dc.name !== 'Lupe', w + 'eigen docent: ' + (Dc && Dc.title));
+    if (Dc) {
+      const all = K.Tutor.lines.every(us).concat([K.Tutor.lines.welcome.nl, K.Tutor.tagline, K.Tutor.persona, K.Tutor.aria, K.Tutor.hi]);
+      ok(all.every(t => !/Lupe|axolotl|ajolot|Xochimilco/i.test(t)), w + 'docent: geen Lupe meer in haar zinnen en karakter: ' + all.filter(t => /Lupe|axolotl|Xochimilco/i.test(t)).slice(0, 2).join(' | '));
+      ok(K.Tutor.lines.every(us).some(t => t.includes(Dc.name)) && K.Tutor.persona.includes(Dc.name) && K.Tutor.persona.includes(K.course.ai.target), w + 'docent stelt zich voor met haar eigen naam, ook in de AI-opdracht');
+      ok(K.t('Rapport van Profe Lupe') === 'Rapport van ' + Dc.title && K.t('Vraag het Lupe') === 'Vraag het ' + Dc.name && !/Lupe/.test(K.t('Lupe’s voorstellen en Lupe\'s advies')), w + 'schermteksten noemen de docent van deze cursus');
+      ok(K.Mistakes.asText(K.Mistakes.report(30)).startsWith('Rapport van ' + Dc.title), w + 'rapport draagt de naam van de docent');
+      for (const o of [{ full: true, wave: true }, {}, { face: true }]) { const g = K.Tutor.svg(100, o); ok(g.includes('m-open') && g.includes('m-closed') && g.includes('lupe-eyes') && !g.includes('class="gill"') && !/undefined|NaN/.test(g), w + 'tekening van de docent compleet ' + JSON.stringify(o)); }
+      ok(K.Icons.line('docente').includes(Dc.icon) && !K.Icons.line('docente').includes(K.Icons.LINE.docente), w + 'eigen tabicoon voor de docent');
+    }
     const ids = new Set();
     for (const u of us) {
       const where = w + u.id;
@@ -1592,6 +1615,13 @@ const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((
   const b = { updated: 1, units: { u1: { steps: {}, best: 0.7, done: false, last: { t: 200, score: 0.7 } } } };
   const m = S.Store.mergeStates(a, b);
   ok(m.units.u1.last.t === 200 && m.units.u1.best === 0.7, 'unittoets: nieuwste laatste toets blijft bewaard na sync');
+}
+{ // vlaggen ook op Windows: eigen vlaggenlettertype en geen <select> met cursusnamen
+  const css = fs.readFileSync(path.join(root, 'css/app.css'), 'utf8'), html = fs.readFileSync(path.join(root, 'index.html'), 'utf8'), sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8'), app = fs.readFileSync(path.join(root, 'js/app.js'), 'utf8');
+  ok(fs.existsSync(path.join(root, 'icons/vlaggen/TwemojiCountryFlags.woff2')) && sw.includes("'icons/vlaggen/TwemojiCountryFlags.woff2'"), 'vlaggen: lettertype bestaat en staat in sw.js');
+  ok(/@font-face \{ font-family: 'Vlaggen'/.test(css) && /:root\.vlagfont \{ --font: 'Vlaggen'[^}]*--serif: 'Vlaggen'/.test(css), 'vlaggen: @font-face en .vlagfont in css');
+  ok(html.includes("classList.add('vlagfont')") && html.indexOf('vlagfont') < html.indexOf('css/app.css'), 'vlaggen: index.html test of de browser vlaggen tekent');
+  ok(!app.split('\n').some(l => /h\('select'/.test(l) && /CNAME|LNAME|\.flag/.test(l)), 'vlaggen: geen <select> met vlaggen (gebruik coursePick)');
 }
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);

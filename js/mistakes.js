@@ -8,6 +8,7 @@
    Alleen rekenwerk en tekst; het tekenen gebeurt in app.js. Getest in tests/run.js. */
 (function (S) {
   'use strict';
+  const NM = x => (S.docentNaam ? S.docentNaam(x) : x); // «Lupe» wordt de docent van deze cursus
   const { U, C } = S;
   const st = () => S.Store.state;
   const MAX = 300;          // zoveel fouten bewaren we
@@ -279,7 +280,7 @@
   function asText(r = report(30), opt = {}) {
     const s = st(), p = S.AI ? S.AI.learnerProfile() : { level: '' };
     const lines = [];
-    lines.push(`Rapport van Profe Lupe — ${new Date().toLocaleDateString(S.LOC, { day: 'numeric', month: 'long', year: 'numeric' })}`);
+    lines.push(`${NM('Rapport van Profe Lupe')} — ${new Date().toLocaleDateString(S.LOC, { day: 'numeric', month: 'long', year: 'numeric' })}`);
     lines.push(`Lesniveau: ${p.level || '?'}${p.cur ? ' (' + p.cur.title + ')' : ''} · laatste ${r.days} dagen · ${r.total} fouten in gesprekken${r.prev ? ' (periode ervoor: ' + r.prev + ')' : ''} · ${r.exTotal || 0} fouten in oefeningen`);
     lines.push(`App ${((typeof self !== 'undefined' && self.SPT_VERSION) || {}).number || '?'} · cursus ${S.course.id || '?'}`);
     const les = u => u ? ' — les: ' + u.level + ' ' + u.title + ' (' + u.id + ')' : '';
@@ -323,7 +324,7 @@
       lines.push('', `Al verwerkt in eerdere updates van de app (niet opnieuw voorstellen, tenzij er ná die datum nieuwe fouten zijn)${hidden ? '. ' + hidden + ' punten hierboven weggelaten: al verwerkt en sindsdien geen nieuwe fouten' : ''}:`);
       S.reworked.forEach(x => lines.push(`- v${x.v} (${fmtD(since(x))}) ${x.tag ? '[' + x.tag + ']' + (x.unit ? ' ' + x.unit : '') : (x.ids || []).join(', ')}: ${x.what}`));
     }
-    if (r.advice && r.advice.text && opt.advice !== false) lines.push('', 'Advies van Lupe (' + fmtD(r.advice.t) + '):', r.advice.text.replace(/\*\*/g, ''));
+    if (r.advice && r.advice.text && opt.advice !== false) lines.push('', NM('Advies van Lupe') + ' (' + fmtD(r.advice.t) + '):', r.advice.text.replace(/\*\*/g, ''));
     if (opt.update !== false) { const u = updateText(r, opt); if (u) lines.push('', u); }
     return lines.join('\n');
   }
@@ -331,19 +332,19 @@
   function updateText(r = report(30), opt = {}) {
     const lines = [];
     if (r.fix && r.fix.length) {
-      lines.push('Voor de volgende update — antwoorden die fout gerekend werden maar volgens Lupe goed zijn:');
+      lines.push(NM('Voor de volgende update — antwoorden die fout gerekend werden maar volgens Lupe goed zijn:'));
       r.fix.slice(0, 30).forEach(e => {
         const u = e.unit ? C.get(e.unit) : null;
         lines.push(`- ${e.q ? '«' + e.q + '»' : '(vraag)'}${u ? ' [' + u.level + ' ' + u.title + (e.id ? ', ' + e.id : '') + ']' : e.id ? ' [' + e.id + ']' : ''}`);
         lines.push(`    mijn antwoord: «${e.u}»${e.a && e.a.length ? ' · in de app: «' + e.a.join('» / «') + '»' : ''}`);
-        if (e.why) lines.push(`    Lupe: ${e.why}`);
-        else if (e.fb) lines.push(`    Lupe: ${e.fb}`);
+        if (e.why) lines.push(`    ${S.Tutor.name}: ${e.why}`);
+        else if (e.fb) lines.push(`    ${S.Tutor.name}: ${e.fb}`);
       });
     }
     if (r.update && r.update.text && opt.proposal !== false) {
       if (lines.length) lines.push('');
       const lr = lastRework(), old = lr && r.update.t < lr.t;
-      lines.push('Voorstellen van Lupe voor de volgende update (' + fmtD(r.update.t) + (old ? ', van vóór update ' + lr.v + ': vraag eerst nieuwe voorstellen' : '') + '):', r.update.text.replace(/\*\*/g, ''));
+      lines.push(NM('Voorstellen van Lupe') + ' voor de volgende update (' + fmtD(r.update.t) + (old ? ', van vóór update ' + lr.v + ': vraag eerst nieuwe voorstellen' : '') + '):', r.update.text.replace(/\*\*/g, ''));
     }
     return lines.join('\n');
   }
@@ -352,7 +353,7 @@
   async function proposeUpdate() {
     const r = report(90);
     const ES = S.course.target === 'es';
-    const sys = `You are Profe Lupe, the ${ES ? 'Latin American Spanish' : S.course.ai.target} teacher inside a language-learning web app${S.course.ui === 'nl' ? ' for a Dutch speaker' : ''}. The app's developer asks you what should go into the NEXT UPDATE, so the course fits this learner (and every learner like them) better. The developer edits the lesson files directly, so every proposal must point to the exact place and contain ready-to-use content.
+    const sys = `You are ${S.Tutor.title}, the ${ES ? 'Latin American Spanish' : S.course.ai.target} teacher inside a language-learning web app${S.course.ui === 'nl' ? ' for a Dutch speaker' : ''}. The app's developer asks you what should go into the NEXT UPDATE, so the course fits this learner (and every learner like them) better. The developer edits the lesson files directly, so every proposal must point to the exact place and contain ready-to-use content.
 The report below contains: mistakes from conversations with you, mistakes from regular exercises (typing, multiple choice, dictation, word tiles), exercises that often go wrong (with ids), weak topics with % correct, and answers that were marked wrong but that you approved. Ids: "x|<unit>|<n>" = exercise n of a unit, "w|<unit>|<n>" = word n of a unit's word list; [tag] = grammar topic key; (a1-04) = unit id.
 
 Write in Dutch. Give 3–6 proposals, most important first, and always finish every proposal completely (max 5 examples each). No intro, no outro, no headings. Use EXACTLY this format for each proposal (a line starting with "- ", then indented lines starting with two spaces):
@@ -374,12 +375,12 @@ Rules: only propose what the report supports, and say so in "Waarom"; if the rep
     const r = report(30);
     const other = S.course.target !== 'es', T = S.course.ai.target;
     const sys = other && S.course.ui === 'nl'
-      ? `You are Profe Lupe, a warm ${T} teacher in a learning app for a native Dutch speaker.
+      ? `You are ${S.Tutor.title}, a warm ${T} teacher in a learning app for a native Dutch speaker.
 Write in Dutch, max ~120 words, no headings, no tables. Based on the learner's mistake report (mistakes in conversations AND in regular exercises): name the 2–3 most important things to improve (watch for typical Dutch-speaker mistakes, false friends and unnatural collocations), explain each in one short sentence with one ${T} example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).`
       : other
-      ? `You are Profe Lupe, a warm ${T} teacher in a learning app for a native speaker of Latin American Spanish. When you write Spanish, use Latin American norms (ustedes, never vosotros; celular, carro, computadora).
+      ? `You are ${S.Tutor.title}, a warm ${T} teacher in a learning app for a native speaker of Latin American Spanish. When you write Spanish, use Latin American norms (ustedes, never vosotros; celular, carro, computadora).
 Write in Latin American Spanish, max ~120 words, no headings, no tables. Based on the learner's mistake report (mistakes in conversations AND in regular exercises): name the 2–3 most important things to improve, explain each in one short sentence with one ${T} example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).`
-      : `You are Profe Lupe, a warm Latin American Spanish teacher in a learning app for a Dutch speaker. Always Latin American norms (ustedes, never vosotros).
+      : `You are ${S.Tutor.title}, a warm Latin American Spanish teacher in a learning app for a Dutch speaker. Always Latin American norms (ustedes, never vosotros).
 Write in Dutch, max ~120 words, no headings, no tables. Based on the learner's mistake report (mistakes in conversations AND in regular exercises): name the 2–3 most important things to improve, explain each in one short sentence with one Latin American Spanish example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).`;
     const text = await S.AI.ask({ system: sys, prompt: asText(r, { advice: false }), maxTokens: 1200 });
     db().advice = { t: Date.now(), text: text.trim() };

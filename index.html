@@ -15,7 +15,24 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/app.css?v=1.77.0">
+<script>
+/* Chrome en Edge op Windows tekenen vlag-emoji als letters («NL», «US»). Test dat op een canvas (letters zijn grijs, een vlag heeft kleur)
+   en zet dan het vlaggenlettertype aan (klasse vlagfont, zie css/app.css). ?vlagfont=1 zet het altijd aan (om te testen). */
+(function () {
+  try {
+    var force = /[?&]vlagfont=1/.test(location.search);
+    var kleur = function (txt) {
+      var c = document.createElement('canvas'); c.width = c.height = 20;
+      var x = c.getContext('2d', { willReadFrequently: true }); x.textBaseline = 'top'; x.font = '16px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji","Twemoji Mozilla",sans-serif'; x.fillText(txt, 0, 2);
+      var d = x.getImageData(0, 0, 20, 20).data;
+      for (var i = 0; i < d.length; i += 4) if (d[i + 3] > 40 && (Math.abs(d[i] - d[i + 1]) > 24 || Math.abs(d[i + 1] - d[i + 2]) > 24)) return true;
+      return false;
+    };
+    if (force || (kleur('\uD83D\uDE0A') && !kleur('\uD83C\uDDF3\uD83C\uDDF1'))) document.documentElement.classList.add('vlagfont');
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="css/app.css?v=1.78.0">
 </head>
 <body>
 <header class="topbar">
@@ -42,113 +59,119 @@
 <div id="toast" role="status" aria-live="polite"></div>
 <noscript><p style="padding:16px">Deze app heeft JavaScript nodig.</p></noscript>
 
-<script src="js/version.js?v=1.77.0"></script>
-<script src="js/changelog.js?v=1.77.0"></script>
-<script src="js/core.js?v=1.77.0"></script>
-<script src="js/badges.js?v=1.77.0"></script>
-<script src="js/i18n.js?v=1.77.0"></script>
-<script src="js/i18n-es.js?v=1.77.0"></script>
-<script src="js/sync.js?v=1.77.0"></script>
-<script src="js/conjugate.js?v=1.77.0"></script>
-<script src="js/curriculum.js?v=1.77.0"></script>
-<script src="content/a1.js?v=1.77.0"></script>
-<script src="content/a2.js?v=1.77.0"></script>
-<script src="content/a1-plus.js?v=1.77.0"></script>
-<script src="content/a2-plus.js?v=1.77.0"></script>
-<script src="content/b1.js?v=1.77.0"></script>
-<script src="content/b2.js?v=1.77.0"></script>
-<script src="content/extra.js?v=1.77.0"></script>
-<script src="content/landen.js?v=1.77.0"></script>
-<script src="content/kaarten/es.js?v=1.77.0"></script>
-<script src="content/kaarten/en.js?v=1.77.0"></script>
-<script src="content/kaarten/nl.js?v=1.77.0"></script>
-<script src="content/kaarten/fr.js?v=1.77.0"></script>
-<script src="content/kaarten/de.js?v=1.77.0"></script>
-<script src="content/kaarten/tr.js?v=1.77.0"></script>
-<script src="content/oefeningen-plus.js?v=1.77.0"></script>
-<script src="content/synoniemen.js?v=1.77.0"></script>
-<script src="content/uitleg.js?v=1.77.0"></script>
-<script src="js/uitzonderingen.js?v=1.77.0"></script>
-<script src="content/regiowoorden.js?v=1.77.0"></script>
-<script src="js/regio.js?v=1.77.0"></script>
-<script src="content/en-es/a1.js?v=1.77.0"></script>
-<script src="content/en-es/a1-2.js?v=1.77.0"></script>
-<script src="content/en-es/a2.js?v=1.77.0"></script>
-<script src="content/en-es/a2-2.js?v=1.77.0"></script>
-<script src="content/en-es/b1.js?v=1.77.0"></script>
-<script src="content/en-es/b1-2.js?v=1.77.0"></script>
-<script src="content/en-es/extra.js?v=1.77.0"></script>
-<script src="content/nl-es/a1.js?v=1.77.0"></script>
-<script src="content/nl-es/a1-2.js?v=1.77.0"></script>
-<script src="content/nl-es/a2.js?v=1.77.0"></script>
-<script src="content/nl-es/a2-2.js?v=1.77.0"></script>
-<script src="content/nl-es/b1.js?v=1.77.0"></script>
-<script src="content/nl-es/b1-2.js?v=1.77.0"></script>
-<script src="content/nl-es/extra.js?v=1.77.0"></script>
-<script src="content/nl-es/landen.js?v=1.77.0"></script>
-<script src="content/en-nl/a1.js?v=1.77.0"></script>
-<script src="content/en-nl/a1-2.js?v=1.77.0"></script>
-<script src="content/en-nl/a2.js?v=1.77.0"></script>
-<script src="content/en-nl/a2-2.js?v=1.77.0"></script>
-<script src="content/en-nl/b1.js?v=1.77.0"></script>
-<script src="content/en-nl/b1-2.js?v=1.77.0"></script>
-<script src="content/en-nl/b2.js?v=1.77.0"></script>
-<script src="content/en-nl/b2-2.js?v=1.77.0"></script>
-<script src="content/en-nl/c1.js?v=1.77.0"></script>
-<script src="content/en-nl/c1-2.js?v=1.77.0"></script>
-<script src="content/en-nl/c2.js?v=1.77.0"></script>
-<script src="content/en-nl/c2-2.js?v=1.77.0"></script>
-<script src="content/en-nl/extra.js?v=1.77.0"></script>
-<script src="content/en-nl/landen.js?v=1.77.0"></script>
-<script src="content/fr-nl/a1.js?v=1.77.0"></script>
-<script src="content/fr-nl/a1-2.js?v=1.77.0"></script>
-<script src="content/fr-nl/a2.js?v=1.77.0"></script>
-<script src="content/fr-nl/a2-2.js?v=1.77.0"></script>
-<script src="content/fr-nl/b1.js?v=1.77.0"></script>
-<script src="content/fr-nl/b1-2.js?v=1.77.0"></script>
-<script src="content/fr-nl/extra.js?v=1.77.0"></script>
-<script src="content/fr-nl/landen.js?v=1.77.0"></script>
-<script src="content/de-nl/a1.js?v=1.77.0"></script>
-<script src="content/de-nl/a1-2.js?v=1.77.0"></script>
-<script src="content/de-nl/a2.js?v=1.77.0"></script>
-<script src="content/de-nl/a2-2.js?v=1.77.0"></script>
-<script src="content/de-nl/b1.js?v=1.77.0"></script>
-<script src="content/de-nl/b1-2.js?v=1.77.0"></script>
-<script src="content/de-nl/extra.js?v=1.77.0"></script>
-<script src="content/de-nl/landen.js?v=1.77.0"></script>
-<script src="content/tr-nl/a1.js?v=1.77.0"></script>
-<script src="content/tr-nl/a1-2.js?v=1.77.0"></script>
-<script src="content/tr-nl/a2.js?v=1.77.0"></script>
-<script src="content/tr-nl/a2-2.js?v=1.77.0"></script>
-<script src="content/tr-nl/a2-3.js?v=1.77.0"></script>
-<script src="content/tr-nl/a2-4.js?v=1.77.0"></script>
-<script src="content/tr-nl/a2-5.js?v=1.77.0"></script>
-<script src="content/tr-nl/extra.js?v=1.77.0"></script>
-<script src="content/tr-nl/landen.js?v=1.77.0"></script>
-<script src="js/gen.js?v=1.77.0"></script>
-<script src="js/games.js?v=1.77.0"></script>
-<script src="js/words.js?v=1.77.0"></script>
-<script src="js/vocab.js?v=1.77.0"></script>
-<script src="js/zwak.js?v=1.77.0"></script>
-<script src="js/woordtoets.js?v=1.77.0"></script>
-<script src="js/dagplan.js?v=1.77.0"></script>
-<script src="js/gloss.js?v=1.77.0"></script>
-<script src="js/mistakes.js?v=1.77.0"></script>
-<script src="js/look.js?v=1.77.0"></script>
-<script src="js/look-fr.js?v=1.77.0"></script>
-<script src="js/look-de.js?v=1.77.0"></script>
-<script src="js/look-tr.js?v=1.77.0"></script>
-<script src="js/tutor.js?v=1.77.0"></script>
-<script src="js/cast.js?v=1.77.0"></script>
-<script src="js/life.js?v=1.77.0"></script>
-<script src="js/icons.js?v=1.77.0"></script>
-<script src="js/unit-art.js?v=1.77.0"></script>
-<script src="js/ai.js?v=1.77.0"></script>
-<script src="js/mic.js?v=1.77.0"></script>
-<script src="js/mundo.js?v=1.77.0"></script>
-<script src="js/begrippen.js?v=1.77.0"></script>
-<script src="js/lesson.js?v=1.77.0"></script>
-<script src="js/ask.js?v=1.77.0"></script>
-<script src="js/app.js?v=1.77.0"></script>
+<script src="js/version.js?v=1.78.0"></script>
+<script src="js/changelog.js?v=1.78.0"></script>
+<script src="js/core.js?v=1.78.0"></script>
+<script src="js/badges.js?v=1.78.0"></script>
+<script src="js/i18n.js?v=1.78.0"></script>
+<script src="js/i18n-es.js?v=1.78.0"></script>
+<script src="js/sync.js?v=1.78.0"></script>
+<script src="js/conjugate.js?v=1.78.0"></script>
+<script src="js/curriculum.js?v=1.78.0"></script>
+<script src="content/a1.js?v=1.78.0"></script>
+<script src="content/a2.js?v=1.78.0"></script>
+<script src="content/a1-plus.js?v=1.78.0"></script>
+<script src="content/a2-plus.js?v=1.78.0"></script>
+<script src="content/b1.js?v=1.78.0"></script>
+<script src="content/b2.js?v=1.78.0"></script>
+<script src="content/extra.js?v=1.78.0"></script>
+<script src="content/landen.js?v=1.78.0"></script>
+<script src="content/kaarten/es.js?v=1.78.0"></script>
+<script src="content/kaarten/en.js?v=1.78.0"></script>
+<script src="content/kaarten/nl.js?v=1.78.0"></script>
+<script src="content/kaarten/fr.js?v=1.78.0"></script>
+<script src="content/kaarten/de.js?v=1.78.0"></script>
+<script src="content/kaarten/tr.js?v=1.78.0"></script>
+<script src="content/oefeningen-plus.js?v=1.78.0"></script>
+<script src="content/synoniemen.js?v=1.78.0"></script>
+<script src="content/uitleg.js?v=1.78.0"></script>
+<script src="js/uitzonderingen.js?v=1.78.0"></script>
+<script src="content/regiowoorden.js?v=1.78.0"></script>
+<script src="js/regio.js?v=1.78.0"></script>
+<script src="content/en-es/a1.js?v=1.78.0"></script>
+<script src="content/en-es/a1-2.js?v=1.78.0"></script>
+<script src="content/en-es/a2.js?v=1.78.0"></script>
+<script src="content/en-es/a2-2.js?v=1.78.0"></script>
+<script src="content/en-es/b1.js?v=1.78.0"></script>
+<script src="content/en-es/b1-2.js?v=1.78.0"></script>
+<script src="content/en-es/extra.js?v=1.78.0"></script>
+<script src="content/nl-es/a1.js?v=1.78.0"></script>
+<script src="content/nl-es/a1-2.js?v=1.78.0"></script>
+<script src="content/nl-es/a2.js?v=1.78.0"></script>
+<script src="content/nl-es/a2-2.js?v=1.78.0"></script>
+<script src="content/nl-es/b1.js?v=1.78.0"></script>
+<script src="content/nl-es/b1-2.js?v=1.78.0"></script>
+<script src="content/nl-es/extra.js?v=1.78.0"></script>
+<script src="content/nl-es/landen.js?v=1.78.0"></script>
+<script src="content/en-nl/a1.js?v=1.78.0"></script>
+<script src="content/en-nl/a1-2.js?v=1.78.0"></script>
+<script src="content/en-nl/a2.js?v=1.78.0"></script>
+<script src="content/en-nl/a2-2.js?v=1.78.0"></script>
+<script src="content/en-nl/b1.js?v=1.78.0"></script>
+<script src="content/en-nl/b1-2.js?v=1.78.0"></script>
+<script src="content/en-nl/b2.js?v=1.78.0"></script>
+<script src="content/en-nl/b2-2.js?v=1.78.0"></script>
+<script src="content/en-nl/c1.js?v=1.78.0"></script>
+<script src="content/en-nl/c1-2.js?v=1.78.0"></script>
+<script src="content/en-nl/c2.js?v=1.78.0"></script>
+<script src="content/en-nl/c2-2.js?v=1.78.0"></script>
+<script src="content/en-nl/extra.js?v=1.78.0"></script>
+<script src="content/en-nl/landen.js?v=1.78.0"></script>
+<script src="content/fr-nl/a1.js?v=1.78.0"></script>
+<script src="content/fr-nl/a1-2.js?v=1.78.0"></script>
+<script src="content/fr-nl/a2.js?v=1.78.0"></script>
+<script src="content/fr-nl/a2-2.js?v=1.78.0"></script>
+<script src="content/fr-nl/b1.js?v=1.78.0"></script>
+<script src="content/fr-nl/b1-2.js?v=1.78.0"></script>
+<script src="content/fr-nl/extra.js?v=1.78.0"></script>
+<script src="content/fr-nl/landen.js?v=1.78.0"></script>
+<script src="content/de-nl/a1.js?v=1.78.0"></script>
+<script src="content/de-nl/a1-2.js?v=1.78.0"></script>
+<script src="content/de-nl/a2.js?v=1.78.0"></script>
+<script src="content/de-nl/a2-2.js?v=1.78.0"></script>
+<script src="content/de-nl/b1.js?v=1.78.0"></script>
+<script src="content/de-nl/b1-2.js?v=1.78.0"></script>
+<script src="content/de-nl/extra.js?v=1.78.0"></script>
+<script src="content/de-nl/landen.js?v=1.78.0"></script>
+<script src="content/tr-nl/a1.js?v=1.78.0"></script>
+<script src="content/tr-nl/a1-2.js?v=1.78.0"></script>
+<script src="content/tr-nl/a2.js?v=1.78.0"></script>
+<script src="content/tr-nl/a2-2.js?v=1.78.0"></script>
+<script src="content/tr-nl/a2-3.js?v=1.78.0"></script>
+<script src="content/tr-nl/a2-4.js?v=1.78.0"></script>
+<script src="content/tr-nl/a2-5.js?v=1.78.0"></script>
+<script src="content/tr-nl/b1.js?v=1.78.0"></script>
+<script src="content/tr-nl/b1-2.js?v=1.78.0"></script>
+<script src="content/tr-nl/b1-3.js?v=1.78.0"></script>
+<script src="content/tr-nl/b1-4.js?v=1.78.0"></script>
+<script src="content/tr-nl/b1-5.js?v=1.78.0"></script>
+<script src="content/tr-nl/extra.js?v=1.78.0"></script>
+<script src="content/tr-nl/landen.js?v=1.78.0"></script>
+<script src="js/gen.js?v=1.78.0"></script>
+<script src="js/games.js?v=1.78.0"></script>
+<script src="js/words.js?v=1.78.0"></script>
+<script src="js/vocab.js?v=1.78.0"></script>
+<script src="js/zwak.js?v=1.78.0"></script>
+<script src="js/woordtoets.js?v=1.78.0"></script>
+<script src="js/dagplan.js?v=1.78.0"></script>
+<script src="js/gloss.js?v=1.78.0"></script>
+<script src="js/mistakes.js?v=1.78.0"></script>
+<script src="js/look.js?v=1.78.0"></script>
+<script src="js/look-fr.js?v=1.78.0"></script>
+<script src="js/look-de.js?v=1.78.0"></script>
+<script src="js/look-tr.js?v=1.78.0"></script>
+<script src="js/docenten.js?v=1.78.0"></script>
+<script src="js/tutor.js?v=1.78.0"></script>
+<script src="js/cast.js?v=1.78.0"></script>
+<script src="js/life.js?v=1.78.0"></script>
+<script src="js/icons.js?v=1.78.0"></script>
+<script src="js/unit-art.js?v=1.78.0"></script>
+<script src="js/ai.js?v=1.78.0"></script>
+<script src="js/mic.js?v=1.78.0"></script>
+<script src="js/mundo.js?v=1.78.0"></script>
+<script src="js/begrippen.js?v=1.78.0"></script>
+<script src="js/lesson.js?v=1.78.0"></script>
+<script src="js/ask.js?v=1.78.0"></script>
+<script src="js/app.js?v=1.78.0"></script>
 </body>
 </html>
