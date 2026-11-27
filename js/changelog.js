@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.90.1', date: '2026-11-27',
+    nl: ['Bij hardnekkige onderwerpen staan onder «Al geprobeerd» nu ook de eerdere rondes: de updates waarin je al extra oefeningen en uitleg kreeg, met hoeveel fouten je daarna nog maakte. Zo zie je meteen dat meer van hetzelfde niet genoeg hielp, en begint de lijst niet leeg.'],
+    es: [] },
   { v: '1.90.0', date: '2026-11-27',
     nl: ['Turks: ⓘ-uitleg van grammaticabegrippen. Tik in de Turkse lessen op een onderstreept woord (klinkerharmonie, naamval, achtervoegsel, brede tijd …) en je krijgt uitleg in gewone taal, met Turkse voorbeelden, tabellen en bij elke uitzondering de reden', '62 begrippen voor Turks, waarvan 13 die alleen in het Turks bestaan: klinkerharmonie, plaktaal, naamvallen, medeklinkerverandering, bindklank, bezitsconstructie, achterzetsel, brede tijd, var en yok, woordvolgorde, kunnen (-ebil), laten doen (-dir) en moeten (-meli)'],
     es: ['Turco: explicación ⓘ de los términos de gramática. En las lecciones de turco, toca una palabra subrayada (armonía vocálica, caso, sufijo, tiempo amplio…) y verás una explicación sencilla con ejemplos en turco, tablas y el porqué de cada excepción.', '62 términos para turco, 13 de ellos solo existen en turco: armonía vocálica, lengua aglutinante, casos, cambio de consonantes, consonante de enlace, construcción posesiva, posposición, tiempo amplio, var y yok, orden de palabras, poder (-ebil), hacer que alguien haga (-dir) y deber (-meli).'] },

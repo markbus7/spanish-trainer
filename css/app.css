@@ -1819,3 +1819,4 @@ details.fold[open] > .fold-sum .fold-chev { transform: rotate(90deg); }
 .strat-card .strat-mis li { padding: .45rem .6rem; border-radius: 10px; background: var(--bg2); }
 .strat-card .strat-mis s { color: var(--bad); }
 .strat-card ol, .strat-card ul { padding-left: 1.3rem; }
+.st-try.st-old { border-left-color: var(--muted); color: var(--muted); }
