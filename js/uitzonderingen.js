@@ -306,11 +306,14 @@ verliezen verloor/verloren verloren perder`.split('\n').map(l => { const m = l.s
   const TENSE_NL = { pres: 'tegenwoordige tijd', pret: 'verleden tijd (indefinido)', imp: 'imperfecto', fut: 'toekomende tijd', cond: 'condicional', subj: 'subjuntivo', imper: 'gebiedende wijs', impsubj: 'imperfecto de subjuntivo', ger: 'gerundio', part: 'voltooid deelwoord' };
   const PERS_NL = ['ik', 'jij', 'hij/zij/u', 'wij', 'zij/jullie'];
   let vIndex = null;
+  const NOREG = ['ser', 'ir']; // geen zinnige «regelmatige» vorm (s-/geen stam)
   function whyEs(inf, tense, p, form, reg, d) {
     const v = S.conj.VERBS[inf] || {};
     const full = ['ser', 'ir', 'estar', 'haber'].includes(inf);
     if (tense === 'part') return 'Het voltooid deelwoord is onregelmatig: <b>' + form + '</b> in plaats van <s>' + reg + '</s>. Dat geldt ook in <i>he ' + form + ', había ' + form + '</i>.';
     if (tense === 'ger') return 'Het gerundio is onregelmatig: <b>' + form + '</b> in plaats van <s>' + reg + '</s>' + (/yendo$/.test(form) ? ' (de <i>i</i> wordt een <i>y</i> tussen twee klinkers).' : '.');
+    // ser en ir: zonder -er/-ir blijft er (bijna) niets over, dus een «regelmatige» vorm vergelijken heeft geen zin
+    if (NOREG.includes(inf)) return '<b>' + inf + '</b> is een van de helemaal onregelmatige werkwoorden. Er bestaat niet eens een regelmatige vorm om mee te vergelijken: haal je <i>-' + inf.slice(-2) + '</i> eraf, dan blijft ' + (inf === 'ir' ? 'er niets over' : 'alleen <i>' + inf.slice(0, -2) + '-</i> over') + '. Daarom leer je deze vormen uit je hoofd.';
     if (full) return '<b>' + inf + '</b> is een van de helemaal onregelmatige werkwoorden: deze vormen leer je uit je hoofd.';
     if ((tense === 'fut' || tense === 'cond') && v.fs) return 'In de ' + TENSE_NL[tense] + ' heeft <i>' + inf + '</i> een <b>eigen stam: ' + v.fs + '-</b> (in plaats van ' + inf + '-). De uitgangen zijn wel gewoon.';
     if (tense === 'imper' && p === 1 && v.tu) return 'De gebiedende wijs voor <i>tú</i> is kort en onregelmatig: <b>' + form + '</b>. Er zijn er acht: <i>di, haz, ve, pon, sal, sé, ten, ven</i>.';
@@ -369,7 +372,7 @@ verliezen verloor/verloren verloren perder`.split('\n').map(l => { const m = l.s
       const who = l.length > 1 ? l.map(x => x.inf).join(' / ') : e.inf;
       const when = e.p != null ? ' (' + PERS_NL[e.p] + ', ' + TENSE_NL[e.t] + ')' : ' (' + TENSE_NL[e.t] + ')';
       const html = (l.length > 1 ? '<b>' + w + '</b> is een vorm van <i>' + l.map(x => x.inf).join('</i> én van <i>') + '</i>. ' : '<b>' + w + '</b> is een onregelmatige vorm van <i>' + e.inf + '</i>' + when + '. ') +
-        (e.reg && l.length === 1 ? 'Regelmatig zou het <s>' + e.reg + '</s> zijn. ' : '') + whyEs(e.inf, e.t, e.p, w, e.reg);
+        (e.reg && l.length === 1 && !(NOREG.includes(e.inf) && e.t !== 'ger' && e.t !== 'part') ? 'Regelmatig zou het <s>' + e.reg + '</s> zijn. ' : '') + whyEs(e.inf, e.t, e.p, w, e.reg);
       out.push({ k: 'v:' + w, t: w + ' · ' + who, html, verb: true });
     });
     return out;
