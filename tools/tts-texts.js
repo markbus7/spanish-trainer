@@ -162,6 +162,7 @@ for (const es of S.Tutor.lines.every(S.C.all())) for (const [v, o] of Object.ent
    en per niveau 'cursus:niveau' voor offline downloaden. */
 const OTHER = { 'en-es': ['en-US-JennyNeural', 'en-US-GuyNeural'], 'en-nl': ['en-US-AriaNeural', 'en-US-GuyNeural'], 'nl-es': ['nl-NL-FennaNeural', 'nl-NL-MaartenNeural'],
   'fr-nl': ['fr-FR-DeniseNeural', 'fr-FR-HenriNeural'],
+  'de-nl': ['de-DE-KatjaNeural', 'de-DE-ConradNeural'],
   'tr-nl': ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural'] };
 for (const [course, [vf, vm_]] of Object.entries(OTHER)) {
   S = load(course);
@@ -217,6 +218,9 @@ const PLACE_VOICES = {
     CW: ['nl-NL-ColetteNeural', 'nl-NL-MaartenNeural'], AF: ['af-ZA-AdriNeural', 'af-ZA-WillemNeural']
   },
   // Frans: eigen stemmen voor Frankrijk, België, Zwitserland en Canada; de Afrikaanse landen en Haïti lenen de Franse stem (voiceNote in de app)
+  de: {
+    DE: ['de-DE-KatjaNeural', 'de-DE-ConradNeural'], AT: ['de-AT-IngridNeural', 'de-AT-JonasNeural'], CH: ['de-CH-LeniNeural', 'de-CH-JanNeural']
+  },
   fr: {
     FR: ['fr-FR-DeniseNeural', 'fr-FR-HenriNeural'], BE: ['fr-BE-CharlineNeural', 'fr-BE-GerardNeural'], CH: ['fr-CH-ArianeNeural', 'fr-CH-FabriceNeural'],
     CA: ['fr-CA-SylvieNeural', 'fr-CA-JeanNeural'], AFR: ['fr-FR-VivienneMultilingualNeural', 'fr-FR-RemyMultilingualNeural']

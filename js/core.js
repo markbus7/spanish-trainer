@@ -82,6 +82,12 @@
       ai: { target: 'French (standard French of France)', native: 'Dutch', style: 'standard French of France; mention Belgian, Swiss or Québec usage when it differs and it matters; put a space before ? ! : ;',
         pitfalls: 'gender of nouns (le/la), partitive articles (du, de la, pas de), être vs. avoir in the passé composé, passé composé vs. imparfait, tu vs. vous, silent final letters and liaison, position of object pronouns, false friends, too literal translations from Dutch',
         exceptions: 'irregular verb forms (vous faites, ils vont), mon amie / cet hôtel / bel homme before a vowel, au printemps, pas de after a negation, être verbs in the passé composé, soixante-dix / quatre-vingts, irregular feminines and plurals (belle, animaux), adjectives placed before the noun' } },
+    // Duits voor Nederlandstaligen, A1 t/m B1 (Hoogduits uit Duitsland; Oostenrijk en Zwitserland in «Op reis»).
+    'de-nl': { id: 'de-nl', target: 'de', ui: 'nl', speak: 'de-DE', listen: 'de-DE', flag: '🇩🇪', ns: 'de-nl', where: 'Duitsland', hello: 'Hallo! Wie geht’s? Willkommen in deinem Deutschkurs.', device: 'Und das ist die Stimme deines Geräts.',
+      brand: 'Deutsch <em>klar</em>', title: 'Deutsch Klar', name: { nl: 'Duits', es: 'alemán' },
+      ai: { target: 'German', native: 'Dutch', style: 'standard German as spoken in Germany; current spelling with ß; use "du" unless the situation is formal, then "Sie"',
+        pitfalls: 'cases (nominative, accusative, dative) and the prepositions that trigger them, der/die/das where Dutch only has de/het, verb in second position and at the end in subordinate clauses, haben vs. sein in the Perfekt, capitalised nouns, false friends such as bellen/doof/das Meer/der See/dürfen/schlimm/die Tasse/klar, too literal translations from Dutch',
+        exceptions: 'das Mädchen is neuter because of -chen; strong verbs with a vowel change (du fährst, er liest); irregular participles; verbs that take sein in the Perfekt; weak masculine nouns (den Jungen, den Herrn); dative plural -n; two-way prepositions' } },
     // Turks voor Nederlandstaligen (standaard-Turks van Turkije, İstanbul-uitspraak).
     'tr-nl': { id: 'tr-nl', target: 'tr', ui: 'nl', speak: 'tr-TR', listen: 'tr-TR', flag: '🇹🇷', ns: 'tr-nl', where: 'Turkije', hello: 'Merhaba! Nasılsın? Türkçe dersine hoş geldin.', device: 'Bu da cihazının sesi.',
       brand: 'Türkçe <em>kolay</em>', title: 'Türkçe Kolay', name: { nl: 'Turks', es: 'turco' },

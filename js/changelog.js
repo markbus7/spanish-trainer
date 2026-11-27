@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.76.0', date: '2026-11-27',
+    nl: ['Nieuwe cursus Duits voor Nederlandstaligen (A1 t/m B1, 30 units) met Duitse sfeer: Lupe in dirndl, een vakwerkstadje met de Alpen en de Brandenburger Tor, en de kaart «Op reis» met Duitsland, Oostenrijk, Zwitserland, Liechtenstein, Luxemburg en Oost-België. Uitzonderingen worden steeds benoemd, met de reden.'],
+    es: ['Nuevo curso: alemán para hablantes de neerlandés (A1 a B1, 30 unidades), con ambiente alemán (Lupe con dirndl, un pueblo de casas con entramado, los Alpes y la Puerta de Brandeburgo) y su propio mapa «De viaje».'] },
   { v: '1.75.0', date: '2026-11-27',
     nl: ['Frans: niveau A2 is compleet. Tien nieuwe units: passé composé met avoir en être, imparfait, bij de dokter, uit eten (le/la/les en en), vergelijken, werk (lui/leur en y), futur simple, een verhaal vertellen en qui/que/où. Met dialogen uit Lyon, Marseille, Namen, Genève, Parijs, Montréal, Abidjan, Dakar, Port-au-Prince en Fès. Uitzonderingen staan er weer steeds bij, met de reden.'],
     es: ['Francés: el nivel A2 está completo (10 unidades nuevas).'] },
