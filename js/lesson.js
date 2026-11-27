@@ -342,6 +342,11 @@
     if (it.culture) {
       return h('div', { class: 'info' }, h('div', { class: 'eyebrow' }, '🌎 Cultuur & regio'), h('h2', null, it.culture.t), h('div', { class: 'prose', html: it.culture.html }));
     }
+    if (it.strat) { // 🧪 andere aanpak (js/strategie.js): uitlegkaart van een leerstrategie
+      const body = h('div', { class: 'prose', html: it.strat.html });
+      body.querySelectorAll('p, li').forEach(p => { if (/^\s*(?:⚠️|⚠|📌)?\s*(?:uitzondering|excepción|excepcion)/iu.test(p.textContent)) p.classList.add('uz-p'); });
+      return h('div', { class: 'info strat-card' }, h('div', { class: 'eyebrow' }, (it.strat.icon || '🧪') + ' Andere aanpak'), h('h2', null, it.strat.title), body);
+    }
     const g = it.grammar;
     return h('div', { class: 'info' }, grammarBlock(g));
   };

@@ -176,6 +176,8 @@ If the course text itself contains a real mistake, say so honestly.`;
     setTimeout(() => { if (inp && window.innerWidth >= 760) inp.focus({ preventScroll: true }); }, 60);
     sync();
   }
+  /** Paneel openen en meteen een vraag stellen (bijv. «leg dit anders uit» vanuit js/strategie.js). */
+  function ask(text) { open(); if (S.AI.enabled()) setTimeout(() => send(text), 80); }
   function close() {
     if (!panel) return;
     panel.hidden = true; backdrop.hidden = true;
@@ -202,5 +204,5 @@ If the course text itself contains a real mistake, say so honestly.`;
     sync();
   }
 
-  S.Ask = { init, open, close, sync, setSource, context, isOpen, system };
+  S.Ask = { init, open, ask, close, sync, setSource, context, isOpen, system };
 })(window.SPT);

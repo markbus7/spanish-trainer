@@ -84,14 +84,16 @@
     if (t.lupe) why.push('🎭 ' + t.lupe + '× fout bij Lupe deze maand');
     if (t.ex) why.push('✏️ ' + t.ex + '× fout in oefeningen deze maand');
     const l = t.last;
-    return h('div', { class: 'zw-topic' },
+    const sb = S.Strat ? S.Strat.block(t.tag, { quiet: true }) : null, stub = S.Strat && S.Strat.isStubborn(t.tag);
+    return h('div', { class: 'zw-topic' + (stub ? ' zw-stub' : '') },
       h('div', { class: 'zw-top' },
         h('div', { class: 'grow' }, h('b', null, t.label), h('small', { class: 'muted' }, why.join(' · '))),
         t.pct != null ? h('div', { class: 'zw-pct' }, pbar(t.pct), h('b', null, pctTxt(t.pct))) : null),
       l && l.right ? h('div', { class: 'small zw-ex' }, h('span', { class: 'muted' }, 'Laatste fout: '),
         l.wrong ? [h('s', { lang: 'es' }, l.wrong), ' → '] : h('span', { class: 'muted' }, '(niet geweten) '), h('b', { lang: 'es' }, l.right)) : null,
+      sb,
       h('div', { class: 'row gap wrap zw-acts' },
-        h('button', { class: 'btn primary small', type: 'button', onclick: () => practiceTopic(t) }, '🎯 Oefen dit'),
+        h('button', { class: 'btn ' + (stub ? 'ghost' : 'primary') + ' small', type: 'button', onclick: () => practiceTopic(t) }, stub ? '🎯 Gewoon oefenen' : '🎯 Oefen dit'),
         t.unit ? h('button', { class: 'btn ghost small', type: 'button', onclick: () => openUitleg(t.unit) }, '📘 Uitleg · ' + t.unit.level + ' ' + t.unit.title) : null));
   }
   function page() {
@@ -109,6 +111,7 @@
     const top = sm.topics[0];
     wrap.append(S.Tutor.coach(top ? { es: 'Practiquemos ' + (top.label.length < 40 ? '«' + top.label + '»' : 'esto') + ' un poco más.', nl: 'Laten we «' + top.label + '» nog wat oefenen.' }
       : { es: 'Repasemos estas palabras juntos.', nl: 'Laten we deze woorden samen herhalen.' }, { full: true }) || '');
+    const drip = S.Strat && S.Strat.dripCard(); if (drip) wrap.append(drip);
     // één grote knop voor alles samen
     wrap.append(h('div', { class: 'card zw-all' },
       h('div', { class: 'zw-counts' },
@@ -121,6 +124,12 @@
     if (sm.topics.length) gram.append(h('p', { class: 'small muted' }, 'Onderwerpen met minder dan 80% goed, of die de laatste tijd vaak misgingen. Zwakste bovenaan.'), h('div', { class: 'zw-topics' }, sm.topics.map(topicRow)));
     else gram.append(h('div', { class: 'card' }, h('p', { class: 'small' }, '💪 Geen zwakke grammatica-onderwerpen. ¡Muy bien!')));
     wrap.append(gram);
+    // 🧪 werkwoordstijden die hardnekkig fout blijven gaan, en wat bij jou werkt (js/strategie.js)
+    const cr = S.Strat ? S.Strat.conjRows() : [];
+    if (cr.length) wrap.append(h('section', { class: 'sec', id: 'zw-conj' }, h('h2', { class: 'sec-title' }, '🔁 Hardnekkige werkwoorden'),
+      h('p', { class: 'small muted' }, 'Deze vervoegingen heb je al vaak geoefend en ze gaan nog steeds mis. Tijd voor een andere aanpak.'), h('div', { class: 'zw-topics' }, cr)));
+    const ov = S.Strat && S.Strat.overview();
+    if (ov) wrap.append(h('section', { class: 'sec', id: 'zw-werkt' }, h('h2', { class: 'sec-title' }, '🧪 Wat werkt voor jou'), ov));
     // woorden
     const wsec = h('section', { class: 'sec', id: 'zw-woord' }, h('h2', { class: 'sec-title' }, '📚 Woorden, zinnen en werkwoorden'));
     if (sm.words.length) {
@@ -147,7 +156,9 @@
 
   /** Kaart voor Hoy: hoeveel zwakke punten, de zwakste genoemd, met Oefen nu + Bekijk. Null als er niets is. */
   function hoyCard() {
-    const sm = summary(); if (!sm.total) return null;
+    const sm = summary(), drip = S.Strat && S.Strat.dripCard();
+    if (!sm.total) return drip;
+    const hard = S.Strat ? S.Strat.topics()[0] : null;
     const names = sm.topics.slice(0, 2).map(t => t.label);
     const parts = [];
     if (sm.topics.length) parts.push(U.plural(sm.topics.length, 'onderwerp', 'onderwerpen'));
@@ -157,6 +168,9 @@
         h('span', { class: 'zw-hoy-ic', 'aria-hidden': 'true' }, '🎯'),
         h('div', { class: 'grow' }, h('b', null, 'Je zwakke punten'), h('small', { class: 'muted' }, parts.join(' · ') + (names.length ? ' · vooral ' + names.join(', ') : ''))),
         h('span', { class: 'fold-chev', 'aria-hidden': 'true' }, '›')),
+      hard && hard.next ? h('div', { class: 'zw-hoy-hard small' }, h('span', { class: 'st-chip' }, '🔁 Hardnekkig'), ' ', h('b', null, hard.label), ' blijft fout gaan. ',
+        h('button', { class: 'btn link small', type: 'button', onclick: () => S.Strat.start(hard.key, hard.next.id) }, '🧪 Probeer het anders: ' + hard.next.icon + ' ' + (S.docentNaam ? S.docentNaam(hard.next.name) : hard.next.name))) : null,
+      drip ? h('div', { class: 'zw-hoy-drip' }, [...drip.querySelectorAll('button')]) : null,
       h('div', { class: 'row gap wrap' },
         h('button', { class: 'btn primary', type: 'button', onclick: () => practiceAll(sm) }, '🎯 Oefen nu'),
         h('a', { class: 'btn ghost', href: '#/zwak' }, 'Bekijk wat en waarom')));

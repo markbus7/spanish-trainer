@@ -445,6 +445,7 @@
     for (const k in O.partial || {}) { const o = O.partial[k], n = out.partial[k]; if (!n || (o.t || 0) > (n.t || 0)) out.partial[k] = clone(o); }
     // fouten uit gesprekken met Lupe: alles van beide apparaten
     if (S.Mistakes) out.lupe = S.Mistakes.merge(N.lupe, O.lupe);
+    if (S.Strat && (N.strat || O.strat)) out.strat = S.Strat.merge(N.strat, O.strat); // 🧪 geprobeerde leerstrategieën
     // onderbroken oefening: de laatst bewaarde (of laatst afgeronde/weggegooide) wint
     const pa = A.paused || {}, pb = B.paused || {};
     out.paused = clone((pa.t || 0) >= (pb.t || 0) ? pa : pb);
