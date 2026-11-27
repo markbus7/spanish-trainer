@@ -60,7 +60,22 @@
     { lv: 'B1', q: 'C\'est le livre ___ je t\'ai parlé.', o: ['dont', 'que', 'qui'], nl: 'Dat is het boek waarover ik je verteld heb.' },
     { lv: 'B1', q: 'Dis-moi ___ tu veux.', o: ['ce que', 'ce qui', 'quoi que'], nl: 'Zeg me wat je wilt.' },
     { lv: 'B1', q: 'Bien qu\'il ___ malade, il travaille.', o: ['soit', 'est', 'était'], nl: 'Hoewel hij ziek is, werkt hij.' },
-    { lv: 'B1', q: 'Elle s\'est ___ les mains.', o: ['lavé', 'lavée', 'lavées'], nl: 'Ze heeft haar handen gewassen.' }
+    { lv: 'B1', q: 'Elle s\'est ___ les mains.', o: ['lavé', 'lavée', 'lavées'], nl: 'Ze heeft haar handen gewassen.' },
+    { lv: 'B2', q: 'Selon la police, le suspect ___ quitté le pays.', o: ['aurait', 'aura', 'ait'], nl: 'Volgens de politie zou de verdachte het land hebben verlaten.' },
+    { lv: 'B2', q: 'Je suis content que tu ___ venu hier.', o: ['sois', 'es', 'aies'], nl: 'Ik ben blij dat je gisteren gekomen bent.' },
+    { lv: 'B2', q: 'Il est probable qu\'elle ___ embauchée.', o: ['sera', 'soit', 'serait'], nl: 'Waarschijnlijk wordt ze aangenomen.' },
+    { lv: 'B2', q: 'Prends un parapluie au cas où il ___.', o: ['pleuvrait', 'pleuve', 'pleut'], nl: 'Neem een paraplu mee voor het geval het regent.' },
+    { lv: 'B2', q: 'C\'est plus grave que je ___ pensais.', o: ['ne', 'pas', 'en'], nl: 'Het is erger dan ik dacht.' },
+    { lv: 'B2', q: 'Les fleurs que j\'ai ___ sont belles.', o: ['achetées', 'acheté', 'achetés'], nl: 'De bloemen die ik heb gekocht zijn mooi.' },
+    { lv: 'B2', q: '« Il fut surpris » veut dire : il ___ surpris.', o: ['a été', 'a eu', 'a fait'], nl: 'Hij was verrast.' },
+    { lv: 'B2', q: '___ la pluie, nous sommes sortis.', o: ['Malgré', 'Bien que', 'Même si'], nl: 'Ondanks de regen zijn we naar buiten gegaan.' },
+    { lv: 'B2', q: 'J\'ai ___ essayer, je n\'y arrive pas.', o: ['beau', 'bien', 'belle'], nl: 'Ik kan proberen wat ik wil, het lukt me niet.' },
+    { lv: 'B2', q: 'C\'est le projet ___ je participe.', o: ['auquel', 'dont', 'à lequel'], nl: 'Dat is het project waaraan ik deelneem.' },
+    { lv: 'B2', q: 'Elle a promis qu\'elle me ___ le lendemain.', o: ['rappellerait', 'rappellera', 'rappelle'], nl: 'Ze beloofde dat ze me de volgende dag zou terugbellen.' },
+    { lv: 'B2', q: 'Je pense à Marie. Je pense à ___.', o: ['elle', 'lui', 'y'], nl: 'Ik denk aan Marie. Ik denk aan haar.' },
+    { lv: 'B2', q: 'Quand j\'___ fini, je t\'appellerai.', o: ['aurai', 'ai', 'aurais'], nl: 'Als ik klaar ben, bel ik je.' },
+    { lv: 'B2', q: 'Après ___ lu votre lettre, je vous ai appelé.', o: ['avoir', 'ayant', 'ai'], nl: 'Na uw brief gelezen te hebben, heb ik u gebeld.' },
+    { lv: 'B2', q: 'Ma voiture ? Je ___ fais réparer demain.', o: ['la', 'lui', 'y'], nl: 'Mijn auto? Ik laat hem morgen repareren.' }
   ]);
 
   /* Vrije gesprekken met Profe Lupe. */
@@ -70,7 +85,9 @@
     { id: 'fr-nl-weekend', icon: '🕰️', lv: 'A2', title: 'Je weekend vertellen', place: 'Lyon 🇫🇷', role: 'You are Julien, a coworker in Lyon. It is Monday morning. Ask what the learner did on the weekend and ask follow-up questions in the passé composé and imparfait. Use tu.', goal: 'Vertel wat je in het weekend hebt gedaan en reageer op zijn verhaal.' },
     { id: 'fr-nl-medecin', icon: '🩺', lv: 'A2', title: 'Bij de huisarts', place: 'Bruxelles 🇧🇪', role: 'You are Docteur Lambert, a calm general practitioner in Brussels. Ask the patient what is wrong, since when, and give simple advice (il faut…, vous devez…). Use vous.', goal: 'Leg uit wat je klachten zijn en vraag wat je moet doen.' },
     { id: 'fr-nl-entretien', icon: '💼', lv: 'B1', title: 'Sollicitatiegesprek', place: 'Genève 🇨🇭', role: 'You are Madame Favre, an HR manager in Geneva interviewing the learner. Ask about experience, strengths, why they want the job, and a hypothetical (Que feriez-vous si… ?). Use vous.', goal: 'Vertel over je ervaring en beantwoord een «wat zou u doen als»-vraag.' },
-    { id: 'fr-nl-debat', icon: '🗳️', lv: 'B1', title: 'Discussie: stad of platteland', place: 'Montréal 🇨🇦', role: 'You are Étienne from Montréal, who is convinced that life in a big city is better than in the countryside. Discuss it with the learner: give your opinion, ask for theirs, and gently challenge their arguments. Use tu.', goal: 'Geef je mening met argumenten en reageer op de zijne.' }
+    { id: 'fr-nl-debat', icon: '🗳️', lv: 'B1', title: 'Discussie: stad of platteland', place: 'Montréal 🇨🇦', role: 'You are Étienne from Montréal, who is convinced that life in a big city is better than in the countryside. Discuss it with the learner: give your opinion, ask for theirs, and gently challenge their arguments. Use tu.', goal: 'Geef je mening met argumenten en reageer op de zijne.' },
+    { id: 'fr-nl-reclamation', icon: '📦', lv: 'B2', title: 'Een klacht indienen', place: 'Bruxelles 🇧🇪', role: 'You are a customer service agent at a Belgian online shop. The learner calls about a late and defective delivery. Ask for details, first offer a repair, and only after they insist explain how to get a refund. Use formal vous and formulas such as je vous prie de, veuillez, dans les meilleurs délais.', goal: 'Leg het probleem uit, blijf beleefd en krijg een vervanging of terugbetaling.' },
+    { id: 'fr-nl-radio', icon: '🎙️', lv: 'B2', title: 'Radiodebat: auto uit de stad?', place: 'Paris 🇫🇷', role: 'You are Claire, a radio host in Paris moderating a debate on banning cars from the city centre. Ask the learner for their position, challenge it with counter-arguments and facts, and ask them to concede or nuance (certes… mais, bien que, pourtant, malgré). Use vous and keep a lively radio tone.', goal: 'Verdedig je standpunt, geef één punt toe en spreek één keer tegen.' }
   ];
 
   /* Uitdrukking van de dag: [Frans, Nederlands, vlag]. */

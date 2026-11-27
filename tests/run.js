@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/begrippen-fr.js', 'js/zwak.js', 'content/beslisregels.js', 'js/strategie.js']) {
+for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/b2-2.js', 'content/extra.js', 'content/landen.js', 'content/landen-praten.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/begrippen-fr.js', 'js/begrippen-de.js', 'js/zwak.js', 'content/beslisregels.js', 'js/strategie.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -40,7 +40,8 @@ const known = {
   'ser|impsubj': 'fuera fueras fuera fuéramos fueran', 'decir|impsubj': 'dijera dijeras dijera dijéramos dijeran',
   'dormir|impsubj': 'durmiera durmieras durmiera durmiéramos durmieran', 'leer|impsubj': 'leyera leyeras leyera leyéramos leyeran',
   'saber|impsubj': 'supiera supieras supiera supiéramos supieran', 'haber|impsubj': 'hubiera hubieras hubiera hubiéramos hubieran',
-  'hacer|condperf': 'habría hecho|habrías hecho|habría hecho|habríamos hecho|habrían hecho', 'ver|plussubj': 'hubiera visto|hubieras visto|hubiera visto|hubiéramos visto|hubieran visto'
+  'hacer|condperf': 'habría hecho|habrías hecho|habría hecho|habríamos hecho|habrían hecho', 'ver|plussubj': 'hubiera visto|hubieras visto|hubiera visto|hubiéramos visto|hubieran visto',
+  'decir|perfsubj': 'haya dicho|hayas dicho|haya dicho|hayamos dicho|hayan dicho', 'volver|futperf': 'habré vuelto|habrás vuelto|habrá vuelto|habremos vuelto|habrán vuelto'
 };
 for (const [k, v] of Object.entries(known)) {
   const [verb, tense] = k.split('|');
@@ -70,7 +71,7 @@ ok(C('ano', ['año']).warn === 'enye', 'ñ-waarschuwing');
 
 /* ---------- lesstof ---------- */
 const units = S.C.all();
-ok(units.length === 45, 'aantal units = ' + units.length);
+ok(units.length === 52, 'aantal units = ' + units.length);
 const ids = new Set();
 const tags = S.C.TAGS;
 for (const u of units) {
@@ -204,6 +205,18 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
     ok(qz.items.every(it => !it.word || !it.word.note.startsWith('grof') || it.q === 'Wat betekent dit?'), 'op reis: ' + p.id + ' grove woorden alleen herkennen');
   });
   ok(Mu.get('pa').sounds.find(x => x[2].includes('pelaos'))[4].startsWith('Voy para') && Mu.list().every(p => p.sounds.every(x => !/\b(vos|vosotros|che|po|pa’)\b/i.test(x[4] || ''))), 'op reis: neutrale versie van klankzinnen zonder lokale vormen');
+  { // verdieping per land: voortgang en opdracht voor de docent
+    const keep = S.Store.state; S.Store.state = JSON.parse(JSON.stringify(keep)); S.Store.state.places = {};
+    const ar = Mu.get('ar');
+    ok(!Mu.finish(ar, 'dialog', { ok: 3, total: 3 }).first && S.Store.state.places.ar.d && !S.Store.state.places.ar.stamp && Mu.status('ar') === 'seen', 'op reis: dialoog gedaan telt als bezocht, geeft geen stempel');
+    const m = S.Store.mergeStates({ updated: 2, places: { ar: { v: 5, d: 9 } } }, { updated: 1, places: { ar: { v: 3, d: 4, t: 6 } } });
+    ok(m.places.ar.d === 4 && m.places.ar.t === 6, 'op reis: dialoog en gesprek samenvoegen bij synchroniseren');
+    S.Store.state = keep;
+    const sys = S.AI.roleplaySystem(Mu.talkScenario(ar)), plain = S.AI.roleplaySystem(S.scenarios[0]);
+    ok(/LOCAL VARIETY/.test(sys) && sys.includes('Argentinië') && sys.includes('che = ') && /never mark them as mistakes/i.test(sys) && /exception/.test(sys) && !sys.includes('boludo'), 'op reis: de docent praat zoals in het land, legt lokale woorden uit en rekent neutraal Spaans goed');
+    ok(!/LOCAL VARIETY/.test(plain), 'op reis: gewone rollenspellen blijven neutraal');
+    ok(Mu.talks().length === Mu.list().length && new Set(Mu.talks().map(x => x.id)).size === Mu.list().length, 'op reis: elk land een eigen gesprek');
+  }
   const pa = Mu.get('pa');
   ok(Mu.search(pa, 'FRIN').length === 1 && Mu.search(pa, 'xopa').length === 1 && Mu.search(pa, 'vriend').length >= 1, 'op reis: zoeken zonder accenten/hoofdletters, Spaans en Nederlands');
   ok(Mu.search(pa, '').length === pa.words.length && Mu.search(pa, '', 'g').every(i => pa.words[i][2] === 'g') && Mu.search(pa, '', 'ok').every(i => !pa.words[i][2]), 'op reis: zoekfilters');
@@ -971,7 +984,24 @@ await micTests();
     ok(hd.some(x => x.id === 'x|a1-04|5' && x.unit === 'a1-04' && x.f === 4 && x.a), 'oefenfouten: vaak fout uit de herhaling, met antwoord');
     ok(Mi.asText(Mi.report(30)).includes('[x|a1-04|5]'), 'oefenfouten: vaak fout staat in de tekst');
     ok(Mi.asText(Mi.report(30)).includes('✔ al verwerkt in v') && Mi.asText(Mi.report(30)).includes('Al verwerkt in eerdere updates'), 'verwerkt: Lupe ziet wat al in de app zit');
-    ok((S.reworked || []).every(x => (x.tag ? S.C.TAGS[x.tag] && S.C.get(x.unit) : x.ids.every(id => S.C.word(S.C.get(id.split('|')[1]), +id.split('|')[2]))) && /^\d{4}-\d\d-\d\d(T\d\d:\d\d:\d\dZ)?$/.test(x.date)), 'verwerkt: tags, units en woorden bestaan');
+    ok((S.reworked || []).every(x => (x.tag ? S.C.TAGS[x.tag] && S.C.get(x.unit) : x.ids.every(id => { const [k, a, b] = id.split('|'); return k === 'c' ? !!S.conj.table(a, b) : k === 'x' ? !!(S.C.get(a) && S.C.get(a).ex[+b]) : !!(S.C.get(a) && S.C.word(S.C.get(a), +b)); })) && /^\d{4}-\d\d-\d\d(T\d\d:\d\d:\d\dZ)?$/.test(x.date)), 'verwerkt: tags, units en woorden bestaan');
+    { // Lupe 27 nov, negende ronde: gerichte tip bij een bekende fout + nieuwe antwoorden
+      const u4b = S.C.get('a1-04'), T = S.Gen.tipFor, f = (s) => u4b.ex.find(e => (e.s === s || e.nl === s) && (e.fb || !/centro de la ciudad|Salvador/.test(s)));
+      const est = f('Nosotros ___ en el centro de la ciudad.'), sal = f('Wij reizen naar El Salvador.'), izq = f('Ga links af. (u)');
+      ok(est && /ser/.test(T('somos', est.fb)) && /est-/.test(T('esas', est.fb)) && T('estamos', est.fb) && !T('', est.fb), 'gerichte tip: ser in plaats van estar');
+      ok(/ser/.test(T('Nosotros somos en el centro.', est.fb)), 'gerichte tip: ook bij een meerkeuzezin');
+      ok(sal && sal.uitz && /Uitzondering/.test(T('Viajamos al Salvador', sal.fb)) && /plak/.test(T('Es el carro de el señor Pérez', sal.fb)) && /del señor/.test(T('Es el carro de señor Perez', sal.fb)), 'gerichte tip: al/del en de uitzondering El Salvador');
+      ok(izq && /a la/.test(T('gira izquerda', izq.fb)) && /qui/.test(T('Gire a la izquerda', izq.fb)) && /gire/.test(T('Gira a la izquierda', izq.fb)), 'gerichte tip: a la izquierda');
+      const nx = S.Gen.normEx(est, u4b, u4b.ex.indexOf(est));
+      ok(nx.fb === est.fb && !S.Gen.checkType('somos', nx).ok && S.Gen.checkType('estamos', nx).ok, 'gerichte tip: komt mee in de oefening');
+      const bus = f('Waar is het busstation?');
+      ok(C('donde esta la parada de bus', bus.a, { strict: false }).ok && C('¿Dónde está la parada de autobús?', bus.a).ok, 'busstation: parada de bus/autobús telt, ook zonder accenten');
+      ok(C('donde esta mi telefono', f('Waar is mijn telefoon?').a, { strict: false }).ok, 'telefoon: teléfono telt, ook zonder accent');
+      const post = S.Gen.wordItem(S.C.word(u4b, 35), 'type', u4b);
+      ok(S.Gen.checkType('el correo', post).ok && S.Gen.checkType('la oficina de correos', post).ok, 'postkantoor: el correo telt ook goed');
+      ok(u4b.ex.filter(e => e.t === 'match').length >= 2 && (S.Gloss.lookup('está') || {}).t === 'estar', 'koppeloefening estar verandert de tikvertaling niet');
+      ok(u4b.grammar.some(g => /eSTAr/.test(g.t) && /Uitzondering/.test(g.html)) && u4b.grammar.some(g => /twee vragen/.test(g.t) && /Uitzondering/.test(g.html) && /Reden/.test(g.html)), 'andere aanpak: ezelsbruggetje en stappenplan, uitzondering met reden');
+    }
     const md = S.md ? S.md('- **Titel** (uitleg erbij)\n  Waar: a1-04\n  Wat: iets\n- Tweede') : '';
     ok(!S.md || (md.match(/<li>/g) || []).length === 2 && md.includes('Waar: a1-04'), 'voorstellen: ingesprongen regels horen bij hetzelfde punt');
   }
@@ -1255,6 +1285,7 @@ await micTests();
     .filter(f => !/(app|lesson|ai|sync|ask)\.js$/.test(f));
   const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
   // één rij per cursus met een kaart: [doeltaal, minimaal aantal landen]
+  const deep = ['es-nl']; // cursussen waarin elk land een dialoog en een gesprek met de docent heeft
   const want = { 'es-nl': ['es', 21], 'en-nl': ['en', 12], 'nl-es': ['nl', 5], 'fr-nl': ['fr', 9], 'de-nl': ['de', 5], 'tr-nl': ['tr', 6] };
   for (const course of Object.keys(S.COURSES)) {
     const w = 'op reis ' + course + ': ';
@@ -1282,6 +1313,29 @@ await micTests();
       ok(ns === (tg === 'es' ? 'pl-' + p.id : 'pl-' + tg + '-' + p.id), v + 'eigen naamruimte voor opnames');
       ok(clip(p.hello[0], ns) && p.sounds.every(x => clip(x[2], ns)) && p.words.every(x => clip(x[0], ns)), v + 'opnames per land');
       ok(p.voice === meta.base || p.sounds.every(x => have.has(K.Speech.clipKey(x[4] || x[2], K.course.ns))), v + 'neutrale versie ingesproken');
+      // verdieping: een eigen dialoog en een eigen gesprek met de docent (content/…/landen-praten.js)
+      if (deep.includes(course)) ok(p.dialog && p.talk, v + 'heeft een dialoog en een gesprek met de docent');
+      if (p.dialog) {
+        const d = p.dialog, who = [...new Set(d.lines.map(l => l[0]))];
+        ok(d.t && d.nl && d.place && d.lines.length >= 7 && d.lines.every(l => l[0] && l[1] && l[2]) && who.length >= 2 && who.every(x => ['f', 'm'].includes(d.who[x])), v + 'dialoog: titel, plaats, zinnen met vertaling, stem per spreker');
+        ok(d.q.length >= 3 && d.q.every(q => q.t === 'mc' && q.q && q.o.length >= 3 && new Set(q.o).size === q.o.length), v + 'dialoog: drie vragen met unieke opties');
+        ok(d.lines.filter(l => l[3]).length >= 3 && d.lines.every(l => !l[3] || /^(🗺️|⚠️ <b>Uitzondering:<\/b>)/.test(l[3])), v + 'dialoog: lokale woorden uitgelegd, afwijkingen heten uitzondering');
+        ok(d.lines.every(l => !/Uitzondering/.test(l[3] || '') || /Reden:/.test(l[3])), v + 'dialoog: elke uitzondering heeft een reden');
+        ok(d.lines.every(l => clip(l[1], ns)) && d.q.every(q => clip(q.q, ns)), v + 'dialoog ingesproken in de naamruimte van het land');
+        const vs = who.map(x => (list.find(y => y.k === K.Speech.clipKey(d.lines.find(l => l[0] === x)[1], ns)) || {}).voice);
+        ok(new Set(vs).size === who.length, v + 'dialoog: elke spreker een eigen stem (' + vs.join(', ') + ')');
+        if (tg === 'es') ok(who.every(x => x === 'Mark' || K.Cast.forSpeaker(x, d.place)) && K.Cast.country(d.place) === p.voice, v + 'dialoog: de spreker van het land is een getekend personage uit dat land');
+        const ses = Mu.dialogSession(p);
+        ok(ses.items[0].kind === 'dialogue' && ses.items[0].clipNs === ns && ses.items.length === 1 + d.q.length && ses.items.slice(1).every(it => it.kind === 'mc' && it.options.includes(it.answer) && !it.srsId), v + 'dialoog: les met vragen, niets in de herhaling');
+        const lokaal = p.words.filter(x => x[2] !== 'g').map(x => x[0].split(/\s*\/\s*/)[0].replace(/[¡!¿?]/g, '').toLowerCase());
+        ok(p.voice === meta.base && tg !== 'es' || lokaal.filter(x => d.lines.some(l => l[1].toLowerCase().includes(x))).length >= 2, v + 'dialoog gebruikt woorden van het land');
+        ok(!p.words.filter(x => x[2] === 'g').some(x => d.lines.some(l => new RegExp('(^|[^\\p{L}])' + x[0].replace(/[¡!¿?]/g, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^\\p{L}]|$)', 'iu').test(l[1]))), v + 'dialoog zonder grove woorden');
+      }
+      if (p.talk) {
+        const t = p.talk, sc = Mu.talkScenario(p);
+        ok(t.title && t.place && t.nl && t.goal && t.role && t.local, v + 'gesprek: titel, plaats, uitleg, doel, rol en taalgebruik');
+        ok(sc.id === 'pais-' + tg + '-' + p.id && sc.local.words.length >= 6 && !p.words.filter(x => x[2] === 'g').some(x => sc.local.words.some(y => y.startsWith(x[0] + ' ='))), v + 'gesprek: de docent krijgt de woorden van het land mee, zonder de grove');
+      }
     });
     ok(list.filter(x => String(x.ns || '').startsWith(Mu.nsFor(tg, ''))).every(x => !/^es-MX/.test(x.voice) || tg === 'es'), w + 'geen Mexicaanse stem in een ander land');
   }
@@ -1314,7 +1368,7 @@ await micTests();
       ok(ck('ich heisse anna', 'Ich heiße Anna.').ok && ck('ich heisse anna', 'Ich heiße Anna.').warn === 'accent' && ck('Schon', 'schön').warn === 'accent', w + 'ss voor ß en ontbrekende umlaut: goed met waarschuwing');
       const r = K.Gen.checkType('der Haus', { answers: ['das Haus'], articleOptional: true });
       ok(!r.ok && r.warn === 'article-wrong' && /onzijdig/.test(r.gender), w + 'fout lidwoord der/die/das met geslacht');
-      ok(K.C.all().length === 30, w + 'A1–B1 = 30 units');
+      ok(K.C.all().length === 40 && K.C.unitsOf('B2').length === 10, w + 'A1–B2 = 40 units');
       // uitzonderingen worden benoemd, met reden
       const U = K.Uitz, has = (l, re) => l.some(x => re.test(x.t + ' ' + x.html));
       ok(U.label() === '⚠️ Uitzondering' && has(U.forWord('das Mädchen'), /-chen/) && has(U.find('Ich helfe dir gern.'), /derde naamval/) && has(U.find('Ich bin zu Hause geblieben.'), /sein/) && has(U.find('Er fährt nach Berlin.'), /ä/) && has(U.find('Berlin ist größer als München.'), /Umlaut/), w + 'uitzonderingen met reden (das Mädchen, helfen + dir, ist geblieben, fährt, größer)');
@@ -1570,6 +1624,18 @@ await micTests();
     ok(G.match('De subjonctif, de passé composé, de imparfait en de gérondif.').map(x => x.id).join() === 'subjuntivo,indefinido,imperfecto,gerundio', w + 'Franse tijdnamen tikbaar');
     ok(G.search('subjonctif')[0].id === 'subjuntivo', w + 'Frans zoeken');
     S.course = c0; G.match('x'); }
+  // Duits: eigen bestand js/begrippen-de.js; Duitse blokken plus begrippen die alleen in het Duits bestaan (naamval, Umlaut …)
+  { const c0 = S.course; S.course = { target: 'de', ui: 'nl' };
+    const dl = G.list('de');
+    ok(dl.length >= 60 && !G.fits(G.get('por-para'), 'de') && !G.fits(G.get('subjuntivo'), 'de') && G.fits(G.get('de-naamval'), 'de') && !G.fits(G.get('de-naamval'), 'es') && !G.fits(G.get('de-umlaut'), 'fr'), w + 'Duits: aantal ' + dl.length + ', eigen begrippen alleen bij Duits');
+    dl.forEach(b => { const k = b.de; ok(k && k.n && k.html && k.ex && k.ex.length >= 1 && k.ex.every(([e, n]) => e && n) && b.t && b.k && b.html && G.CATS.some(c => c[0] === b.c), w + 'de ' + b.id + ' blok met voorbeelden');
+      (k.table || []).forEach(r => ok(r.length === k.table[0].length, w + 'de ' + b.id + ' tabelrij'));
+      (k.uz || []).forEach(u => ok(u[0] && /<b>Waarom\?<\/b>/.test(u[1]), w + 'de ' + b.id + ' uitzondering met reden: ' + u[0]));
+      if (/^de-/.test(b.id)) (b.rel || []).forEach(r => ok(G.get(r) && G.fits(G.get(r), 'de'), w + 'de ' + b.id + ' verwijst naar ' + r)); });
+    ok(G.title(G.get('condicional')).startsWith('Konjunktiv II') && G.title(G.get('lidwoord')) === 'Lidwoord', w + 'Duits: eigen titel');
+    ok(G.match('De Akkusativ, de derde naamval, de Konjunktiv II, een scheidbaar werkwoord en de Umlaut.').map(x => x.id).join() === 'de-akkusativ,de-dativ,condicional,de-trennbar,de-umlaut', w + 'Duitse termen tikbaar: ' + G.match('De Akkusativ, de derde naamval, de Konjunktiv II, een scheidbaar werkwoord en de Umlaut.').map(x => x.id).join());
+    ok(G.match('de Konjunktiv I en het Partizip I')[0].id === 'de-konj1' && G.match('het Partizip II')[0].id === 'deelwoord' && G.search('Dativ').some(b => b.id === 'de-dativ'), w + 'Konjunktiv I ≠ II, Partizip I ≠ II, zoeken');
+    S.course = c0; G.match('x'); }
   // Engels: begrippen zonder Engels blok (por/para, stamklinkerwisseling) horen niet bij de Engelse cursus
   ok(!G.fits(G.get('por-para'), 'en') && G.fits(G.get('lidwoord'), 'en') && G.list('en').length < G.list('es').length, w + 'per doeltaal');
 }
@@ -1714,6 +1780,13 @@ const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((
   ok(/@font-face \{ font-family: 'Vlaggen'/.test(css) && /:root\.vlagfont \{ --font: 'Vlaggen'[^}]*--serif: 'Vlaggen'/.test(css), 'vlaggen: @font-face en .vlagfont in css');
   ok(html.includes("classList.add('vlagfont')") && html.indexOf('vlagfont') < html.indexOf('css/app.css'), 'vlaggen: index.html test of de browser vlaggen tekent');
   ok(!app.split('\n').some(l => /h\('select'/.test(l) && /CNAME|LNAME|\.flag/.test(l)), 'vlaggen: geen <select> met vlaggen (gebruik coursePick)');
+}
+{ // leestekst en vraag samen in beeld
+  const css = fs.readFileSync(path.join(root, 'css/app.css'), 'utf8'), ls = fs.readFileSync(path.join(root, 'js/lesson.js'), 'utf8');
+  ok(/function textSource\(\)/.test(ls) && /syncText\(\);/.test(ls) && !ls.includes('ls-src-btn'), 'tekst naast vraag: tekstvak in de les, geen losse «Lees eerst»-knop meer');
+  ok(/@container lesson \(min-width: \d+px\) \{\s*\.ls\.with-txt \{ display: grid/.test(css) && /\.ls-txt \{[^}]*overflow-y: auto/.test(css), 'tekst naast vraag: naast elkaar op breed scherm, eigen scrollvak op smal scherm');
+  const t = S.Gen.stepSession(S.C.get('a1-04'), 'test').items.find(i => i.src);
+  ok(t && t.src.reading && t.skill === 'read' && S.Gen.stepSession(S.C.get('a1-04'), 'read').items.slice(1).some(i => i.skill === 'read' && i.kind === 'mc'), 'tekst naast vraag: leesvragen herkenbaar (src of skill read)');
 }
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);

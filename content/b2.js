@@ -1,4 +1,4 @@
-/* Niveau B2 — Latijns-Amerikaans Spaans (eerste units).
+/* Niveau B2 — Latijns-Amerikaans Spaans, deel 1 (b2-01 t/m b2-13); deel 2 staat in content/b2-2.js.
    Oefeningen: mc (eerste optie = juist), cloze (___ = gat; o = keuzeknoppen, eerste = juist), tr (vertalen NL→ES), order, match.
    Vanaf B1 toont de app (instelling «Automatisch») de Spaanse samenvatting (sum) en zit de Nederlandse uitleg achter een klapmenu. */
 (function (S) {

@@ -562,7 +562,60 @@
     extra({ id: 'genesis', name: 'Génesis', animal: 'turpial', nl: 'troepiaal', city: 'Caracas', cc: 'VE', age: 34, female: true, trait: 'Radiomaakster in Caracas die elk nieuwtje als eerste hoort. Zegt er altijd bij of het al bevestigd is.', color: '#f59a1b' },
       bird({ fur: ['#ffd27a', '#f59a1b', '#c96f0a'], beak: '#c8ccd4', beak2: '#7a808c', wear: { kind: 'blazer', a: '#1f4f9e', b: '#173a78', trim: '#ffd23f', inner: '#fff' },
         marks: '<path d="M26 60C27 36 44 24 60 24C76 24 93 36 94 60C88 50 76 46 60 46C44 46 32 50 26 60Z" fill="#1e1e26"/><ellipse cx="42" cy="64" rx="10" ry="9" fill="#3b82d6" opacity=".6"/><ellipse cx="78" cy="64" rx="10" ry="9" fill="#3b82d6" opacity=".6"/><path d="M24 92C30 86 38 88 40 96C34 100 26 98 24 92Z M96 92C90 86 82 88 80 96C86 100 94 98 96 92Z" fill="#fff" opacity=".85"/>',
-        eyes: { lash: true, iris: '#e8a010' }, front: ACC.mic() + ACC.earrings('#ffd23f') }))
+        eyes: { lash: true, iris: '#e8a010' }, front: ACC.mic() + ACC.earrings('#ffd23f') })),
+    extra({ id: 'suyapa', name: 'Suyapa', animal: 'colibrí esmeralda', nl: 'Hondurese smaragdkolibrie', city: 'Copán Ruinas', cc: 'HN', age: 29, female: true, trait: 'Gids bij de Maya-ruïnes van Copán. Plant alles vooruit en weet precies wanneer de grote groepen komen.', color: '#1fbf8a' },
+      bird({ fur: ['#9ff5cf', '#1fbf8a', '#0e7a5a'], long: true, beak: '#3a3a44', beak2: '#1e1e26', wear: { kind: 'vest', a: '#f6efe0', b: '#e0d6c0', trim: '#a8844e' },
+        marks: '<path d="M34 92C44 102 76 102 86 92C80 100 70 103 60 103C50 103 40 100 34 92Z" fill="#fff" opacity=".85"/><path d="M28 54C36 40 52 36 60 36C68 36 84 40 92 54C82 46 70 44 60 44C50 44 38 46 28 54Z" fill="#35d6f0" opacity=".55"/>',
+        hat: '<g transform="translate(0 -6)">' + HAT.safari() + '</g>', eyes: { lash: true, iris: '#0e5a4a' }, front: ACC.badge('#fff8e0') })),
+    extra({ id: 'norlan', name: 'Norlan', animal: 'mono congo', nl: 'brulaap', city: 'Isla de Ometepe', cc: 'NI', age: 33, female: false, trait: 'Gids op de vulkaan Concepción. Maakt overal een grap over, behalve over veiligheid.', color: '#5a4a40' },
+      beast({ fur: ['#7a6658', '#4a3a30', '#281e18'], ears: 'round', earIn: '#8a6a58', muzzle: '#c9a88a', mrx: 17, mry: 13, my: 84, noseCol: '#1a120e', line: '#4a2e1e', wear: { kind: 'vest', a: '#2f6fb8', b: '#1f4f8e', trim: '#f2b134' },
+        marks: '<path d="M36 58C38 48 50 46 60 50C70 46 82 48 84 58C86 70 78 80 60 80C42 80 34 70 36 58Z" fill="#c9a88a"/><path d="M30 96C40 104 80 104 90 96C82 102 72 105 60 105C48 105 38 102 30 96Z" fill="#3a2c24"/>',
+        hat: HAT.cap('#c9283b'), eyes: { iris: '#6a3a1a' } })),
+    extra({ id: 'nico', name: 'Nico', animal: 'hornero', nl: 'ovenvogel', city: 'Buenos Aires', cc: 'AR', age: 35, female: false, trait: 'Porteño en ontwerper die geen debat laat liggen. Geeft je nooit helemaal gelijk, maar trakteert wel op koffie.', color: '#c4824a' },
+      bird({ fur: ['#f0c49a', '#c4824a', '#8e5628'], beak: '#8a6a4a', beak2: '#5a4028', wear: { kind: 'shirt', a: '#74acdf', b: '#4a86c0', trim: '#fff', inner: '#fff', btn: '#f6b40e' },
+        marks: '<path d="M34 90C44 100 76 100 86 90C80 99 70 102 60 102C50 102 40 99 34 90Z" fill="#fbeedd"/><path d="M30 54Q42 48 52 54M68 54Q78 48 90 54" fill="none" stroke="#fbeedd" stroke-width="3" stroke-linecap="round"/>',
+        eyes: { iris: '#6a3a1a' }, front: ACC.glasses('#2a2a33') })),
+    extra({ id: 'yesenia', name: 'Yesenia', animal: 'torogoz', nl: 'torogoz (motmot)', city: 'El Tunco', cc: 'SV', age: 28, female: true, trait: 'Surflerares in El Tunco. Geduldig met beginners en altijd in voor een pupusa na de les.', color: '#2fb8b0' },
+      bird({ fur: ['#9ff0e6', '#2fb8b0', '#167a80'], beak: '#2a2a33', beak2: '#101018', wear: { kind: 'tee', a: '#ff8a3a', b: '#e2622a', trim: '#fff' },
+        marks: '<ellipse cx="42" cy="63" rx="12" ry="9.5" fill="#12333a" opacity=".5"/><ellipse cx="78" cy="63" rx="12" ry="9.5" fill="#12333a" opacity=".5"/><path d="M34 92C44 102 76 102 86 92C80 100 70 103 60 103C50 103 40 100 34 92Z" fill="#f59a4a"/><path d="M30 50C38 38 52 34 60 34C68 34 82 38 90 50C80 44 70 42 60 42C50 42 40 44 30 50Z" fill="#3b82d6" opacity=".7"/>',
+        eyes: { lash: true, iris: '#b8442a' }, front: ACC.earrings('#fff') + flower(90, 40, '#ffd23f', 2.6, '#f7941d') })),
+    extra({ id: 'dona-flor', name: 'Doña Flor', animal: 'danta', nl: 'tapir', city: 'Valle de Orosi', cc: 'CR', age: 62, female: true, trait: 'Heeft een kleine koffiefinca in Costa Rica. Zegt usted tegen iedereen en schenkt altijd nog een cafecito in.', color: '#857468' },
+      beast({ fur: ['#c2b4a8', '#8a7a6e', '#5a4c44'], ears: 'round', earIn: '#fff6ea', muzzle: '#a09084', mrx: 13, mry: 15, my: 86, nose: 'dots', noseCol: '#3a2e28', line: '#3a2e28', mouthY: 93, wear: { kind: 'flowers', a: '#1f9e6a', b: '#0e7a4e', f1: '#fff', f2: '#e8344e' },
+        marks: '<path d="M40 30C46 24 54 24 58 30M62 30C66 24 74 24 80 30" fill="none" stroke="#fff6ea" stroke-width="2.4" stroke-linecap="round" opacity=".7"/>',
+        hat: '<g transform="translate(0 -6)">' + HAT.sun() + '</g>', eyes: { lash: true, iris: '#4a3020' }, front: ACC.earrings() + ACC.glasses('#8a6a4a') }))
+  );
+
+  /* ---------- «Op reis»: een eigen personage voor elk land dat er nog geen had (content/landen-praten.js) ---------- */
+  const brow0 = (col, y = 50) => `<path d="M38 ${y + .5}Q44 ${y - 2.5} 50 ${y}M82 ${y + .5}Q76 ${y - 2.5} 70 ${y}" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round"/>`;
+  const tuft = (col) => `<path d="M29 14l-3-9 7 6ZM91 14l3-9-7 6Z" fill="${col}"/>`;
+  CAST.push(
+    extra({ id: 'marisol', name: 'Marisol', animal: 'torogoz', nl: 'torogoz (motmot)', city: 'San Salvador', cc: 'SV', age: 27, female: true, trait: 'Verkoopt de lekkerste pupusas van de wijk. Noemt iedereen «vos» en geeft er altijd curtido bij.', color: '#1fa7a0' },
+      bird({ fur: ['#9aeedd', '#35b8a6', '#1b7f78'], beak: '#3a3a44', beak2: '#1e1e26', wear: { kind: 'flowers', a: '#1f4f9e', b: '#173a78', f1: '#fff', f2: '#ffd23f' },
+        marks: '<path d="M28 54C32 34 46 26 60 26C74 26 88 34 92 54C82 44 72 41 60 41C48 41 38 44 28 54Z" fill="#2f7fd6"/><path d="M25 63C31 60 47 60 53 63C47 67 31 67 25 63ZM95 63C89 60 73 60 67 63C73 67 89 67 95 63Z" fill="#1e1e26" opacity=".85"/><path d="M40 92C48 100 72 100 80 92C74 99 66 101 60 101C54 101 46 99 40 92Z" fill="#e88a3a"/>',
+        eyes: { lash: true, iris: '#b03a2a' }, front: ACC.earrings('#ffd23f') })),
+    extra({ id: 'josue', name: 'Josué', animal: 'colibrí esmeralda', nl: 'Hondurese smaragdkolibrie', city: 'Tegucigalpa', cc: 'HN', age: 23, female: false, trait: 'Student en gids in zijn vrije tijd. Praat snel, lacht veel en weet waar de beste baleadas zijn.', color: '#2fa77a' },
+      bird({ fur: ['#b6f2c4', '#3fc07e', '#1f8a58'], long: true, beak: '#3a3a44', beak2: '#1e1e26', wear: { kind: 'tee', a: '#00bce4', b: '#0090b8', trim: '#fff' },
+        marks: '<path d="M40 90C48 98 72 98 80 90C76 100 68 102 60 102C52 102 44 100 40 90Z" fill="#3aa0e8"/><path d="M30 50C36 34 48 28 60 28C72 28 84 34 90 50C80 42 70 40 60 40C50 40 40 42 30 50Z" fill="#2a9a66" opacity=".7"/>', eyes: { iris: '#3a2a1a' }, hat: HAT.cap('#0090b8') })),
+    extra({ id: 'xiomara', name: 'Xiomara', animal: 'mono congo', nl: 'brulaap', city: 'Granada', cc: 'NI', age: 35, female: true, trait: 'Heeft een pulpería bij het meer. Kent de hele buurt en hoort alles als eerste.', color: '#7a4a2a' },
+      beast({ fur: ['#8a6248', '#5c3c28', '#3a2418'], ears: 'round', earIn: '#c99a80', muzzle: '#e8c8a8', mrx: 16, mry: 13, my: 82, noseCol: '#2a1810', line: '#3a2014',
+        marks: '<path d="M33 60C33 46 45 42 60 42C75 42 87 46 87 60C87 72 78 76 60 76C42 76 33 72 33 60Z" fill="#e8c8a8"/>' + brow0('#3a2418'), eyes: { lash: true, iris: '#6a3a1a' },
+        wear: { kind: 'stripes', a: '#3a78d6', b: '#1f4f9e', trim: '#fff', trim2: '#ffd23f' }, front: ACC.earrings() + flower(88, 38, '#fff', 2.6, '#ffd23f') })),
+    extra({ id: 'yunior', name: 'Yunior', animal: 'tocororo', nl: 'Cubaanse trogon', city: 'La Habana', cc: 'CU', age: 30, female: false, trait: 'Rijdt in een almendrón uit 1956 door Havana. Kent bij elk gebouw een verhaal en bij elk verhaal een grap.', color: '#d8343f' },
+      bird({ fur: ['#ffffff', '#eef0f4', '#c8ccd6'], beak: '#e8a23a', beak2: '#b8741a', wear: { kind: 'shirt', a: '#fbfbfd', b: '#dfe2ea', trim: '#fff', inner: '#fbfbfd', btn: '#8a8f9c' },
+        marks: '<path d="M26 58C27 36 44 24 60 24C76 24 93 36 94 58C86 48 74 44 60 44C46 44 34 48 26 58Z" fill="#2f5fc8"/><path d="M36 92C46 102 74 102 84 92C78 100 68 103 60 103C52 103 42 100 36 92Z" fill="#d8343f"/>', eyes: { iris: '#b02a2a' }, hat: HAT.sun() })),
+    extra({ id: 'carmen', name: 'Carmen', animal: 'lince ibérico', nl: 'Iberische lynx', city: 'Madrid', cc: 'ES', age: 32, female: true, trait: 'Madrileense die elke avond «de cañas» gaat. Zegt «vale» na elke zin en praat met vosotros.', color: '#c98a3a' },
+      beast({ fur: ['#f6dcae', '#dba968', '#a8763a'], ears: 'point', earIn: '#fff4e0', back: tuft('#2a1a12'), cheeks: '#fffaf0', nose: 'cat', noseCol: '#c9576a',
+        marks: SPOTS('#5a3a1a', [[36, 46, 2], [84, 46, 2], [46, 38, 1.8], [74, 38, 1.8], [60, 36, 1.8], [27, 62, 1.6], [93, 62, 1.6]]) + '<path d="M22 84C16 88 14 96 18 102C24 98 28 92 28 86ZM98 84C104 88 106 96 102 102C96 98 92 92 92 86Z" fill="#fffaf0"/><path d="M19 90l5 2M17 96l6 0M101 90l-5 2M103 96l-6 0" stroke="#2a1a12" stroke-width="1.3" stroke-linecap="round"/>',
+        eyes: { lash: true, iris: '#9a8a1e' }, wear: { kind: 'blazer', a: '#c9283b', b: '#a01f30', trim: '#e0485a', inner: '#fff', pin: '#ffd23f' }, front: ACC.whisk('#7a5a30') + ACC.earrings() })),
+    extra({ id: 'santiago-gq', name: 'Santiago', animal: 'loro gris', nl: 'grijze roodstaartpapegaai', city: 'Malabo', cc: 'GQ', age: 45, female: false, trait: 'Leraar op het eiland Bioko. Spreekt Spaans, Fang en Pichi door elkaar en legt alles rustig uit.', color: '#8a909d' },
+      bird({ fur: ['#eceef2', '#b4b9c4', '#7f8592'], hook: true, beak: '#3a3a44', beak2: '#1e1e26', wear: { kind: 'shirt', a: '#3a9d5d', b: '#2a7a44', trim: '#5cc47a', inner: '#fff', btn: '#fff' },
+        marks: '<path d="M30 58C34 50 50 50 52 62C50 72 34 74 30 66Z" fill="#fff"/><path d="M90 58C86 50 70 50 68 62C70 72 86 74 90 66Z" fill="#fff"/><g fill="none" stroke="#7f8592" stroke-width="1.1" opacity=".6"><path d="M40 36q4-3 8 0M56 32q4-3 8 0M72 36q4-3 8 0M48 42q4-3 8 0M64 42q4-3 8 0"/></g>',
+        eyes: { iris: '#e8d87a' }, front: ACC.glasses('#4a3a2a') })),
+    extra({ id: 'brenda', name: 'Brenda', animal: 'correcaminos', nl: 'renkoekoek (roadrunner)', city: 'Los Ángeles', cc: 'US', age: 26, female: true, trait: 'Geboren in East L.A., ouders uit Jalisco. Wisselt midden in een zin van Spaans naar Engels en terug.', color: '#b8743a' },
+      bird({ fur: ['#f2e2c4', '#c9a878', '#8f7048'], beak: '#5a4a3a', beak2: '#2e241a', wear: { kind: 'tee', a: '#9a6ad8', b: '#7046b0', trim: '#ffd23f' },
+        back: '<path d="M44 34C40 20 46 10 52 4C54 12 56 18 58 14C60 8 64 6 68 4C68 14 72 20 76 34Z" fill="#4a3a2a"/>',
+        marks: '<g stroke="#5a4630" stroke-width="1.6" stroke-linecap="round" opacity=".7"><path d="M38 40l2 6M48 36l1 7M60 35v7M72 36l-1 7M82 40l-2 6"/></g><path d="M86 60C92 58 98 60 100 64C96 66 90 66 86 64Z" fill="#e8743a"/><path d="M34 60C28 58 22 60 20 64C24 66 30 66 34 64Z" fill="#3a8ad8"/>',
+        eyes: { lash: true, iris: '#c98a1e' }, front: ACC.phone() + ACC.earrings('#ffd23f') }))
   );
 
   /* ---------- jouw eigen personage (kies je in Perfil; staat rechts bij jouw zinnen in de dialogen) ---------- */
@@ -708,7 +761,9 @@
     doctora: V('es-MX-Dalia', -6, -4), entrevistadora: V('es-MX-Dalia', -4), yarisel: V('es-PA-Margarita'), yokasta: V('es-DO-Ramona'),
     paola: V('es-MX-Dalia'), 'tio-beto': V('es-MX-Jorge', -10, -6), lupita: V('es-MX-Dalia', 8, 6), mauricio: V('es-CR-Juan', 0, -4),
     turista: V('es-US-Alonso', -4, -4), 'ana-lucia': V('es-GT-Marta'), daniela: V('es-EC-Andrea'), fer: V('es-MX-Jorge', 6, 4),
-    moderadora: V('es-PE-Camila', -4), quispe: V('es-PE-Alex', -8, -6), huaman: V('es-BO-Marcelo'), 'valentina-co': V('es-CO-Salome'), 'diego-pe': V('es-PE-Alex'), wara: V('es-BO-Sofia'), arami: V('es-PY-Tania'), genesis: V('es-VE-Paola', 4)
+    moderadora: V('es-PE-Camila', -4), quispe: V('es-PE-Alex', -8, -6), huaman: V('es-BO-Marcelo'), 'valentina-co': V('es-CO-Salome'), 'diego-pe': V('es-PE-Alex'), wara: V('es-BO-Sofia'), arami: V('es-PY-Tania'), genesis: V('es-VE-Paola', 4),
+    suyapa: V('es-HN-Karla'), norlan: V('es-NI-Federico'), nico: V('es-AR-Tomas'), yesenia: V('es-SV-Lorena', 4), 'dona-flor': V('es-CR-Maria', -10, -6),
+    marisol: V('es-SV-Lorena'), josue: V('es-HN-Carlos', 4, 4), xiomara: V('es-NI-Yolanda', -4), yunior: V('es-CU-Manuel'), carmen: V('es-ES-Elvira'), 'santiago-gq': V('es-GQ-Javier', -4, -4), brenda: V('es-US-Paloma', 4)
   };
   CAST.forEach(c => { c.voice = VOICE[c.id] || null; });
   const BY = Object.fromEntries([...CAST, ...PLAYERS].map(c => [c.id, c]));
@@ -721,7 +776,9 @@
     'Andrés': 'andres', 'Valentina': 'valentina-co', 'Valentina@PE': 'valentina-ar', 'Camila': 'camila', 'Señora': 'senora-cartagena', 'Ana': 'ana',
     'Mesero': 'mesero', 'Vendedora': 'vendedora', 'Andrea': 'andrea', 'Carlos': 'carlos', 'Doctora': 'doctora', 'Entrevistadora': 'entrevistadora',
     'Yarisel': 'yarisel', 'Yokasta': 'yokasta', 'Paola': 'paola', 'Tío Beto': 'tio-beto', 'Lupita': 'lupita', 'Guía Mauricio': 'mauricio',
-    'Turista': 'turista', 'Ana Lucía': 'ana-lucia', 'Daniela': 'daniela', 'Fer': 'fer', 'Moderadora': 'moderadora', 'Prof. Quispe': 'quispe', 'Sr. Huamán': 'huaman', 'Wara': 'wara', 'Arami': 'arami', 'Génesis': 'genesis'
+    'Turista': 'turista', 'Ana Lucía': 'ana-lucia', 'Daniela': 'daniela', 'Fer': 'fer', 'Moderadora': 'moderadora', 'Prof. Quispe': 'quispe', 'Sr. Huamán': 'huaman', 'Wara': 'wara', 'Arami': 'arami', 'Génesis': 'genesis',
+    'Suyapa': 'suyapa', 'Norlan': 'norlan', 'Nico': 'nico', 'Yesenia': 'yesenia', 'Doña Flor': 'dona-flor',
+    'Valentina@AR': 'valentina-ar', 'Marisol': 'marisol', 'Josué': 'josue', 'Xiomara': 'xiomara', 'Yunior': 'yunior', 'Carmen': 'carmen', 'Santiago': 'santiago-gq', 'Brenda': 'brenda'
   };
   function country(place) {
     const cps = [...String(place || '')].map(c => c.codePointAt(0)).filter(c => c >= 0x1F1E6 && c <= 0x1F1FF);

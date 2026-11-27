@@ -129,6 +129,28 @@ LV = 'X';
 /* Op reis (content/landen.js): alles van een land met de stem van dat land, in naamruimte 'pl-<land>'.
    Woorden met een uitspraakhint (4e veld) houden hun sleutel, maar de stem leest de hint. De klankzinnen
    komen ook zonder naamruimte (Mexicaanse stem) voor de knop «Neutraal». */
+/* Op reis, verdieping per land (content/landen-praten.js): de dialoog van een land in de naamruimte van dat land.
+   Een getekend personage (js/cast.js) houdt zijn eigen stem; anders de stem van het land die bij man/vrouw past (dialog.who).
+   Twee sprekers krijgen nooit dezelfde stem: de tweede valt terug op de basisstem van de cursus of op een reservestem. */
+function placeDialog(p, ns, land, base, spare, lv) {
+  const d = p.dialog; if (!d) return;
+  const who = [...new Set(d.lines.map(l => l[0]))], taken = new Set(), spec = {};
+  const num = x => parseInt(x || 0, 10), sign = n => (n >= 0 ? '+' : '') + n;
+  // eerst de personages en de mensen van het land, dan de bezoeker (Mark)
+  who.slice().sort((a, b) => (a === 'Mark') - (b === 'Mark')).forEach(w => {
+    const ch = S.Cast && w !== 'Mark' && S.Cast.forSpeaker(w, d.place), cv = ch && ch.voice, i = d.who[w] === 'm' ? 1 : 0;
+    if (cv && !taken.has(cv.v)) { taken.add(cv.v); spec[w] = { voice: cv.v, p: cv.pitch, r: cv.rate }; return; }
+    const v = (w === 'Mark' ? [base[i], spare[i], land[i]] : [land[i], base[i], spare[i]]).find(x => !taken.has(x)) || land[i];
+    taken.add(v); spec[w] = { voice: v, p: 0, r: 0 };
+  });
+  d.lines.forEach(([w, t]) => {
+    const k = S.Speech.clipKey(t, ns), m = mood(t), sp = spec[w];
+    if (!out.has(k)) out.set(k, { k, ns, text: S.Speech.clean(t), voice: sp.voice, pitch: sign(num(m.pitch) + sp.p) + 'Hz', rate: sign(num(m.rate) + sp.r) + '%', lv: [lv] });
+  });
+  // de vragen over de dialoog en hun goede antwoord, met de vrouwenstem van het land
+  (d.q || []).forEach(q => [q.q, q.o && q.o[0]].forEach(t => { if (!t || !/\p{L}/u.test(t)) return; const k = S.Speech.clipKey(t, ns); if (!out.has(k)) out.set(k, { k, ns, text: S.Speech.clean(t), voice: land[0], lv: [lv] }); }));
+  return spec;
+}
 for (const p of S.places || []) {
   const [vf, vm_] = VOICES[p.voice] || VOICES.MX, ns = S.Mundo.ns(p);
   const put = (text, voice, said) => {
@@ -139,6 +161,7 @@ for (const p of S.places || []) {
   put(p.hello[0], vm_, p.hello[2]);
   (p.sounds || []).forEach(([, , es, , neu], i) => { put(es, i % 2 ? vm_ : vf); add(neu || es); });
   p.words.forEach(([es, , , said]) => put(es, vf, said));
+  placeDialog(p, ns, [vf, vm_], VOICES.MX, VOICES.US, ns + ':X');
 }
 add('¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.');
 
@@ -248,6 +271,7 @@ for (const course of Object.keys(OTHER)) {
     // klankzin met de stem van het land; de neutrale versie (knop «Neutraal») in de naamruimte van de cursus, met de basisstem
     (p.sounds || []).forEach(([, , t, , neu], i) => { put(t, i % 2 ? vm_ : vf); put(neu || t, base[0], null, S.course.ns); });
     p.words.forEach(([t, , , said]) => put(t, vf, said));
+    placeDialog(p, ns, [vf, vm_], base, OTHER[course], ns + ':X');
   }
 }
 const list = [...out.values()];

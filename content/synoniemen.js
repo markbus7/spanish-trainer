@@ -162,6 +162,7 @@
     'a pesar de': ['pese a'],
     'no obstante': ['sin embargo'],
     'es decir': ['o sea'],
-    'subir (los precios)': ['aumentar']
+    'subir (los precios)': ['aumentar'],
+    'la oficina de correos': ['el correo', 'correos']
   };
 })(window.SPT = window.SPT || {});

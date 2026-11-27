@@ -190,7 +190,7 @@ WORD GLOSS (required, invisible): right after the <fix> line, add one line <glos
     // daarna de woordjes bij leesteksten en de koppelparen uit de oefeningen
     C.all().forEach(u => {
       (u.reading && u.reading.gl || []).forEach(v => put(v[0], String(v[1])));
-      (u.ex || []).forEach(x => { if (x && x.t === 'match' && Array.isArray(x.p)) x.p.forEach(v => Array.isArray(v) && put(v[0], String(v[1]))); });
+      (u.ex || []).forEach(x => { if (x && x.t === 'match' && !x.nog && Array.isArray(x.p)) x.p.forEach(v => Array.isArray(v) && put(v[0], String(v[1]))); });
     });
     if (S.Words && S.Store && S.Store.state) try { S.Words.mine().forEach(w => put(w.es, w.nl)); } catch (e) { /* geen eigen woorden */ }
     if (S.course.target === 'es' && S.course.ui === 'nl') {
