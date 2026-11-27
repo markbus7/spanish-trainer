@@ -69,7 +69,7 @@
         ['der Rhein', 'de Rijn'], ['die Alp', 'de bergweide'], ['das Velo', 'de fiets'], ['Tschau!', 'doei!', 'i'], ['der Rappen', 'de rappen (cent van de frank)'], ['die Gemeinde', 'de gemeente']],
       fact: 'Liechtenstein is 25 kilometer lang en heeft ongeveer 40.000 inwoners. Op de nationale feestdag nodigt de vorst het hele land uit voor een drankje in de tuin van zijn kasteel.' },
 
-    { id: 'lu', flag: '🇱🇺', name: 'Luxemburg', city: 'Luxemburg · Esch · Echternach', speakers: '±500.000 sprekers', group: 'klein', voice: 'DE', listen: 'de-DE', pin: [150, 362],
+    { id: 'lu', flag: '🇱🇺', name: 'Luxemburg', city: 'Luxemburg · Esch · Echternach', speakers: '±500.000 sprekers', group: 'klein', voice: 'DE', listen: 'de-DE', pin: [152, 358],
       voiceNote: 'Er bestaat geen Luxemburgse computerstem voor het Duits. Je hoort hier een stem uit Duitsland; Luxemburgers spreken Duits met een zachter, wat Frans klinkend accent.',
       hello: ['Moien! Willkommen in Luxemburg.', 'Hallo! Welkom in Luxemburg.'],
       intro: 'Luxemburgers groeien op met drie talen: Luxemburgs (Lëtzebuergesch) thuis, Duits op de basisschool en in de krant, Frans in de winkel en bij de overheid. Hun Duits zit vol Franse woorden.',
@@ -81,7 +81,7 @@
         ['die Gemeinde', 'de gemeente'], ['das Großherzogtum', 'het groothertogdom'], ['der Großherzog', 'de groothertog'], ['dreisprachig', 'drietalig'], ['der Grenzgänger', 'de grensarbeider']],
       fact: 'Het nationale motto is Luxemburgs: «Mir wëlle bleiwe wat mir sinn» (Wij willen blijven wat wij zijn). Elke dag pendelen ruim 200.000 mensen uit Duitsland, Frankrijk en België naar Luxemburg om er te werken.' },
 
-    { id: 'be', flag: '🇧🇪', name: 'Oost-België', city: 'Eupen · Sankt Vith', speakers: '±78.000 sprekers', group: 'klein', voice: 'DE', listen: 'de-DE', pin: [112, 290],
+    { id: 'be', flag: '🇧🇪', name: 'Oost-België', city: 'Eupen · Sankt Vith', speakers: '±78.000 sprekers', group: 'klein', voice: 'DE', listen: 'de-DE', pin: [150, 298],
       voiceNote: 'Er bestaat geen Belgische computerstem voor het Duits. Je hoort hier een stem uit Duitsland; het Duits van Oost-België lijkt sterk op dat van het Duitse Rijnland.',
       hello: ['Guten Tag! Willkommen in Ostbelgien.', 'Goedendag! Welkom in Oost-België.'],
       intro: 'België heeft drie officiële talen, en de derde is Duits. In negen gemeenten rond Eupen en Sankt Vith, tegen de Duitse grens, is Duits de taal van school, bestuur en straat.',

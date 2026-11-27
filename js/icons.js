@@ -48,7 +48,7 @@
     // 🃏 woorden: woordkaartjes
     vocab: `<rect x="6" y="11" width="24" height="29" rx="5" fill="${C.g}" transform="rotate(-12 18 25.5)"/>
       <rect x="17" y="8" width="25" height="31" rx="5" fill="${C.o}"/>
-      <text x="29.5" y="28" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="15" fill="#fff">${(window.SPT && window.SPT.course && { en: 'Aa', nl: 'ij', fr: 'ç', tr: 'ğ' }[window.SPT.course.target]) || 'ñ'}</text>
+      <text x="29.5" y="28" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="15" fill="#fff">${(window.SPT && window.SPT.course && { en: 'Aa', nl: 'ij', fr: 'ç', tr: 'ğ', de: 'ß' }[window.SPT.course.target]) || 'ñ'}</text>
       <rect x="22" y="31.5" width="15" height="2.6" rx="1.3" fill="#fff" opacity=".7"/>`,
     // 🧩 grammatica: bouwblokken
     grammar: `<rect x="6" y="25" width="17" height="15" rx="3.5" fill="${C.t}"/><rect x="25" y="25" width="17" height="15" rx="3.5" fill="${C.g}"/>
