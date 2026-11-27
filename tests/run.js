@@ -1649,6 +1649,13 @@ const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((
   ok(html.includes("classList.add('vlagfont')") && html.indexOf('vlagfont') < html.indexOf('css/app.css'), 'vlaggen: index.html test of de browser vlaggen tekent');
   ok(!app.split('\n').some(l => /h\('select'/.test(l) && /CNAME|LNAME|\.flag/.test(l)), 'vlaggen: geen <select> met vlaggen (gebruik coursePick)');
 }
+{ // leestekst en vraag samen in beeld
+  const css = fs.readFileSync(path.join(root, 'css/app.css'), 'utf8'), ls = fs.readFileSync(path.join(root, 'js/lesson.js'), 'utf8');
+  ok(/function textSource\(\)/.test(ls) && /syncText\(\);/.test(ls) && !ls.includes('ls-src-btn'), 'tekst naast vraag: tekstvak in de les, geen losse «Lees eerst»-knop meer');
+  ok(/@container lesson \(min-width: \d+px\) \{\s*\.ls\.with-txt \{ display: grid/.test(css) && /\.ls-txt \{[^}]*overflow-y: auto/.test(css), 'tekst naast vraag: naast elkaar op breed scherm, eigen scrollvak op smal scherm');
+  const t = S.Gen.stepSession(S.C.get('a1-04'), 'test').items.find(i => i.src);
+  ok(t && t.src.reading && t.skill === 'read' && S.Gen.stepSession(S.C.get('a1-04'), 'read').items.slice(1).some(i => i.skill === 'read' && i.kind === 'mc'), 'tekst naast vraag: leesvragen herkenbaar (src of skill read)');
+}
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);
 })();
