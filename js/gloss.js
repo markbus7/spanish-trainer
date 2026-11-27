@@ -179,7 +179,7 @@ WORD GLOSS (required, invisible): right after the <fix> line, add one line <glos
     if (IDX && IDX.n === C.all().length) return IDX;
     // twee sleutels per woord: precies (kleine letters, mét accenten: está ≠ esta) en kaal (zonder accenten, als vangnet)
     const one = new Map(), exact = new Map(), multi = [], verb = new Map(), verbX = new Map();
-    const low = w => String(w).toLowerCase();
+    const low = w => S.lower(w);
     const put1 = (w, x) => { if (!exact.has(low(w))) exact.set(low(w), x); if (!one.has(bare(w))) one.set(bare(w), x); };
     const put = (es, nl) => variants(es).forEach(v => {
       const ws = words(v); if (!ws.length) return;
@@ -226,7 +226,7 @@ WORD GLOSS (required, invisible): right after the <fix> line, add one line <glos
   /** Wat betekent dit woord? Eerst de lesstof, dan een vervoegde vorm, dan meervoud/vrouwelijk terug naar de basis. Zonder DOM. */
   function lookup(word) {
     const b = bare(word); if (!b) return null;
-    const ix = index(), lw = String(word).toLowerCase();
+    const ix = index(), lw = S.lower(word);
     const hit = ix.exact.get(lw);
     if (hit) return { t: hit.t, m: hit.m, src: 'les' };
     // meervoud eerst (casas = huizen, niet: je trouwt), dan vervoegde vormen, dan de rest
