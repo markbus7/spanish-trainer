@@ -2,7 +2,7 @@
    npm i world-atlas@2 topojson-client@3 topojson-simplify@3 d3-geo@3 && node tools/kaart-maken.mjs <taal> [uitvoer.js]
    Talen: es (Latijns-Amerika + inzet Spanje/Eq.-Guinea), en (wereldkaart), nl (Nederland en België + inzetten),
    fr (Canada, Haïti en Afrika + kader met Frankrijk, België en Zwitserland);
-   tr (van Nederland tot Azerbeidzjan).
+   tr (van Nederland tot Azerbeidzjan); de (Midden-Europa: Duitsland, Oostenrijk, Zwitserland, Liechtenstein, Luxemburg, Oost-België).
    Nieuwe taal: voeg hieronder een kaart toe (landcode → ISO-nummer uit Natural Earth), en zet de vlagknoppen
    (pin) in de landenlijst van die taal (content/<cursus>/landen.js). */
 import fs from 'fs';
@@ -93,6 +93,23 @@ const MAPS = {
     const pr = d3.geoMercator().fitExtent([[box[0] + 8, box[1] + 14], [box[0] + box[2] - 8, box[1] + box[3] - 8]], both), p2 = d3.geoPath(pr);
     out.c.cw = { d: round(p2(cw) + p2(aw)), p: p2.centroid(cw).map(v => Math.round(v)), box };
     return { out, title: 'Nederland en België, met Suriname, Curaçao en Aruba en Zuid-Afrika als inzet' };
+  },
+  /* Duits: Midden-Europa met Duitsland, Oostenrijk, Zwitserland, Liechtenstein, Luxemburg en België (Oost-België). */
+  de() {
+    const DE = { de: 276, at: 40, ch: 756, li: 438, lu: 442, be: 56 };
+    const W = 600, H = 600;
+    const bbox = { type: 'MultiPoint', coordinates: [[2.3, 55.2], [17.4, 55.2], [17.4, 45.6], [2.3, 45.6]] };
+    const proj = d3.geoMercator().fitExtent([[10, 10], [W - 10, H - 10]], bbox).clipExtent([[0, 0], [W, H]]);
+    const path = d3.geoPath(proj);
+    const nums = new Set(Object.values(DE));
+    const bg = all.filter(f => !nums.has(+f.id)).map(f => path(simplify(f, 1e-7))).filter(Boolean).join('');
+    const out = { w: W, h: H, bg: round(bg), c: {} };
+    for (const [id, n] of Object.entries(DE)) {
+      const f = simplify(byNum(n), id === 'de' ? 2e-8 : 0);
+      // België: de vlag op Oost-België (Eupen), waar Duits de officiële taal is
+      out.c[id] = { d: round(path(f)), p: (id === 'be' ? proj([6.04, 50.63]) : path.centroid(f)).map(v => Math.round(v)) };
+    }
+    return { out, title: 'Midden-Europa: Duitsland, Oostenrijk, Zwitserland, Liechtenstein, Luxemburg en Oost-België' };
   },
   /* Frans: de Atlantische wereld (Canada/Québec, Haïti, West- en Centraal-Afrika), met Frankrijk, België en Zwitserland
      samen in één uitvergroot kader midden in de oceaan. */

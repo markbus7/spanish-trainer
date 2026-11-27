@@ -226,7 +226,7 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
 {
   const list = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/tts-texts.js')], { maxBuffer: 64 << 20 }).toString());
   const have = new Set(list.map(x => x.k));
-  ok(list.every(x => x.k === S.Speech.clipKey(x.text, x.ns) && /^(es-[A-Z]{2}|en-[A-Z]{2}|nl-(NL|BE)|af-ZA|fr-(FR|BE|CH|CA)|tr-TR|az-AZ)-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
+  ok(list.every(x => x.k === S.Speech.clipKey(x.text, x.ns) && /^(es-[A-Z]{2}|en-[A-Z]{2}|nl-(NL|BE)|af-ZA|fr-(FR|BE|CH|CA)|de-(DE|AT|CH)|tr-TR|az-AZ)-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
   // invulzinnen: voorgelezen met een stilte op het gat, hints tussen haakjes niet
   ok(JSON.stringify(S.Speech.gapParts('Did you ___ the email?')) === JSON.stringify(['Did you …', null, '… the email?']), 'invulzin: stukken rond het gat');
   ok(JSON.stringify(S.Speech.gapParts('¡___ la verdad! (decir, tú)')) === JSON.stringify([null, '… la verdad!']), 'invulzin: gat vooraan, hint weg');
@@ -1288,6 +1288,11 @@ await micTests();
       const r = K.Gen.checkType('der Haus', { answers: ['das Haus'], articleOptional: true });
       ok(!r.ok && r.warn === 'article-wrong' && /onzijdig/.test(r.gender), w + 'fout lidwoord der/die/das met geslacht');
       ok(K.C.all().length === 30, w + 'A1–B1 = 30 units');
+      // uitzonderingen worden benoemd, met reden
+      const U = K.Uitz, has = (l, re) => l.some(x => re.test(x.t + ' ' + x.html));
+      ok(U.label() === '⚠️ Uitzondering' && has(U.forWord('das Mädchen'), /-chen/) && has(U.find('Ich helfe dir gern.'), /derde naamval/) && has(U.find('Ich bin zu Hause geblieben.'), /sein/) && has(U.find('Er fährt nach Berlin.'), /ä/) && has(U.find('Berlin ist größer als München.'), /Umlaut/), w + 'uitzonderingen met reden (das Mädchen, helfen + dir, ist geblieben, fährt, größer)');
+      ok(U.RULES.de.every(x => /Uitzondering/.test(x.html) && /Waarom\?/.test(x.html)), w + 'elke uitzonderingsregel noemt «Uitzondering» en «Waarom?»');
+      ok(!U.find('Ich wohne in einem kleinen Dorf und lerne Deutsch.').length, w + 'geen valse uitzonderingen');
     } },
     'fr-nl': { pre: 'fr', name: 'Frans', lupe: 'Une tâche de moins\u00a0! Continue comme ça.', art: ['la maison', 'maison'], extra(K, w) {
       const ck = (u, a) => K.check.check(u, [a]);

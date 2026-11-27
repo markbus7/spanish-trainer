@@ -393,6 +393,92 @@ verliezen verloor/verloren verloren perder`.split('\n').map(l => { const m = l.s
     'Getallen vanaf 100': ['<b>Uitzondering:</b> <b>quinientos</b> (500), <b>setecientos</b> (700) en <b>novecientos</b> (900). En <b>cien</b> = precies 100, <b>ciento</b> vanaf 101.']
   };
 
+  /* ---------- Duits (uitleg in het Nederlands): vormen die de gewone regel doorbreken ---------- */
+  const DE_PERS = '(?:mir|dir|ihm|ihr|uns|euch|ihnen)';
+  const DE = [
+    { p: '(?:das|dem|des|ein|einem|eines|kein|mein|dein|dieses) (?:\\p{L}+e[sn]? )?mädchen',
+      t: 'das Mädchen: onzijdig, geen die',
+      html: 'Een meisje is vrouwelijk, dus je verwacht <i>die</i>. <b>Uitzondering:</b> het is <b>das Mädchen</b>. <b>Waarom?</b> Het woord eindigt op <b>-chen</b>, en alle verkleinwoorden op <i>-chen</i> en <i>-lein</i> zijn onzijdig, net als in het Nederlands (<i>het meisje</i>). De uitgang wint het van de betekenis.' },
+    { p: '(?:der|den|dem|ein|einen|einem|kein|keinen|mein|meinen|meinem) (?:käse|name|namen|buchstabe|buchstaben|gedanke|gedanken)|(?:das|dem|ein|einem|kein|mein|am|im) (?:auge|ende|interesse|gemüse|gebäude)',
+      t: 'der Käse, das Ende: woorden op -e die niet vrouwelijk zijn',
+      html: 'Woorden op <b>-e</b> zijn bijna altijd <b>vrouwelijk</b> (<i>die Lampe, die Straße, die Reise</i>). <b>Uitzondering:</b> <b>der Käse, der Name</b> en mannelijke personen op -e (<i>der Junge, der Kollege</i>), en onzijdig <b>das Auge, das Ende, das Interesse</b> en woorden met <i>Ge-</i> (<i>das Gemüse, das Gebäude</i>). <b>Waarom?</b> Hun -e is geen vrouwelijke uitgang, maar een rest van een oudere woordvorm (<i>Käse</i> komt van het Latijnse <i>caseus</i>).' },
+    { p: '(?:die|der|eine|einer|keine|meine) (?:butter|nummer|mauer|feier|steuer|oper|leiter)|(?:das|dem|ein|einem|kein|mein|im|am|ins) (?:\\p{L}+e[sn]? )?(?:zimmer|fenster|wetter|wasser|messer|theater|alter|abenteuer)',
+      t: 'die Butter, das Zimmer: woorden op -er die niet mannelijk zijn',
+      html: 'Woorden op <b>-er</b> zijn meestal <b>mannelijk</b> (<i>der Lehrer, der Computer, der Koffer</i>). <b>Uitzondering:</b> <b>die Butter, die Nummer, die Mauer, die Feier</b> zijn vrouwelijk en <b>das Zimmer, das Fenster, das Wetter, das Wasser, das Messer</b> onzijdig. <b>Waarom?</b> Bij deze woorden is -er geen achtervoegsel voor «iemand die iets doet», maar gewoon het einde van de stam; het geslacht moet je erbij leren.' },
+    { p: '(?:den|dem|des|einen|einem|eines|keinen|meinen|meinem|deinen|deinem|unseren|unserem|diesen|diesem|jeden|jedem) (?:\\p{L}+en )?(?:kollegen|kunden|jungen|studenten|menschen|nachbarn|experten|touristen|patienten|polizisten|journalisten|präsidenten|herrn)|herrn \\p{L}+',
+      t: 'den Kollegen, Herrn Müller: zwakke mannelijke woorden',
+      html: 'Een zelfstandig naamwoord verandert normaal niet in de vierde en derde naamval (<i>den Lehrer, dem Lehrer</i>). <b>Uitzondering:</b> een groep mannelijke woorden krijgt overal behalve in de eerste naamval <b>-(e)n</b>: <i>den Kolleg<b>en</b>, dem Student<b>en</b>, den Mensch<b>en</b>, Herr<b>n</b> Müller</i>. <b>Waarom?</b> Het is een rest van een oude verbuigingsklasse (de n-verbuiging) voor personen en dieren op -e en voor woorden op -ent, -ist, -at.' },
+    { p: '(?:den|meinen|deinen|seinen|ihren|unseren|euren|diesen|keinen|allen|vielen|zwei|drei|vier|fünf) (?:\\p{L}+en )?(?:kindern|freunden|männern|häusern|büchern|schülern|lehrern|tagen|jahren|monaten|brüdern|zimmern)|(?:vor|seit|nach|in|mit) (?:\\p{L}+ )?(?:jahren|tagen|monaten|kindern|freunden)',
+      t: 'den Kindern: extra -n in de derde naamval meervoud',
+      html: 'Het meervoud is normaal in alle naamvallen gelijk (<i>die Kinder, die Kinder</i>). <b>Uitzondering:</b> in de <b>derde naamval meervoud</b> krijgt het zelfstandig naamwoord zelf nog een <b>-n</b>: <i>mit den Kinder<b>n</b>, vor zwei Jahre<b>n</b>, bei meinen Freunde<b>n</b></i>. <b>Waarom?</b> Het is een overgebleven naamvalsuitgang. Hij vervalt alleen als het meervoud al op -n of -s eindigt (<i>den Frauen, den Autos</i>).' },
+    { p: '(?:zu|nach) hause',
+      t: 'zu Hause, nach Hause: Haus met een -e',
+      html: 'Normaal krijgt <i>Haus</i> na een voorzetsel geen uitgang (<i>in dem Haus</i>). <b>Uitzondering:</b> in de vaste uitdrukkingen <b>zu Hause</b> (thuis) en <b>nach Hause</b> (naar huis) staat er een <b>-e</b> en geen lidwoord. <b>Waarom?</b> Het is een oude derde-naamvals-e die in vaste uitdrukkingen bewaard is gebleven, zoals Nederlands <i>ten huize</i> en <i>van huize uit</i>.' },
+    { p: 'meiner meinung nach|(?:deiner|seiner|ihrer|unserer) meinung nach',
+      t: 'meiner Meinung nach: nach achteraan',
+      html: 'Een voorzetsel staat normaal vóór het zelfstandig naamwoord (<i>nach dem Essen</i>). <b>Uitzondering:</b> in <b>meiner Meinung nach</b> staat <i>nach</i> erachter. <b>Waarom?</b> Het is een versteende uitdrukking uit ouder Duits, waarin <i>nach</i> in de betekenis «volgens» vaak achteraan stond.' },
+    { p: '(?:hotels|autos|kinos|taxis|büros|fotos|handys|restaurants|cafés|sofas|radios|babys|hobbys|partys|teams|parks|zoos|omas|opas)', soft: true,
+      t: 'die Autos: meervoud op -s',
+      html: 'Duitse meervouden eindigen meestal op <i>-e, -er, -n</i> of <i>-en</i>, vaak met Umlaut. <b>Uitzondering:</b> leenwoorden en woorden op een klinker (behalve -e) krijgen <b>-s</b>: <i>die Auto<b>s</b>, die Hotel<b>s</b>, die Kino<b>s</b>, die Oma<b>s</b></i>. <b>Waarom?</b> Deze woorden passen niet in de oude Duitse meervoudsklassen; -s laat het woord zelf onveranderd. Let op: in de derde naamval komt er dan géén extra -n (<i>mit den Autos</i>).' },
+    { p: '(?:älter|größer|jünger|wärmer|kälter|länger|kürzer|stärker|schwächer|klüger|ärmer|härter|gesünder)\\p{L}*|am (?:ältesten|größten|jüngsten|wärmsten|kältesten|längsten|kürzesten|stärksten)|(?:älteste|größte|jüngste|längste|kürzeste)\\p{L}*',
+      t: 'älter, größer: Umlaut bij het vergelijken',
+      html: 'De vergrotende trap is normaal gewoon + <b>-er</b> (<i>klein → kleiner, schnell → schneller</i>). <b>Uitzondering:</b> veel korte woorden met <i>a, o, u</i> krijgen daarbij een <b>Umlaut</b>: <i>alt → <b>ä</b>lter, groß → gr<b>ö</b>ßer, jung → j<b>ü</b>nger, kalt → kälter, lang → länger</i>. <b>Waarom?</b> De oude uitgang bevatte een i-klank, en die kleurde de klinker ervoor (hetzelfde als bij <i>du fährst</i>).' },
+    { p: 'besser\\p{L}*|am besten|(?:beste|bester|besten|bestes)|lieber|am liebsten|höher\\p{L}*|am höchsten|höchste\\p{L}*|am meisten|die meisten',
+      t: 'gut – besser, gern – lieber, hoch – höher',
+      html: 'Normaal maak je de trappen met <b>-er</b> en <b>am …-sten</b>. <b>Uitzondering:</b> <i>gut → <b>besser</b> → am <b>besten</b></i>, <i>gern → <b>lieber</b> → am <b>liebsten</b></i>, <i>viel → <b>mehr</b> → am <b>meisten</b></i>, <i>hoch → <b>höher</b> → am <b>höchsten</b></i>. <b>Waarom?</b> Het zijn zeer oude, veelgebruikte woorden waarvan de trappen van een andere stam komen, net als <i>goed – beter – best</i> en <i>graag – liever</i> in het Nederlands. Bij <i>hoch</i> valt de c weg zodra er een klinker volgt.' },
+    { p: '(?:ärztin|ärztinnen|köchin|köchinnen|französin|bäuerin)',
+      t: 'Ärztin, Köchin: Umlaut in de vrouwelijke vorm',
+      html: 'De vrouwelijke vorm is normaal gewoon + <b>-in</b> (<i>Lehrer → Lehrerin</i>). <b>Uitzondering:</b> bij enkele korte woorden komt er een <b>Umlaut</b> bij: <i>Arzt → <b>Ä</b>rztin, Koch → K<b>ö</b>chin</i>. <b>Waarom?</b> De i van <i>-in</i> kleurt bij deze oude woorden de klinker ervoor.' },
+    { p: '(?:ich|er|sie|es|man|wer|das) (?:kann|muss|will|darf|soll|mag|weiß)', soft: true, verb: true,
+      t: 'ich kann, er muss: geen uitgang bij ich en er',
+      html: 'Normaal eindigt de ich-vorm op <b>-e</b> en de er-vorm op <b>-t</b> (<i>ich mache, er macht</i>). <b>Uitzondering:</b> de modale werkwoorden en <i>wissen</i> hebben daar <b>geen uitgang</b>, en ich en er zijn gelijk: <i>ich kann – er kann, ich weiß – er weiß</i>. <b>Waarom?</b> Hun tegenwoordige tijd is van oorsprong een oude verleden tijd, en die heeft bij ich/er nooit een uitgang (vergelijk <i>ich kam – er kam</i>). Nederlands doet hetzelfde: <i>hij kan, hij mag</i>, zonder -t.' },
+    { p: '(?:fährst|fährt|schläfst|schläft|trägst|trägt|läufst|läuft|wäschst|wäscht|fängst|fängt|hältst|hält|lässt|fällst|fällt|lädst|lädt|gefällt)', soft: true, verb: true,
+      t: 'du fährst, er schläft: a wordt ä',
+      html: 'Normaal blijft de stam in alle personen gelijk (<i>ich mache, du machst</i>). <b>Uitzondering:</b> sterke werkwoorden met een <b>a</b> krijgen bij <b>du</b> en <b>er/sie/es</b> een <b>ä</b>: <i>fahren → du f<b>ä</b>hrst, er f<b>ä</b>hrt; schlafen → er schl<b>ä</b>ft; laufen → er l<b>äu</b>ft</i>. <b>Waarom?</b> De oude uitgangen van du en er bevatten een i-klank, en die trok de a naar voren in de mond. Bij ich en in het meervoud zat die i er niet.' },
+    { p: '(?:sprichst|spricht|isst|gibst|gibt|nimmst|nimmt|hilfst|hilft|triffst|trifft|siehst|sieht|liest|empfiehlst|empfiehlt|vergisst|wirst|wird|wirfst|wirft|stirbt)', soft: true, verb: true,
+      t: 'du sprichst, er sieht: e wordt i of ie',
+      html: 'Normaal blijft de stam gelijk. <b>Uitzondering:</b> sterke werkwoorden met een <b>e</b> krijgen bij <b>du</b> en <b>er/sie/es</b> een <b>i</b> (korte klinker) of <b>ie</b> (lange klinker): <i>sprechen → du spr<b>i</b>chst, geben → er g<b>i</b>bt, sehen → er s<b>ie</b>ht, lesen → er l<b>ie</b>st</i>; <i>nehmen → du n<b>imm</b>st</i> en <i>werden → du w<b>ir</b>st, er w<b>ird</b></i> veranderen nog meer. <b>Waarom?</b> Dezelfde oude i-klank in de uitgang als bij <i>du fährst</i>; je hoort het nog in het Nederlandse <i>geven – gift</i>.' },
+    { p: '(?:arbeitest|arbeitet|wartest|wartet|findest|findet|redest|redet|kostet|antwortest|antwortet|öffnest|öffnet|regnet|badest|badet|arbeitete\\p{L}*|wartete\\p{L}*|antwortete\\p{L}*|redete\\p{L}*)', soft: true, verb: true,
+      t: 'du arbeitest, er wartet: extra e',
+      html: 'De uitgangen zijn normaal <b>-st</b> en <b>-t</b> (<i>du machst, er macht</i>). <b>Uitzondering:</b> na een stam op <b>-t</b> of <b>-d</b> (en na <i>-fn, -gn</i>) komt er een <b>e</b> tussen: <i>du arbeit<b>e</b>st, er wart<b>e</b>t, es regn<b>e</b>t</i>, en in de verleden tijd <i>arbeit<b>e</b>te</i>. <b>Waarom?</b> Zonder die e kun je de uitgang niet horen of uitspreken (<i>arbeitt, regnt</i>).' },
+    { p: 'du (?:heißt|tanzt|sitzt|reist|putzt|benutzt|schließt|genießt)', soft: true, verb: true,
+      t: 'du heißt: alleen -t na een s-klank',
+      html: 'De du-vorm eindigt normaal op <b>-st</b>. <b>Uitzondering:</b> eindigt de stam al op een s-klank (<b>s, ß, z, x</b>), dan komt er alleen een <b>-t</b> bij: <i>du heiß<b>t</b>, du tanz<b>t</b>, du reis<b>t</b></i>. <b>Waarom?</b> Twee s-klanken achter elkaar smelten samen; de du-vorm is dan gelijk aan de er-vorm.' },
+    { p: '(?:bin|bist|ist|sind|seid|war|warst|waren|wart) (?:\\p{L}+ ){0,5}?(?:geblieben|gewesen|passiert|geworden|geschehen)', verb: true,
+      t: 'ist geblieben, ist gewesen: sein zonder beweging',
+      html: 'Het Perfekt met <b>sein</b> hoort bij <b>beweging</b> of <b>verandering</b> (<i>ist gegangen, ist eingeschlafen</i>). <b>Uitzondering:</b> <b>bleiben, sein, werden, passieren</b> en <b>geschehen</b> krijgen ook <i>sein</i>, al is er geen beweging: <i>Ich <b>bin</b> zu Hause geblieben. Was <b>ist</b> passiert?</i> <b>Waarom?</b> Het zijn «toestandswerkwoorden» zonder lijdend voorwerp; het Nederlands doet precies hetzelfde (<i>ik ben gebleven, er is iets gebeurd</i>).' },
+    { p: '(?:habe|hast|hat|haben|habt|hatte|hattest|hatten|hattet|wurde|wurden|wird|werden) (?:\\p{L}+ ){0,5}?(?:studiert|telefoniert|probiert|repariert|reserviert|fotografiert|diskutiert|informiert|funktioniert|besucht|bezahlt|verkauft|erzählt|vergessen|verstanden|bekommen|begonnen|entschieden|empfohlen|erklärt|bestellt|verloren|versucht|gebucht)', verb: true,
+      t: 'studiert, besucht, vergessen: voltooid deelwoord zonder ge-',
+      html: 'Het voltooid deelwoord begint normaal met <b>ge-</b> (<i>gemacht, gesehen</i>). <b>Uitzondering:</b> werkwoorden op <b>-ieren</b> en werkwoorden met een onscheidbaar voorvoegsel (<b>be-, ver-, er-, ent-, emp-, zer-, ge-</b>) krijgen <b>geen ge-</b>: <i>studiert, telefoniert, besucht, verkauft, erzählt, vergessen</i>. <b>Waarom?</b> <i>Ge-</i> staat alleen vóór een beklemtoonde eerste lettergreep, en bij deze werkwoorden ligt de klemtoon verderop. Nederlands doet dat deels ook: <i>bezocht, verkocht</i> (maar wél <i>gestudeerd</i>).' },
+    { p: '(?:ge\\p{L}+|\\p{L}+iert|be\\p{L}+t|ver\\p{L}+t|er\\p{L}+t) worden',
+      t: 'ist gebaut worden: worden zonder ge-',
+      html: 'Het voltooid deelwoord van <i>werden</i> is normaal <b>geworden</b> (<i>Er ist Arzt geworden</i>). <b>Uitzondering:</b> in de lijdende vorm is het <b>worden</b>, zonder ge-: <i>Das Haus ist gebaut <b>worden</b>.</i> <b>Waarom?</b> Er staat al een voltooid deelwoord met ge- vlak voor; twee keer ge- achter elkaar wordt vermeden.' },
+    { p: '(?:habe|hast|hat|haben|habt|hatte|hatten) (?:\\p{L}+ ){1,6}?\\p{L}+(?:en|ern|eln) (?:lassen|müssen|können|wollen|dürfen|sollen)', verb: true,
+      t: 'habe reparieren lassen: heel werkwoord in plaats van deelwoord',
+      html: 'In het Perfekt staat normaal een voltooid deelwoord (<i>ich habe gelassen, ich habe gemusst</i>). <b>Uitzondering:</b> staat er nóg een werkwoord bij, dan blijven <i>lassen</i> en de modale werkwoorden in de <b>hele vorm</b>: <i>Ich habe mein Auto reparieren <b>lassen</b>. Ich habe arbeiten <b>müssen</b>.</i> <b>Waarom?</b> Ze gedragen zich als hulpwerkwoorden; het Nederlands doet hetzelfde (<i>heb laten repareren, heb moeten werken</i>).' },
+    { p: '(?:dachte|brachte|wusste|kannte|nannte|rannte|brannte)\\p{L}*', soft: true, verb: true,
+      t: 'dachte, wusste: klinkerwissel én -te',
+      html: 'Zwakke werkwoorden krijgen in de verleden tijd <b>-te</b> en houden hun klinker; sterke werkwoorden wisselen van klinker en krijgen geen -te. <b>Uitzondering:</b> een paar «gemengde» werkwoorden doen <b>allebei</b>: <i>denken → <b>dachte</b>, bringen → <b>brachte</b>, wissen → <b>wusste</b>, kennen → <b>kannte</b></i>. <b>Waarom?</b> Het zijn oorspronkelijk zwakke werkwoorden waarvan de stamklinker door een oude klankwet veranderde; Nederlands heeft hetzelfde bij <i>dacht, bracht, wist</i>.' },
+    { p: '(?:wäre|wärst|wären|wärt|hätte|hättest|hätten|hättet|könnte|könntest|könnten|könntet|müsste|müsstest|müssten|dürfte|dürftest|dürften)', soft: true, verb: true,
+      t: 'wäre, hätte, könnte: eigen vorm in plaats van würde',
+      html: '«Zou» maak je normaal met <b>würde + heel werkwoord</b> (<i>ich würde kommen</i>). <b>Uitzondering:</b> <i>sein, haben</i> en de modale werkwoorden hebben een eigen korte vorm: <b>wäre, hätte, könnte, müsste, dürfte</b> (verleden tijd + Umlaut). <b>Waarom?</b> Deze werkwoorden komen zo vaak voor dat hun oude vormen bewaard zijn gebleven; <i>würde sein</i> klinkt omslachtig. Let op: <i>sollte</i> en <i>wollte</i> krijgen géén Umlaut.' },
+    { p: '(?:hilfst|hilft|helfe|helfen|helft|danke|dankst|dankt|danken|gratuliere|gratulierst|gratuliert|gratulieren|gefällt|gefallen|gehört|gehören|schmeckt|schmecken|antworte|antwortet|antworten|passt|stimme|stimmst|stimmt|stimmen|widerspreche|widersprechen) ' + DE_PERS + '|' + DE_PERS + ' (?:\\p{L}+ ){0,3}?(?:helfen|geholfen|danken|gedankt|gratulieren|gratuliert|zustimmen|widersprechen)',
+      t: 'ich helfe dir: derde naamval in plaats van vierde',
+      html: 'Het lijdend voorwerp staat normaal in de <b>vierde naamval</b> (<i>Ich sehe <b>dich</b></i>). <b>Uitzondering:</b> een kleine groep werkwoorden krijgt altijd de <b>derde naamval</b>: <i>helfen, danken, gratulieren, gefallen, gehören, schmecken, antworten, zustimmen</i>: <i>Ich helfe <b>dir</b>. Das gefällt <b>mir</b>.</i> <b>Waarom?</b> Ze drukken uit dat iets <i>ten goede komt aan</i> iemand: je geeft «hulp aan», «dank aan» iemand. Die persoon is een ontvanger, en ontvangers staan in de derde naamval.' },
+    { p: '(?:wasche|wäschst|putze|putzt|kämme|kämmst|ziehe|ziehst) (?:mir|dir) (?:\\p{L}+ ){1,3}',
+      t: 'ich wasche mir die Hände: mir in plaats van mich',
+      html: 'Een wederkerend werkwoord heeft normaal <b>mich / dich</b> (<i>Ich wasche <b>mich</b></i>). <b>Uitzondering:</b> staat er nog een lijdend voorwerp in de zin, dan wordt het <b>mir / dir</b>: <i>Ich wasche <b>mir</b> die Hände.</i> <b>Waarom?</b> Een zin kan maar één lijdend voorwerp (vierde naamval) hebben; dat zijn hier de handen, dus «ik» wordt de ontvanger (derde naamval).' },
+    { p: '(?:alles|etwas|nichts|vieles|das beste|das schönste|das einzige) was',
+      t: 'alles, was …: was in plaats van das',
+      html: 'Het betrekkelijk voornaamwoord is normaal <b>der, die, das</b> (<i>das Buch, <b>das</b> ich lese</i>). <b>Uitzondering:</b> na <i>alles, etwas, nichts</i> en na een overtreffende trap zonder zelfstandig naamwoord gebruik je <b>was</b>: <i>Alles, <b>was</b> er sagt, stimmt.</i> <b>Waarom?</b> Deze woorden zijn onbepaald: er is geen concreet woord met een geslacht waar <i>das</i> naar kan verwijzen.' },
+    { p: '(?:meinetwegen|deinetwegen|seinetwegen|ihretwegen|unseretwegen)',
+      t: 'meinetwegen: wegen + ich als één woord',
+      html: 'Na <i>wegen</i> volgt normaal een tweede naamval (<i>wegen des Wetters</i>). <b>Uitzondering:</b> met een persoonlijk voornaamwoord wordt het één woord: <b>meinetwegen, deinetwegen, seinetwegen</b> (niet <s>wegen mir</s> in net Duits). <b>Waarom?</b> De oude tweede naamval van <i>ich</i> is met <i>wegen</i> versmolten. <i>Meinetwegen</i> betekent ook «wat mij betreft».' },
+    { p: 'nicht zu \\p{L}+en|nur zu \\p{L}+en|brauch(?:e|st|t|en) (?:\\p{L}+ ){0,4}?zu \\p{L}+en',
+      t: 'du brauchst nicht zu kommen: brauchen met zu',
+      html: 'Na een werkwoord dat als hulpwerkwoord dient, komt normaal <b>geen zu</b> (<i>Du musst kommen</i>). <b>Uitzondering:</b> <i>brauchen</i> krijgt wél <b>zu</b>, en je gebruikt het zo alleen met <i>nicht</i> of <i>nur</i>: <i>Du brauchst nicht <b>zu</b> kommen</i> (je hoeft niet te komen). <b>Waarom?</b> <i>Brauchen</i> is van oorsprong een gewoon werkwoord («nodig hebben») en houdt de bouw van een gewoon werkwoord.', soft: true }
+  ];
+
   /* ================= zoeken ================= */
   const words = s => String(s || '').toLowerCase().normalize('NFC').replace(/[’']/g, ' ').match(/[\p{L}\d]+/gu) || [];
   const compile = list => list.map(r => Object.assign({}, r, { re: new RegExp('(?<![\\p{L}\\d])(?:' + r.p + ')(?![\\p{L}\\d])', 'gu') }));
@@ -401,7 +487,7 @@ verliezen verloor/verloren verloren perder`.split('\n').map(l => { const m = l.s
   const loc = v => (v && typeof v === 'object') ? (v[UI()] || v.nl) : v;
 
   /* Regels en werkwoordnotities per doeltaal. Nieuwe doeltaal: een lijst zoals EN/NL maken en hier een rij toevoegen. */
-  const RULES = { es: ES, en: EN, nl: NL, fr: FR, tr: TR };
+  const RULES = { es: ES, en: EN, nl: NL, fr: FR, tr: TR, de: DE };
   const VERB_NOTES = { es: (t, f) => verbNotesEs(t, f), en: (t, f) => verbNotesEn(t, f), nl: (t, f) => verbNotesNl(t, f) };
   let cache = null;
   function rules() {
