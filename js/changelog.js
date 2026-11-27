@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.85.0', date: '2026-11-27',
+    nl: ['Frans B2 compleet: tien nieuwe units. Nieuws lezen (conditionnel voor onbevestigd nieuws), subjonctif passé, voorwaarden zonder si en de ne explétif, passé simple herkennen, debatteren (bien que, malgré, avoir beau), auquel en duquel, navertellen in het verleden, y en en bij werkwoorden met à en de, futur antérieur en formele brieven. De niveautest gaat nu tot B2 en er zijn twee nieuwe gesprekken.'],
+    es: ['Francés B2 completo: diez unidades nuevas, prueba de nivel hasta B2 y dos conversaciones nuevas.'] },
   { v: '1.84.0', date: '2026-11-27',
     nl: ['Leestekst en vraag staan nu samen op één scherm. Op de iPad liggend zie je de tekst links en de vraag rechts; staand en op de iPhone staat de tekst bovenaan in een eigen scrollvak met de vraag eronder. Je hoeft dus niet meer te wisselen met de knop «Tekst».', 'Dit werkt bij de les Lezen, bij de vragen na een dialoog en bij de leesvraag in de unittoets en eigen toetsen, in alle cursussen. De tekst blijft staan zolang de vragen over dezelfde tekst gaan. Met «Groot» open je de tekst nog schermvullend.'],
     es: ['El texto y la pregunta ahora se ven juntos en una sola pantalla: en el iPad en horizontal, el texto a la izquierda y la pregunta a la derecha; en vertical y en el iPhone, el texto arriba en su propio cuadro con la pregunta debajo.', 'Funciona en la lección de lectura, en las preguntas después de un diálogo y en las pruebas, en todos los cursos.'] },
