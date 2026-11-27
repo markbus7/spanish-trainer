@@ -52,7 +52,15 @@
       // «bijna goed»: ook accent grave, circonflexe en cedille mogen ontbreken (è, ê, ç), en œ mag als oe
       fold: s => s.normalize('NFD').replace(/[\u0300\u0302\u0327]/g, '').normalize('NFC').replace(/œ/g, 'oe').replace(/æ/g, 'ae'),
       gender: a => ({ le: 'mannelijk (le)', la: 'vrouwelijk (la)', un: 'mannelijk (un)', une: 'vrouwelijk (une)' })[a] || '' },
-    tr: { nl: 'Turks', es: 'turco', en: 'Turkish', flag: '🇹🇷', arts: null, letters: 'çğıöşü' }
+    // Turks heeft twee i's: İ/i (met punt) en I/ı (zonder punt). De gewone toLowerCase/toUpperCase kent die paren niet (İ → i̇, i → I).
+    // fold = vorm zonder Turkse tekens: wie «cay» typt voor «çay» krijgt «bijna goed, let op de tekens». fill = letters voor de woordzoeker.
+    tr: { nl: 'Turks', es: 'turco', en: 'Turkish', flag: '🇹🇷', arts: null, letters: 'çğıöşüâîû',
+      lower: s => s.replace(/İ/g, 'i').replace(/I/g, 'ı').toLowerCase(),
+      upper: s => s.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase(),
+      fold: s => s.replace(/[çğışöüâîû]/g, c => ({ 'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ş': 's', 'ö': 'o', 'ü': 'u', 'â': 'a', 'î': 'i', 'û': 'u' })[c]),
+      plain: s => s.normalize('NFC').replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase().replace(/[ÂÎÛ]/g, c => ({ 'Â': 'A', 'Î': 'İ', 'Û': 'U' })[c]),
+      fill: 'AAAAAAAEEEEEEİİİİİIIIKKKKLLLLNNNNRRRRMMMTTTUUYYSSDDOOBBÜÜŞŞZGÇHĞVCÖPFJ',
+      keys: ['ERTYUIOPĞÜ', 'ASDFGHJKLŞİ', 'ZCVBNMÖÇ⌫'] }
   };
   S.LANGS = LANGS;
   const COURSES = {
@@ -79,7 +87,13 @@
       brand: 'Deutsch <em>klar</em>', title: 'Deutsch Klar', name: { nl: 'Duits', es: 'alemán' },
       ai: { target: 'German', native: 'Dutch', style: 'standard German as spoken in Germany; current spelling with ß; use "du" unless the situation is formal, then "Sie"',
         pitfalls: 'cases (nominative, accusative, dative) and the prepositions that trigger them, der/die/das where Dutch only has de/het, verb in second position and at the end in subordinate clauses, haben vs. sein in the Perfekt, capitalised nouns, false friends such as bellen/doof/das Meer/der See/dürfen/schlimm/die Tasse/klar, too literal translations from Dutch',
-        exceptions: 'das Mädchen is neuter because of -chen; strong verbs with a vowel change (du fährst, er liest); irregular participles; verbs that take sein in the Perfekt; weak masculine nouns (den Jungen, den Herrn); dative plural -n; two-way prepositions' } }
+        exceptions: 'das Mädchen is neuter because of -chen; strong verbs with a vowel change (du fährst, er liest); irregular participles; verbs that take sein in the Perfekt; weak masculine nouns (den Jungen, den Herrn); dative plural -n; two-way prepositions' } },
+    // Turks voor Nederlandstaligen (standaard-Turks van Turkije, İstanbul-uitspraak).
+    'tr-nl': { id: 'tr-nl', target: 'tr', ui: 'nl', speak: 'tr-TR', listen: 'tr-TR', flag: '🇹🇷', ns: 'tr-nl', where: 'Turkije', hello: 'Merhaba! Nasılsın? Türkçe dersine hoş geldin.', device: 'Bu da cihazının sesi.',
+      brand: 'Türkçe <em>kolay</em>', title: 'Türkçe Kolay', name: { nl: 'Turks', es: 'turco' },
+      ai: { target: 'Turkish', native: 'Dutch', style: 'standard Turkish as spoken in Türkiye (İstanbul norm); always write the Turkish letters ç, ğ, ı, İ, ö, ş, ü correctly',
+        pitfalls: 'vowel harmony in suffixes, d/t and c/ç assimilation after f-s-t-k-ç-ş-h-p, consonant softening (k→ğ, p→b, ç→c, t→d), verb-final word order, no verb "to have" (var/yok with a possessive suffix), no articles (the accusative -(y)i marks a definite object), dotted i vs. dotless ı, buçuk (üç buçuk = half past three, not "half drie"), sen vs. siz',
+        exceptions: 'saat → saatler (not saatlar), su → suyu, oğul → oğlum, gitmek → gidiyor, yemek → yiyor, ben → bana, yazın/kışın, the aorist of one-syllable verbs such as gelir/alır/olur, nationalities without -li such as Türk and Alman' } }
   };
   S.COURSES = COURSES;
 

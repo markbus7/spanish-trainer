@@ -483,9 +483,66 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     [/^¡Bien hecho! Tu nivel es (\w+)\./, (m, l) => `Bien joué ! Ton niveau est ${l}. Continuons à travailler ensemble.`],
     [/^¡Ya conoces (más de )?(\d+) palabras!/, (m, more, n) => `Tu connais déjà ${more ? 'plus de ' : ''}${n} mots ! Je suis très fière de toi.`]
   ];
+  /* ---------- Turkse cursus: Lupe praat Turks (zelfde opzet als Engels en Duits) ---------- */
+  const TR = {
+    '¡Hola! Te quedaste a mitad de una lección. ¿Seguimos donde ibas?': 'Merhaba! Bir dersin ortasında kaldın. Kaldığın yerden devam edelim mi?',
+    '¡Plan cumplido! Lo que hagas ahora es extra.': 'Plan tamam! Şimdi yaptığın her şey ekstra.',
+    '¡Plan cumplido! ¿Seguimos con la próxima lección?': 'Plan tamam! Sonraki derse geçelim mi?',
+    '¡Meta del día cumplida! Estoy muy orgullosa de ti.': 'Günlük hedef tamam! Seninle gurur duyuyorum.',
+    '¡Órale! Ya cumpliste tu meta. Todo lo que hagas ahora es extra.': 'Harika! Hedefine ulaştın. Bundan sonrası ekstra.',
+    '¡Qué gusto verte otra vez! Empecemos con algo cortito.': 'Seni tekrar görmek ne güzel! Kısa bir şeyle başlayalım.',
+    '¡Ya casi! Solo te falta una tarea.': 'Az kaldı! Sadece bir görevin var.',
+    '¡Una tarea menos! Sigue así.': 'Bir görev daha bitti! Böyle devam.',
+    '¡Hoy toca la prueba de la unidad! Tú puedes.': 'Bugün ünite testi var! Yapabilirsin.',
+    '¡Vas muy bien hoy! Un poquito más y llegas a tu meta.': 'Bugün çok iyisin! Biraz daha, sonra hedefine ulaşıyorsun.',
+    'Un ratito cada día hace la diferencia. ¡Vamos!': 'Her gün birazcık çalışmak fark yaratır. Hadi!',
+    '¡Hola! Te preparé un plan para hoy. ¡Vamos!': 'Merhaba! Bugün için sana bir plan hazırladım. Hadi!',
+    'Casi lo logras. Repasamos un poco y lo intentamos otra vez, ¿va?': 'Neredeyse oldu. Biraz tekrar edelim, sonra yeniden deneyelim, tamam mı?',
+    '¡Felicidades! Terminaste la unidad. ¡Qué orgullo!': 'Tebrikler! Üniteyi bitirdin. Seninle gurur duyuyorum!',
+    '¡Listo! Buen trabajo.': 'Tamam! Aferin sana.',
+    '¡Perfecto! Sin ningún error. ¡Eres una estrella!': 'Mükemmel! Hiç hata yok. Sen bir yıldızsın!',
+    '¡Excelente trabajo! Casi sin errores.': 'Harika iş! Neredeyse hiç hata yok.',
+    '¡Muy bien! Vas avanzando.': 'Çok güzel! İlerliyorsun.',
+    'Cada error te enseña algo. ¡Ánimo, vamos bien!': 'Her hata sana bir şey öğretir. Hadi, iyi gidiyoruz!',
+    '¡Subiste de nivel! ¡Qué padre! Se nota que practicas.': 'Bir seviye atladın! Harika! Çalıştığın belli oluyor.',
+    'No te preocupes, a veces pasa. Repasamos juntos y lo intentas otra vez.': 'Merak etme, bazen olur. Birlikte tekrar edelim, sonra yeniden dene.',
+    '¡Gracias por hacer la prueba! Ahora sé por dónde empezar contigo.': 'Testi yaptığın için teşekkürler! Artık nereden başlayacağımızı biliyorum.',
+    'Aquí vas a ver todo lo que aprendes. ¡Empecemos hoy!': 'Öğrendiğin her şeyi burada göreceksin. Hadi bugün başlayalım!',
+    'Cada palabra nueva cuenta. ¡Qué padre!': 'Her yeni kelime önemli. Harika!',
+    '¡Buen comienzo! Poco a poco se llega lejos.': 'Güzel bir başlangıç! Adım adım uzağa gidilir.',
+    '¡Perfecto! ¡Qué buena memoria!': 'Mükemmel! Hafızan çok iyi!',
+    '¡Muy bien jugado!': 'Çok güzel oynadın!',
+    '¡Sigue así! Las palabras difíciles vuelven pronto.': 'Böyle devam! Zor kelimeler yakında tekrar gelecek.',
+    '¡Todo repasado! Nos vemos mañana.': 'Hepsini tekrar ettin! Yarın görüşürüz.',
+    '¡Terminaste tu plan de hoy! Abre tu cofre.': 'Bugünkü planını bitirdin! Sandığını aç.',
+    '¡Plan del día completado! ¡Qué padre!': 'Günün planı tamam! Harika!',
+    '¡Lo lograste! Estoy muy orgullosa de ti.': 'Başardın! Seninle gurur duyuyorum.',
+    '¡Perfecto! Ahora te hablo en voz alta.': 'Mükemmel! Artık seninle sesli konuşuyorum.',
+    '¡Hola! Soy Lupe. ¿Te gusta mi voz?': 'Merhaba! Ben Lupe. Sesimi beğendin mi?',
+    '¡Platiquemos! Así veo en qué te puedo ayudar.': 'Hadi konuşalım! Böylece sana nasıl yardım edebileceğimi görürüm.',
+    '¡Vas mejorando! Cometes menos errores que antes.': 'Gittikçe iyi oluyorsun! Eskisinden daha az hata yapıyorsun.',
+    'Mira, esto es lo que más practicaría yo.': 'Bak, ben en çok bunu çalışırdım.',
+    'Hoy tienes más de cien repasos. Empecemos por ahí, así no se te olvida nada.': 'Bugün yüzden fazla tekrarın var. Oradan başlayalım, böylece hiçbir şeyi unutmazsın.',
+    '¡Llevas más de cien días seguidos! ¡Qué padre!': 'Yüz günden fazla aralıksız çalıştın! Harika!',
+    'Más de cien días seguidos. ¡No rompas la racha!': 'Yüz günden fazla aralıksız. Seriyi bozma!',
+    '¡Cinco seguidas! ¡Órale!': 'Art arda beş doğru! Süper!',
+    '¡Diez seguidas! ¡Qué padre!': 'Art arda on doğru! Harika!'
+  };
+  const TR_RE = [
+    [/^¡Hola! Soy Lupe, tu profe de .+\.$/, () => 'Merhaba! Ben Lupe, Türkçe öğretmenin.'],
+    [/^¿Empezamos\? Hoy vemos: (.+)\.$/, (m, u) => 'Başlayalım mı? Bugünün konusu: ' + u + '.'],
+    [/^Hoy tienes (\d+) repasos\./, (m, n) => `Bugün ${n} tekrarın var. Oradan başlayalım, böylece hiçbir şeyi unutmazsın.`],
+    [/^¡Llevas (\d+) días seguidos! ¡Qué padre!$/, (m, n) => `${n} gün aralıksız çalıştın! Harika!`],
+    [/^(\d+) días seguidos\. ¡No rompas la racha!$/, (m, n) => `${n} gün aralıksız. Seriyi bozma!`],
+    [/^¡(\d+) seguidas! ¡Imparable!$/, (m, n) => `Art arda ${n} doğru! Seni kimse durduramaz!`],
+    [/^¡Plan del día completado! Llevas (\d+) días seguidos\.$/, (m, n) => `Günün planı tamam! ${n} gündür aralıksız çalışıyorsun.`],
+    [/^¡Bien hecho! Tu nivel es (\w+)\./, (m, l) => `Aferin! Seviyen ${l}. Birlikte çalışmaya devam edelim.`],
+    [/^¡Ya conoces (más de )?(\d+) palabras!/, (m, more, n) => `Artık ${n}${more ? ' kelimeden fazla' : ' kelime'} biliyorsun! Seninle gurur duyuyorum.`]
+  ];
   /* Per doeltaal (met Nederlandse uitleg) de vertaling van Lupes vaste zinnen. Nieuwe taal: lijst + patronen toevoegen;
      de test controleert dat geen enkele zin Spaans blijft. Zonder rij praat Lupe Spaans. */
-  const LOCS = { en: { map: EN, re: EN_RE }, de: { map: DE, re: DE_RE }, fr: { map: FR, re: FR_RE, fix: s => s.replace(/ ([?!:;])/g, '\u00a0$1') } };
+  const LOCS = { en: { map: EN, re: EN_RE }, de: { map: DE, re: DE_RE }, fr: { map: FR, re: FR_RE, fix: s => s.replace(/ ([?!:;])/g, '\u00a0$1') },
+    tr: { map: TR, re: TR_RE } };
   const LOC = (S.course && S.course.ui === 'nl' && LOCS[S.course.target]) || null;
   const lineLang = LOC ? S.course.target : 'es';
   function locText(es) {

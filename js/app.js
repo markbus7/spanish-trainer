@@ -14,7 +14,9 @@
     fr: { greet: ['Bonjour\u00a0', 'Bon après-midi\u00a0', 'Bonsoir\u00a0'], welcome: 'Bienvenue !', phrase: 'L’expression du jour', hi: 'Salut ! Moi, c’est Lupe 👋',
       ask: 'Bonjour ! Je suis Lupe, ta prof de français. Qu’est-ce que tu veux savoir aujourd’hui ?', write: 'On écrit ! Écris ton texte et je t’aide à le corriger.' },
     de: { greet: ['Guten Morgen', 'Guten Tag', 'Guten Abend'], welcome: 'Willkommen!', phrase: 'Ausdruck des Tages', hi: 'Hallo! Ich bin Lupe 👋',
-      ask: 'Hallo! Ich bin Lupe, deine Deutschlehrerin. Was möchtest du heute wissen?', write: 'Auf geht’s, wir schreiben! Schreib deinen Text und ich helfe dir beim Korrigieren.' }
+      ask: 'Hallo! Ich bin Lupe, deine Deutschlehrerin. Was möchtest du heute wissen?', write: 'Auf geht’s, wir schreiben! Schreib deinen Text und ich helfe dir beim Korrigieren.' },
+    tr: { greet: ['Günaydın', 'İyi günler', 'İyi akşamlar'], welcome: 'Hoş geldin!', phrase: 'Günün ifadesi', hi: 'Merhaba! Ben Lupe 👋',
+      ask: 'Merhaba! Ben Lupe, Türkçe öğretmenin. Bugün ne öğrenmek istiyorsun?', write: 'Hadi yazalım! Metnini yaz, ben de düzeltmene yardım edeyim.' }
   })[S.course.target] || null;
   const save = U.debounce(() => Store.save(), 300);
 
@@ -1266,10 +1268,12 @@
     es: { type: 'Escribe en español… (Nederlands mag ook)', write: 'Escribe tu texto aquí…', send: 'Enviar', start: '(Empecemos el juego de rol. / Laten we beginnen.)' },
     en: { type: 'Write in English… (Nederlands mag ook)', write: 'Write your text here…', send: 'Send', start: '(Let’s start the role-play. / Laten we beginnen.)' },
     fr: { type: 'Écris en français… (Nederlands mag ook)', write: 'Écris ton texte ici…', send: 'Envoyer', start: '(Commençons le jeu de rôle. / Laten we beginnen.)' },
-    de: { type: 'Schreib auf Deutsch… (Nederlands mag ook)', write: 'Schreib deinen Text hier…', send: 'Senden', start: '(Fangen wir mit dem Rollenspiel an. / Laten we beginnen.)' }
+    de: { type: 'Schreib auf Deutsch… (Nederlands mag ook)', write: 'Schreib deinen Text hier…', send: 'Senden', start: '(Fangen wir mit dem Rollenspiel an. / Laten we beginnen.)' },
+    tr: { type: 'Türkçe yaz… (Nederlands mag ook)', write: 'Metnini buraya yaz…', send: 'Gönder', start: '(Hadi rol oyununa başlayalım. / Laten we beginnen.)' }
   };
   const ASK_EX = { en: '«Wanneer gebruik ik since en wanneer for?» of «Wat betekent “to touch base”?»', de: '«Wanneer gebruik ik den en wanneer dem?» of «Wat betekent “Feierabend”?»',
-    fr: '«Wanneer gebruik ik passé composé en wanneer imparfait?» of «Wat betekent “avoir le cafard”?»' };
+    fr: '«Wanneer gebruik ik passé composé en wanneer imparfait?» of «Wat betekent “avoir le cafard”?»',
+    tr: '«Wanneer gebruik ik -de en wanneer -e?» of «Wat betekent “kolay gelsin”?»' };
   function lupeAv(size, cls) { return S.Tutor.avatar(size, cls); }
   function tutorHead() {
     const on = () => !!st().settings.tutorVoice;
@@ -2062,7 +2066,8 @@
       label('Thema', h('select', { class: 'input', onchange: e => { set('theme', e.target.value); applyTheme(); } }, [['auto', 'Automatisch'], ['light', 'Licht'], ['dark', 'Donker']].map(([v, l]) => h('option', { value: v, selected: s.theme === v ? true : null }, l)))))));
     // stem
     const voiceSel = h('select', { class: 'input', onchange: e => set('voice', e.target.value) });
-    const VOICE_TIP = { es: 'Paulina of Juan (Mexico)', en: 'bijvoorbeeld Ava of Evan (Verenigde Staten)', nl: 'bijvoorbeeld Ellen of Xander (Nederland)', de: 'bijvoorbeeld Anna of Markus (Duitsland)', fr: 'bijvoorbeeld Audrey, Aurélie of Thomas (Frankrijk)' };
+    const VOICE_TIP = { es: 'Paulina of Juan (Mexico)', en: 'bijvoorbeeld Ava of Evan (Verenigde Staten)', nl: 'bijvoorbeeld Ellen of Xander (Nederland)', de: 'bijvoorbeeld Anna of Markus (Duitsland)', fr: 'bijvoorbeeld Audrey, Aurélie of Thomas (Frankrijk)',
+      tr: 'bijvoorbeeld Yelda of Cem (Turkije)' };
     const fillVoices = () => {
       voiceSel.innerHTML = ''; voiceSel.append(h('option', { value: '' }, !NLX ? 'Automatisch (beste Latijns-Amerikaanse stem)' : 'Automatisch (beste ' + S.course.name.nl + 'e stem)'));
       Speech.voices.slice().sort((a, b) => Speech.rank(b) - Speech.rank(a)).forEach(v => voiceSel.append(h('option', { value: v.voiceURI, selected: s.voice === v.voiceURI ? true : null }, v.name + ' (' + v.lang + ')' + (/es-es/i.test(v.lang) ? ' — Spanje' : '') + (Speech.qualityLabel(v) ? ' · ' + Speech.qualityLabel(v) : ''))));
@@ -2268,8 +2273,8 @@
   const LNAME = l => { const x = S.LANGS[l]; return x ? x.flag + ' ' + (S.course.ui === 'es' ? x.es.charAt(0).toUpperCase() + x.es.slice(1) : x.nl) : l; };
   const CNAME = c => { const x = S.COURSES[c]; return x ? LNAME(x.ui) + ' → ' + LNAME(x.target) : c; };
   const NOTR = (text, tag) => h(tag || 'span', { 'data-notr': '' }, text);
-  const CDESC = c => ({ 'es-nl': 'uitleg in het Nederlands', 'en-nl': 'A1–C2 · uitleg in het Nederlands', 'fr-nl': 'uitleg in het Nederlands', 'de-nl': 'A1–B1 · uitleg in het Nederlands', 'en-es': 'explicaciones en español', 'nl-es': 'explicaciones en español' })[c] || '';
-  const CLONG = { 'es-nl': 'Spaans leren · uitleg in het Nederlands', 'en-nl': 'Engels leren (A1–C2) · uitleg in het Nederlands', 'fr-nl': 'Frans leren · uitleg in het Nederlands', 'de-nl': 'Duits leren (A1–B1) · uitleg in het Nederlands', 'en-es': 'Inglés · explicaciones en español', 'nl-es': 'Neerlandés · explicaciones en español' };
+  const CDESC = c => ({ 'es-nl': 'uitleg in het Nederlands', 'en-nl': 'A1–C2 · uitleg in het Nederlands', 'fr-nl': 'uitleg in het Nederlands', 'de-nl': 'A1–B1 · uitleg in het Nederlands', 'tr-nl': 'uitleg in het Nederlands', 'en-es': 'explicaciones en español', 'nl-es': 'explicaciones en español' })[c] || '';
+  const CLONG = { 'es-nl': 'Spaans leren · uitleg in het Nederlands', 'en-nl': 'Engels leren (A1–C2) · uitleg in het Nederlands', 'fr-nl': 'Frans leren · uitleg in het Nederlands', 'de-nl': 'Duits leren (A1–B1) · uitleg in het Nederlands', 'tr-nl': 'Turks leren · uitleg in het Nederlands', 'en-es': 'Inglés · explicaciones en español', 'nl-es': 'Neerlandés · explicaciones en español' };
   function profilesCard() {
     const Pr = P_(); const card = h('div', { class: 'card form prof-card' });
     const draw = () => {

@@ -226,7 +226,7 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
 {
   const list = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/tts-texts.js')], { maxBuffer: 64 << 20 }).toString());
   const have = new Set(list.map(x => x.k));
-  ok(list.every(x => x.k === S.Speech.clipKey(x.text, x.ns) && /^(es-[A-Z]{2}|en-[A-Z]{2}|nl-(NL|BE)|af-ZA|fr-(FR|BE|CH|CA))-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
+  ok(list.every(x => x.k === S.Speech.clipKey(x.text, x.ns) && /^(es-[A-Z]{2}|en-[A-Z]{2}|nl-(NL|BE)|af-ZA|fr-(FR|BE|CH|CA)|tr-TR|az-AZ)-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
   // invulzinnen: voorgelezen met een stilte op het gat, hints tussen haakjes niet
   ok(JSON.stringify(S.Speech.gapParts('Did you ___ the email?')) === JSON.stringify(['Did you …', null, '… the email?']), 'invulzin: stukken rond het gat');
   ok(JSON.stringify(S.Speech.gapParts('¡___ la verdad! (decir, tú)')) === JSON.stringify([null, '… la verdad!']), 'invulzin: gat vooraan, hint weg');
@@ -1228,7 +1228,7 @@ await micTests();
     .filter(f => !/(app|lesson|ai|sync|ask)\.js$/.test(f));
   const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
   // één rij per cursus met een kaart: [doeltaal, minimaal aantal landen]
-  const want = { 'es-nl': ['es', 21], 'en-nl': ['en', 12], 'nl-es': ['nl', 5], 'fr-nl': ['fr', 9], 'de-nl': ['de', 5] };
+  const want = { 'es-nl': ['es', 21], 'en-nl': ['en', 12], 'nl-es': ['nl', 5], 'fr-nl': ['fr', 9], 'de-nl': ['de', 5], 'tr-nl': ['tr', 6] };
   for (const course of Object.keys(S.COURSES)) {
     const w = 'op reis ' + course + ': ';
     const c = vm.createContext({ console, setTimeout, clearTimeout }); c.window = c; c.globalThis = c; c.self = c; c.SPT_COURSE = course;
@@ -1317,6 +1317,20 @@ await micTests();
       ok(!ck('our', 'or').ok && !ck('four', 'for').ok && ck('My favorite color.', 'My favorite color.').exact, w + 'Britse spelling: geen valse treffers');
       ok(K.check.parts('My favourite colour is blue', 'My favorite color is gray').k.join() === '0,1,2,3', w + 'Britse spelling telt per woord als goed');
       ok(K.check.check("I've lived here since 2015", ["I've lived here since 2015."]).ok, w + 'apostrof en punt');
+    } },
+    'tr-nl': { pre: 'tr', name: 'Turks', lupe: 'Bir görev daha bitti! Böyle devam.', art: ['ev', 'ev'], extra(K, w) {
+      // Turkse letters: İ/i en I/ı zijn aparte paren; zonder Turkse tekens typen is «bijna goed» (accent), nooit zomaar goed
+      const ck = (u, a) => K.check.check(u, [a]);
+      ok(K.lower('İSTANBUL') === 'istanbul' && K.lower('IŞIK') === 'ışık' && K.upper('iyi') === 'İYİ' && K.upper('kız') === 'KIZ', w + 'hoofd- en kleine letters met İ/ı');
+      ok(ck('İstanbul’da yaşıyorum.', "İstanbul'da yaşıyorum").exact && ck('istanbul’da yaşıyorum', "İstanbul'da yaşıyorum.").exact, w + 'İstanbul met en zonder hoofdletter');
+      const noMarks = ck('Cay istiyorum', 'Çay istiyorum.'), dotless = ck('Istanbul', 'İstanbul'), wrongI = ck('kiz', 'kız');
+      ok(noMarks.ok && !noMarks.exact && dotless.ok && !dotless.exact && wrongI.ok && !wrongI.exact, w + 'zonder Turkse tekens: goed met waarschuwing');
+      ok(!ck('Çay istiyorsun', 'Çay istiyorum').ok && !ck('evde', 'evden').ok, w + 'een andere uitgang blijft fout');
+      ok(K.C.all().every(u => u.grammar.some(g => /Uitzondering|Let op/.test(g.html)) || u.ex.some(e => /Uitzondering/.test(e.x || ''))) , w + 'uitzonderingen en valkuilen benoemd in elke unit');
+      ok(K.C.all().flatMap(u => u.grammar).filter(g => /⚠️ Uitzondering/.test(g.html)).every(g => /Waarom\?/.test(g.html)), w + 'elke ⚠️ Uitzondering heeft een «Waarom?»');
+      // woordspellen: Turkse letters blijven eigen letters (Ç is geen C), en de puzzel vult met Turkse letters
+      const gw = K.Games.gen.gameWord({ id: 'w', unit: 'u', es: 'çay', nl: 'thee' }), gi = K.Games.gen.gameWord({ id: 'w', unit: 'u', es: 'İyi', nl: 'goed' });
+      ok(gw.plain === 'ÇAY' && gi.key === 'iyi' && gi.plain === 'İYİ' && K.Games.gen.gameWord({ id: 'w', unit: 'u', es: 'kız', nl: 'meisje' }).plain === 'KIZ', w + 'spelwoorden houden Turkse letters');
     } }
   };
   ok(Object.values(S.COURSES).filter(c => c.ui === 'nl' && c.target !== 'es').every(c => NL_COURSES[c.id]), 'elke cursus met Nederlandse uitleg heeft een rij in NL_COURSES (tests/run.js)');
@@ -1415,6 +1429,12 @@ await micTests();
     ok(has(U.forItem({ kind: 'type', sentence: 'We ___ to Chicago last year.', answers: ['went'] }, { expected: 'went' }), /goed<\/s>/), w + 'went (niet goed)');
     ok(has(U.forWord('children'), /onregelmatig/) && has(U.forWord('an hour'), /klank/) && has(U.forWord('some advice'), /ontelbaar/), w + 'children, an hour, advice');
     ok(U.label() === '⚠️ Uitzondering', w + 'label Nederlands');
+  }
+  { const K = load('tr-nl'), U = K.Uitz, w = 'uitzondering tr-nl: ';
+    ok(has(U.forWord('saatler'), /Arabisch/) && has(U.forWord('meyve suyu'), /suv/) && has(U.forItem({ kind: 'mc', sentence: 'Okula ___.', answer: 'gidiyorum' }, { expected: 'gidiyorum' }), /t een d/), w + 'saatler, meyve suyu, gidiyorum');
+    ok(has(U.forText('Bana bir bilet, lütfen.'), /bene/) && !U.find('Evde çay içiyorum.').length && U.label() === '⚠️ Uitzondering', w + 'bana; geen valse uitzonderingen');
+    const all = K.C.all().flatMap(u => [...u.vocab.map(v => v[0]), ...u.ex.map(e => (e.s ? e.s.replace('___', (e.o || e.a || [''])[0]) : '') + ' ' + (e.t === 'mc' ? e.o.join(' ') : '') + ' ' + (e.t === 'tr' ? e.a[0] : '')), ...u.dialogue.lines.map(l => l[1]), ...u.reading.p.map(p => p[0])]).join(' \n ').toLowerCase();
+    U.RULES.tr.forEach(r => ok(new RegExp('(?<![\\p{L}\\d])(?:' + r.p + ')(?![\\p{L}\\d])', 'u').test(all), w + 'regel raakt de lesstof: ' + r.t));
   }
   { const K = load('en-es'), U = K.Uitz, w = 'uitzondering en-es: ';
     ok(U.label() === '⚠️ Excepción' && has(U.forWord('children'), /irregular/) && has(U.forItem({ kind: 'type', sentence: 'We ___ to Chicago.', answers: ['went'] }, { expected: 'went' }), /verbo irregular/), w + 'uitleg in het Spaans');

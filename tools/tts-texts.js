@@ -150,7 +150,8 @@ const LUPE = { girl: { voice: 'es-MX-DaliaNeural', pitch: '+30Hz', rate: '+6%' }
 const LUPE_DE = { girl: { voice: 'de-DE-KatjaNeural', pitch: '+30Hz', rate: '+6%' }, woman: { voice: 'de-DE-KatjaNeural', pitch: '+0Hz', rate: '+0%' } };
 /* Lupes stem per doeltaal waarin ze praat (S.Tutor.lineLang). Nieuwe taal: hier een rij. */
 const LUPE_FR = { girl: { voice: 'fr-FR-EloiseNeural', pitch: '+0Hz', rate: '+0%' }, woman: { voice: 'fr-FR-VivienneMultilingualNeural', pitch: '+0Hz', rate: '+0%' } };
-const LUPE_BY = { es: LUPE, en: LUPE_EN, de: LUPE_DE, fr: LUPE_FR };
+const LUPE_TR = { girl: { voice: 'tr-TR-EmelNeural', pitch: '+30Hz', rate: '+6%' }, woman: { voice: 'tr-TR-EmelNeural', pitch: '+0Hz', rate: '+0%' } };
+const LUPE_BY = { es: LUPE, en: LUPE_EN, de: LUPE_DE, fr: LUPE_FR, tr: LUPE_TR };
 for (const es of S.Tutor.lines.every(S.C.all())) for (const [v, o] of Object.entries(LUPE)) {
   const ns = 'lupe-' + v, k = S.Speech.clipKey(es, ns);
   if (!out.has(k)) out.set(k, { k, ns, text: S.Speech.clean(es), voice: o.voice, pitch: o.pitch, rate: o.rate, lv: ['X'] });
@@ -161,7 +162,8 @@ for (const es of S.Tutor.lines.every(S.C.all())) for (const [v, o] of Object.ent
    en per niveau 'cursus:niveau' voor offline downloaden. */
 const OTHER = { 'en-es': ['en-US-JennyNeural', 'en-US-GuyNeural'], 'en-nl': ['en-US-AriaNeural', 'en-US-GuyNeural'], 'nl-es': ['nl-NL-FennaNeural', 'nl-NL-MaartenNeural'],
   'fr-nl': ['fr-FR-DeniseNeural', 'fr-FR-HenriNeural'],
-  'de-nl': ['de-DE-KatjaNeural', 'de-DE-ConradNeural'] };
+  'de-nl': ['de-DE-KatjaNeural', 'de-DE-ConradNeural'],
+  'tr-nl': ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural'] };
 for (const [course, [vf, vm_]] of Object.entries(OTHER)) {
   S = load(course);
   const ns = S.course.ns;
@@ -222,6 +224,11 @@ const PLACE_VOICES = {
   fr: {
     FR: ['fr-FR-DeniseNeural', 'fr-FR-HenriNeural'], BE: ['fr-BE-CharlineNeural', 'fr-BE-GerardNeural'], CH: ['fr-CH-ArianeNeural', 'fr-CH-FabriceNeural'],
     CA: ['fr-CA-SylvieNeural', 'fr-CA-JeanNeural'], AFR: ['fr-FR-VivienneMultilingualNeural', 'fr-FR-RemyMultilingualNeural']
+  },
+  // Turks: alleen Turkije en Azerbeidzjan (zustertaal) hebben een eigen stem; de andere landen gebruiken de Turkse stem (voiceNote in de app)
+  tr: {
+    TR: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural'], CY: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural'], BG: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural'],
+    DE: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural'], NL: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural'], AZ: ['az-AZ-BanuNeural', 'az-AZ-BabekNeural']
   }
 };
 for (const course of Object.keys(OTHER)) {
