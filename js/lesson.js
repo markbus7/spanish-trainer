@@ -940,7 +940,25 @@
     }
     const footNote = h('p', { class: 'ls-note small muted', hidden: true });
     const foot = h('div', { class: 'ls-foot' }, fb, h('div', { class: 'ls-actions' }, backBtn, skipBtn, mainBtn), footNote);
-    root.append(h('div', { class: 'ls' }, h('div', { class: 'ls-top' }, closeBtn, h('div', { class: 'ls-bar' }, bar), timerEl, peekBtn, count), body, foot));
+    const lsEl = h('div', { class: 'ls' }, h('div', { class: 'ls-top' }, closeBtn, h('div', { class: 'ls-bar' }, bar), timerEl, peekBtn, count), body, foot);
+    root.append(lsEl);
+    /* Lange feedback scrolt binnen het paneel; een zachte vervaging onderaan laat zien dat er nog meer staat. */
+    const fbFade = () => { fb.classList.toggle('scrolls', fb.scrollHeight - fb.scrollTop - fb.clientHeight > 4); };
+    fb.addEventListener('scroll', fbFade, { passive: true });
+    if (window.ResizeObserver) new ResizeObserver(fbFade).observe(fb); // ook als er later nog uitleg (Lupe) bij komt
+    /* Toetsenbord open (iPad/iPhone): de les past zich aan het zichtbare deel van het scherm aan, zodat het invulveld
+       niet achter het toetsenbord of het feedbackpaneel verdwijnt. */
+    const vv = window.visualViewport;
+    const fitViewport = () => {
+      if (!vv) return;
+      const kb = vv.scale <= 1.01 && window.innerHeight - vv.height > 120; // niet bij knijpzoomen
+      lsEl.classList.toggle('kb-open', kb);
+      if (kb) { root.style.height = vv.height + 'px'; root.style.top = vv.offsetTop + 'px'; root.style.bottom = 'auto'; }
+      else { root.style.height = root.style.top = root.style.bottom = ''; }
+      fbFade();
+    };
+    if (vv) { vv.addEventListener('resize', fitViewport); vv.addEventListener('scroll', fitViewport); }
+    window.addEventListener('resize', fbFade);
 
     let tick = null;
     if (timerEnd) tick = setInterval(() => { const s = Math.max(0, Math.round((timerEnd - Date.now()) / 1000)); timerEl.textContent = '⏱ ' + s + 's'; if (s <= 0) { clearInterval(tick); finish(); } }, 250);
@@ -1011,7 +1029,7 @@
       if (needsTiles(queue[idx])) { queue[idx].tiled = true; queue.splice(idx, 0, { kind: 'order', support: true, target: queue[idx].answers[0], nl: queue[idx].prompt, orig: queue[idx] }); }
       progress(); persist(idx);
       const it = queue[idx];
-      answered = false; fb.innerHTML = ''; fb.className = 'ls-fb'; foot.classList.remove('ok', 'bad');
+      answered = false; fb.innerHTML = ''; fb.className = 'ls-fb'; fb.scrollTop = 0; foot.classList.remove('ok', 'bad'); lsEl.classList.remove('retyping');
       skipBtn.hidden = true; skipBtn.onclick = null;
       backBtn.hidden = !canBack();
       if (!backBtn.hidden) { const k = queue[idx - 1].kind; backBtn.textContent = k === 'dialogue' ? '← Dialoog' : k === 'reading' ? '← Tekst' : '← Terug'; }
@@ -1074,6 +1092,7 @@
       }
       touch(); persist(idx + 1); // dit antwoord is verwerkt: na verversen ga je verder met de volgende vraag
       renderFeedback(it, r);
+      requestAnimationFrame(fbFade);
       mainBtn.hidden = false; mainBtn.disabled = false; mainBtn.textContent = T('next');
       mainBtn.onclick = () => { touch(); idx++; show(); };
       retypeCur = null;
@@ -1158,8 +1177,8 @@
       };
       document.addEventListener('keydown', onKey, true);
       leaveFns.push(() => document.removeEventListener('keydown', onKey, true));
-      wrap.append(box);
-      retypeCur = { cancel: () => { if (done) return; finish(); box.remove(); wrap.querySelectorAll('.accent-bar').forEach(b => { b.hidden = false; }); } };
+      wrap.append(box); lsEl.classList.add('retyping'); requestAnimationFrame(fbFade);
+      retypeCur = { cancel: () => { if (done) return; finish(); box.remove(); lsEl.classList.remove('retyping'); wrap.querySelectorAll('.accent-bar').forEach(b => { b.hidden = false; }); } };
       setTimeout(() => { box.scrollIntoView({ block: 'nearest' }); focus(); }, 60);
     }
 
@@ -1369,6 +1388,9 @@
       touch(); if (tick) clearInterval(tick);
       closePeek(); leaveFns.forEach(f => f()); Speech.stop(); Speech.abortListening();
       document.removeEventListener('keydown', onKey);
+      if (vv) { vv.removeEventListener('resize', fitViewport); vv.removeEventListener('scroll', fitViewport); }
+      window.removeEventListener('resize', fbFade);
+      root.style.height = root.style.top = root.style.bottom = '';
       root.hidden = true; root.innerHTML = ''; document.body.classList.remove('in-lesson');
       if (S.Ask) S.Ask.setSource(null);
       if (!silent && hooks.onAbort) {
