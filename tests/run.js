@@ -1285,7 +1285,7 @@ await micTests();
     .filter(f => !/(app|lesson|ai|sync|ask)\.js$/.test(f));
   const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
   // één rij per cursus met een kaart: [doeltaal, minimaal aantal landen]
-  const deep = ['es-nl']; // cursussen waarin elk land een dialoog en een gesprek met de docent heeft
+  const deep = ['es-nl', 'en-nl', 'fr-nl', 'de-nl', 'tr-nl', 'nl-es']; // cursussen waarin elk land een dialoog en een gesprek met de docent heeft
   const want = { 'es-nl': ['es', 21], 'en-nl': ['en', 12], 'nl-es': ['nl', 5], 'fr-nl': ['fr', 9], 'de-nl': ['de', 5], 'tr-nl': ['tr', 6] };
   for (const course of Object.keys(S.COURSES)) {
     const w = 'op reis ' + course + ': ';
@@ -1319,8 +1319,8 @@ await micTests();
         const d = p.dialog, who = [...new Set(d.lines.map(l => l[0]))];
         ok(d.t && d.nl && d.place && d.lines.length >= 7 && d.lines.every(l => l[0] && l[1] && l[2]) && who.length >= 2 && who.every(x => ['f', 'm'].includes(d.who[x])), v + 'dialoog: titel, plaats, zinnen met vertaling, stem per spreker');
         ok(d.q.length >= 3 && d.q.every(q => q.t === 'mc' && q.q && q.o.length >= 3 && new Set(q.o).size === q.o.length), v + 'dialoog: drie vragen met unieke opties');
-        ok(d.lines.filter(l => l[3]).length >= 3 && d.lines.every(l => !l[3] || /^(🗺️|⚠️ <b>Uitzondering:<\/b>)/.test(l[3])), v + 'dialoog: lokale woorden uitgelegd, afwijkingen heten uitzondering');
-        ok(d.lines.every(l => !/Uitzondering/.test(l[3] || '') || /Reden:/.test(l[3])), v + 'dialoog: elke uitzondering heeft een reden');
+        ok(d.lines.filter(l => l[3]).length >= 3 && d.lines.every(l => !l[3] || /^(🗺️|⚠️ <b>(Uitzondering|Excepción):<\/b>)/.test(l[3])), v + 'dialoog: lokale woorden uitgelegd, afwijkingen heten uitzondering');
+        ok(d.lines.every(l => !/Uitzondering|Excepción/.test(l[3] || '') || /(Reden|Motivo):/.test(l[3])), v + 'dialoog: elke uitzondering heeft een reden');
         ok(d.lines.every(l => clip(l[1], ns)) && d.q.every(q => clip(q.q, ns)), v + 'dialoog ingesproken in de naamruimte van het land');
         const vs = who.map(x => (list.find(y => y.k === K.Speech.clipKey(d.lines.find(l => l[0] === x)[1], ns)) || {}).voice);
         ok(new Set(vs).size === who.length, v + 'dialoog: elke spreker een eigen stem (' + vs.join(', ') + ')');
