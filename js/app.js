@@ -363,6 +363,72 @@
         good.length ? h('p', { class: 'adv-good small' }, '✓ Goed gegaan: ', good.map((g, i) => [i ? ', ' : '', h('span', null, ADV[g.key].nl)])) : null);
     };
   }
+  /* ================= Unittoets op de unitpagina =================
+     Na elke unittoets bewaren we kort hoe hij ging (us.last): score, per onderdeel goed/totaal en wat er fout ging.
+     De unitpagina laat dat zien en maakt er een gerichte oefentoets van, aangevuld met wat je in deze unit vaak fout doet. */
+  function testRecord(sum, passed) {
+    const parts = advGroups(sum).map(g => ({ k: g.key, ok: g.ok, n: g.n, tags: g.key === 'grammar' ? [...g.tags.entries()].map(([t, v]) => [t, v.ok, v.n]) : undefined }));
+    const wrong = (sum.results || []).filter(r => !r.ok).map(r => r.it);
+    return { t: Date.now(), score: Math.round(sum.score * 1000) / 1000, passed: !!passed, parts,
+      ids: [...new Set(wrong.map(it => it.srsId).filter(id => /^[wx]\|/.test(id || '')))].slice(0, 30),
+      conj: [...new Map(wrong.filter(it => it.conj).map(it => [it.conj.verb + '|' + it.conj.tense, [it.conj.verb, it.conj.tense]])).values()].slice(0, 6) };
+  }
+  /** Wat je in deze unit vaak fout doet: kaarten met fouten (zwakste eerst) en grammatica-onderwerpen onder 80%. */
+  function unitTrouble(u) {
+    const srs = st().srs, pre = ['w|' + u.id + '|', 'x|' + u.id + '|'];
+    const cards = Object.entries(srs).filter(([id, c]) => pre.some(p => id.startsWith(p)) && ((c.f || 0) >= 2 || ((c.l || 0) >= 1 && (c.i || 0) < 7)))
+      .sort((a, b) => ((b[1].f || 0) + (b[1].l || 0)) - ((a[1].f || 0) + (a[1].l || 0))).map(([id]) => id);
+    const tagsIn = new Set(u.ex.map(e => e.tag).filter(t => t && t !== 'vocab'));
+    const tags = Object.entries(st().tags || {}).filter(([t, v]) => tagsIn.has(t) && v.ok + v.no >= 3 && v.ok / (v.ok + v.no) < 0.8)
+      .sort((a, b) => a[1].ok / (a[1].ok + a[1].no) - b[1].ok / (b[1].ok + b[1].no)).map(([t, v]) => [t, v.ok / (v.ok + v.no)]);
+    return { cards, tags };
+  }
+  /** De gerichte oefentoets: eerst de fouten uit je laatste toets, dan wat je in deze unit vaak fout doet. */
+  function unitFocusSpec(u) {
+    const last = P.unitState(u.id).last, tr = unitTrouble(u);
+    const ids = [...new Set([...(last ? last.ids : []), ...tr.cards])];
+    const words = ids.filter(id => id.startsWith('w|')).map(id => C.word(u, +id.split('|')[2])).filter(Boolean);
+    const redo = ids.filter(id => id.startsWith('x|')).map(id => Gen.resolve(id)).filter(Boolean).slice(0, 10);
+    const tags = new Set(tr.tags.map(x => x[0]));
+    if (last) last.parts.forEach(p => (p.tags || []).forEach(([t, ok, n]) => { if (ok < n) tags.add(t); }));
+    const f = { words, redo, tags: [...tags].slice(0, 4), conj: last ? last.conj : [] };
+    if (last) last.parts.forEach(p => { if (p.ok < p.n && p.k === 'listen') f.listen = true; if (p.ok < p.n && p.k === 'read') f.read = true; });
+    const n = words.length + redo.length + f.tags.length + f.conj.length + (f.listen ? 1 : 0) + (f.read ? 1 : 0);
+    return { f, n, tr };
+  }
+  function unitTestCard(u) {
+    const s = P.unitState(u.id), last = s.last, spec = unitFocusSpec(u);
+    const card = h('div', { class: 'card ut-card' });
+    const pctOf = x => Math.round(x * 100) + '%';
+    if (last) {
+      card.append(h('div', { class: 'ut-head' },
+        h('div', { class: 'ut-score ' + (last.passed ? 'ok' : 'no') }, h('b', null, pctOf(last.score)), h('small', null, last.passed ? 'gehaald' : 'niet gehaald')),
+        h('div', { class: 'grow' }, h('b', null, 'Je laatste unittoets'), h('small', { class: 'muted' }, fmtDate(last.t, { day: 'numeric', month: 'long' }) + ' · je hebt 80% nodig' + (s.best && s.best > last.score ? ' · beste ooit ' + pctOf(s.best) : '')))),
+        h('div', { class: 'ut-parts' }, last.parts.slice().sort((a, b) => a.ok / a.n - b.ok / b.n).map(p => {
+          const fr = p.n ? p.ok / p.n : 1, lvl = fr >= 0.8 ? 'ok' : fr >= 0.5 ? 'mid' : 'low';
+          const sub = p.k === 'grammar' && p.tags ? p.tags.filter(([, ok, n]) => ok < n).map(([t, ok, n]) => C.tag(t) + ' ' + ok + '/' + n).join(' · ') : '';
+          return h('div', { class: 'ut-part adv-' + lvl },
+            h('div', { class: 'ut-prow' }, h('span', { class: 'grow' }, (ADV[p.k] || ADV.grammar).nl), h('b', null, p.ok + ' van ' + p.n)),
+            h('div', { class: 'adv-bar' }, h('i', { style: { width: Math.round(fr * 100) + '%' } })),
+            sub ? h('small', { class: 'muted' }, 'Fout: ' + sub) : null);
+        })));
+    } else if (s.done || s.tested) {
+      card.append(h('div', { class: 'ut-head' }, h('div', { class: 'grow' }, h('b', null, '🏁 Unittoets'), h('small', { class: 'muted' }, s.best ? 'Beste score: ' + pctOf(s.best) + '. De details van je toets worden bewaard vanaf je volgende poging.' : s.done ? 'Deze unit is klaar.' : 'Overgeslagen met de niveautest.'))));
+    } else {
+      card.append(h('div', { class: 'ut-head' }, h('div', { class: 'grow' }, h('b', null, '🏁 Unittoets'), h('small', { class: 'muted' }, 'Nog niet gedaan. Haal je 80% of meer, dan is de unit klaar. Daarna zie je hier hoe het ging.'))));
+    }
+    if (spec.n) {
+      const what = [];
+      if (last && (last.ids.length || last.conj.length)) what.push('de vragen die je bij de laatste toets fout had');
+      if (spec.tr.cards.length) what.push(U.plural(spec.tr.cards.length, 'woord of zin', 'woorden en zinnen') + ' uit deze unit die je vaak fout doet');
+      if (spec.tr.tags.length) what.push('grammatica die nog niet lekker gaat (' + spec.tr.tags.map(([t, p]) => C.tag(t) + ' ' + pctOf(p)).join(', ') + ')');
+      card.append(h('div', { class: 'ut-focus' },
+        h('p', { class: 'small' }, h('b', null, '🎯 Gerichte oefentoets: '), what.length ? 'oefent ' + what.join(', ') + '.' : 'oefent wat er bij je laatste toets misging.'),
+        h('button', { class: 'btn primary wide', type: 'button', onclick: () => { const sp = unitFocusSpec(u); const ses = Gen.focusSession(u, sp.f); ses.title = u.title + ' · Gerichte oefentoets'; startFocus(u, sp.f, ses); } }, '🎯 Start gerichte oefentoets')));
+    } else if (last) card.append(h('p', { class: 'small muted' }, last.passed && last.score === 1 ? '🏅 Alles goed. Niets om extra te oefenen.' : '💪 Op dit moment niets dat je in deze unit vaak fout doet.'));
+    card.append(h('button', { class: (spec.n ? 'btn ghost' : 'btn primary') + ' wide', type: 'button', onclick: () => startStep(u, 'test') }, last ? (last.passed ? '🏁 Unittoets nog eens doen' : '🏁 Unittoets opnieuw') : '🏁 Unittoets doen'));
+    return card;
+  }
   /* Na het niveau-examen: welke units je het beste kunt herhalen. */
   function examAdvice(sum) {
     const by = new Map();
@@ -392,6 +458,7 @@
         if (stepId === 'test') {
           const passed = sum.score >= (session.pass || 0.8);
           us.best = Math.max(us.best || 0, sum.score);
+          us.last = testRecord(sum, passed);
           st().fast = sum.score >= 0.9 ? (st().fast || 0) + 1 : 0;
           if (passed) {
             us.steps.test = true; us.done = true;
@@ -923,7 +990,8 @@
     wrap.append(section('Stappen', steps));
     if (!s.done) wrap.append(h('div', { class: 'row gap wrap' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => S.confirm('Ik ken dit al', 'Je doet meteen de unittoets. Haal je 80% of meer, dan is de unit afgerond en gaan de woorden en oefeningen in je herhaling.', 'Start toets', () => {
       startStep(u, 'test');
-    }) }, ico('skip', 'Ik ken dit al → direct de toets') === 'Ik ken dit al → direct de toets' ? '⏭️ Ik ken dit al → direct de toets' : ico('skip', 'Ik ken dit al → direct de toets')), s.best ? h('span', { class: 'muted small' }, 'Beste toets: ' + Math.round(s.best * 100) + '%') : null));
+    }) }, ico('skip', 'Ik ken dit al → direct de toets') === 'Ik ken dit al → direct de toets' ? '⏭️ Ik ken dit al → direct de toets' : ico('skip', 'Ik ken dit al → direct de toets'))));
+    wrap.append(section('Unittoets', unitTestCard(u)));
 
     // naslag
     const tabs = [[ico('grammar', 'Grammatica'), () => h('div', null, begrippenLink(), u.grammar.map(g => S.Lesson.grammarBlock(g)))],
