@@ -123,7 +123,7 @@
   X('a1-04', {
     vocab: [
       ['el centro', 'het centrum'], ['el mercado', 'de markt'], ['la panadería', 'de bakkerij'], ['la universidad', 'de universiteit'],
-      ['la oficina de correos', 'het postkantoor'], ['la parada (de bus)', 'de (bus)halte'], ['la catedral', 'de kathedraal'], ['el taxi', 'de taxi'],
+      ['la oficina de correos', 'het postkantoor', 'Kort zeg je ook «el correo» (dat betekent ook: de post).'], ['la parada (de bus)', 'de (bus)halte'], ['la catedral', 'de kathedraal'], ['el taxi', 'de taxi'],
       ['detrás de', 'achter'], ['delante de', 'voor (plaats)'], ['debajo de', 'onder'], ['encima de', 'op, boven'], ['dentro de', 'binnen in'],
       ['bonito / bonita', 'mooi'], ['el puerto', 'de haven'], ['animado / animada', 'levendig, gezellig druk'], ['el colectivo', 'de bus', 'AR · ook: la micro (CL), la buseta (CO), el camión (MX)'],
       ['¿me puede ayudar?', 'kunt u me helpen?']
