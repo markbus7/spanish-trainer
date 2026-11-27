@@ -425,14 +425,71 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     [/^¡Bien hecho! Tu nivel es (\w+)\./, (m, l) => `Gut gemacht! Dein Niveau ist ${l}. Üben wir zusammen weiter.`],
     [/^¡Ya conoces (más de )?(\d+) palabras!/, (m, more, n) => `Du kennst schon ${more ? 'mehr als ' : ''}${n} Wörter! Ich bin sehr stolz auf dich.`]
   ];
+  /* ---------- Franse cursus: Lupe praat Frans (zelfde opzet als Engels) ---------- */
+  const FR = {
+    '¡Hola! Te quedaste a mitad de una lección. ¿Seguimos donde ibas?': 'Salut ! Tu as laissé une leçon en cours. On reprend là où tu en étais ?',
+    '¡Plan cumplido! Lo que hagas ahora es extra.': 'Programme terminé ! Tout ce que tu fais maintenant, c’est du bonus.',
+    '¡Plan cumplido! ¿Seguimos con la próxima lección?': 'Programme terminé ! On continue avec la leçon suivante ?',
+    '¡Meta del día cumplida! Estoy muy orgullosa de ti.': 'Objectif du jour atteint ! Je suis très fière de toi.',
+    '¡Órale! Ya cumpliste tu meta. Todo lo que hagas ahora es extra.': 'Bravo ! Tu as atteint ton objectif. Tout le reste, c’est du bonus.',
+    '¡Qué gusto verte otra vez! Empecemos con algo cortito.': 'Quel plaisir de te revoir ! Commençons par quelque chose de court.',
+    '¡Ya casi! Solo te falta una tarea.': 'On y est presque ! Il te reste une seule tâche.',
+    '¡Una tarea menos! Sigue así.': 'Une tâche de moins ! Continue comme ça.',
+    '¡Hoy toca la prueba de la unidad! Tú puedes.': 'Aujourd’hui, c’est le test de l’unité ! Tu vas y arriver.',
+    '¡Vas muy bien hoy! Un poquito más y llegas a tu meta.': 'Tu travailles très bien aujourd’hui ! Encore un petit effort et tu atteins ton objectif.',
+    'Un ratito cada día hace la diferencia. ¡Vamos!': 'Un petit moment chaque jour, ça change tout. Allez !',
+    '¡Hola! Te preparé un plan para hoy. ¡Vamos!': 'Salut ! Je t’ai préparé un programme pour aujourd’hui. Allez !',
+    'Casi lo logras. Repasamos un poco y lo intentamos otra vez, ¿va?': 'Tu y es presque. On révise un peu et on réessaie, d’accord ?',
+    '¡Felicidades! Terminaste la unidad. ¡Qué orgullo!': 'Félicitations ! Tu as terminé l’unité. Quelle fierté !',
+    '¡Listo! Buen trabajo.': 'Et voilà ! Bon travail.',
+    '¡Perfecto! Sin ningún error. ¡Eres una estrella!': 'Parfait ! Aucune erreur. Tu es une star !',
+    '¡Excelente trabajo! Casi sin errores.': 'Excellent travail ! Presque aucune erreur.',
+    '¡Muy bien! Vas avanzando.': 'Très bien ! Tu progresses.',
+    'Cada error te enseña algo. ¡Ánimo, vamos bien!': 'Chaque erreur t’apprend quelque chose. Courage, on avance bien !',
+    '¡Subiste de nivel! ¡Qué padre! Se nota que practicas.': 'Tu as changé de niveau ! Génial ! On voit que tu t’entraînes.',
+    'No te preocupes, a veces pasa. Repasamos juntos y lo intentas otra vez.': 'Ne t’inquiète pas, ça arrive. On révise ensemble et tu réessaies.',
+    '¡Gracias por hacer la prueba! Ahora sé por dónde empezar contigo.': 'Merci d’avoir fait le test ! Maintenant, je sais par où commencer avec toi.',
+    'Aquí vas a ver todo lo que aprendes. ¡Empecemos hoy!': 'Ici, tu vas voir tout ce que tu apprends. Commençons aujourd’hui !',
+    'Cada palabra nueva cuenta. ¡Qué padre!': 'Chaque nouveau mot compte. Génial !',
+    '¡Buen comienzo! Poco a poco se llega lejos.': 'Bon début ! Petit à petit, on va loin.',
+    '¡Perfecto! ¡Qué buena memoria!': 'Parfait ! Quelle bonne mémoire !',
+    '¡Muy bien jugado!': 'Très bien joué !',
+    '¡Sigue así! Las palabras difíciles vuelven pronto.': 'Continue comme ça ! Les mots difficiles reviennent bientôt.',
+    '¡Todo repasado! Nos vemos mañana.': 'Tout est révisé ! À demain.',
+    '¡Terminaste tu plan de hoy! Abre tu cofre.': 'Tu as terminé ton programme du jour ! Ouvre ta récompense.',
+    '¡Plan del día completado! ¡Qué padre!': 'Programme du jour terminé ! Génial !',
+    '¡Lo lograste! Estoy muy orgullosa de ti.': 'Tu as réussi ! Je suis très fière de toi.',
+    '¡Perfecto! Ahora te hablo en voz alta.': 'Parfait ! Maintenant, je te parle à voix haute.',
+    '¡Hola! Soy Lupe. ¿Te gusta mi voz?': 'Salut ! Je suis Lupe. Tu aimes ma voix ?',
+    '¡Platiquemos! Así veo en qué te puedo ayudar.': 'Discutons ! Comme ça, je vois comment je peux t’aider.',
+    '¡Vas mejorando! Cometes menos errores que antes.': 'Tu t’améliores ! Tu fais moins d’erreurs qu’avant.',
+    'Mira, esto es lo que más practicaría yo.': 'Regarde, voilà ce que je travaillerais le plus.',
+    'Hoy tienes más de cien repasos. Empecemos por ahí, así no se te olvida nada.': 'Aujourd’hui, tu as plus de cent révisions. Commençons par là, comme ça tu n’oublies rien.',
+    '¡Llevas más de cien días seguidos! ¡Qué padre!': 'Plus de cent jours de suite ! Génial !',
+    'Más de cien días seguidos. ¡No rompas la racha!': 'Plus de cent jours de suite. Ne casse pas ta série !',
+    '¡Cinco seguidas! ¡Órale!': 'Cinq de suite ! Bravo !',
+    '¡Diez seguidas! ¡Qué padre!': 'Dix de suite ! Génial !'
+  };
+  const FR_RE = [
+    [/^¡Hola! Soy Lupe, tu profe de .+\.$/, () => 'Salut ! Je suis Lupe, ta prof de français.'],
+    [/^¿Empezamos\? Hoy vemos: (.+)\.$/, (m, u) => 'On commence ? Aujourd’hui : ' + u + '.'],
+    [/^Hoy tienes (\d+) repasos\./, (m, n) => `Aujourd’hui, tu as ${n} révisions. Commençons par là, comme ça tu n’oublies rien.`],
+    [/^¡Llevas (\d+) días seguidos! ¡Qué padre!$/, (m, n) => `${n} jours de suite ! Génial !`],
+    [/^(\d+) días seguidos\. ¡No rompas la racha!$/, (m, n) => `${n} jours de suite. Ne casse pas ta série !`],
+    [/^¡(\d+) seguidas! ¡Imparable!$/, (m, n) => `${n} de suite ! Rien ne t’arrête !`],
+    [/^¡Plan del día completado! Llevas (\d+) días seguidos\.$/, (m, n) => `Programme du jour terminé ! Ça fait ${n} jours de suite.`],
+    [/^¡Bien hecho! Tu nivel es (\w+)\./, (m, l) => `Bien joué ! Ton niveau est ${l}. Continuons à travailler ensemble.`],
+    [/^¡Ya conoces (más de )?(\d+) palabras!/, (m, more, n) => `Tu connais déjà ${more ? 'plus de ' : ''}${n} mots ! Je suis très fière de toi.`]
+  ];
   /* Per doeltaal (met Nederlandse uitleg) de vertaling van Lupes vaste zinnen. Nieuwe taal: lijst + patronen toevoegen;
      de test controleert dat geen enkele zin Spaans blijft. Zonder rij praat Lupe Spaans. */
-  const LOCS = { en: { map: EN, re: EN_RE }, de: { map: DE, re: DE_RE } };
+  const LOCS = { en: { map: EN, re: EN_RE }, de: { map: DE, re: DE_RE }, fr: { map: FR, re: FR_RE, fix: s => s.replace(/ ([?!:;])/g, '\u00a0$1') } };
   const LOC = (S.course && S.course.ui === 'nl' && LOCS[S.course.target]) || null;
   const lineLang = LOC ? S.course.target : 'es';
   function locText(es) {
-    if (LOC.map[es]) return LOC.map[es];
-    for (const [re, fn] of LOC.re) { const m = String(es).match(re); if (m) return fn(...m); }
+    const fix = LOC.fix || (x => x); // bijv. Frans: vaste spatie vóór ? en !
+    if (LOC.map[es]) return fix(LOC.map[es]);
+    for (const [re, fn] of LOC.re) { const m = String(es).match(re); if (m) return fix(fn(...m)); }
     return null;
   }
   /* Een zin van Lupe in de taal van de cursus: { es, nl, lang } of een losse tekst. */
