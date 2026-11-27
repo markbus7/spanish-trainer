@@ -1685,3 +1685,27 @@ details.fold[open] > .fold-sum .fold-chev { transform: rotate(90deg); }
 .card-word .regio { max-width: 34rem; margin: .8rem auto 0; }
 .voc-detail .regio { margin: .2rem 0 .6rem; }
 .gp-rg { margin-top: .35rem; }
+
+/* ---------- Zwakke punten (#/zwak, js/zwak.js) ---------- */
+.zw-all .zw-counts { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-bottom: .8rem; }
+.zw-count { display: flex; flex-direction: column; align-items: center; padding: .7rem .5rem; border-radius: 12px; background: var(--bg2); color: var(--ink); text-decoration: none; }
+.zw-count b { font-size: 1.8rem; line-height: 1.1; color: var(--bad); }
+.zw-all .btn + p { margin: .5rem 0 0; }
+.zw-topics { display: flex; flex-direction: column; gap: .6rem; }
+.zw-topic { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--bad); border-radius: 12px; padding: .7rem .85rem; box-shadow: var(--shadow); }
+.zw-top { display: flex; align-items: center; gap: .8rem; }
+.zw-top .grow { display: flex; flex-direction: column; min-width: 0; gap: .1rem; }
+.zw-pct { display: flex; align-items: center; gap: .45rem; flex: none; }
+.zw-pct b { min-width: 2.6rem; text-align: right; }
+.zw-bar { width: 70px; height: 8px; border-radius: 999px; background: var(--bg2); overflow: hidden; }
+.zw-bar i { display: block; height: 100%; border-radius: 999px; }
+.zw-ex { margin: .4rem 0 0; } .zw-ex s { color: var(--bad); }
+.zw-acts { margin-top: .6rem; }
+.zw-acts .btn { white-space: normal; text-align: left; }
+.zwak-page .voc-list { display: flex; flex-direction: column; gap: .5rem; }
+.zw-hoy-head { display: flex; align-items: center; gap: .7rem; color: var(--ink); text-decoration: none; margin-bottom: .7rem; }
+.zw-hoy-head .grow { display: flex; flex-direction: column; min-width: 0; }
+.zw-hoy-ic { font-size: 1.6rem; width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: 12px; background: var(--accent-soft); flex: none; }
+.zw-hoy { border-left: 4px solid var(--accent); }
+.zw-link, .voc-zwak { margin-bottom: .7rem; }
+@media (max-width: 520px) { .zw-top { flex-direction: column; align-items: stretch; } .zw-pct { justify-content: flex-start; } }
