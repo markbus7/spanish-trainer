@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.74.0', date: '2026-11-27',
+    nl: ['Frans: niveau A2 is compleet. Tien nieuwe units: passé composé met avoir en être, imparfait, bij de dokter, uit eten (le/la/les en en), vergelijken, werk (lui/leur en y), futur simple, een verhaal vertellen en qui/que/où. Met dialogen uit Lyon, Marseille, Namen, Genève, Parijs, Montréal, Abidjan, Dakar, Port-au-Prince en Fès. Uitzonderingen staan er weer steeds bij, met de reden.'],
+    es: ['Francés: el nivel A2 está completo (10 unidades nuevas).'] },
   { v: '1.73.0', date: '2026-11-27',
     nl: ['Nieuwe cursus: Turks voor Nederlandstaligen (🇳🇱 Nederlands → 🇹🇷 Turks), niveau A1 met 10 units: begroeten, familie, getallen en klok, bestellen, je dag, de stad, winkelen, verleden en toekomende tijd', 'Turkse letters ç, ğ, ı, İ, ö, ş, ü: eigen tekenbalk bij typen, en wie ze weglaat krijgt «bijna goed, let op de Turkse letters»', 'Uitzonderingen in het Turks (saatler, meyve suyu, oğlum, gidiyor, bana, yazın) staan er altijd bij als ⚠️ Uitzondering, met de reden', 'Op reis voor Turks: kaart met Turkije, Cyprus, de Balkan, Duitsland, Nederland en Azerbeidzjan', 'Lupe, de tabbladen en de woordspellen zijn in de Turkse cursus in het Turks'],
     es: ['Nuevo curso: turco para hablantes de neerlandés (🇳🇱 Neerlandés → 🇹🇷 Turco), nivel A1 con 10 unidades.', 'Letras turcas ç, ğ, ı, İ, ö, ş, ü: barra propia al escribir; si faltan, la app dice «casi bien».', 'Las excepciones del turco aparecen siempre como ⚠️ excepción, con el motivo.', 'De viaje para el turco: mapa con Turquía, Chipre, los Balcanes, Alemania, Países Bajos y Azerbaiyán.', 'Lupe, las pestañas y los juegos están en turco en el curso de turco.'] },
