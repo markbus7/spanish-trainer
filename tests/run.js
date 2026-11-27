@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/b2-2.js', 'content/extra.js', 'content/landen.js', 'content/landen-praten.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/begrippen-fr.js', 'js/begrippen-de.js', 'js/zwak.js', 'content/beslisregels.js', 'js/strategie.js']) {
+for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/b2-2.js', 'content/extra.js', 'content/landen.js', 'content/landen-praten.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/begrippen-fr.js', 'js/begrippen-de.js', 'js/begrippen-tr.js', 'js/zwak.js', 'content/beslisregels.js', 'js/strategie.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -1635,6 +1635,20 @@ await micTests();
     ok(G.title(G.get('condicional')).startsWith('Konjunktiv II') && G.title(G.get('lidwoord')) === 'Lidwoord', w + 'Duits: eigen titel');
     ok(G.match('De Akkusativ, de derde naamval, de Konjunktiv II, een scheidbaar werkwoord en de Umlaut.').map(x => x.id).join() === 'de-akkusativ,de-dativ,condicional,de-trennbar,de-umlaut', w + 'Duitse termen tikbaar: ' + G.match('De Akkusativ, de derde naamval, de Konjunktiv II, een scheidbaar werkwoord en de Umlaut.').map(x => x.id).join());
     ok(G.match('de Konjunktiv I en het Partizip I')[0].id === 'de-konj1' && G.match('het Partizip II')[0].id === 'deelwoord' && G.search('Dativ').some(b => b.id === 'de-dativ'), w + 'Konjunktiv I ≠ II, Partizip I ≠ II, zoeken');
+    S.course = c0; G.match('x'); }
+  // Turks: eigen bestand js/begrippen-tr.js; Turkse blokken plus begrippen die alleen in het Turks bestaan (klinkerharmonie, naamval …)
+  { const c0 = S.course; S.course = { target: 'tr', ui: 'nl' };
+    const tl = G.list('tr');
+    ok(tl.length >= 58 && !G.fits(G.get('por-para'), 'tr') && !G.fits(G.get('stamwissel'), 'tr') && G.fits(G.get('tr-klinkerharmonie'), 'tr') && !G.fits(G.get('tr-klinkerharmonie'), 'es') && !G.fits(G.get('tr-naamval'), 'de') && !G.fits(G.get('de-naamval'), 'tr'), w + 'Turks: aantal ' + tl.length + ', eigen begrippen alleen bij Turks');
+    tl.forEach(b => { const k = b.tr; ok(k && k.n && k.html && k.ex && k.ex.length >= 2 && k.ex.every(([e, n]) => e && n) && b.t && b.k && b.html && G.CATS.some(c => c[0] === b.c), w + 'tr ' + b.id + ' blok met voorbeelden');
+      (k.table || []).forEach(r => ok(r.length === k.table[0].length, w + 'tr ' + b.id + ' tabelrij'));
+      (k.uz || []).forEach(u => ok(u[0] && /<b>Waarom\?<\/b>/.test(u[1]), w + 'tr ' + b.id + ' uitzondering met reden: ' + u[0]));
+      ok(!/Lima|Quito|Mexic|Spaans/.test(JSON.stringify([G.title(b), k.k || b.k, k.gen || b.html, k])), w + 'tr ' + b.id + ' geen Spaanse resten');
+      if (/^tr-/.test(b.id)) (b.rel || []).forEach(r => ok(G.get(r) && G.fits(G.get(r), 'tr'), w + 'tr ' + b.id + ' verwijst naar ' + r)); });
+    ok(G.title(G.get('indefinido')) === 'Verleden tijd (-di)' && G.title(G.get('aanspreken')) === 'Sen en siz' && G.title(G.get('lidwoord')) === 'Lidwoord', w + 'Turks: eigen titel');
+    const tm = G.match('De klinkerharmonie, een naamval, het achtervoegsel, de brede tijd, van horen zeggen en een achterzetsel.').map(x => x.id).join();
+    ok(tm === 'tr-klinkerharmonie,tr-naamval,tr-achtervoegsel,tr-bredetijd,perfecto,tr-achterzetsel', w + 'Turkse termen tikbaar: ' + tm);
+    ok(G.search('ünlü uyumu')[0].id === 'tr-klinkerharmonie' && G.search('geniş zaman').some(b => b.id === 'tr-bredetijd'), w + 'Turks zoeken');
     S.course = c0; G.match('x'); }
   // Engels: begrippen zonder Engels blok (por/para, stamklinkerwisseling) horen niet bij de Engelse cursus
   ok(!G.fits(G.get('por-para'), 'en') && G.fits(G.get('lidwoord'), 'en') && G.list('en').length < G.list('es').length, w + 'per doeltaal');
