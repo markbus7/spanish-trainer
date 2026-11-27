@@ -1761,6 +1761,15 @@ const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((
   const tx = X.asText();
   ok(/al \/ del \[contractions\]/.test(tx) && /Beslisregel: 38% → 33%/.test(tx) && /hielp niet/.test(tx) && /Contrastparen/.test(tx) && /Wat bij deze leerling werkt/.test(tx) && /hay vs\. estar \[hay-estar\].*nog geen andere aanpak/.test(tx), 'strategie: tekst voor het rapport: ' + tx);
   ok(S.Mistakes.asText(S.Mistakes.report(30)).includes('Hardnekkige onderwerpen en geprobeerde leerstrategieën'), 'strategie: staat in het rapport van de docent');
+  { // eerdere updaterondes (S.reworked) tellen als «al geprobeerd», met de fouten erna
+    const E = X.earlier('contractions');
+    ok(E.length >= 2 && E.every((r, i) => !i || r.t >= E[i - 1].t) && E[E.length - 1].last, 'strategie: eerdere updates over dit onderwerp, oudste eerst');
+    St.lupe.ex.push({ t: t0, v: E[0].v, id: 'x|a1-04|7', tag: 'contractions', q: 'q', u: 'a el', a: 'al' }, { t: t0, v: '99.0.0', id: 'x|a1-04|7', tag: 'contractions', q: 'q', u: 'a el', a: 'al' });
+    const E2 = X.earlier('contractions');
+    ok(E2[0].n === E[0].n + 1 && E2[E2.length - 1].n === E[E.length - 1].n + 1, 'strategie: fouten per periode na een update');
+    ok(/Extra oefeningen en uitleg \(.*v[\d.]+\)/.test(X.asText()), 'strategie: eerdere rondes in de rapporttekst');
+    St.lupe.ex.length -= 2;
+  }
   // werkwoordstijd
   St.srs['c|estar|pres'] = { d: 0, i: 0, e: 2, r: 0, l: 3, f: 6, g: 3 };
   ok(X.isStubborn('c|estar|pres') && X.label('c|estar|pres').startsWith('estar vervoegen'), 'strategie: hardnekkige werkwoordstijd');
