@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/begrippen-fr.js', 'js/zwak.js']) {
+for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/begrippen-fr.js', 'js/begrippen-de.js', 'js/zwak.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -1314,7 +1314,7 @@ await micTests();
       ok(ck('ich heisse anna', 'Ich heiße Anna.').ok && ck('ich heisse anna', 'Ich heiße Anna.').warn === 'accent' && ck('Schon', 'schön').warn === 'accent', w + 'ss voor ß en ontbrekende umlaut: goed met waarschuwing');
       const r = K.Gen.checkType('der Haus', { answers: ['das Haus'], articleOptional: true });
       ok(!r.ok && r.warn === 'article-wrong' && /onzijdig/.test(r.gender), w + 'fout lidwoord der/die/das met geslacht');
-      ok(K.C.all().length === 30, w + 'A1–B1 = 30 units');
+      ok(K.C.all().length === 40 && K.C.unitsOf('B2').length === 10, w + 'A1–B2 = 40 units');
       // uitzonderingen worden benoemd, met reden
       const U = K.Uitz, has = (l, re) => l.some(x => re.test(x.t + ' ' + x.html));
       ok(U.label() === '⚠️ Uitzondering' && has(U.forWord('das Mädchen'), /-chen/) && has(U.find('Ich helfe dir gern.'), /derde naamval/) && has(U.find('Ich bin zu Hause geblieben.'), /sein/) && has(U.find('Er fährt nach Berlin.'), /ä/) && has(U.find('Berlin ist größer als München.'), /Umlaut/), w + 'uitzonderingen met reden (das Mädchen, helfen + dir, ist geblieben, fährt, größer)');
@@ -1569,6 +1569,18 @@ await micTests();
     ok(G.title(G.get('indefinido')) === 'Passé composé' && G.title(G.get('lidwoord')) === 'Lidwoord', w + 'Frans: eigen titel');
     ok(G.match('De subjonctif, de passé composé, de imparfait en de gérondif.').map(x => x.id).join() === 'subjuntivo,indefinido,imperfecto,gerundio', w + 'Franse tijdnamen tikbaar');
     ok(G.search('subjonctif')[0].id === 'subjuntivo', w + 'Frans zoeken');
+    S.course = c0; G.match('x'); }
+  // Duits: eigen bestand js/begrippen-de.js; Duitse blokken plus begrippen die alleen in het Duits bestaan (naamval, Umlaut …)
+  { const c0 = S.course; S.course = { target: 'de', ui: 'nl' };
+    const dl = G.list('de');
+    ok(dl.length >= 60 && !G.fits(G.get('por-para'), 'de') && !G.fits(G.get('subjuntivo'), 'de') && G.fits(G.get('de-naamval'), 'de') && !G.fits(G.get('de-naamval'), 'es') && !G.fits(G.get('de-umlaut'), 'fr'), w + 'Duits: aantal ' + dl.length + ', eigen begrippen alleen bij Duits');
+    dl.forEach(b => { const k = b.de; ok(k && k.n && k.html && k.ex && k.ex.length >= 1 && k.ex.every(([e, n]) => e && n) && b.t && b.k && b.html && G.CATS.some(c => c[0] === b.c), w + 'de ' + b.id + ' blok met voorbeelden');
+      (k.table || []).forEach(r => ok(r.length === k.table[0].length, w + 'de ' + b.id + ' tabelrij'));
+      (k.uz || []).forEach(u => ok(u[0] && /<b>Waarom\?<\/b>/.test(u[1]), w + 'de ' + b.id + ' uitzondering met reden: ' + u[0]));
+      if (/^de-/.test(b.id)) (b.rel || []).forEach(r => ok(G.get(r) && G.fits(G.get(r), 'de'), w + 'de ' + b.id + ' verwijst naar ' + r)); });
+    ok(G.title(G.get('condicional')).startsWith('Konjunktiv II') && G.title(G.get('lidwoord')) === 'Lidwoord', w + 'Duits: eigen titel');
+    ok(G.match('De Akkusativ, de derde naamval, de Konjunktiv II, een scheidbaar werkwoord en de Umlaut.').map(x => x.id).join() === 'de-akkusativ,de-dativ,condicional,de-trennbar,de-umlaut', w + 'Duitse termen tikbaar: ' + G.match('De Akkusativ, de derde naamval, de Konjunktiv II, een scheidbaar werkwoord en de Umlaut.').map(x => x.id).join());
+    ok(G.match('de Konjunktiv I en het Partizip I')[0].id === 'de-konj1' && G.match('het Partizip II')[0].id === 'deelwoord' && G.search('Dativ').some(b => b.id === 'de-dativ'), w + 'Konjunktiv I ≠ II, Partizip I ≠ II, zoeken');
     S.course = c0; G.match('x'); }
   // Engels: begrippen zonder Engels blok (por/para, stamklinkerwisseling) horen niet bij de Engelse cursus
   ok(!G.fits(G.get('por-para'), 'en') && G.fits(G.get('lidwoord'), 'en') && G.list('en').length < G.list('es').length, w + 'per doeltaal');
