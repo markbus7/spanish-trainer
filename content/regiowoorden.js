@@ -35,6 +35,11 @@
     '¡arrarray!': '¡qué calor!', 'de ley': 'seguro', '¿mande?': '¿perdón?', 'la chompa': 'el suéter', 'la movilidad': 'el transporte',
     'la pollera': 'la falda', 'el casero / la casera': 'el vendedor / la vendedora', 'la wawa': 'el bebé', '¡qué macana!': '¡qué lástima!',
     '¡jallalla!': '¡salud!', 'la pieza': 'la habitación', 'los yuyos': 'las hierbas', '¿mba’éichapa?': '¿cómo estás?', 'iporã': 'bien',
-    'aguyje': 'gracias', 'haku': 'caliente', 'echar el cuento': 'contar la historia', 'chamo / chama': 'chico / chica', '¡Epa!': '¡hola!'
+    'aguyje': 'gracias', 'haku': 'caliente', 'echar el cuento': 'contar la historia', 'chamo / chama': 'chico / chica', '¡Epa!': '¡hola!',
+    'la guara': 'la guacamaya', 'catracho / catracha': 'hondureño / hondureña', 'cheque': 'de acuerdo', 'el pisto': 'el dinero', 'la pulpería': 'la tienda',
+    '¡púchica!': '¡caramba!', '¡dale pues!': '¡de acuerdo!', '¡ideay!': '¡oye!', 'el chunche': 'la cosa', 'la medialuna': 'el cruasán', 'bancar': 'aguantar',
+    'un garrón': 'una molestia', 'tal cual': 'exacto', 'chivo': 'genial', 'el chero / la chera': 'el amigo / la amiga', 'el cipote / la cipota': 'el niño / la niña',
+    '¡cabal!': '¡exacto!', '¡vaya pues!': '¡de acuerdo!', 'un momentico': 'un momentito', 'chiquitico': 'chiquitito', '¡upe!': '¿hay alguien?', '¡qué chiva!': '¡qué genial!',
+    'chapín / chapina': 'guatemalteco / guatemalteca', '¡Híjole!': '¡caramba!'
   };
 })(window.SPT);

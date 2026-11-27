@@ -38,7 +38,10 @@
     'passive': 'passief (fue construido)', 'se-accidental': 'se me olvidó (per ongeluk)', 'caribe': 'Caribisch Spaans', 'reported-adv': 'indirecte rede in het verleden', 'rumor': 'geruchten en bronnen (según, habría)',
     'register': 'formeel register (e-mails)', 'concession': 'aunque + subjuntivo',
     'probability': 'vermoedens (¿dónde estará?)', 'relative-adv': 'en la que, lo cual, cuyo',
-    'periphrasis-adv': 'llevar / seguir + gerundio, ponerse a', 'subj-relative': 'busco algo que + subjuntivo'
+    'periphrasis-adv': 'llevar / seguir + gerundio, ponerse a', 'subj-relative': 'busco algo que + subjuntivo',
+    'subj-perfect': 'haya + participio (espero que hayas…)', 'future-perfect': 'futuro perfecto (habré terminado)', 'subj-conj': 'en cuanto, con tal de que, a no ser que',
+    'debate': 'nuanceren en debatteren (no es que…)', 'verb-prep': 'werkwoord + vast voorzetsel (soñar con)', 'diminutive': 'verkleinwoorden en versterkers (-ito, -ísimo)',
+    'lo-neutro': 'lo bueno, lo de, lo cansado que', 'anecdote': 'een anekdote vertellen (resulta que, por poco)'
   };
 
   const units = [];
