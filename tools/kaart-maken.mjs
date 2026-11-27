@@ -1,6 +1,7 @@
 /* Maakt de kaarten van «Op reis»: content/kaarten/<taal>.js (één per doeltaal). Eenmalig, buiten de app:
    npm i world-atlas@2 topojson-client@3 topojson-simplify@3 d3-geo@3 && node tools/kaart-maken.mjs <taal> [uitvoer.js]
    Talen: es (Latijns-Amerika + inzet Spanje/Eq.-Guinea), en (wereldkaart), nl (Nederland en België + inzetten),
+   fr (Canada, Haïti en Afrika + kader met Frankrijk, België en Zwitserland);
    tr (van Nederland tot Azerbeidzjan).
    Nieuwe taal: voeg hieronder een kaart toe (landcode → ISO-nummer uit Natural Earth), en zet de vlagknoppen
    (pin) in de landenlijst van die taal (content/<cursus>/landen.js). */
@@ -92,6 +93,33 @@ const MAPS = {
     const pr = d3.geoMercator().fitExtent([[box[0] + 8, box[1] + 14], [box[0] + box[2] - 8, box[1] + box[3] - 8]], both), p2 = d3.geoPath(pr);
     out.c.cw = { d: round(p2(cw) + p2(aw)), p: p2.centroid(cw).map(v => Math.round(v)), box };
     return { out, title: 'Nederland en België, met Suriname, Curaçao en Aruba en Zuid-Afrika als inzet' };
+  },
+  /* Frans: de Atlantische wereld (Canada/Québec, Haïti, West- en Centraal-Afrika), met Frankrijk, België en Zwitserland
+     samen in één uitvergroot kader midden in de oceaan. */
+  fr() {
+    const FR = { ca: 124, ht: 332, ma: 504, sn: 686, ci: 384, cd: 180 };
+    const EU = { fr: 250, be: 56, ch: 756 };
+    const W = 1000, H = 600;
+    const bbox = { type: 'MultiPoint', coordinates: [[-97, 60], [-97, -15], [44, -15], [44, 60], [-26, 60], [-26, -15]] };
+    const proj = d3.geoNaturalEarth1().fitExtent([[8, 8], [W - 8, H - 8]], bbox).clipExtent([[0, 0], [W, H]]);
+    const path = d3.geoPath(proj).digits(0);
+    const nums = new Set(Object.values(FR));
+    const inView = f => { const b = d3.geoBounds(f); return b[1][0] > -110 && b[0][0] < 55 && b[1][1] > -25 && b[0][1] < 68; };
+    const bg = all110.filter(f => !nums.has(+f.id) && +f.id !== 10 && inView(f)).map(f => path(simplify(f, 1e-4))).filter(Boolean).join('');
+    const out = { w: W, h: H, bg: round(bg), c: {} };
+    for (const [id, n] of Object.entries(FR)) {
+      const f = id === 'ht' ? simplify(byNum(n), 0) : simplify(all110.find(x => +x.id === n), 4e-5);
+      // Canada: het zwaartepunt op Québec leggen (de Franstalige provincie)
+      out.c[id] = { d: round(path(f)), p: (id === 'ca' ? proj([-72, 49]) : path.centroid(byNum(n))).map(v => Math.round(v)) };
+    }
+    // Europa uitvergroot: alleen het vasteland van Frankrijk (plus Corsica), België en Zwitserland, in één kader
+    const box = [296, 158, 240, 240];
+    const europe = p => p[0][0][0] > -6 && p[0][0][0] < 11 && p[0][0][1] > 40 && p[0][0][1] < 52;
+    const fs3 = Object.fromEntries(Object.entries(EU).map(([id, n]) => [id, only(simplify(byNum(n), 2e-6), europe)]));
+    const pr = d3.geoMercator().fitExtent([[box[0] + 10, box[1] + 10], [box[0] + box[2] - 10, box[1] + box[3] - 10]], { type: 'FeatureCollection', features: Object.values(fs3) });
+    const p2 = d3.geoPath(pr);
+    for (const id of Object.keys(EU)) out.c[id] = { d: round(p2(fs3[id])), p: p2.centroid(fs3[id]).map(v => Math.round(v)), box };
+    return { out, title: 'de Atlantische wereld (Canada, Haïti, Afrika), met Frankrijk, België en Zwitserland uitvergroot', k: 1.25 };
   },
   /* Turks: van Nederland tot Azerbeidzjan. Turkije en Cyprus, de Balkan (Bulgarije), de Turkse gemeenschap in Duitsland
      en Nederland, en Azerbeidzjan (zustertaal Azerbeidzjaans). */

@@ -48,7 +48,10 @@
     nl: { nl: 'Nederlands', es: 'neerlandés', en: 'Dutch', flag: '🇳🇱', arts: /^(de|het|een)\s+/i, letters: 'éëïöüè' },
     de: { nl: 'Duits', es: 'alemán', en: 'German', flag: '🇩🇪', arts: /^(der|die|das|ein|eine)\s+/i, letters: 'äöüß', fold: s => s.replace(/ß/g, 'ss'),
       gender: a => ({ der: 'mannelijk (der)', die: 'vrouwelijk of meervoud (die)', das: 'onzijdig (das)' })[a] || '' },
-    fr: { nl: 'Frans', es: 'francés', en: 'French', flag: '🇫🇷', arts: /^(?:(le|la|les|un|une|des)\s+|(l)['’]\s*)/i, letters: 'àâæçéèêëîïôœùûüÿ' },
+    fr: { nl: 'Frans', es: 'francés', en: 'French', flag: '🇫🇷', arts: /^(?:(le|la|les|un|une|des)\s+|(l)['’]\s*)/i, letters: 'àâæçéèêëîïôœùûüÿ',
+      // «bijna goed»: ook accent grave, circonflexe en cedille mogen ontbreken (è, ê, ç), en œ mag als oe
+      fold: s => s.normalize('NFD').replace(/[\u0300\u0302\u0327]/g, '').normalize('NFC').replace(/œ/g, 'oe').replace(/æ/g, 'ae'),
+      gender: a => ({ le: 'mannelijk (le)', la: 'vrouwelijk (la)', un: 'mannelijk (un)', une: 'vrouwelijk (une)' })[a] || '' },
     // Turks heeft twee i's: İ/i (met punt) en I/ı (zonder punt). De gewone toLowerCase/toUpperCase kent die paren niet (İ → i̇, i → I).
     // fold = vorm zonder Turkse tekens: wie «cay» typt voor «çay» krijgt «bijna goed, let op de tekens». fill = letters voor de woordzoeker.
     tr: { nl: 'Turks', es: 'turco', en: 'Turkish', flag: '🇹🇷', arts: null, letters: 'çğıöşüâîû',
@@ -73,6 +76,12 @@
       // ai.style = variant die de AI-docent aanhoudt; ai.pitfalls = typische fouten van Nederlandstaligen; ai.exceptions = voorbeelden van uitzonderingen
       ai: { target: 'American English', native: 'Dutch', style: 'US spelling and vocabulary; mention the British variant when it differs and it matters',
         pitfalls: 'false friends such as eventually/actually/sensible, since vs. for, present perfect vs. past simple, word order, make vs. do, too literal translations, "Dunglish"' } },
+    // Frans voor Nederlandstaligen (Frans van Frankrijk; België, Zwitserland, Québec en Afrika komen in «Op reis» en in de uitleg).
+    'fr-nl': { id: 'fr-nl', target: 'fr', ui: 'nl', speak: 'fr-FR', listen: 'fr-FR', flag: '🇫🇷', ns: 'fr-nl', where: 'Frankrijk', hello: 'Bonjour ! Comment ça va ? Bienvenue à ton cours de français.', device: 'Et voici la voix de ton appareil.',
+      brand: 'Français <em>facile</em>', title: 'Français Facile', name: { nl: 'Frans', es: 'francés' },
+      ai: { target: 'French (standard French of France)', native: 'Dutch', style: 'standard French of France; mention Belgian, Swiss or Québec usage when it differs and it matters; put a space before ? ! : ;',
+        pitfalls: 'gender of nouns (le/la), partitive articles (du, de la, pas de), être vs. avoir in the passé composé, passé composé vs. imparfait, tu vs. vous, silent final letters and liaison, position of object pronouns, false friends, too literal translations from Dutch',
+        exceptions: 'irregular verb forms (vous faites, ils vont), mon amie / cet hôtel / bel homme before a vowel, au printemps, pas de after a negation, être verbs in the passé composé, soixante-dix / quatre-vingts, irregular feminines and plurals (belle, animaux), adjectives placed before the noun' } },
     // Turks voor Nederlandstaligen (standaard-Turks van Turkije, İstanbul-uitspraak).
     'tr-nl': { id: 'tr-nl', target: 'tr', ui: 'nl', speak: 'tr-TR', listen: 'tr-TR', flag: '🇹🇷', ns: 'tr-nl', where: 'Turkije', hello: 'Merhaba! Nasılsın? Türkçe dersine hoş geldin.', device: 'Bu da cihazının sesi.',
       brand: 'Türkçe <em>kolay</em>', title: 'Türkçe Kolay', name: { nl: 'Turks', es: 'turco' },

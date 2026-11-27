@@ -96,10 +96,11 @@
     const svg = el('svg', { viewBox: `0 0 ${M.w} ${M.h}`, class: 'mundo-map' + (M.w > M.h ? ' wide' : ''), role: 'img', 'aria-label': 'Kaart van de landen waar je deze taal spreekt' });
     svg.append(el('rect', { x: 0, y: 0, width: M.w, height: M.h, class: 'sea', rx: 18 }));
     svg.append(el('path', { d: M.bg, class: 'land' }));
-    const shapes = el('g'), lines = el('g'), pins = el('g');
+    const boxes = el('g'), shapes = el('g'), lines = el('g'), pins = el('g'), boxSeen = new Set();
     list().forEach(p => {
       const c = M.c[p.id], s = status(p.id);
-      if (c && c.box) shapes.append(el('rect', { x: c.box[0], y: c.box[1], width: c.box[2], height: c.box[3], rx: 10, class: 'inset' }));
+      // kaders eerst (en elk kader één keer): landen kunnen een kader delen, zoals Frankrijk, België en Zwitserland
+      if (c && c.box && !boxSeen.has(c.box.join())) { boxSeen.add(c.box.join()); boxes.append(el('rect', { x: c.box[0], y: c.box[1], width: c.box[2], height: c.box[3], rx: 10, class: 'inset' })); }
       if (c) { const sh = el('path', { d: c.d, class: 'cty ' + s }); sh.addEventListener('click', () => go(p.id)); shapes.append(sh); }
       const [x, y] = p.pin || (c ? c.p : [0, 0]);
       if (p.line && c) lines.append(el('line', { x1: x, y1: y, x2: c.p[0], y2: c.p[1], class: 'lead' }));
@@ -111,7 +112,7 @@
       g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(p.id); } });
       pins.append(g);
     });
-    svg.append(shapes, lines, pins);
+    svg.append(boxes, shapes, lines, pins);
     return svg;
   }
   function stampChip(id) {

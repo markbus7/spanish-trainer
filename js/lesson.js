@@ -11,9 +11,11 @@
     en: ['Well done!', 'Excellent!', 'Spot on!', 'Perfect!', 'Nice one!', 'Great!', 'Correct!', 'Brilliant!'],
     nl: ['Heel goed!', 'Uitstekend!', 'Precies!', 'Perfect!', 'Goed gedaan!', 'Top!', 'Klopt!', 'Zo doe je dat!'],
     de: ['Sehr gut!', 'Ausgezeichnet!', 'Genau!', 'Perfekt!', 'Gut gemacht!', 'Super!', 'Richtig!', 'Toll!'],
+    fr: ['Très bien !', 'Excellent !', 'C’est ça !', 'Parfait !', 'Bien joué !', 'Génial !', 'Correct !', 'Bravo !'],
     tr: ['Çok güzel!', 'Harika!', 'Aynen öyle!', 'Mükemmel!', 'Aferin!', 'Süper!', 'Doğru!', 'Bravo!']
   };
   const OOPSES = { es: ['Casi…', 'No exactamente', 'Ups…', 'Todavía no'], en: ['Almost…', 'Not quite', 'Oops…', 'Not yet'], nl: ['Bijna…', 'Niet helemaal', 'Oeps…', 'Nog niet'], de: ['Fast…', 'Nicht ganz', 'Hoppla…', 'Noch nicht'],
+    fr: ['Presque…', 'Pas tout à fait', 'Oups…', 'Pas encore'],
     tr: ['Neredeyse…', 'Tam değil', 'Hay aksi…', 'Henüz değil'] };
   const PRAISE = PRAISES[S.course.target] || (S.course.ui === 'nl' ? PRAISES.nl : PRAISES.es);
   const OOPS = OOPSES[S.course.target] || (S.course.ui === 'nl' ? OOPSES.nl : OOPSES.es);
@@ -33,6 +35,13 @@
       conj: 'Konjugiere das Verb', type: 'Schreib auf Deutsch', meaning: 'Was bedeutet das?', howsay: 'Wie sagt man das auf Deutsch?', hear: 'Was hörst du?',
       newword: 'Neues Wort', correct: 'Richtige Antwort', retype: 'Schreib die richtige Antwort ab', write: 'Schreibaufgabe',
       typehere: 'Schreib die richtige Antwort…', rightafter: 'Es war doch richtig!', lessonsays: 'In der Lektion steht: '
+    },
+    fr: {
+      check: 'Vérifier', next: 'Continuer', skip: 'Passer', gotit: 'Compris', choose: 'Choisis la bonne réponse', fill: 'Complète', translate: 'Traduis en français',
+      aslesson: 'Traduis comme dans la leçon', order: 'Remets la phrase dans l’ordre', match: 'Associe les paires', listen: 'Écoute et écris ce que tu entends', speak: 'Dis-le à voix haute',
+      conj: 'Conjugue le verbe', type: 'Écris en français', meaning: 'Qu’est-ce que ça veut dire ?', howsay: 'Comment dit-on en français ?', hear: 'Qu’est-ce que tu entends ?',
+      newword: 'Nouveau mot', correct: 'Bonne réponse', retype: 'Recopie la bonne réponse', write: 'Exercice d’écriture',
+      typehere: 'Écris la bonne réponse…', rightafter: 'C’était juste, finalement !', lessonsays: 'Dans la leçon : '
     },
     tr: {
       check: 'Kontrol et', next: 'Devam', skip: 'Geç', gotit: 'Anladım', choose: 'Doğru cevabı seç', fill: 'Boşluğu doldur', translate: 'Türkçeye çevir',
@@ -119,6 +128,7 @@
 
   // Speciale tekens van de doeltaal. Engels heeft ze niet nodig: dan blijft de balk leeg en verborgen.
   const ACCENTS = { es: ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü', '¿', '¡'], en: [], nl: ['é', 'ë', 'ï', 'ö', 'ü', 'è'], de: ['ä', 'ö', 'ü', 'ß', 'Ä', 'Ö', 'Ü'],
+    fr: ['é', 'è', 'ê', 'à', 'â', 'ç', 'ù', 'û', 'î', 'ï', 'ô', 'œ', 'ë'],
     tr: ['ç', 'ğ', 'ı', 'ö', 'ş', 'ü', 'İ', 'â'] };
   function accentBar(target) {
     const chars = ACCENTS[S.course.target] || [];
@@ -753,7 +763,8 @@
   };
 
   R.order = (it, ctx) => {
-    const words = it.target.split(/\s+/);
+    // Frans zet een spatie vóór ? ! : ; en binnen « »: zo'n los leesteken hoort bij het woord ernaast, niet op een eigen tegel
+    const words = it.target.split(/\s+/).reduce((a, w) => { if (a.length && (/^[?!:;»]+$/.test(w) || a[a.length - 1] === '«')) a[a.length - 1] += '\u00a0' + w; else a.push(w); return a; }, []);
     const pool = h('div', { class: 'tiles pool' }), line = h('div', { class: 'tiles line' });
     let order = U.shuffle(words.map((w, i) => ({ w, i })));
     if (order.every((o, i) => o.i === i) && words.length > 1) order = order.reverse();
