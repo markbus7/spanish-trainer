@@ -221,7 +221,29 @@ details summary { cursor: pointer; font-weight: 600; color: var(--accent); margi
 .ls-peek { position: absolute; inset: 0; z-index: 5; background: var(--bg); display: flex; flex-direction: column; max-width: 760px; margin: 0 auto; }
 .ls-peek-top { padding: calc(10px + env(safe-area-inset-top)) 16px 6px; }
 .ls-top .ls-peek-btn { flex: none; padding: .35rem .7rem; }
-.ls-src-btn { display: block; margin: 0 0 .8rem; text-align: left; white-space: normal; }
+/* 📖 Tekst en vraag samen in beeld: staand/iPhone de tekst bovenaan in een eigen scrollvak, breed scherm (iPad liggend) naast elkaar */
+#lesson { container: lesson / inline-size; }
+.ls-txt { flex: 0 1 auto; min-height: 5.5rem; max-height: 44%; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  margin: 0 12px 6px; padding: .6rem .8rem .8rem; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: inset 0 -10px 10px -10px rgba(0, 0, 0, .14); }
+.ls.kb-open .ls-txt { max-height: 30%; }
+.ls-txt h2 { font-size: 1.1rem; margin: .1rem 0 .4rem; }
+.ls-txt .eyebrow + h2 ~ p.muted, .ls-txt .dl-stage, .ls-txt .rd-gl { display: none; }
+.ls-txt .btn { padding: .3rem .6rem; font-size: .82rem; }
+.ls-txt .reading .rd-body { margin-top: .6rem; padding: 0; border: 0; background: none; border-radius: 0; }
+.ls-txt .rd-text p { font-size: 1rem; }
+.ls-txt .rd-p { flex-direction: column; gap: .15rem; }
+.ls-txt .rd-p .dl-btns { flex-direction: row; align-self: flex-start; gap: .45rem; transform: scale(.86); transform-origin: left center; }
+body.ask-fab-on #lesson .ls-txt { padding-right: 58px; } /* Lupe-knop bedekt de tekst niet */
+@container lesson (min-width: 860px) {
+  .ls.with-txt { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; max-width: 1240px; }
+  .ls.with-txt > .ls-top { grid-column: 1 / -1; }
+  .ls.with-txt > .ls-txt { grid-column: 1; grid-row: 2 / 4; max-height: none; margin: 0 4px calc(12px + env(safe-area-inset-bottom)) 16px; padding: .9rem 1.1rem 1.2rem; box-shadow: none; }
+  .ls.with-txt > .ls-body { grid-column: 2; grid-row: 2; }
+  .ls.with-txt > .ls-foot { grid-column: 2; grid-row: 3; max-height: none; border-radius: 16px 16px 0 0; }
+  .ls.with-txt > .ls-top .ls-peek-btn { display: none; }
+  body.ask-fab-on #lesson .ls.with-txt > .ls-txt { padding-right: 1.1rem; }
+  .ls.with-txt .ls-txt .rd-text p { font-size: 1.05rem; }
+}
 .ls-actions .ls-back { flex: none; padding: .9rem 1.1rem; font-size: 1.05rem; }
 .ls-note { max-width: 640px; margin: .45rem auto 0; text-align: center; }
 @keyframes rise { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
