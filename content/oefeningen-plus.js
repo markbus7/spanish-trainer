@@ -761,15 +761,15 @@
      ezelsbruggetje + ritme, koppelen (match), foutenjacht met zijn eigen fouten, een stappenplan in twee vragen
      en een gerichte tip bij precies de fout die hij maakt (fb, zie S.Gen.tipFor). */
   S.reworked = S.reworked.concat([
-    { tag: 'conj', unit: 'a1-04', v: '1.86.0', date: '2026-11-27T21:30:00Z', what: 'ANDERE AANPAK estar: ezelsbruggetje (eSTAr = waar iets STAat, alle vormen beginnen met est-), vormen koppelen, foutenjacht, hardop in ritme, 6 typoefeningen alleen estar met gerichte tip bij somos/eres/esas' },
-    { ids: ['c|estar|pres'], v: '1.86.0', date: '2026-11-27T21:30:00Z', what: 'estar apart geoefend (zie [conj] a1-04), tip bij verwisseling met ser' },
-    { tag: 'contractions', unit: 'a1-04', v: '1.86.0', date: '2026-11-27T21:30:00Z', what: 'ANDERE AANPAK al/del: stappenplan in twee vragen (heen = a / vandaan = de; volgt het lidwoord el?), kiezen uit a/al/de/del, koppelen, paar ir a ↔ venir de, uitzondering a El Salvador met reden, gerichte tip bij «a el», «al Salvador», «voy del»' },
-    { ids: ['x|a1-04|14', 'x|a1-04|28', 'x|a1-04|45', 'x|a1-04|81'], v: '1.86.0', date: '2026-11-27T21:30:00Z', what: 'zelfde stof in nieuwe oefenvormen (kiezen a/al/de/del, koppelen, ir a ↔ venir de)' },
-    { tag: 'hay-estar', unit: 'a1-04', v: '1.86.0', date: '2026-11-27T21:30:00Z', what: 'vertaal- en dicteezinnen met ciudad, centro, parque, parada (hay en está samen), speltip bij «cuidad» en «center»' },
-    { ids: ['x|a1-04|18', 'x|a1-04|10', 'x|a1-04|40', 'x|a1-04|48'], v: '1.86.0', date: '2026-11-27T21:30:00Z', what: 'spelling kernwoorden (ciudad, centro, parada) in typ- en dicteezinnen' },
-    { tag: 'ser-estar', unit: 'a1-04', v: '1.86.0', date: '2026-11-27T21:30:00Z', what: '«parada de bus/autobús» telt goed bij het busstation; accenten tellen niet als fout maar worden wel getoond; tip «a la izquierda» en spelling izquierda' },
-    { ids: ['x|a1-04|107', 'x|a1-04|108', 'x|a1-04|134'], v: '1.86.0', date: '2026-11-27T21:30:00Z', what: 'parada de bus/autobús en teléfono/celular goed; gerichte tip bij «izquierda» zonder «a la» en bij «izquerda»' },
-    { ids: ['w|a1-04|35', 'w|a1-01|24'], v: '1.86.0', date: '2026-11-27T21:30:00Z', what: '«el correo» telt goed bij het postkantoor (met tip); zinnen en speloefeningen voor perdón, Medellín, el pie ↔ la piel' }
+    { tag: 'conj', unit: 'a1-04', v: '1.87.0', date: '2026-11-27T21:35:00Z', what: 'ANDERE AANPAK estar: ezelsbruggetje (eSTAr = waar iets STAat, alle vormen beginnen met est-), vormen koppelen, foutenjacht, hardop in ritme, 6 typoefeningen alleen estar met gerichte tip bij somos/eres/esas' },
+    { ids: ['c|estar|pres'], v: '1.87.0', date: '2026-11-27T21:35:00Z', what: 'estar apart geoefend (zie [conj] a1-04), tip bij verwisseling met ser' },
+    { tag: 'contractions', unit: 'a1-04', v: '1.87.0', date: '2026-11-27T21:35:00Z', what: 'ANDERE AANPAK al/del: stappenplan in twee vragen (heen = a / vandaan = de; volgt het lidwoord el?), kiezen uit a/al/de/del, koppelen, paar ir a ↔ venir de, uitzondering a El Salvador met reden, gerichte tip bij «a el», «al Salvador», «voy del»' },
+    { ids: ['x|a1-04|14', 'x|a1-04|28', 'x|a1-04|45', 'x|a1-04|81'], v: '1.87.0', date: '2026-11-27T21:35:00Z', what: 'zelfde stof in nieuwe oefenvormen (kiezen a/al/de/del, koppelen, ir a ↔ venir de)' },
+    { tag: 'hay-estar', unit: 'a1-04', v: '1.87.0', date: '2026-11-27T21:35:00Z', what: 'vertaal- en dicteezinnen met ciudad, centro, parque, parada (hay en está samen), speltip bij «cuidad» en «center»' },
+    { ids: ['x|a1-04|18', 'x|a1-04|10', 'x|a1-04|40', 'x|a1-04|48'], v: '1.87.0', date: '2026-11-27T21:35:00Z', what: 'spelling kernwoorden (ciudad, centro, parada) in typ- en dicteezinnen' },
+    { tag: 'ser-estar', unit: 'a1-04', v: '1.87.0', date: '2026-11-27T21:35:00Z', what: '«parada de bus/autobús» telt goed bij het busstation; accenten tellen niet als fout maar worden wel getoond; tip «a la izquierda» en spelling izquierda' },
+    { ids: ['x|a1-04|107', 'x|a1-04|108', 'x|a1-04|134'], v: '1.87.0', date: '2026-11-27T21:35:00Z', what: 'parada de bus/autobús en teléfono/celular goed; gerichte tip bij «izquierda» zonder «a la» en bij «izquerda»' },
+    { ids: ['w|a1-04|35', 'w|a1-01|24'], v: '1.87.0', date: '2026-11-27T21:35:00Z', what: '«el correo» telt goed bij het postkantoor (met tip); zinnen en speloefeningen voor perdón, Medellín, el pie ↔ la piel' }
   ]);
   X('a1-04', {
     grammar: [
