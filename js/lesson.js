@@ -11,10 +11,12 @@
     en: ['Well done!', 'Excellent!', 'Spot on!', 'Perfect!', 'Nice one!', 'Great!', 'Correct!', 'Brilliant!'],
     nl: ['Heel goed!', 'Uitstekend!', 'Precies!', 'Perfect!', 'Goed gedaan!', 'Top!', 'Klopt!', 'Zo doe je dat!'],
     de: ['Sehr gut!', 'Ausgezeichnet!', 'Genau!', 'Perfekt!', 'Gut gemacht!', 'Super!', 'Richtig!', 'Toll!'],
-    fr: ['Très bien !', 'Excellent !', 'C’est ça !', 'Parfait !', 'Bien joué !', 'Génial !', 'Correct !', 'Bravo !']
+    fr: ['Très bien !', 'Excellent !', 'C’est ça !', 'Parfait !', 'Bien joué !', 'Génial !', 'Correct !', 'Bravo !'],
+    tr: ['Çok güzel!', 'Harika!', 'Aynen öyle!', 'Mükemmel!', 'Aferin!', 'Süper!', 'Doğru!', 'Bravo!']
   };
   const OOPSES = { es: ['Casi…', 'No exactamente', 'Ups…', 'Todavía no'], en: ['Almost…', 'Not quite', 'Oops…', 'Not yet'], nl: ['Bijna…', 'Niet helemaal', 'Oeps…', 'Nog niet'], de: ['Fast…', 'Nicht ganz', 'Hoppla…', 'Noch nicht'],
-    fr: ['Presque…', 'Pas tout à fait', 'Oups…', 'Pas encore'] };
+    fr: ['Presque…', 'Pas tout à fait', 'Oups…', 'Pas encore'],
+    tr: ['Neredeyse…', 'Tam değil', 'Hay aksi…', 'Henüz değil'] };
   const PRAISE = PRAISES[S.course.target] || (S.course.ui === 'nl' ? PRAISES.nl : PRAISES.es);
   const OOPS = OOPSES[S.course.target] || (S.course.ui === 'nl' ? OOPSES.nl : OOPSES.es);
   /* Instructies in de doeltaal (bij «uitleg in de doeltaal», standaard vanaf B1) voor cursussen met Nederlandse uitleg.
@@ -40,6 +42,13 @@
       conj: 'Conjugue le verbe', type: 'Écris en français', meaning: 'Qu’est-ce que ça veut dire ?', howsay: 'Comment dit-on en français ?', hear: 'Qu’est-ce que tu entends ?',
       newword: 'Nouveau mot', correct: 'Bonne réponse', retype: 'Recopie la bonne réponse', write: 'Exercice d’écriture',
       typehere: 'Écris la bonne réponse…', rightafter: 'C’était juste, finalement !', lessonsays: 'Dans la leçon : '
+    },
+    tr: {
+      check: 'Kontrol et', next: 'Devam', skip: 'Geç', gotit: 'Anladım', choose: 'Doğru cevabı seç', fill: 'Boşluğu doldur', translate: 'Türkçeye çevir',
+      aslesson: 'Dersteki gibi çevir', order: 'Cümleyi sıraya koy', match: 'Çiftleri eşleştir', listen: 'Dinle ve duyduğunu yaz', speak: 'Yüksek sesle söyle',
+      conj: 'Fiili çek', type: 'Türkçe yaz', meaning: 'Bu ne demek?', howsay: 'Bu Türkçede nasıl söylenir?', hear: 'Ne duyuyorsun?',
+      newword: 'Yeni kelime', correct: 'Doğru cevap', retype: 'Doğru cevabı yaz', write: 'Yazma görevi',
+      typehere: 'Doğru cevabı yaz…', rightafter: 'Aslında doğruydu!', lessonsays: 'Derste şöyle yazıyor: '
     }
   };
   const T_EN = (S.course.ui === 'nl' && T_X[S.course.target]) || null, EN = !!T_EN;
@@ -119,7 +128,8 @@
 
   // Speciale tekens van de doeltaal. Engels heeft ze niet nodig: dan blijft de balk leeg en verborgen.
   const ACCENTS = { es: ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü', '¿', '¡'], en: [], nl: ['é', 'ë', 'ï', 'ö', 'ü', 'è'], de: ['ä', 'ö', 'ü', 'ß', 'Ä', 'Ö', 'Ü'],
-    fr: ['é', 'è', 'ê', 'à', 'â', 'ç', 'ù', 'û', 'î', 'ï', 'ô', 'œ', 'ë'] };
+    fr: ['é', 'è', 'ê', 'à', 'â', 'ç', 'ù', 'û', 'î', 'ï', 'ô', 'œ', 'ë'],
+    tr: ['ç', 'ğ', 'ı', 'ö', 'ş', 'ü', 'İ', 'â'] };
   function accentBar(target) {
     const chars = ACCENTS[S.course.target] || [];
     if (!chars.length) return h('div', { class: 'accent-bar', hidden: true });
@@ -1243,7 +1253,7 @@
       if (r.ok && r.hinted) fb.append(h('div', { class: 'small' }, '💡 Goed, met ' + (r.hinted === 1 ? 'een hint' : r.hinted + ' hints') + ' — je krijgt hem straks nog een keer.'));
       if (r.matchMistakes) fb.append(h('div', null, r.matchMistakes + (r.matchMistakes === 1 ? ' fout' : ' fouten') + ' — die woorden komen terug in je herhaling.'));
       if (r.speakScore != null) fb.append(h('div', null, 'Uitspraakscore: ' + r.speakScore + '%'));
-      if (r.ok && r.warn === 'accent') fb.append(h('div', null, '✍️ Let op de accenten: ', h('b', { lang: 'es' }, r.expected)));
+      if (r.ok && r.warn === 'accent') fb.append(h('div', null, (S.course.target === 'tr' && S.course.ui === 'nl' ? '✍️ Let op de Turkse letters (ç, ğ, ı, ö, ş, ü): ' : '✍️ Let op de accenten: '), h('b', { lang: 'es' }, r.expected)));
       if (r.ok && r.warn === 'enye') fb.append(h('div', null, '✍️ Let op de ñ: ', h('b', { lang: 'es' }, r.expected)));
       if (r.ok && r.warn === 'typo') fb.append(h('div', null, '🔤 Kleine typfout — precies: ', h('b', { lang: 'es' }, r.expected)));
       if (r.ok && r.warn === 'article') fb.append(h('div', null, '📌 Vergeet het lidwoord niet: ', h('b', { lang: 'es' }, r.expected)));
