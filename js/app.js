@@ -642,6 +642,8 @@
       h('div', null, h('h1', null, greeting()), h('p', { class: 'muted' }, min >= goal ? '🎯 Dagdoel gehaald! Alles wat je nu nog doet, is extra.' : `Vandaag: ${min} van ${goal} minuten.`),
         h('div', { class: 'chips' }, h('span', { class: 'chip' }, '🔥 ' + U.plural(Store.liveStreak(), 'dag', 'dagen')), h('span', { class: 'chip' }, '📈 ' + P.estimate().label))),
       ring(min / goal, min + "'", 'van ' + goal + "'")));
+    // sfeerstrook van de doeltaal (js/look.js), bv. de daken van Parijs
+    const decor = S.Look && S.Look.decor(); if (decor) wrap.append(decor);
     // het dagplan: drie taken, elk met een duidelijke 'klaar'-staat, en een beloning als alles af is
     const ds = S.Dagplan.status(d, { due });
     if (ds.tasks.review.free && !d.done.review0) d.done.review0 = true;

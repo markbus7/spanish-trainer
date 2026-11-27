@@ -19,6 +19,8 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   function svg(size, opt) {
     opt = opt || {};
     const id = 'lp' + (++uid), u = k => `url(#${id}${k})`;
+    // kleding per doeltaal (js/look.js); zonder eigen look draagt Lupe haar Mexicaanse huipil en goudsbloem
+    const LK = (S.Look && S.Look.get() || {}).lupe || {};
     const fronds = side => {
       const x = side < 0 ? 25 : 95;
       return [-38, -78, -118].map((a, i) => {
@@ -52,7 +54,7 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     const lace = Array.from({ length: 11 }, (_, i) => { const [x, y] = qb([29.5, 141], [60, 151], [90.5, 141], i / 10); return `<circle cx="${x}" cy="${y}" r="2.7"/>`; }).join('');
     const laceDots = Array.from({ length: 11 }, (_, i) => { const [x, y] = qb([29.5, 142.6], [60, 152.6], [90.5, 142.6], i / 10); return `<circle cx="${x}" cy="${y}" r=".7"/>`; }).join('');
     const sleeve = (x, flip) => `<g transform="translate(${x} 100) scale(${flip} 1)"><path d="M-6.5 3.5C-8 -2-4.5-6 .5-6S8-2 6.5 3.5C3.5 6-3.5 6-6.5 3.5Z" fill="#3a78d6"/><path d="M-6.3 3.4C-3.3 5.8 3.3 5.8 6.3 3.4" fill="none" stroke="#fff4e6" stroke-width="1.6" stroke-linecap="round"/><path d="M-6.3 3.4C-3.3 5.8 3.3 5.8 6.3 3.4" fill="none" stroke="#f0789f" stroke-width=".9" stroke-dasharray="1 1.6" stroke-linecap="round" transform="translate(0 1.6)"/><path d="M-3-3.5Q0-4.8 3-3.5" stroke="#fff" stroke-width=".9" opacity=".35" fill="none" stroke-linecap="round"/></g>`;
-    const dress = full ? `
+    const dress = full && LK.dress ? LK.dress(id) : full ? `
   <g class="lupe-dress">
     <g fill="#ffeef4" stroke="#e98bb0" stroke-width=".7">${lace}</g><g fill="#f0789f">${laceDots}</g>
     <path d="M41 93C35 108 31 124 29 141Q60 151 91 141C89 124 85 108 79 93Z" fill="${u('h')}"/>
@@ -90,17 +92,17 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   </defs>
   ${body}
   <g class="gills-l">${fronds(-1)}</g><g class="gills-r">${fronds(1)}</g>
-  ${opt.face || full ? '' : `<path d="M20 121C22 101 36 91 60 91S98 101 100 121Z" fill="${u('h')}"/>
+  ${opt.face || full ? '' : LK.bust ? LK.bust(id) : `<path d="M20 121C22 101 36 91 60 91S98 101 100 121Z" fill="${u('h')}"/>
   <path d="M31 95.5Q60 113 89 95.5" fill="none" stroke="#fff4e6" stroke-width="3.6" stroke-linecap="round"/>
   <path d="M30 103Q60 120 90 103" fill="none" stroke="#f2b134" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/>
   <g><circle cx="42" cy="113" r="3.1" fill="#f0789f"/><circle cx="60" cy="116" r="3.1" fill="#f2b134"/><circle cx="78" cy="113" r="3.1" fill="#f0789f"/><circle cx="42" cy="113" r="1.1" fill="#fff4e6"/><circle cx="60" cy="116" r="1.1" fill="#fff4e6"/><circle cx="78" cy="113" r="1.1" fill="#fff4e6"/></g>`}
   <path d="M60 34C88 34 105 47 105 66C105 87 87 99 60 99C33 99 15 87 15 66C15 47 32 34 60 34Z" fill="${u('s')}"/>
   <ellipse cx="43" cy="45" rx="11" ry="5" transform="rotate(-22 43 45)" fill="#fff" opacity=".4"/>
   <g fill="#e483aa" opacity=".55"><circle cx="58" cy="39" r="1.9"/><circle cx="66" cy="41.5" r="1.4"/><circle cx="51" cy="42.5" r="1.3"/><circle cx="31" cy="58" r="1.5"/><circle cx="91" cy="60" r="1.5"/></g>
-  <g class="lupe-flower" transform="translate(85 38)">
+  ${LK.hat ? LK.hat(id) : `<g class="lupe-flower" transform="translate(85 38)">
     <ellipse cx="-8" cy="6" rx="5" ry="2.4" transform="rotate(35 -8 6)" fill="#3a9d5d"/><ellipse cx="6" cy="8.5" rx="4.4" ry="2.1" transform="rotate(-30 6 8.5)" fill="#2f8a50"/>
     ${petals}<circle r="5" fill="#f7b733"/><circle r="2.3" fill="#e2603a"/>
-  </g>
+  </g>`}
   <g class="lupe-eyes">
     <ellipse cx="42" cy="64" rx="7.4" ry="7.8" fill="#2a1a22"/><ellipse cx="78" cy="64" rx="7.4" ry="7.8" fill="#2a1a22"/>
     <ellipse cx="42" cy="67.2" rx="4.6" ry="3" fill="#5a2c42" opacity=".7"/><ellipse cx="78" cy="67.2" rx="4.6" ry="3" fill="#5a2c42" opacity=".7"/>
