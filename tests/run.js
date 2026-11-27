@@ -984,7 +984,24 @@ await micTests();
     ok(hd.some(x => x.id === 'x|a1-04|5' && x.unit === 'a1-04' && x.f === 4 && x.a), 'oefenfouten: vaak fout uit de herhaling, met antwoord');
     ok(Mi.asText(Mi.report(30)).includes('[x|a1-04|5]'), 'oefenfouten: vaak fout staat in de tekst');
     ok(Mi.asText(Mi.report(30)).includes('✔ al verwerkt in v') && Mi.asText(Mi.report(30)).includes('Al verwerkt in eerdere updates'), 'verwerkt: Lupe ziet wat al in de app zit');
-    ok((S.reworked || []).every(x => (x.tag ? S.C.TAGS[x.tag] && S.C.get(x.unit) : x.ids.every(id => S.C.word(S.C.get(id.split('|')[1]), +id.split('|')[2]))) && /^\d{4}-\d\d-\d\d(T\d\d:\d\d:\d\dZ)?$/.test(x.date)), 'verwerkt: tags, units en woorden bestaan');
+    ok((S.reworked || []).every(x => (x.tag ? S.C.TAGS[x.tag] && S.C.get(x.unit) : x.ids.every(id => { const [k, a, b] = id.split('|'); return k === 'c' ? !!S.conj.table(a, b) : k === 'x' ? !!(S.C.get(a) && S.C.get(a).ex[+b]) : !!(S.C.get(a) && S.C.word(S.C.get(a), +b)); })) && /^\d{4}-\d\d-\d\d(T\d\d:\d\d:\d\dZ)?$/.test(x.date)), 'verwerkt: tags, units en woorden bestaan');
+    { // Lupe 27 nov, negende ronde: gerichte tip bij een bekende fout + nieuwe antwoorden
+      const u4b = S.C.get('a1-04'), T = S.Gen.tipFor, f = (s) => u4b.ex.find(e => (e.s === s || e.nl === s) && (e.fb || !/centro de la ciudad|Salvador/.test(s)));
+      const est = f('Nosotros ___ en el centro de la ciudad.'), sal = f('Wij reizen naar El Salvador.'), izq = f('Ga links af. (u)');
+      ok(est && /ser/.test(T('somos', est.fb)) && /est-/.test(T('esas', est.fb)) && T('estamos', est.fb) && !T('', est.fb), 'gerichte tip: ser in plaats van estar');
+      ok(/ser/.test(T('Nosotros somos en el centro.', est.fb)), 'gerichte tip: ook bij een meerkeuzezin');
+      ok(sal && sal.uitz && /Uitzondering/.test(T('Viajamos al Salvador', sal.fb)) && /plak/.test(T('Es el carro de el señor Pérez', sal.fb)) && /del señor/.test(T('Es el carro de señor Perez', sal.fb)), 'gerichte tip: al/del en de uitzondering El Salvador');
+      ok(izq && /a la/.test(T('gira izquerda', izq.fb)) && /qui/.test(T('Gire a la izquerda', izq.fb)) && /gire/.test(T('Gira a la izquierda', izq.fb)), 'gerichte tip: a la izquierda');
+      const nx = S.Gen.normEx(est, u4b, u4b.ex.indexOf(est));
+      ok(nx.fb === est.fb && !S.Gen.checkType('somos', nx).ok && S.Gen.checkType('estamos', nx).ok, 'gerichte tip: komt mee in de oefening');
+      const bus = f('Waar is het busstation?');
+      ok(C('donde esta la parada de bus', bus.a, { strict: false }).ok && C('¿Dónde está la parada de autobús?', bus.a).ok, 'busstation: parada de bus/autobús telt, ook zonder accenten');
+      ok(C('donde esta mi telefono', f('Waar is mijn telefoon?').a, { strict: false }).ok, 'telefoon: teléfono telt, ook zonder accent');
+      const post = S.Gen.wordItem(S.C.word(u4b, 35), 'type', u4b);
+      ok(S.Gen.checkType('el correo', post).ok && S.Gen.checkType('la oficina de correos', post).ok, 'postkantoor: el correo telt ook goed');
+      ok(u4b.ex.filter(e => e.t === 'match').length >= 2 && (S.Gloss.lookup('está') || {}).t === 'estar', 'koppeloefening estar verandert de tikvertaling niet');
+      ok(u4b.grammar.some(g => /eSTAr/.test(g.t) && /Uitzondering/.test(g.html)) && u4b.grammar.some(g => /twee vragen/.test(g.t) && /Uitzondering/.test(g.html) && /Reden/.test(g.html)), 'andere aanpak: ezelsbruggetje en stappenplan, uitzondering met reden');
+    }
     const md = S.md ? S.md('- **Titel** (uitleg erbij)\n  Waar: a1-04\n  Wat: iets\n- Tweede') : '';
     ok(!S.md || (md.match(/<li>/g) || []).length === 2 && md.includes('Waar: a1-04'), 'voorstellen: ingesprongen regels horen bij hetzelfde punt');
   }

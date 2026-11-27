@@ -1291,6 +1291,9 @@
           fb.append(h('div', { class: 'small fb-wrong' }, 'Per woord: ', wordDiff(r.parts), h('span', { class: 'muted' }, ' (groen goed' + (r.parts.st.includes('accent') ? ' · geel: let op het accent' : '') + ' · rood fout)')));
           if (r.keepLater && !r.tilesLater) fb.append(h('div', { class: 'small fb-wrong' }, '🔁 Straks staan de groene woorden er al en vul je alleen de rode opnieuw in.'));
         }
+        // 🎯 gerichte tip bij precies deze fout (fb in de lesstof)
+        const tip = it.fb && r.user && S.Gen.tipFor ? S.Gen.tipFor(r.user, it.fb) : '';
+        if (tip) fb.append(h('div', { class: 'fb-incomplete fb-tip', html: '🎯 ' + tip }));
         if (r.warn === 'incomplete' && r.hint) fb.append(h('div', { class: 'fb-incomplete' }, '🧩 Bijna! Je mist een stukje: «', h('b', { lang: 'es' }, r.hint), '». Leer de hele uitdrukking.'));
         if (r.warn === 'article-wrong') {
           const noun = r.expected.replace(S.Gen.ART, '');

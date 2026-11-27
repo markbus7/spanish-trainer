@@ -6,6 +6,35 @@
   'use strict';
   if (S.isCourse && !S.isCourse('es-nl')) return; // lesstof van de cursus Spaans (uitleg in het Nederlands)
   const X = S.extendUnit;
+  /* 🎯 Gerichte tips bij een bekende fout (fb, zie S.Gen.tipFor): has = woorden die in het foute antwoord staan
+     (zonder accenten), not = woorden die er dan níet in mogen staan. De eerste regel die past, wordt getoond. */
+  const SER_FB = [
+    { has: ['somos', 'soy', 'eres', 'es', 'son'], tip: 'Dat is een vorm van <b>ser</b> (wie of wat je bent). Bij een <b>plek</b> hoort <b>estar</b>, en elke vorm daarvan begint met <b>est-</b>: estoy, estás, está, estamos, están.' },
+    { has: ['esas', 'esa', 'esos', 'eso', 'ese'], tip: 'Bijna! Estar begint altijd met <b>est-</b> (met een t): estás, está, están. «Esa / esas» betekent «die».' },
+    { has: 'esto', tip: '⚠️ Uitzondering: bij yo is het <b>estoy</b>, niet esto. Korte werkwoorden krijgen bij yo -oy (soy, voy, doy, estoy).' },
+    { has: ['estoy', 'estas', 'esta', 'estamos', 'estan'], tip: 'Het goede werkwoord, maar de verkeerde persoon. Kijk wie het doet en zeg het rijtje op: estoy, estás, está · estamos, están.' }
+  ];
+  const AL_FB = [
+    { has: ['al salvador', 'del salvador'], tip: '⚠️ Uitzondering: <b>El</b> hoort bij de naam van het land. Een naam verander je niet: <b>a El Salvador</b>, <b>de El Salvador</b>.' },
+    { has: ['a el', 'de el'], not: ['a el salvador', 'de el salvador'], tip: 'A + el en de + el plak je altijd aan elkaar: <b>al</b> en <b>del</b>.' },
+    { has: ['voy del', 'voy de'], tip: '<b>Voy</b> is altijd heen (voy a). Terugkomen is <b>venir de</b>: <i>vengo del parque</i>.' },
+    { has: 'de señor', tip: 'Over iemand praten doe je met het lidwoord: <i>el señor Pérez</i>. Dus de + el = <b>del señor</b>.' },
+    { has: 'a', tip: 'Na <i>a</i> volgt hier het lidwoord <i>el</i>, en dan plak je: a + el = <b>al</b>.' },
+    { has: 'de', tip: 'Na <i>de</i> volgt hier het lidwoord <i>el</i>, en dan plak je: de + el = <b>del</b>.' }
+  ];
+  const CITY_FB = [
+    { has: ['cuidad', 'cuidades', 'cuidat', 'ciudat'], tip: 'Spelling: <b>ciudad</b>. Eerst c-i, dan de u (ciu-dad), en een d aan het eind.' },
+    { has: ['center', 'centrum', 'centre', 'sentro'], tip: 'In het Spaans is het <b>centro</b>: met een c en -o aan het eind.' },
+    { has: ['park', 'parke', 'parc', 'parqe'], tip: 'Spelling: <b>parque</b>, met <b>qu</b>.' },
+    { has: ['parrada', 'parade', 'pareda'], tip: 'Spelling: <b>parada</b>, met één r.' },
+    { has: ['esta un', 'esta una', 'es un', 'es una'], tip: '<i>Un / una</i> is onbepaald (iets nieuws) → <b>hay</b>: hay un parque, hay una parada.' },
+    { has: ['hay el', 'hay la'], tip: 'Na <i>hay</i> komt nooit el/la. Met <i>el / la</i> (iets bekends) zeg je waar het is met <b>está</b>.' }
+  ];
+  const IZQ = [
+    { has: ['izquierda', 'izquerda', 'isquierda', 'izqierda'], not: ['a la izquierda', 'a la izquerda', 'a la isquierda', 'a la izqierda'], tip: 'Links = <b>a la</b> izquierda. Leer het als één geheel, net als <i>a la derecha</i>.' },
+    { has: ['izquerda', 'isquierda', 'izqierda'], tip: 'Spelling: iz-<b>qui</b>-er-da → <b>izquierda</b>.' },
+    { has: ['gira', 'va', 've', 'vas'], tip: 'Tegen <i>u</i> (usted) zeg je <b>gire</b>. <i>Gira</i> zeg je tegen <i>jou</i> (tú).' }
+  ];
 
   /* ======================= A2 ======================= */
   X('a2-01', { ex: [
@@ -651,7 +680,7 @@
       { t: 'tr', nl: 'Er zijn twee winkels tegenover de kerk.', a: ['Hay dos tiendas enfrente de la iglesia.', 'Enfrente de la iglesia hay dos tiendas.'], x: 'Ook in het meervoud blijft het hay. La iglesia → de la (niet del).', tag: 'hay-estar' },
       { t: 'tr', nl: 'Waar zijn de taxi\'s?', a: ['¿Dónde están los taxis?'], x: 'Plaats = estar; los taxis is meervoud → están. Dónde krijgt een accent in een vraag.', tag: 'ser-estar' },
       { t: 'tr', nl: 'Waar is jouw huis?', a: ['¿Dónde está tu casa?'], x: 'Waar iets is = estar, nooit «¿dónde es?». Dónde met accent.', tag: 'ser-estar' },
-      { t: 'tr', nl: 'Waar is het busstation?', a: ['¿Dónde está la estación de autobuses?', '¿Dónde está la terminal de autobuses?', '¿Dónde está la estación de buses?', '¿Dónde está la terminal de buses?'], tag: 'ser-estar' },
+      { t: 'tr', nl: 'Waar is het busstation?', a: ['¿Dónde está la estación de autobuses?', '¿Dónde está la terminal de autobuses?', '¿Dónde está la estación de buses?', '¿Dónde está la terminal de buses?', '¿Dónde está la estación de autobús?', '¿Dónde está la terminal de autobús?', '¿Dónde está la parada de autobús?', '¿Dónde está la parada de bus?', '¿Dónde está la parada de autobuses?', '¿Dónde está la parada de buses?'], x: 'Het grote busstation is la estación (of la terminal) de autobuses. La parada is de halte op straat; dat telt hier ook goed.', tag: 'ser-estar' },
       { t: 'tr', nl: 'Waar is mijn telefoon?', a: ['¿Dónde está mi celular?', '¿Dónde está mi teléfono?'], x: 'In Latijns-Amerika zeg je meestal celular (in Spanje móvil).', tag: 'ser-estar' }
     ],
     say: [['Sí, hay uno enfrente de la plaza.', 'Ja, er is er een tegenover het plein.'], ['¿Dónde están los taxis?', 'Waar zijn de taxi\'s?']]
@@ -721,9 +750,109 @@
       { t: 'tr', nl: 'De bank is rechts.', a: ['El banco está a la derecha.'], x: 'Rechts = a la derecha, de hele uitdrukking.', tag: 'prepositions' },
       { t: 'tr', nl: 'De kat zit onder de tafel.', a: ['El gato está debajo de la mesa.'], tag: 'prepositions' },
       { t: 'tr', nl: 'Er is een winkel tegenover het hotel.', a: ['Hay una tienda enfrente del hotel.', 'Enfrente del hotel hay una tienda.'], tag: 'prepositions' },
-      { t: 'tr', nl: 'Ga links af. (u)', a: ['Gire a la izquierda.', 'Doble a la izquierda.', 'Voltee a la izquierda.'], x: 'Links = a la izquierda. Voltee hoor je vooral in Mexico.', tag: 'prepositions' },
+      { t: 'tr', nl: 'Ga links af. (u)', a: ['Gire a la izquierda.', 'Doble a la izquierda.', 'Voltee a la izquierda.'], x: 'Links = a la izquierda. Voltee hoor je vooral in Mexico.', fb: IZQ, tag: 'prepositions' },
       { t: 'tr', nl: 'De hond ligt onder de auto.', a: ['El perro está debajo del carro.', 'El perro está debajo del auto.'], x: 'Debajo de + el carro → debajo del carro. In Latijns-Amerika: el carro (of el auto).', tag: 'prepositions' }
     ],
     say: [['La panadería está al lado del banco.', 'De bakkerij is naast de bank.'], ['El banco está a la derecha.', 'De bank is rechts.'], ['El perro está debajo del carro.', 'De hond ligt onder de auto.']]
+  });
+
+  /* ---------- Lupe-rapport 27 nov, negende ronde: een ándere aanpak bij estar en al/del ----------
+     Mark (27 nov): wat steeds fout blijft gaan, niet met nóg meer van hetzelfde oefenen. Daarom hier:
+     ezelsbruggetje + ritme, koppelen (match), foutenjacht met zijn eigen fouten, een stappenplan in twee vragen
+     en een gerichte tip bij precies de fout die hij maakt (fb, zie S.Gen.tipFor). */
+  S.reworked = S.reworked.concat([
+    { tag: 'conj', unit: 'a1-04', v: '1.88.0', date: '2026-11-27T21:35:00Z', what: 'ANDERE AANPAK estar: ezelsbruggetje (eSTAr = waar iets STAat, alle vormen beginnen met est-), vormen koppelen, foutenjacht, hardop in ritme, 6 typoefeningen alleen estar met gerichte tip bij somos/eres/esas' },
+    { ids: ['c|estar|pres'], v: '1.88.0', date: '2026-11-27T21:35:00Z', what: 'estar apart geoefend (zie [conj] a1-04), tip bij verwisseling met ser' },
+    { tag: 'contractions', unit: 'a1-04', v: '1.88.0', date: '2026-11-27T21:35:00Z', what: 'ANDERE AANPAK al/del: stappenplan in twee vragen (heen = a / vandaan = de; volgt het lidwoord el?), kiezen uit a/al/de/del, koppelen, paar ir a ↔ venir de, uitzondering a El Salvador met reden, gerichte tip bij «a el», «al Salvador», «voy del»' },
+    { ids: ['x|a1-04|14', 'x|a1-04|28', 'x|a1-04|45', 'x|a1-04|81'], v: '1.88.0', date: '2026-11-27T21:35:00Z', what: 'zelfde stof in nieuwe oefenvormen (kiezen a/al/de/del, koppelen, ir a ↔ venir de)' },
+    { tag: 'hay-estar', unit: 'a1-04', v: '1.88.0', date: '2026-11-27T21:35:00Z', what: 'vertaal- en dicteezinnen met ciudad, centro, parque, parada (hay en está samen), speltip bij «cuidad» en «center»' },
+    { ids: ['x|a1-04|18', 'x|a1-04|10', 'x|a1-04|40', 'x|a1-04|48'], v: '1.88.0', date: '2026-11-27T21:35:00Z', what: 'spelling kernwoorden (ciudad, centro, parada) in typ- en dicteezinnen' },
+    { tag: 'ser-estar', unit: 'a1-04', v: '1.88.0', date: '2026-11-27T21:35:00Z', what: '«parada de bus/autobús» telt goed bij het busstation; accenten tellen niet als fout maar worden wel getoond; tip «a la izquierda» en spelling izquierda' },
+    { ids: ['x|a1-04|107', 'x|a1-04|108', 'x|a1-04|134'], v: '1.88.0', date: '2026-11-27T21:35:00Z', what: 'parada de bus/autobús en teléfono/celular goed; gerichte tip bij «izquierda» zonder «a la» en bij «izquerda»' },
+    { ids: ['w|a1-04|35', 'w|a1-01|24'], v: '1.88.0', date: '2026-11-27T21:35:00Z', what: '«el correo» telt goed bij het postkantoor (met tip); zinnen en speloefeningen voor perdón, Medellín, el pie ↔ la piel' }
+  ]);
+  X('a1-04', {
+    grammar: [
+      { t: 'Ezelsbruggetje: eSTAr = waar iets STAat', es: 'Estoy, estás, está, estamos, están',
+        html: `<p>Ser en estar betekenen allebei «zijn». Stel jezelf één vraag: gaat het over <b>waar</b> iemand of iets is? Dan is het altijd <b>estar</b>.</p>
+<p>🧠 <b>Ezelsbruggetje:</b> in e<b>STA</b>r zit het Nederlandse <b>sta</b>an. <i>De bank <b>staat</b> naast het park</i> → <i>El banco <b>está</b> al lado del parque.</i></p>
+<p>👀 <b>Controle in één oogopslag:</b> alle vormen van estar beginnen met <b>est-</b>. Geen enkele vorm van ser doet dat (<i>soy, eres, es, somos, son</i>). Typ je bij een plek <s>somos</s> of <s>eres</s>, dan weet je meteen dat het niet kan: <i>est</i>amos, <i>est</i>ás.</p>
+<p>🥁 <b>Zeg het hardop, op ritme:</b> <i>estoy, estás, está · estamos, están</i>. De klemtoon valt steeds op het laatste stuk, daarom krijgen <i>estás, está</i> en <i>están</i> een accent.</p>
+<p>⚠️ <b>Uitzondering:</b> bij <i>yo</i> is het <b>estoy</b> en niet <s>esto</s>. Reden: een paar heel korte werkwoorden krijgen bij <i>yo</i> <b>-oy</b> (<i>soy, voy, doy, estoy</i>). En let op: <i>esta</i> zonder accent is een ander woord (<i>esta casa</i> = dit huis).</p>`,
+        table: [['wie', 'estar (waar?)', 'ser (wie / wat?)'], ['yo', 'estoy', 'soy'], ['tú', 'estás', 'eres'], ['él / ella / usted', 'está', 'es'], ['nosotros', 'estamos', 'somos'], ['ustedes / ellos', 'están', 'son']],
+        ex: [['Soy de Holanda, pero ahora estoy en México.', 'Ik kom uit Nederland, maar nu ben ik in Mexico.'], ['Nosotros estamos en el centro.', 'Wij zijn in het centrum.']],
+        sum: '¿Dónde? → estar: estoy, estás, está, estamos, están.' },
+      { t: 'al of del in twee vragen', es: '¿A, al, de o del?',
+        html: `<p>Twijfel je? Stel jezelf steeds dezelfde <b>twee vragen</b>, in deze volgorde:</p>
+<p><b>1. Heen of vandaan?</b> Ergens <b>heen</b> = <b>a</b> (<i>voy a…</i>). Ergens <b>vandaan</b> of <b>van iemand</b> = <b>de</b> (<i>vengo de…, la casa de…</i>).</p>
+<p><b>2. Staat er daarna het lidwoordje <i>el</i>?</b> Ja → plakken: <b>al</b> / <b>del</b>. Nee (<i>la, los, las</i> of geen lidwoord) → niets plakken.</p>
+<p>🔁 <b>Onthoud ze als paar:</b> <i>ir <b>a</b></i> (heen) en <i>venir <b>de</b></i> (terug): <i>Voy <b>al</b> museo y vengo <b>del</b> parque.</i> Niet <s>voy del parque</s>: voy is altijd heen.</p>
+<p>⚠️ <b>Uitzondering:</b> hoort <i>El</i> met een <b>hoofdletter</b> bij een <b>naam</b>, dan plak je niet: <i>Viajamos <b>a El</b> Salvador</i>, <i>vengo <b>de El</b> Salvador</i>. Reden: <i>El</i> is daar geen lidwoord maar een stukje van de naam, en een naam verander je niet.</p>`,
+        table: [['wat volgt er?', 'heen (a)', 'vandaan / van (de)'], ['el banco', 'al banco', 'del banco'], ['la escuela', 'a la escuela', 'de la escuela'], ['los parques', 'a los parques', 'de los parques'], ['⚠️ El Salvador (naam)', 'a El Salvador', 'de El Salvador']],
+        sum: 'Primero: ¿a o de? Después: ¿sigue «el»? Entonces al / del.' }
+    ],
+    ex: [
+      // ---- estar: koppelen, foutenjacht en daarna pas typen ----
+      { t: 'match', p: [['estoy', 'yo'], ['estás', 'tú'], ['está', 'usted / él / ella'], ['estamos', 'nosotros'], ['están', 'ustedes / ellos']], nog: true, tag: 'conj' }, // nog: geen woordbetekenis voor de tikvertaling
+      { t: 'mc', q: 'Foutenjacht: welke zin is goed? «Wij zijn in het centrum.»', o: ['Nosotros estamos en el centro.', 'Nosotros somos en el centro.', 'Nosotros están en el centro.'], x: 'Waar je bent = estar, en alle vormen beginnen met est-: nosotros estamos.', fb: SER_FB, tag: 'conj' },
+      { t: 'mc', q: 'Foutenjacht: welke zin is goed? «Jij bent in het park.»', o: ['Tú estás en el parque.', 'Tú eres en el parque.', 'Tú esas en el parque.'], x: 'Tú → estás: est- + ás, met accent. «Esas» betekent «die» (esas casas).', fb: SER_FB, tag: 'conj' },
+      { t: 'mc', q: 'In «Ustedes son cerca del banco» zit een fout. Wat moet er staan in plaats van «son»?', o: ['están', 'es', 'somos'], x: 'Cerca del banco is een plek → estar. Ustedes → están.', tag: 'conj' },
+      { t: 'cloze', s: 'Soy de Holanda, pero ahora ___ en México.', a: ['estoy'], o: ['estoy', 'soy', 'es'], nl: 'Ik kom uit Nederland, maar nu ben ik in Mexico.', x: 'Waar je vandaan komt = ser (soy de). Waar je nu bent = estar (estoy en).', tag: 'conj' },
+      { t: 'cloze', s: 'Tú ___ en el parque.', h: 'estar', a: ['estás'], nl: 'Jij bent in het park.', fb: SER_FB, tag: 'conj' },
+      { t: 'cloze', s: 'Nosotros ___ en el centro de la ciudad.', h: 'estar', a: ['estamos'], nl: 'Wij zijn in het centrum van de stad.', fb: SER_FB, tag: 'conj' },
+      { t: 'cloze', s: 'Ustedes ___ cerca del banco.', h: 'estar', a: ['están'], nl: 'Jullie zijn dicht bij de bank.', x: 'Ustedes is in Latijns-Amerika «jullie» én «u» (meervoud): están.', fb: SER_FB, tag: 'conj' },
+      { t: 'cloze', s: 'Yo ___ en la casa de mi tío.', h: 'estar', a: ['estoy'], nl: 'Ik ben in het huis van mijn oom.', uitz: 'Bij yo is het <b>estoy</b>, niet <s>esto</s>. Reden: heel korte werkwoorden krijgen bij yo -oy (soy, voy, doy, estoy).', fb: SER_FB, tag: 'conj' },
+      { t: 'cloze', s: 'Usted ___ al lado de la farmacia.', h: 'estar', a: ['está'], nl: 'U staat naast de apotheek.', x: 'Usted krijgt de vorm van él/ella: está, met accent.', fb: SER_FB, tag: 'conj' },
+      { t: 'cloze', s: 'Mis padres ___ en casa.', h: 'estar', a: ['están'], nl: 'Mijn ouders zijn thuis.', fb: SER_FB, tag: 'conj' },
+      { t: 'order', s: 'Nosotros estamos en el centro.', nl: 'Wij zijn in het centrum.', tag: 'conj' },
+      // ---- al / del: koppelen, kiezen uit vier, ir a ↔ venir de ----
+      { t: 'match', p: [['al', 'a + el'], ['del', 'de + el'], ['a la', 'a + la'], ['de los', 'de + los'], ['a El Salvador', 'a + El Salvador (naam)']], nog: true, tag: 'contractions' },
+      { t: 'cloze', s: 'Vamos ___ banco.', a: ['al'], o: ['al', 'a', 'de', 'del'], nl: 'Wij gaan naar de bank.', x: 'Heen → a. Daarna el banco → plakken: al.', tag: 'contractions' },
+      { t: 'cloze', s: 'Vengo ___ mercado.', a: ['del'], o: ['del', 'de', 'a', 'al'], nl: 'Ik kom van de markt.', x: 'Vandaan → de. Daarna el mercado → plakken: del.', tag: 'contractions' },
+      { t: 'cloze', s: 'Es el carro ___ señor Pérez.', a: ['del'], o: ['del', 'de', 'a', 'al'], nl: 'Het is de auto van meneer Pérez.', x: 'Van iemand → de. Je zegt el señor Pérez, dus de + el = del.', tag: 'contractions' },
+      { t: 'cloze', s: 'Vengo ___ la escuela.', a: ['de'], o: ['de', 'del', 'a', 'al'], nl: 'Ik kom van school.', x: 'Vandaan → de. Daarna la (niet el) → niets plakken: de la escuela.', tag: 'contractions' },
+      { t: 'cloze', s: 'Voy ___ la farmacia.', a: ['a'], o: ['a', 'al', 'de', 'del'], nl: 'Ik ga naar de apotheek.', x: 'Heen → a. Daarna la → niets plakken: a la farmacia.', tag: 'contractions' },
+      { t: 'cloze', s: 'Viajamos ___ El Salvador.', a: ['a'], o: ['a', 'al', 'de', 'del'], nl: 'Wij reizen naar El Salvador.', uitz: 'Geen <i>al</i>: <b>El</b> (hoofdletter) hoort bij de naam van het land. Een naam verander je niet, dus <i>a El Salvador</i>.', tag: 'contractions' },
+      { t: 'cloze', s: 'Mi amiga es ___ El Salvador.', a: ['de'], o: ['de', 'del', 'a', 'al'], nl: 'Mijn vriendin komt uit El Salvador.', uitz: 'Geen <i>del</i>: <b>El</b> hoort bij de naam van het land, dus <i>de El Salvador</i>.', tag: 'contractions' },
+      { t: 'mc', q: 'Foutenjacht: welke zin is goed? «Ik ga naar het museum en kom van het park.»', o: ['Voy al museo y vengo del parque.', 'Voy al museo y voy del parque.', 'Voy a el museo y vengo de el parque.'], x: 'Heen = ir a (voy al), terug = venir de (vengo del). En a + el / de + el plak je altijd.', tag: 'contractions' },
+      { t: 'cloze', s: 'Voy al mercado y ___ del mercado.', h: 'venir, yo', a: ['vengo'], nl: 'Ik ga naar de markt en kom van de markt.', x: 'Ir a (heen) ↔ venir de (terug): voy al…, vengo del…', fb: [{ has: 'voy', tip: '<b>Voy</b> = ik ga (heen, met <i>a</i>). Ergens vandaan komen is <b>venir de</b>: <i>vengo del mercado</i>.' }, { has: ['veno', 'viengo', 'vino'], tip: 'Venir is bij yo onregelmatig: <b>vengo</b> (met een g, net als tengo).' }], tag: 'contractions' },
+      { t: 'cloze', s: 'Voy ___ museo y vengo del parque.', h: 'naar het', a: ['al'], nl: 'Ik ga naar het museum en kom van het park.', fb: AL_FB, tag: 'contractions' },
+      { t: 'cloze', s: 'Voy al museo y vengo ___ parque.', h: 'van het', a: ['del'], nl: 'Ik ga naar het museum en kom van het park.', fb: AL_FB, tag: 'contractions' },
+      { t: 'tr', nl: 'Wij reizen naar El Salvador.', a: ['Viajamos a El Salvador.'], uitz: 'Geen <i>al</i>: <b>El</b> hoort bij de naam van het land, dus <i>a El Salvador</i>.', fb: AL_FB, tag: 'contractions' },
+      { t: 'tr', nl: 'Het is de auto van meneer Pérez.', a: ['Es el carro del señor Pérez.', 'Es el auto del señor Pérez.'], x: 'De + el señor = del señor. In Latijns-Amerika: el carro (of el auto).', fb: AL_FB, tag: 'contractions' },
+      { t: 'order', s: 'Voy al museo y vengo del parque.', nl: 'Ik ga naar het museum en kom van het park.', tag: 'contractions' },
+      // ---- hay / está met de kernwoorden van de stad: regel en spelling tegelijk ----
+      { t: 'cloze', s: 'Vivo en una ___ grande.', h: 'stad', a: ['ciudad'], nl: 'Ik woon in een grote stad.', x: 'Ciudad: eerst c-i, dan u (ciu-dad).', fb: CITY_FB, tag: 'hay-estar' },
+      { t: 'cloze', s: 'El hotel está en el ___.', h: 'centrum', a: ['centro'], nl: 'Het hotel is in het centrum.', fb: CITY_FB, tag: 'hay-estar' },
+      { t: 'mc', q: '«Er is een bushalte, en de halte is dichtbij.»', o: ['Hay una parada y la parada está cerca.', 'Está una parada y la parada hay cerca.', 'Hay una parada y la parada es cerca.'], x: 'Una parada (nieuw, onbepaald) → hay. La parada (bekend) + waar → está.', tag: 'hay-estar' },
+      { t: 'tr', nl: 'In mijn stad is een groot park.', a: ['En mi ciudad hay un parque grande.', 'Hay un parque grande en mi ciudad.'], x: 'Un parque (onbepaald) → hay.', fb: CITY_FB, tag: 'hay-estar' },
+      { t: 'tr', nl: 'Het centrum is dichtbij.', a: ['El centro está cerca.', 'El centro queda cerca.'], x: 'El centro (bepaald) + waar → está.', fb: CITY_FB, tag: 'hay-estar' },
+      { t: 'tr', nl: 'Er is een bushalte op de hoek.', a: ['Hay una parada de autobús en la esquina.', 'Hay una parada de bus en la esquina.', 'Hay una parada en la esquina.', 'En la esquina hay una parada de autobús.', 'En la esquina hay una parada de bus.', 'En la esquina hay una parada.'], fb: CITY_FB, tag: 'hay-estar' },
+      { t: 'tr', nl: 'Is er een bank in het centrum?', a: ['¿Hay un banco en el centro?'], fb: CITY_FB, tag: 'hay-estar' },
+      { t: 'tr', nl: 'De bushalte is tegenover het park.', a: ['La parada está enfrente del parque.', 'La parada de autobús está enfrente del parque.', 'La parada de bus está enfrente del parque.', 'La parada está frente al parque.', 'La parada de autobús está frente al parque.', 'La parada de bus está frente al parque.'], x: 'La parada (bepaald) → está. Enfrente de + el parque → enfrente del parque.', fb: CITY_FB, tag: 'hay-estar' },
+      // ---- richtingen: a la izquierda ----
+      { t: 'cloze', s: 'Gire a la ___.', h: 'links', a: ['izquierda'], nl: 'Ga links af. (u)', x: 'Izquierda: i-z-q-u-i-e-r-d-a, met «qui» in het midden.', tag: 'prepositions' },
+      { t: 'tr', nl: 'De bushalte is links.', a: ['La parada está a la izquierda.', 'La parada de autobús está a la izquierda.', 'La parada de bus está a la izquierda.'], fb: IZQ, tag: 'prepositions' },
+      // ---- woorden: a pie ↔ la piel, el correo ----
+      { t: 'mc', q: '«Voy al centro a pie.» Hoe ga ik?', o: ['te voet', 'met de bus', 'met de auto'], x: 'El pie = de voet, a pie = te voet. Niet verwarren met la piel = de huid.', tag: 'vocab' },
+      { t: 'cloze', s: 'Me duele el ___.', h: 'voet', a: ['pie'], nl: 'Mijn voet doet pijn.', fb: [{ has: 'piel', tip: '<b>La piel</b> = de huid. De voet is <b>el pie</b>, zonder l.' }], tag: 'vocab' },
+      { t: 'cloze', s: 'La ___ es suave.', h: 'huid', a: ['piel'], nl: 'De huid is zacht.', fb: [{ has: 'pie', tip: '<b>El pie</b> = de voet. De huid is <b>la piel</b>, met een l erachter.' }], tag: 'vocab' },
+      { t: 'tr', nl: 'Waar is het postkantoor?', a: ['¿Dónde está la oficina de correos?', '¿Dónde está el correo?', '¿Dónde queda la oficina de correos?', '¿Dónde queda el correo?'], x: 'Voluit: la oficina de correos. Kort zeg je in Latijns-Amerika ook el correo.', tag: 'ser-estar' }
+    ],
+    // dictee (Práctica › Luisteren) en hardop zeggen: horen en spreken in plaats van alleen typen
+    say: [['Estoy, estás, está, estamos, están.', 'Ik ben, jij bent, hij is, wij zijn, zij zijn (estar).'], ['Nosotros estamos en el centro.', 'Wij zijn in het centrum.'],
+      ['Voy al museo y vengo del parque.', 'Ik ga naar het museum en kom van het park.'], ['Viajamos a El Salvador.', 'Wij reizen naar El Salvador.'],
+      ['En mi ciudad hay un parque grande.', 'In mijn stad is een groot park.'], ['El centro está cerca.', 'Het centrum is dichtbij.'],
+      ['Hay una parada de autobús en la esquina.', 'Er is een bushalte op de hoek.'], ['¿Hay un banco en el centro?', 'Is er een bank in het centrum?'],
+      ['La parada está enfrente del parque.', 'De bushalte is tegenover het park.'], ['Gire a la izquierda.', 'Ga links af. (u)']]
+  });
+  X('a1-01', {
+    ex: [
+      { t: 'mc', q: 'Hoe schrijf je «pardon»?', o: ['perdón', 'perdon', 'pérdon'], x: 'De klemtoon ligt op de laatste lettergreep (per-DÓN) en het woord eindigt op -n: dan komt er een accent op de o.', tag: 'vocab' },
+      { t: 'mc', q: 'Hoe schrijf je deze stad in Colombia?', o: ['Medellín', 'Medelín', 'Medellin'], x: 'Twee l\'en (ll klinkt als j: me-de-JIEN) en een accent op de í, want de klemtoon ligt achteraan en het woord eindigt op -n.', tag: 'vocab' },
+      { t: 'cloze', s: 'Vivo en ___, Colombia.', h: 'stad met ll en í', a: ['Medellín'], nl: 'Ik woon in Medellín, Colombia.', fb: [{ has: ['medelin'], tip: 'Medellín heeft een <b>dubbele l</b> en een accent op de <b>í</b>.' }], tag: 'vocab' },
+      { t: 'tr', nl: 'Pardon, waar is de wc?', a: ['Perdón, ¿dónde está el baño?', 'Disculpe, ¿dónde está el baño?', 'Perdone, ¿dónde está el baño?', 'Disculpa, ¿dónde está el baño?'], x: 'Perdón met accent op de o, dónde en está ook met accent.', tag: 'vocab' }
+    ],
+    say: [['Vivo en Medellín.', 'Ik woon in Medellín.'], ['Perdón, ¿dónde está el baño?', 'Pardon, waar is de wc?']]
   });
 })(window.SPT);
