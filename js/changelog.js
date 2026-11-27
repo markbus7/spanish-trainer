@@ -4,9 +4,12 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
-  { v: '1.77.0', date: '2026-11-27',
+  { v: '1.78.0', date: '2026-11-27',
     nl: ['Elke taal heeft nu een eigen docent die bij het land past. Engels: Ms. Ruby, een wasbeer uit New York. Duits: Frau Bärbel, een bruine beer uit Berlijn. Frans: Madame Colette, een poedel uit Parijs. Turks: Pamuk Öğretmen, een Van-kat met één blauw en één amberkleurig oog. Nederlands: Juf Saar, een koe uit Friesland. Ze staan overal waar eerst Lupe stond (startpagina, feedback, «Vraag het …», rollenspel, rapport en voorstellen), en ook de AI-docent heeft hun naam en karakter. In de Spaanse cursus blijft Profe Lupe precies zoals ze is.'],
     es: ['Cada idioma tiene ahora su propia profe: Ms. Ruby (una mapache de Nueva York) para inglés y Juf Saar (una vaca de Frisia) para neerlandés; también alemán, francés y turco tienen la suya. La profe con IA lleva su nombre y su carácter. En el curso de español sigue Profe Lupe.'] },
+  { v: '1.77.0', date: '2026-11-27',
+    nl: ['Turks: niveau B1 is er, met 10 nieuwe units: van horen zeggen (-miş), bijzinnen (-en, -diği), als en zou (-se, keşke), de lijdende vorm, laten doen, solliciteren en het nieuws.', 'Turks: de niveautest gaat nu tot B1 en Lupe heeft 6 nieuwe B1-gesprekken, zoals het sollicitatiegesprek en de kapper.'],
+    es: ['Turco: ya está el nivel B1, con 10 unidades nuevas: lo que se oye decir (-miş), oraciones de relativo (-en, -diği), condicional (-se, keşke), la voz pasiva, mandar hacer, la entrevista de trabajo y las noticias.', 'Turco: la prueba de nivel llega ahora hasta B1 y Lupe tiene 6 conversaciones B1 nuevas, como la entrevista de trabajo y la peluquería.'] },
   { v: '1.76.1', date: '2026-11-27',
     nl: ['Vlaggetjes zijn nu overal echte vlaggetjes, ook op een Windows-computer (Chrome of Edge), waar eerst letters als «NL», «US» en «FR» stonden. De cursuskeuze bij Instellingen is een eigen lijst geworden, met de vlaggen erin en een label «nieuw» bij cursussen die je nog niet volgt.'],
     es: ['Las banderas ahora se ven como banderas de verdad también en Windows (Chrome o Edge), donde antes salían letras como «NL» o «US». La lista de cursos en Ajustes muestra las banderas y la etiqueta «nuevo».'] },
