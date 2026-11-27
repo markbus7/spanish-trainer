@@ -270,6 +270,86 @@ verliezen verloor/verloren verloren perder`.split('\n').map(l => { const m = l.s
       html: 'Normalmente una vocal corta sigue corta en el plural (<i>bal → ballen</i>). <b>Excepción:</b> <i>dag → <b>dagen</b>, weg → <b>wegen</b>, glas → <b>glazen</b></i> tienen vocal <b>larga</b>, y <i>stad → <b>steden</b>, schip → <b>schepen</b></i> cambian de vocal. Hay que aprenderlas de memoria.' }
   ];
 
+  /* ---------- Frans (uitleg in het Nederlands) ----------
+     Let op: de tekst wordt eerst in woorden geknipt (apostrof en streepje = spatie): «l'eau» → «l eau», «soixante-dix» → «soixante dix». */
+  const FR_VOY = '(?:amie|école|eau|idée|adresse|histoire|université|entreprise|équipe|année|heure|émission|expérience|opinion|habitude|erreur|orange|église|armoire|invitation|addition|enfance|assiette|aventure|activité|épaule|oreille|origine|usine|île)';
+  const FR_AVOIR = '(?:ai|as|a|avons|avez|ont|avais|avait|avions|aviez|avaient|aurai|aura|aurais|aurait)';
+  const FR_ETRE = '(?:suis|es|est|sommes|êtes|sont|étais|était|étions|étiez|étaient|serai|sera|serais|serait)';
+  const FR = [
+    { p: '(?:mon|ton|son) ' + FR_VOY,
+      t: 'mon amie: mon vóór een vrouwelijk woord met klinker',
+      html: 'Normaal is het <i>ma, ta, sa</i> bij een vrouwelijk woord. <b>Uitzondering:</b> begint dat woord met een <b>klinker of stomme h</b>, dan gebruik je <b>mon, ton, son</b>: <i>mon amie, ton école, son idée</i>. <b>Waarom?</b> <s>Ma amie</s> laat twee klinkers botsen; met <i>mon</i> loopt het soepel («mon-namie»).' },
+    { p: 'cet \\p{L}+',
+      t: 'cet hôtel: ce wordt cet',
+      html: 'Normaal is het <i>ce</i> bij een mannelijk woord. <b>Uitzondering:</b> vóór een <b>klinker of stomme h</b> wordt het <b>cet</b>: <i>cet hôtel, cet ami, cet été</i>. <b>Waarom?</b> Zo botsen er geen twee klinkers. Je spreekt het uit als <i>cette</i>.' },
+    { p: '(?:bel|nouvel|vieil) \\p{L}+',
+      t: 'un bel hôtel: beau, nouveau, vieux vóór een klinker',
+      html: '<b>Uitzondering:</b> <i>beau, nouveau</i> en <i>vieux</i> worden <b>bel, nouvel, vieil</b> vóór een mannelijk woord dat met een <b>klinker of stomme h</b> begint: <i>un bel hôtel, un nouvel ami, un vieil homme</i>. <b>Waarom?</b> <s>Un beau hôtel</s> laat twee klinkers botsen.' },
+    { p: 'au printemps',
+      t: 'au printemps (maar: en été)',
+      html: 'Bij seizoenen is het normaal <i>en</i>: <i>en été, en automne, en hiver</i>. <b>Uitzondering:</b> <b>au printemps</b>. <b>Waarom?</b> <i>Été, automne</i> en <i>hiver</i> beginnen met een klinkerklank; <i>printemps</i> begint met een medeklinker en krijgt daarom <i>au</i> (à + le).' },
+    { p: 'soixante dix(?: \\p{L}+)?|soixante et onze|soixante (?:douze|treize|quatorze|quinze|seize)|quatre vingts?(?: \\p{L}+){0,2}',
+      t: '70, 80 en 90 zijn rekensommen',
+      html: 'Tot 69 tel je gewoon (tiental + eenheid). <b>Uitzondering:</b> 70 = <b>soixante-dix</b> (60 + 10), 80 = <b>quatre-vingts</b> (4 × 20), 90 = <b>quatre-vingt-dix</b> (4 × 20 + 10). <b>Waarom?</b> Een overblijfsel van het oude tellen in twintigtallen. In België en Zwitserland zegt men wél <i>septante</i> en <i>nonante</i>.' },
+    { p: 'vous (?:faites|dites)|(?:faites|dites) vous', soft: true,
+      t: 'vous faites, vous dites (niet -ez)',
+      html: 'De vous-vorm eindigt normaal op <b>-ez</b>. <b>Uitzondering:</b> drie werkwoorden eindigen op <b>-tes</b>: <i>vous <b>êtes</b></i> (être), <i>vous <b>faites</b></i> (faire) en <i>vous <b>dites</b></i> (dire). Niet <s>vous faisez</s>. <b>Waarom?</b> Het zijn heel oude vormen die rechtstreeks uit het Latijn komen.' },
+    { p: '(?:je|j) (?:vais|irai)|tu vas|(?:il|elle|on) va|(?:ils|elles) vont', soft: true, verb: true,
+      t: 'aller: het enige onregelmatige -er-werkwoord',
+      html: '<i>Aller</i> eindigt op -er, maar is <b>helemaal onregelmatig</b>: <i>je vais, tu vas, il va, ils vont</i> (alleen <i>nous allons, vous allez</i> zijn gewoon). <b>Waarom?</b> <i>Aller</i> is uit drie verschillende Latijnse werkwoorden samengegroeid.' },
+    { p: 'nous (?:mangeons|voyageons|nageons|changeons|partageons|rangeons|bougeons)|nous (?:commençons|avançons|plaçons|lançons)', soft: true, verb: true,
+      t: 'nous mangeons, nous commençons',
+      html: '<b>Uitzondering in de spelling:</b> bij werkwoorden op <i>-ger</i> komt er vóór -ons een <b>e</b> (<i>nous mang<b>e</b>ons</i>) en bij <i>-cer</i> wordt de c een <b>ç</b> (<i>nous commen<b>ç</b>ons</i>). <b>Waarom?</b> Zo blijven de g en de c zacht klinken vóór de o.' },
+    { p: '(?:lève|lèves|lèvent|achète|achètes|achètent|promène|promènes|promènent|préfère|préfères|préfèrent|répète|répètes|répètent|espère|espères|espèrent)', soft: true, verb: true,
+      t: 'je me lève, j’achète, je préfère (è)',
+      html: '<b>Uitzondering in de spelling:</b> in de vormen met een stomme uitgang (je, tu, il, ils) wordt de e of é van de stam een <b>è</b>: <i>lever → je l<b>è</b>ve</i>, <i>acheter → j\'ach<b>è</b>te</i>, <i>préférer → je préf<b>è</b>re</i>. Bij nous en vous niet: <i>nous levons</i>. <b>Waarom?</b> Twee «stomme» lettergrepen achter elkaar kan het Frans niet uitspreken; de eerste wordt daarom een open è.' },
+    { p: '(?:prenons|prenez|prennent|comprenons|comprenez|comprennent|apprenons|apprenez|apprennent)', soft: true, verb: true,
+      t: 'nous prenons, ils prennent (zonder d)',
+      html: 'Regelmatige werkwoorden op -re houden hun d (<i>nous attendons</i>). <b>Uitzondering:</b> <i>prendre, comprendre</i> en <i>apprendre</i> verliezen de <b>d</b> in het meervoud: <i>nous prenons, vous prenez, ils prennent</i> (met dubbel n).' },
+    { p: '(?:je|tu) (?:dors|sors|pars|sers|sens|mens)|(?:il|elle|on) (?:dort|sort|part|sert|sent|ment)|nous (?:dormons|sortons|partons|servons|sentons)|(?:ils|elles) (?:dorment|sortent|partent|servent|sentent)', soft: true, verb: true,
+      t: 'dormir, sortir, partir (zonder -iss-)',
+      html: 'De meeste werkwoorden op -ir gaan als <i>finir</i>: <i>nous fin<b>iss</b>ons</i>. <b>Uitzondering:</b> <i>dormir, sortir, partir, servir, sentir</i> krijgen <b>geen -iss-</b> en verliezen in het enkelvoud een medeklinker: <i>je dors, nous dormons</i>. <b>Waarom?</b> Ze komen uit een andere, oudere Latijnse groep.' },
+    { p: '(?:pas|jamais) (?:de|d) \\p{L}+', soft: true,
+      t: 'pas de: na een ontkenning',
+      html: 'Normaal: <i>du, de la, des, un, une</i>. <b>Uitzondering:</b> na een <b>ontkenning</b> worden ze allemaal <b>de</b> (of <b>d\'</b>): <i>Je mange du pain → Je ne mange <b>pas de</b> pain.</i> <b>Waarom?</b> De hoeveelheid is nul, en na een hoeveelheid staat in het Frans alleen <i>de</i>. (Niet na <i>être</i>: <i>Ce n\'est pas du pain.</i>)' },
+    { p: '(?:de|d) (?:bons|bonnes|belles|beaux|petits|petites|grands|grandes|nouveaux|nouvelles|jolis|jolies|vieux|vieilles|jeunes|gros|grosses|mauvais|mauvaises|autres) \\p{L}+', soft: true,
+      t: 'de belles fleurs: des wordt de',
+      html: 'Het meervoud van <i>un / une</i> is <i>des</i>. <b>Uitzondering:</b> staat er een <b>bijvoeglijk naamwoord vóór</b> het zelfstandig naamwoord, dan wordt <i>des</i> → <b>de</b>: <i><b>de</b> nouvelles chaussures, <b>de</b> bons amis</i>. In spreektaal hoor je ook <i>des</i>.' },
+    { p: 'animaux|journaux|chevaux|hôpitaux|canaux|travaux|bocaux|locaux|nationaux|internationaux|normaux|principaux|sociaux|yeux',
+      t: 'onregelmatig meervoud: -al → -aux',
+      html: 'Het meervoud krijgt normaal een -s. <b>Uitzondering:</b> woorden op <b>-al</b> krijgen <b>-aux</b>: <i>un animal → des anim<b>aux</b>, un journal → des journ<b>aux</b>, un cheval → des chev<b>aux</b></i>. En helemaal apart: <i>un œil → des <b>yeux</b></i>, <i>le travail → les trav<b>aux</b></i>.' },
+    { p: 'gâteaux|cadeaux|bateaux|bureaux|manteaux|chapeaux|châteaux|tableaux|morceaux|oiseaux|jeux|feux|lieux|neveux|cheveux|bijoux|genoux|choux',
+      t: 'meervoud op -x',
+      html: 'Het meervoud krijgt normaal een -s. <b>Uitzondering:</b> woorden op <b>-eau</b> en <b>-eu</b> krijgen een <b>-x</b>: <i>un gâteau → des gâteau<b>x</b>, un jeu → des jeu<b>x</b></i>. Ook een handvol woorden op -ou: <i>bijoux, genoux, choux</i>. Je hoort geen verschil.' },
+    { p: 'blanche|blanches|belle|belles|nouvelle|nouvelles|vieille|vieilles|longue|longues|fraîche|sèche|douce|fausse|rousse|folle|gentille|grosse|bonne|bonnes|ancienne|italienne|publique|grecque|favorite|chère|chères|première|dernière|étrangère|heureuse|sérieuse|sportive|active|neuve',
+      t: 'onregelmatige vrouwelijke vorm',
+      html: 'Vrouwelijk is normaal mannelijk + <b>-e</b>. <b>Uitzondering:</b> sommige bijvoeglijke naamwoorden veranderen meer: <i>blanc → blanche, beau → belle, nouveau → nouvelle, vieux → vieille, long → longue, bon → bonne, gentil → gentille, cher → chère, premier → première, heureux → heureuse, sportif → sportive, neuf → neuve</i>. Vaak verdubbelt de medeklinker of verandert de uitgang zodat het woord uitspreekbaar blijft.' },
+    { p: '(?:la|une|cette|ma|ta|sa) (?:plage|page|image|cage)|(?:les|des|ces) (?:plages|pages|images|cages)',
+      t: 'la plage: vrouwelijk, ondanks -age',
+      html: 'Woorden op <b>-age</b> zijn bijna altijd <b>mannelijk</b>: <i>le fromage, le voyage, le garage, le village</i>. <b>Uitzondering:</b> <b>la plage, la page, l\'image, la cage</b> (en <i>la nage, la rage</i>) zijn vrouwelijk. <b>Waarom?</b> Bij deze korte woorden is -age geen achtervoegsel, maar deel van de stam.' },
+    { p: '(?:le|un|ce|du|au) (?:musée|lycée)|(?:les|des|ces|aux) (?:musées|lycées)',
+      t: 'le musée: mannelijk, ondanks -ée',
+      html: 'Woorden op <b>-ée</b> zijn bijna altijd <b>vrouwelijk</b>: <i>la journée, l\'année, l\'idée, l\'entrée</i>. <b>Uitzondering:</b> <b>le musée</b> en <b>le lycée</b> zijn mannelijk. <b>Waarom?</b> Ze komen uit het Grieks (mouseion, lykeion), niet van een Frans voltooid deelwoord.' },
+    { p: '(?:le|un|ce|du|au) (?:problème|système|programme|thème|poème|téléphone)|(?:les|des|ces) (?:problèmes|systèmes|programmes|thèmes|poèmes)',
+      t: 'le problème: mannelijk',
+      html: 'Veel woorden op -e zijn vrouwelijk, maar <b>le problème, le système, le programme, le thème, le poème</b> zijn <b>mannelijk</b>. <b>Waarom?</b> Het zijn Griekse woorden op -ma, die ook in het Spaans en Italiaans mannelijk zijn (<i>el problema</i>).' },
+    { p: '(?:au|du|le) mexique',
+      t: 'le Mexique: mannelijk land op -e',
+      html: 'Landen op <b>-e</b> zijn vrouwelijk en krijgen <i>en</i>: <i>en France, en Belgique, en Chine</i>. <b>Uitzondering:</b> <b>le Mexique</b> is mannelijk, dus <b>au Mexique</b>. (Ook: <i>le Cambodge, le Mozambique</i>.)' },
+    { p: FR_ETRE + ' (?:pas |déjà |aussi |bien |jamais |toujours )?(?:allé|venu|parti|arrivé|sorti|entré|resté|tombé|né|mort|monté|descendu|rentré|retourné|devenu|revenu|passé)(?:e|s|es)?', soft: true, verb: true,
+      t: 'passé composé met être',
+      html: 'De meeste werkwoorden vormen het passé composé met <i>avoir</i>. <b>Uitzondering:</b> een groep van ongeveer vijftien werkwoorden van <b>beweging of verandering</b> gebruikt <b>être</b>: <i>aller, venir, arriver, partir, entrer, sortir, monter, descendre, rester, tomber, naître, mourir, retourner, rentrer, devenir</i>. Het deelwoord past zich dan aan het onderwerp aan: <i>elle est allé<b>e</b></i>. Vaak is het in het Nederlands ook «zijn»: <i>ik <b>ben</b> gegaan</i>.' },
+    { p: FR_AVOIR + ' (?:pas |déjà |aussi |bien |jamais |toujours |tout )?(?:eu|été|fait|pris|mis|dit|vu|lu|bu|pu|su|dû|voulu|écrit|ouvert|offert|reçu|connu|vécu|compris|appris|couru|tenu|permis|promis|conduit|produit|peint|plu|fallu)', soft: true, verb: true,
+      t: 'onregelmatig voltooid deelwoord',
+      html: 'Het voltooid deelwoord eindigt normaal op <b>-é</b> (-er), <b>-i</b> (-ir) of <b>-u</b> (-re). <b>Uitzondering:</b> veelgebruikte werkwoorden hebben een eigen vorm: <i>avoir → <b>eu</b>, être → <b>été</b>, faire → <b>fait</b>, prendre → <b>pris</b>, mettre → <b>mis</b>, dire → <b>dit</b>, écrire → <b>écrit</b>, voir → <b>vu</b>, lire → <b>lu</b>, boire → <b>bu</b>, pouvoir → <b>pu</b>, ouvrir → <b>ouvert</b></i>. Deze leer je uit je hoofd.' },
+    { p: '(?:ser|aur|ir|fer|pourr|voudr|devr|saur|verr|viendr|tiendr|faudr|enverr|courr|recevr)(?:ai|as|a|ons|ez|ont|ais|ait|ions|iez|aient)', soft: true, verb: true,
+      t: 'onregelmatige stam in futur en conditionnel',
+      html: 'De futur en de conditionnel maak je normaal van het hele werkwoord + uitgang (<i>parler → je parler<b>ai</b></i>). <b>Uitzondering:</b> een aantal werkwoorden heeft een <b>eigen stam</b>: <i>être → <b>ser-</b>, avoir → <b>aur-</b>, aller → <b>ir-</b>, faire → <b>fer-</b>, pouvoir → <b>pourr-</b>, vouloir → <b>voudr-</b>, devoir → <b>devr-</b>, savoir → <b>saur-</b>, voir → <b>verr-</b>, venir → <b>viendr-</b>, falloir → <b>il faudra</b></i>. De uitgangen zijn wél gewoon.' },
+    { p: '(?:que|qu) (?:je|j|tu|il|elle|on|nous|vous|ils|elles) (?:sois|soit|soyons|soyez|soient|aie|aies|ait|ayons|ayez|aient|aille|ailles|aillent|allions|fasse|fasses|fassent|fassions|fassiez|puisse|puisses|puissent|puissions|puissiez|sache|saches|sachent|veuille|veuilles|veuillent)', soft: true, verb: true,
+      t: 'onregelmatige subjonctif',
+      html: 'De subjonctif maak je normaal van de ils-vorm (<i>ils parlent → que je parle</i>). <b>Uitzondering:</b> zeven werkwoorden hebben een eigen stam: <i>être → <b>sois</b>, avoir → <b>aie</b>, aller → <b>aille</b>, faire → <b>fasse</b>, pouvoir → <b>puisse</b>, savoir → <b>sache</b>, vouloir → <b>veuille</b></i>.' }
+  ];
+
   /* ---------- extra uitzonderingen per grammaticaonderdeel (sleutel = titel) ---------- */
   const GRAMMAR = {
     'Lidwoorden en geslacht': ['<b>Uitzondering:</b> mannelijk op -a: <i>el día, el mapa, el problema, el tema, el idioma, el sistema</i>. <b>Waarom?</b> Woorden op <b>-ma</b> komen uit het Grieks (daar onzijdig, in het Spaans mannelijk). Vrouwelijk op -o: <i>la mano</i> (al vrouwelijk in het Latijn), <i>la foto, la moto</i> (kort voor <i>la fotografía, la motocicleta</i>).',
@@ -294,7 +374,7 @@ verliezen verloor/verloren verloren perder`.split('\n').map(l => { const m = l.s
   const loc = v => (v && typeof v === 'object') ? (v[UI()] || v.nl) : v;
 
   /* Regels en werkwoordnotities per doeltaal. Nieuwe doeltaal: een lijst zoals EN/NL maken en hier een rij toevoegen. */
-  const RULES = { es: ES, en: EN, nl: NL };
+  const RULES = { es: ES, en: EN, nl: NL, fr: FR };
   const VERB_NOTES = { es: (t, f) => verbNotesEs(t, f), en: (t, f) => verbNotesEn(t, f), nl: (t, f) => verbNotesNl(t, f) };
   let cache = null;
   function rules() {

@@ -19,6 +19,8 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   function svg(size, opt) {
     opt = opt || {};
     const id = 'lp' + (++uid), u = k => `url(#${id}${k})`;
+    // kleding per doeltaal (js/look.js); zonder eigen look draagt Lupe haar Mexicaanse huipil en goudsbloem
+    const LK = (S.Look && S.Look.get() || {}).lupe || {};
     const fronds = side => {
       const x = side < 0 ? 25 : 95;
       return [-38, -78, -118].map((a, i) => {
@@ -52,7 +54,7 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     const lace = Array.from({ length: 11 }, (_, i) => { const [x, y] = qb([29.5, 141], [60, 151], [90.5, 141], i / 10); return `<circle cx="${x}" cy="${y}" r="2.7"/>`; }).join('');
     const laceDots = Array.from({ length: 11 }, (_, i) => { const [x, y] = qb([29.5, 142.6], [60, 152.6], [90.5, 142.6], i / 10); return `<circle cx="${x}" cy="${y}" r=".7"/>`; }).join('');
     const sleeve = (x, flip) => `<g transform="translate(${x} 100) scale(${flip} 1)"><path d="M-6.5 3.5C-8 -2-4.5-6 .5-6S8-2 6.5 3.5C3.5 6-3.5 6-6.5 3.5Z" fill="#3a78d6"/><path d="M-6.3 3.4C-3.3 5.8 3.3 5.8 6.3 3.4" fill="none" stroke="#fff4e6" stroke-width="1.6" stroke-linecap="round"/><path d="M-6.3 3.4C-3.3 5.8 3.3 5.8 6.3 3.4" fill="none" stroke="#f0789f" stroke-width=".9" stroke-dasharray="1 1.6" stroke-linecap="round" transform="translate(0 1.6)"/><path d="M-3-3.5Q0-4.8 3-3.5" stroke="#fff" stroke-width=".9" opacity=".35" fill="none" stroke-linecap="round"/></g>`;
-    const dress = full ? `
+    const dress = full && LK.dress ? LK.dress(id) : full ? `
   <g class="lupe-dress">
     <g fill="#ffeef4" stroke="#e98bb0" stroke-width=".7">${lace}</g><g fill="#f0789f">${laceDots}</g>
     <path d="M41 93C35 108 31 124 29 141Q60 151 91 141C89 124 85 108 79 93Z" fill="${u('h')}"/>
@@ -90,17 +92,17 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   </defs>
   ${body}
   <g class="gills-l">${fronds(-1)}</g><g class="gills-r">${fronds(1)}</g>
-  ${opt.face || full ? '' : `<path d="M20 121C22 101 36 91 60 91S98 101 100 121Z" fill="${u('h')}"/>
+  ${opt.face || full ? '' : LK.bust ? LK.bust(id) : `<path d="M20 121C22 101 36 91 60 91S98 101 100 121Z" fill="${u('h')}"/>
   <path d="M31 95.5Q60 113 89 95.5" fill="none" stroke="#fff4e6" stroke-width="3.6" stroke-linecap="round"/>
   <path d="M30 103Q60 120 90 103" fill="none" stroke="#f2b134" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/>
   <g><circle cx="42" cy="113" r="3.1" fill="#f0789f"/><circle cx="60" cy="116" r="3.1" fill="#f2b134"/><circle cx="78" cy="113" r="3.1" fill="#f0789f"/><circle cx="42" cy="113" r="1.1" fill="#fff4e6"/><circle cx="60" cy="116" r="1.1" fill="#fff4e6"/><circle cx="78" cy="113" r="1.1" fill="#fff4e6"/></g>`}
   <path d="M60 34C88 34 105 47 105 66C105 87 87 99 60 99C33 99 15 87 15 66C15 47 32 34 60 34Z" fill="${u('s')}"/>
   <ellipse cx="43" cy="45" rx="11" ry="5" transform="rotate(-22 43 45)" fill="#fff" opacity=".4"/>
   <g fill="#e483aa" opacity=".55"><circle cx="58" cy="39" r="1.9"/><circle cx="66" cy="41.5" r="1.4"/><circle cx="51" cy="42.5" r="1.3"/><circle cx="31" cy="58" r="1.5"/><circle cx="91" cy="60" r="1.5"/></g>
-  <g class="lupe-flower" transform="translate(85 38)">
+  ${LK.hat ? LK.hat(id) : `<g class="lupe-flower" transform="translate(85 38)">
     <ellipse cx="-8" cy="6" rx="5" ry="2.4" transform="rotate(35 -8 6)" fill="#3a9d5d"/><ellipse cx="6" cy="8.5" rx="4.4" ry="2.1" transform="rotate(-30 6 8.5)" fill="#2f8a50"/>
     ${petals}<circle r="5" fill="#f7b733"/><circle r="2.3" fill="#e2603a"/>
-  </g>
+  </g>`}
   <g class="lupe-eyes">
     <ellipse cx="42" cy="64" rx="7.4" ry="7.8" fill="#2a1a22"/><ellipse cx="78" cy="64" rx="7.4" ry="7.8" fill="#2a1a22"/>
     <ellipse cx="42" cy="67.2" rx="4.6" ry="3" fill="#5a2c42" opacity=".7"/><ellipse cx="78" cy="67.2" rx="4.6" ry="3" fill="#5a2c42" opacity=".7"/>
@@ -425,14 +427,71 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     [/^¡Bien hecho! Tu nivel es (\w+)\./, (m, l) => `Gut gemacht! Dein Niveau ist ${l}. Üben wir zusammen weiter.`],
     [/^¡Ya conoces (más de )?(\d+) palabras!/, (m, more, n) => `Du kennst schon ${more ? 'mehr als ' : ''}${n} Wörter! Ich bin sehr stolz auf dich.`]
   ];
+  /* ---------- Franse cursus: Lupe praat Frans (zelfde opzet als Engels) ---------- */
+  const FR = {
+    '¡Hola! Te quedaste a mitad de una lección. ¿Seguimos donde ibas?': 'Salut ! Tu as laissé une leçon en cours. On reprend là où tu en étais ?',
+    '¡Plan cumplido! Lo que hagas ahora es extra.': 'Programme terminé ! Tout ce que tu fais maintenant, c’est du bonus.',
+    '¡Plan cumplido! ¿Seguimos con la próxima lección?': 'Programme terminé ! On continue avec la leçon suivante ?',
+    '¡Meta del día cumplida! Estoy muy orgullosa de ti.': 'Objectif du jour atteint ! Je suis très fière de toi.',
+    '¡Órale! Ya cumpliste tu meta. Todo lo que hagas ahora es extra.': 'Bravo ! Tu as atteint ton objectif. Tout le reste, c’est du bonus.',
+    '¡Qué gusto verte otra vez! Empecemos con algo cortito.': 'Quel plaisir de te revoir ! Commençons par quelque chose de court.',
+    '¡Ya casi! Solo te falta una tarea.': 'On y est presque ! Il te reste une seule tâche.',
+    '¡Una tarea menos! Sigue así.': 'Une tâche de moins ! Continue comme ça.',
+    '¡Hoy toca la prueba de la unidad! Tú puedes.': 'Aujourd’hui, c’est le test de l’unité ! Tu vas y arriver.',
+    '¡Vas muy bien hoy! Un poquito más y llegas a tu meta.': 'Tu travailles très bien aujourd’hui ! Encore un petit effort et tu atteins ton objectif.',
+    'Un ratito cada día hace la diferencia. ¡Vamos!': 'Un petit moment chaque jour, ça change tout. Allez !',
+    '¡Hola! Te preparé un plan para hoy. ¡Vamos!': 'Salut ! Je t’ai préparé un programme pour aujourd’hui. Allez !',
+    'Casi lo logras. Repasamos un poco y lo intentamos otra vez, ¿va?': 'Tu y es presque. On révise un peu et on réessaie, d’accord ?',
+    '¡Felicidades! Terminaste la unidad. ¡Qué orgullo!': 'Félicitations ! Tu as terminé l’unité. Quelle fierté !',
+    '¡Listo! Buen trabajo.': 'Et voilà ! Bon travail.',
+    '¡Perfecto! Sin ningún error. ¡Eres una estrella!': 'Parfait ! Aucune erreur. Tu es une star !',
+    '¡Excelente trabajo! Casi sin errores.': 'Excellent travail ! Presque aucune erreur.',
+    '¡Muy bien! Vas avanzando.': 'Très bien ! Tu progresses.',
+    'Cada error te enseña algo. ¡Ánimo, vamos bien!': 'Chaque erreur t’apprend quelque chose. Courage, on avance bien !',
+    '¡Subiste de nivel! ¡Qué padre! Se nota que practicas.': 'Tu as changé de niveau ! Génial ! On voit que tu t’entraînes.',
+    'No te preocupes, a veces pasa. Repasamos juntos y lo intentas otra vez.': 'Ne t’inquiète pas, ça arrive. On révise ensemble et tu réessaies.',
+    '¡Gracias por hacer la prueba! Ahora sé por dónde empezar contigo.': 'Merci d’avoir fait le test ! Maintenant, je sais par où commencer avec toi.',
+    'Aquí vas a ver todo lo que aprendes. ¡Empecemos hoy!': 'Ici, tu vas voir tout ce que tu apprends. Commençons aujourd’hui !',
+    'Cada palabra nueva cuenta. ¡Qué padre!': 'Chaque nouveau mot compte. Génial !',
+    '¡Buen comienzo! Poco a poco se llega lejos.': 'Bon début ! Petit à petit, on va loin.',
+    '¡Perfecto! ¡Qué buena memoria!': 'Parfait ! Quelle bonne mémoire !',
+    '¡Muy bien jugado!': 'Très bien joué !',
+    '¡Sigue así! Las palabras difíciles vuelven pronto.': 'Continue comme ça ! Les mots difficiles reviennent bientôt.',
+    '¡Todo repasado! Nos vemos mañana.': 'Tout est révisé ! À demain.',
+    '¡Terminaste tu plan de hoy! Abre tu cofre.': 'Tu as terminé ton programme du jour ! Ouvre ta récompense.',
+    '¡Plan del día completado! ¡Qué padre!': 'Programme du jour terminé ! Génial !',
+    '¡Lo lograste! Estoy muy orgullosa de ti.': 'Tu as réussi ! Je suis très fière de toi.',
+    '¡Perfecto! Ahora te hablo en voz alta.': 'Parfait ! Maintenant, je te parle à voix haute.',
+    '¡Hola! Soy Lupe. ¿Te gusta mi voz?': 'Salut ! Je suis Lupe. Tu aimes ma voix ?',
+    '¡Platiquemos! Así veo en qué te puedo ayudar.': 'Discutons ! Comme ça, je vois comment je peux t’aider.',
+    '¡Vas mejorando! Cometes menos errores que antes.': 'Tu t’améliores ! Tu fais moins d’erreurs qu’avant.',
+    'Mira, esto es lo que más practicaría yo.': 'Regarde, voilà ce que je travaillerais le plus.',
+    'Hoy tienes más de cien repasos. Empecemos por ahí, así no se te olvida nada.': 'Aujourd’hui, tu as plus de cent révisions. Commençons par là, comme ça tu n’oublies rien.',
+    '¡Llevas más de cien días seguidos! ¡Qué padre!': 'Plus de cent jours de suite ! Génial !',
+    'Más de cien días seguidos. ¡No rompas la racha!': 'Plus de cent jours de suite. Ne casse pas ta série !',
+    '¡Cinco seguidas! ¡Órale!': 'Cinq de suite ! Bravo !',
+    '¡Diez seguidas! ¡Qué padre!': 'Dix de suite ! Génial !'
+  };
+  const FR_RE = [
+    [/^¡Hola! Soy Lupe, tu profe de .+\.$/, () => 'Salut ! Je suis Lupe, ta prof de français.'],
+    [/^¿Empezamos\? Hoy vemos: (.+)\.$/, (m, u) => 'On commence ? Aujourd’hui : ' + u + '.'],
+    [/^Hoy tienes (\d+) repasos\./, (m, n) => `Aujourd’hui, tu as ${n} révisions. Commençons par là, comme ça tu n’oublies rien.`],
+    [/^¡Llevas (\d+) días seguidos! ¡Qué padre!$/, (m, n) => `${n} jours de suite ! Génial !`],
+    [/^(\d+) días seguidos\. ¡No rompas la racha!$/, (m, n) => `${n} jours de suite. Ne casse pas ta série !`],
+    [/^¡(\d+) seguidas! ¡Imparable!$/, (m, n) => `${n} de suite ! Rien ne t’arrête !`],
+    [/^¡Plan del día completado! Llevas (\d+) días seguidos\.$/, (m, n) => `Programme du jour terminé ! Ça fait ${n} jours de suite.`],
+    [/^¡Bien hecho! Tu nivel es (\w+)\./, (m, l) => `Bien joué ! Ton niveau est ${l}. Continuons à travailler ensemble.`],
+    [/^¡Ya conoces (más de )?(\d+) palabras!/, (m, more, n) => `Tu connais déjà ${more ? 'plus de ' : ''}${n} mots ! Je suis très fière de toi.`]
+  ];
   /* Per doeltaal (met Nederlandse uitleg) de vertaling van Lupes vaste zinnen. Nieuwe taal: lijst + patronen toevoegen;
      de test controleert dat geen enkele zin Spaans blijft. Zonder rij praat Lupe Spaans. */
-  const LOCS = { en: { map: EN, re: EN_RE }, de: { map: DE, re: DE_RE } };
+  const LOCS = { en: { map: EN, re: EN_RE }, de: { map: DE, re: DE_RE }, fr: { map: FR, re: FR_RE, fix: s => s.replace(/ ([?!:;])/g, '\u00a0$1') } };
   const LOC = (S.course && S.course.ui === 'nl' && LOCS[S.course.target]) || null;
   const lineLang = LOC ? S.course.target : 'es';
   function locText(es) {
-    if (LOC.map[es]) return LOC.map[es];
-    for (const [re, fn] of LOC.re) { const m = String(es).match(re); if (m) return fn(...m); }
+    const fix = LOC.fix || (x => x); // bijv. Frans: vaste spatie vóór ? en !
+    if (LOC.map[es]) return fix(LOC.map[es]);
+    for (const [re, fn] of LOC.re) { const m = String(es).match(re); if (m) return fix(fn(...m)); }
     return null;
   }
   /* Een zin van Lupe in de taal van de cursus: { es, nl, lang } of een losse tekst. */
