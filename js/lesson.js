@@ -379,7 +379,7 @@
     const set = S.Store.state.settings;
     const speakers = [...new Set(d.lines.map(l => l[0]))];
     // dialoogzinnen hebben eigen opnames met de stem die bij de spreker past (naamruimte 'ch' = vaste stem per personage uit js/cast.js, tools/tts-texts.js)
-    const say = { clipNs: S.course.ns ? undefined : 'ch' };
+    const say = { clipNs: it.clipNs !== undefined ? it.clipNs : S.course.ns ? undefined : 'ch' }; // een dialoog van «Op reis» heeft opnames in de naamruimte van het land
     let showAll = false;
     const seen = new Set();
     /* Personages: elke spreker is een getekend dier uit de vaste cast (js/cast.js). Mark (de leerling) staat altijd rechts. */
@@ -452,7 +452,7 @@
       maskBtn.textContent = on ? '👀 Toon de tekst' : '🎧 Verberg de tekst';
       intro.textContent = (on ? '🎧 Luister eerst zonder tekst. Hoeveel versta je? Daarna maak je de tekst zichtbaar.' : 'Lees en luister. Tik op een woord voor de betekenis, of op ' + TR_LABEL + ' voor de hele zin.') + (seen.size || lines.some(l => l._note) ? ' Tik op ⓘ voor extra uitleg.' : '');
     }
-    mask(listenFirst);
+    mask(listenFirst && !ctx.aside); // naast een vraag (ctx.aside) staat de tekst er meteen leesbaar
 
     let playing = false;
     async function playAll() {
@@ -543,7 +543,7 @@
     return h('div', { class: 'dialogue' },
       h('div', { class: 'eyebrow' }, '💬 ' + (d.place || '')), h('h2', null, d.t),
       stage, stage && sceneBubble, stage && info, intro,
-      h('div', { class: 'row gap wrap' }, Speech.canSpeak() ? playBtn : null, Speech.canSpeak() ? maskBtn : null, trBtn, Speech.canSpeak() && Speech.canListen() ? roleBtn : null),
+      h('div', { class: 'row gap wrap' }, Speech.canSpeak() ? playBtn : null, Speech.canSpeak() && !ctx.aside ? maskBtn : null, trBtn, Speech.canSpeak() && Speech.canListen() && !ctx.aside ? roleBtn : null),
       rolePanel, list);
   };
 
@@ -961,6 +961,32 @@
       for (let i = Math.min(idx, queue.length) - 1; i >= 0; i--) if (['dialogue', 'reading'].includes(queue[i].kind)) return queue[i];
       return null;
     }
+    /* 📖 Tekst en vraag samen in beeld (Mark, 2026-11-27): bij vragen óver een leestekst of dialoog staat die tekst in een
+       eigen scrollvak naast de vraag (breed scherm) of erboven (staand/iPhone). Het vak blijft staan zolang de vragen
+       over dezelfde tekst gaan, zodat je ook niet steeds opnieuw naar je plek hoeft te scrollen. */
+    const srcKey = s => s && (s.reading || s.dialogue);
+    const sameSrc = (a, b) => { const x = srcKey(a), y = srcKey(b); return !!x && !!y && (x === y || (!!x.t && x.t === y.t && !!a.reading === !!b.reading)); };
+    function textSource() {
+      if (timerEnd) return null;
+      const cur = queue[idx]; if (!cur) return null;
+      if (cur.src) return cur.src;
+      // in de les Lezen/Dialoog: alleen de begripsvragen; bij dictee, zin bouwen en uitspreken zou de tekst het antwoord verklappen
+      if (session.mode === 'exam' || cur.skill !== 'read' || cur.audio || !['mc', 'type'].includes(cur.kind)) return null;
+      for (let i = idx - 1; i >= 0; i--) if (['dialogue', 'reading'].includes(queue[i].kind)) return queue[i];
+      return null;
+    }
+    let txtEl = null, txtSrc = null;
+    function dropText() { if (!txtEl) return; txtEl._leave.forEach(f => f()); txtEl.remove(); txtEl = txtSrc = null; lsEl.classList.remove('with-txt'); }
+    function syncText() {
+      const src = textSource();
+      if (!src) return dropText();
+      if (txtEl && sameSrc(src, txtSrc)) return;
+      dropText();
+      const leave = [], ctx = { aside: true, free() {}, auto() {}, onLeave: f => leave.push(f), answered: () => false, submit() {} };
+      txtEl = h('div', { class: 'ls-txt', role: 'region', 'aria-label': src.kind === 'dialogue' ? 'Dialoog bij de vraag' : 'Tekst bij de vraag', tabindex: '0' }, R[src.kind](src, ctx));
+      txtEl._leave = leave; txtSrc = src;
+      body.before(txtEl); lsEl.classList.add('with-txt');
+    }
     function closePeek() { if (!peekEl) return; peekEl._leave.forEach(f => f()); peekEl.remove(); peekEl = null; }
     function openPeek() {
       const src = peekSource(); if (!src) return;
@@ -1063,12 +1089,14 @@
       if (needsTiles(queue[idx])) { queue[idx].tiled = true; queue.splice(idx, 0, { kind: 'order', support: true, target: queue[idx].answers[0], nl: queue[idx].prompt, orig: queue[idx] }); }
       progress(); persist(idx);
       const it = queue[idx];
+      syncText();
       answered = false; fb.innerHTML = ''; fb.className = 'ls-fb'; fb.scrollTop = 0; foot.classList.remove('ok', 'bad'); lsEl.classList.remove('retyping');
       skipBtn.hidden = true; skipBtn.onclick = null;
       backBtn.hidden = !canBack();
       if (!backBtn.hidden) { const k = queue[idx - 1].kind; backBtn.textContent = k === 'dialogue' ? '← Dialoog' : k === 'reading' ? '← Tekst' : '← Terug'; }
       const ps = canBack() ? null : peekSource();
-      peekBtn.hidden = !ps; if (ps) peekBtn.textContent = ps.kind === 'dialogue' ? '💬 Dialoog' : '📖 Tekst';
+      peekBtn.hidden = !ps; if (ps) peekBtn.textContent = txtEl ? '⤢ Groot' : ps.kind === 'dialogue' ? '💬 Dialoog' : '📖 Tekst';
+      if (ps) peekBtn.setAttribute('aria-label', (ps.kind === 'dialogue' ? 'Dialoog' : 'Tekst') + ' schermvullend bekijken');
       mainBtn.disabled = true; mainBtn.textContent = T('check'); mainBtn.hidden = false;
       const ctx = ctxObj = {
         answered: () => answered,
@@ -1084,11 +1112,6 @@
       mainBtn.onclick = () => { if (ctx.evaluate) feedback(it, ctx.evaluate()); };
       freshBody();
       const el = (R[it.kind] || R.info)(it, ctx);
-      // brengt de vraag zijn eigen tekst mee? Dan ook een duidelijke knop boven de vraag
-      if (it.src && ps === it.src) {
-        const t = it.src.kind === 'dialogue' ? (it.src.dialogue.place || 'de dialoog') : it.src.reading.t;
-        el.prepend(h('button', { class: 'btn ghost small ls-src-btn', type: 'button', onclick: () => openPeek() }, (it.src.kind === 'dialogue' ? '💬 Lees eerst de dialoog' : '📖 Lees eerst de tekst') + ' «' + t + '»'));
-      }
       body.append(el);
     }
 
@@ -1382,7 +1405,7 @@
       const sum = summary();
       const extra = (hooks.onFinish && hooks.onFinish(sum)) || {};
       if (session.mode === 'exam' && extra.silent) { close(true); extra.next && extra.next(); return; }
-      freshBody(); fb.innerHTML = ''; fb.className = 'ls-fb'; foot.classList.remove('ok', 'bad'); skipBtn.hidden = true;
+      dropText(); freshBody(); fb.innerHTML = ''; fb.className = 'ls-fb'; foot.classList.remove('ok', 'bad'); skipBtn.hidden = true;
       bar.style.width = '100%';
       const pct = Math.round(sum.score * 100);
       const passed = extra.passed;
@@ -1423,7 +1446,7 @@
     }
     function close(silent) {
       touch(); if (tick) clearInterval(tick);
-      closePeek(); leaveFns.forEach(f => f()); Speech.stop(); Speech.abortListening();
+      closePeek(); dropText(); leaveFns.forEach(f => f()); Speech.stop(); Speech.abortListening();
       document.removeEventListener('keydown', onKey);
       if (vv) { vv.removeEventListener('resize', fitViewport); vv.removeEventListener('scroll', fitViewport); }
       window.removeEventListener('resize', fbFade);

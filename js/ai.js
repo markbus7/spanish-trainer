@@ -177,6 +177,17 @@ Do not use Markdown headings or tables. Keep formatting minimal.`;
   const glossRule = mode => (S.Gloss ? S.Gloss.promptRule(mode) + '\n' : '');
   function tutorPersona() { return (S.Tutor && S.Tutor.persona) || ''; }
 
+  /* Gesprek per land («Op reis», js/mundo.js): de docent praat zoals in dat land en legt elk lokaal woord uit.
+     Wat de leerling in de basiscursus leerde blijft goed; lokale vormen die van de regel afwijken heten uitzondering, met de reden. */
+  function localRule(L) {
+    const ex = CO().ui === 'nl' ? 'Zo zeggen ze het in ' + L.country : 'Así se dice en ' + L.country;
+    return `
+LOCAL VARIETY: this conversation takes place in ${L.country}. Speak the ${TL()} that people really speak there${L.how ? ': ' + L.how : ''}.
+- Use one or two typical local words or expressions per reply, mainly from this list (never vulgar ones): ${L.words.join('; ')}.
+- The learner studies ${L.neutral ? 'this same standard variety' : 'the neutral standard variety of the basic course'}: neutral forms and words from the learner are fully correct. Never mark them as mistakes and never demand the local form.
+- After the feedback (below the "---"), add one line per local word or local grammar form you used in this reply and have not explained earlier in this conversation: "🗺️ **local word** = meaning in ${NL()} (${ex}; neutral: **standard word**)". If a local form breaks a rule the learner knows (for example a different verb form or pronoun), call it an exception and give the reason in a few words.
+`;
+  }
   function roleplaySystem(sc) {
     const p = learnerProfile();
     return `${baseRules(p)}
@@ -184,7 +195,7 @@ Do not use Markdown headings or tables. Keep formatting minimal.`;
 You are now doing a ROLE-PLAY conversation.
 Character and setting: ${sc.role}${sc.place ? ' (Location: ' + sc.place + ')' : ''}
 Learner's goal: ${sc.goal}
-
+${sc.local ? localRule(sc.local) : ''}
 Rules for every reply:
 1. Stay in character and reply ONLY in ${TL()}, 1–3 short sentences adapted to the learner's level, and usually end with a question to keep the conversation going.
 2. If the learner writes in ${NL()} or asks how to say something, help briefly in ${NL()} and give the ${TL()} phrase, then continue the role-play.
