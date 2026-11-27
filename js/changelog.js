@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.73.0', date: '2026-11-27',
+    nl: ['Frans: niveau A2 is compleet. Tien nieuwe units: passé composé met avoir en être, imparfait, bij de dokter, uit eten (le/la/les en en), vergelijken, werk (lui/leur en y), futur simple, een verhaal vertellen en qui/que/où. Met dialogen uit Lyon, Marseille, Namen, Genève, Parijs, Montréal, Abidjan, Dakar, Port-au-Prince en Fès. Uitzonderingen staan er weer steeds bij, met de reden.'],
+    es: ['Francés: el nivel A2 está completo (10 unidades nuevas).'] },
   { v: '1.72.0', date: '2026-11-27',
     nl: ['Nieuwe cursus: Frans voor Nederlandstaligen (🇳🇱 Nederlands → 🇫🇷 Frans). Niveau A1 is compleet: 10 units met woorden, grammatica, dialogen, leesteksten en spreekoefeningen. Uitzonderingen staan er steeds bij, met de reden.', 'Bij Frans hoort een eigen kaart «Op reis»: Frankrijk, België, Zwitserland, Québec, Haïti, Marokko, Senegal, Ivoorkust en Congo, elk met eigen woorden en klanken.', 'In de Franse cursus praat Lupe Frans en staan de tabs en spellen in het Frans. Accenten vergeten telt als bijna goed.', 'Elke taal krijgt een eigen sfeer. Frans heeft een Franse look: blauw-wit-rood met lavendel, Lupe draagt een gestreepte marinière met rode baret en sjaaltje, en op de startpagina zie je de daken van Parijs met de Eiffeltoren. Spaans blijft Mexicaans.'],
     es: ['Nuevo curso: francés para hablantes de neerlandés (nivel A1 completo), con su propio mapa «De viaje».', 'Cada idioma tiene su propio ambiente: el curso de francés tiene un estilo francés (Lupe con boina y camiseta marinera, los tejados de París).'] },
