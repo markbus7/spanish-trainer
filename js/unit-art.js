@@ -205,7 +205,50 @@
       <path d="M18.5 20h11M18.5 23.5h11M18.5 27h11M18.5 30.5h11" stroke="${C.ink}" stroke-width="1.1" opacity=".55"/>${shine(21, 20, 2, 4.5)}
       <path d="M14 29a10 10 0 0 0 20 0" fill="none" stroke="${C.ink}" stroke-width="2.2" stroke-linecap="round"/><path d="M24 39v4" stroke="${C.ink}" stroke-width="2.4"/>
       <rect x="15" y="42.5" width="18" height="3.5" rx="1.75" fill="${C.ink}"/>
-      <rect x="2" y="37" width="12" height="8" rx="2.5" fill="${C.red}"/>${txt(8, 43, 'ON', 5.4, '#fff', 900)}`
+      <rect x="2" y="37" width="12" height="8" rx="2.5" fill="${C.red}"/>${txt(8, 43, 'ON', 5.4, '#fff', 900)}`,
+    /* Maya-trappiramide van Copán met de hiërogliefentrap, een rode ara en een vinkje (tegen die tijd klaar) */
+    'b2-14': `<circle cx="39" cy="9" r="5.5" fill="${C.g}"/><path d="M2 43h44" stroke="${C.green}" stroke-width="3.4" stroke-linecap="round"/>
+      <path d="M5 41h38l-3-7H8z" fill="#b9a58c"/><path d="M9 34h30l-3-7H12z" fill="#c9b79e"/><path d="M13 27h22l-3-7H16z" fill="#d9c9b2"/><rect x="18" y="12" width="12" height="8" rx="1" fill="#e6d8c2"/><rect x="16.500" y="10" width="15" height="3" rx="1" fill="#b9a58c"/>
+      <path d="M21 41l1.500-21h3L27 41z" fill="${C.cream}"/><path d="M21.400 36h5.200M21.700 31.500h4.600M22 27h4M22.300 23h3.400" stroke="${C.brown}" stroke-width="1.100" opacity=".7"/><rect x="22.300" y="14.500" width="3.400" height="5.500" rx=".6" fill="${C.ink}" opacity=".7"/>
+      <path d="M6 13c3-4 8-3.500 9 .5-2.500-.6-4 .4-5 2.500-1-1.800-2.300-2.700-4-3z" fill="${C.red}"/><path d="M10 16c.4 3 2.500 5 5.500 5.500-2-1.600-2.300-3.400-.5-5z" fill="${C.b}"/><circle cx="8.300" cy="12.600" r=".8" fill="#fff"/>
+      <circle cx="39" cy="33" r="6" fill="${C.t}"/><path d="M36 33.200l2.200 2.200 3.900-4.400" fill="none" stroke="#fff" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round"/>`,
+    /* Ometepe: twee vulkanen op een eiland in het meer, rookpluim en een bootje */
+    'b2-15': `<rect x="2" y="3" width="44" height="30" rx="6" fill="#ffe1c4"/><circle cx="38" cy="12" r="4.600" fill="${C.g}" opacity=".9"/>
+      <path d="M3 33L18 9l4 5 3-2 11 21z" fill="#6f8f6a"/><path d="M16.200 11.900L18 9l4 5-2.400 1.300-1.600-1.800-1.200 1.400z" fill="${C.o}"/>
+      <path d="M26 33l9-13 10 13z" fill="${C.green}"/><path d="M33 23l2-3 2.300 3-2.200-.8z" fill="${C.green2}"/>
+      <path d="M18 8c-2-2-.5-4.500 1.500-4 .5-2 3.500-2 4 0 2.200-.4 3 2.600 1 3.600" fill="none" stroke="${C.grey}" stroke-width="2.400" stroke-linecap="round"/>
+      <path d="M2 33h44v8a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5z" fill="${C.b}"/><path d="M5 38q3-2 6 0t6 0M26 41q3-2 6 0t6 0" fill="none" stroke="${C.b2}" stroke-width="1.500" stroke-linecap="round"/>
+      <path d="M12 37.500h10l-1.800 3.500h-6.400z" fill="${C.cream}"/><path d="M16.500 37.500v-6l4.500 6z" fill="${C.red}"/>`,
+    /* Debat in het café: twee tekstballonnen (eens/oneens) boven een cortado */
+    'b2-16': `<path d="M3 8a5 5 0 0 1 5-5h12a5 5 0 0 1 5 5v7a5 5 0 0 1-5 5h-6l-5 4.500V20H8a5 5 0 0 1-5-5z" fill="${C.t}"/><path d="M9.500 11.800l3 3 5.500-6" fill="none" stroke="#fff" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M24 13a5 5 0 0 1 5-5h11a5 5 0 0 1 5 5v7a5 5 0 0 1-5 5h-1v4.500L34 25h-5a5 5 0 0 1-5-5z" fill="${C.o}"/>${txt(34.500, 20.500, 'pero…', 6.200, '#fff')}
+      <ellipse cx="22" cy="44" rx="15" ry="2.600" fill="${C.grey}"/><path d="M12 30h20v6a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8z" fill="${C.cream}"/><path d="M12 30h20v6a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8z" fill="none" stroke="${C.brown2}" stroke-width="1.400"/>
+      <ellipse cx="22" cy="30.500" rx="9.600" ry="2.400" fill="${C.brown}"/><ellipse cx="20.500" cy="30.300" rx="4" ry="1" fill="#f6e2bd" opacity=".85"/>
+      <path d="M32 32.500h2.500a3.300 3.300 0 0 1 0 6.600H31" fill="none" stroke="${C.brown2}" stroke-width="2"/>`,
+    /* Surfplank op een golf bij El Tunco, met zon en de rots in zee */
+    'b2-17': `<circle cx="37" cy="11" r="6.500" fill="${C.g}"/><circle cx="37" cy="11" r="9.500" fill="${C.g2}" opacity=".35"/>
+      <path d="M2 30c6-12 16-16 24-10-4 0-7 3-6.500 7 4 3 12 2 18-1 3-1.500 6-1.500 8.500 0V41a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5z" fill="${C.b}"/>
+      <path d="M2 30c6-12 16-16 24-10-5-.5-9 2-10 6" fill="none" stroke="#fff" stroke-width="2.200" stroke-linecap="round" opacity=".85"/><path d="M8 40q4-2.500 8 0t8 0 8 0" fill="none" stroke="${C.b2}" stroke-width="1.600" stroke-linecap="round"/>
+      <g transform="rotate(-28 27 27)"><ellipse cx="27" cy="27" rx="15" ry="4.200" fill="${C.o}"/><path d="M13 27h28" stroke="${C.cream}" stroke-width="1.500"/><ellipse cx="22" cy="25.600" rx="5" ry="1" fill="#fff" opacity=".35"/></g>
+      <path d="M40 34c0-3.500 2-5.500 4-5.500 1.500 0 2 2 2 5.500z" fill="${C.ink}" opacity=".6"/>`,
+    /* Chorreador: stoffen koffiefilter aan een houten standaard, druppels in een kopje, koffiebessen */
+    'b2-18': `<path d="M9 5h4v38H9zM31 5h4v38h-4z" fill="${C.brown}"/><rect x="6" y="5" width="32" height="4" rx="2" fill="${C.brown2}"/><rect x="4" y="41" width="36" height="4.500" rx="2.200" fill="${C.brown2}"/>
+      <ellipse cx="22" cy="12" rx="7.500" ry="2.200" fill="none" stroke="${C.ink}" stroke-width="1.600" opacity=".7"/><path d="M14.600 12.300c1 8 4 13 7.400 15.700 3.400-2.700 6.400-7.700 7.400-15.700z" fill="${C.cream}"/><path d="M16.400 15c1.200 5.500 3.200 9 5.600 11.200 2.400-2.200 4.400-5.700 5.600-11.200z" fill="${C.brown}" opacity=".55"/>
+      <path d="M22 29.500c1 1.400 1 2.400 0 3.300-1-.9-1-1.900 0-3.300z" fill="${C.brown}"/>
+      <path d="M15.500 35h13v2.500a5 5 0 0 1-5 5h-3a5 5 0 0 1-5-5z" fill="${C.t}"/><path d="M28.500 36h1.500a2 2 0 0 1 0 4h-2" fill="none" stroke="${C.t}" stroke-width="1.600"/>
+      <path d="M40 13c2.500-4 6-4 7-1-2.500 0-4.500 1-5.500 3z" fill="${C.green}"/><circle cx="41.500" cy="19" r="3.400" fill="${C.red}"/><circle cx="45" cy="24" r="2.800" fill="${C.red}"/><circle cx="41" cy="26.500" r="2.600" fill="${C.o}"/>${shine(40.600, 18, 1.100, .7)}`,
+    /* Lago de Atitlán: drie vulkanen, een lancha en een geweven rand (huipil) */
+    'b2-19': `<rect x="2" y="3" width="44" height="26" rx="6" fill="${C.b2}"/><path d="M2 29L13 11l7 12 6-9 8 13 4-5 8 7z" fill="#5f7fa6"/><path d="M13 11l2.800 4.600-2.300-.9-1.800 1.600z M26 14l2.300 3.700-2-.8-1.700 1.300z" fill="#fff" opacity=".85"/>
+      <path d="M2 29h44v7H2z" fill="${C.t}"/><path d="M6 32.500q3-2 6 0t6 0M30 33q3-2 6 0t6 0" fill="none" stroke="${C.t2}" stroke-width="1.500" stroke-linecap="round"/>
+      <path d="M17 31h15l-2.500 4h-10z" fill="${C.cream}"/><path d="M17 31h15" stroke="${C.red}" stroke-width="1.600"/><rect x="21" y="27" width="7" height="4" rx="1" fill="${C.g}"/>
+      <path d="M2 36h44v5a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5z" fill="${C.p}"/><path d="M4 41l4-3.500 4 3.500 4-3.500 4 3.500 4-3.500 4 3.500 4-3.500 4 3.500 4-3.500 4 3.500" fill="none" stroke="${C.g2}" stroke-width="1.800" stroke-linejoin="round"/>
+      <path d="M6 44.200h36" stroke="${C.b}" stroke-width="1.400" stroke-linecap="round" opacity=".8"/>`,
+    /* Afscheidsavond in Mérida: twee glazen die klinken, confetti en een «¡!»-ballon */
+    'b2-20': `<path d="M26 4a4.500 4.500 0 0 1 4.500-3h11a4.500 4.500 0 0 1 4.500 4.500v6a4.500 4.500 0 0 1-4.500 4.500H38l-4.500 4v-4h-3a4.500 4.500 0 0 1-4.500-4.500z" fill="${C.o}"/>${txt(36, 12.300, '¡Oh!', 6.400, '#fff')}
+      <g transform="rotate(-14 15 28)"><path d="M8 17h14l-1.500 12a5.500 5.500 0 0 1-11 0z" fill="${C.cream}" stroke="${C.b2}" stroke-width="1.400"/><path d="M9 22h12l-.9 7a5 5 0 0 1-10.200 0z" fill="${C.g}"/><path d="M15 34.500V42M10.500 42.500h9" stroke="${C.b2}" stroke-width="2" stroke-linecap="round"/></g>
+      <g transform="rotate(14 33 30)"><path d="M26 19h14l-1.500 12a5.500 5.500 0 0 1-11 0z" fill="${C.cream}" stroke="${C.b2}" stroke-width="1.400"/><path d="M27 24h12l-.9 7a5 5 0 0 1-10.200 0z" fill="${C.p}"/><path d="M33 36.500V44M28.500 44.500h9" stroke="${C.b2}" stroke-width="2" stroke-linecap="round"/></g>
+      ${spark(24, 14, 3.200, C.g)}${spark(5, 10, 2.200, C.t)}${spark(44, 26, 2, C.p)}
+      <circle cx="12" cy="6" r="1.500" fill="${C.p}"/><circle cx="19" cy="9" r="1.200" fill="${C.b}"/><rect x="3" y="20" width="2.600" height="2.600" rx=".6" fill="${C.o}" transform="rotate(20 4 21)"/><rect x="43" y="36" width="2.600" height="2.600" rx=".6" fill="${C.t}" transform="rotate(-20 44 37)"/>`
   };
 
   function svg(id) { const b = ART[id]; return b ? `<svg class="ic-art" viewBox="0 0 48 48" aria-hidden="true">${b}</svg>` : ''; }

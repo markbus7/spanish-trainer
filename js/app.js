@@ -123,6 +123,7 @@
     const d = Store.today(); d.items++; if (ok) d.ok++;
     if (it.skill) Store.skill(it.skill, ok);
     if (it.tag) Store.mark(it.tag, ok);
+    if (S.Strat) S.Strat.answer(it, ok); // 🧪 hardnekkige fouten: bijhouden of een andere aanpak werkt
     if (!ok && S.Mistakes) S.Mistakes.exercise(it, r); // voor het rapport en Lupe's advies: ook fouten uit gewone oefeningen
     if (it.srsId && it.wt && (!SRS.has(it.srsId) || (r && r.override && (st().srs[it.srsId].s || 0) >= Date.now() - 864e5 && st().srs[it.srsId].i === 0))) {
       // woordtoets: nieuw woord goed = meteen bekend (interval it.wt), fout of met hint = vandaag in de herhaling
@@ -629,7 +630,8 @@
         h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.all()[0].id) }, h('b', null, '🌱 Vanaf het begin (' + C.all()[0].level + ')'), h('span', null, 'Je begint bij unit 1. Units die je al kent, kun je snel afronden met «Ik ken dit al».')),
         C.unitsOf('A2').length ? h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf('A2')[0].id) }, h('b', null, '🚀 Begin bij A2'), h('span', null, S.course.allLevels ? 'Je redt je in de tegenwoordige tijd en wilt de verleden tijd, vergelijken en de present perfect leren.' : S.course.target !== 'es' ? 'Je kunt je al redden in de tegenwoordige tijd en wilt de verleden tijd leren.' : 'Je kunt je al redden in de presente en wilt de verleden tijden leren.')) : null,
         C.unitsOf('B1').length ? h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf('B1')[0].id) }, h('b', null, '🌠 Begin bij B1'), h('span', null, S.course.allLevels ? 'Je kent de basis en wilt de passive, conditionals, indirecte rede en phrasal verbs leren.' : S.course.target !== 'es' ? 'Je kent de verleden tijd en wilt lastigere grammatica leren en je mening kunnen geven.' : 'Je kent de verleden tijden en wilt de subjuntivo, de condicional en argumenteren leren.')) : null),
-        ...(S.course.allLevels ? [['B2', '🧗', 'Je spreekt al vlot en wilt lastige grammatica, valse vrienden en idioom onder de knie krijgen.'], ['C1', '🎯', 'Je Engels is erg goed; je werkt aan register, nuance en natuurlijk klinken.'], ['C2', '🏆', 'Bijna native: ironie, understatement, Brits en Amerikaans, de laatste puntjes op de i.']]
+        ...(S.course.allLevels || S.course.target !== 'es' ? (S.course.allLevels ? [['B2', '🧗', 'Je spreekt al vlot en wilt lastige grammatica, valse vrienden en idioom onder de knie krijgen.'], ['C1', '🎯', 'Je Engels is erg goed; je werkt aan register, nuance en natuurlijk klinken.'], ['C2', '🏆', 'Bijna native: ironie, understatement, Brits en Amerikaans, de laatste puntjes op de i.']]
+          : [['B2', '🧗', 'Je spreekt al vlot en wilt lastige grammatica, nieuwsberichten en discussies aankunnen.'], ['C1', '🎯', 'Je bent al erg goed; je werkt aan schrijftaal, nuance en natuurlijk klinken.'], ['C2', '🏆', 'Bijna moedertaalniveau: stijl, ironie, dialecten en de laatste puntjes op de i.']])
           .filter(([l]) => C.unitsOf(l).length && C.all()[0].level !== l).map(([l, ic, t]) => h('button', { class: 'choice', type: 'button', onclick: () => startAt(C.unitsOf(l)[0].id) }, h('b', null, ic + ' Begin bij ' + l), h('span', null, t))) : []),
       h('p', { class: 'muted small center' }, '🔒 Je voortgang wordt alleen op dit apparaat bewaard. Via Perfil kun je een back-up maken.'));
   };
@@ -1449,6 +1451,8 @@
           t.units.length ? h('a', { class: 'btn link small', href: '#/unit/' + t.units[0].id }, '📘 Uitleg in de les: ' + t.units[0].level + ' · ' + t.units[0].icon + ' ' + t.units[0].title) : null)),
         tags.length ? h('button', { class: 'btn primary wide', type: 'button', onclick: () => practiceMistakes(tags.slice(0, 6), []) }, '🎯 Oefen deze onderwerpen') : null)));
     }
+    // 🧪 hardnekkige onderwerpen: welke andere aanpak is geprobeerd en wat deed het
+    const strc = S.Strat && S.Strat.reportCard(); if (strc) wrap.append(section('🧪 Andere aanpak geprobeerd', strc));
     // advies van Lupe
     const adv = h('div', { class: 'card rep-advice' });
     const drawAdv = a => {
@@ -2281,8 +2285,8 @@
   const LNAME = l => { const x = S.LANGS[l]; return x ? x.flag + ' ' + (S.course.ui === 'es' ? x.es.charAt(0).toUpperCase() + x.es.slice(1) : x.nl) : l; };
   const CNAME = c => { const x = S.COURSES[c]; return x ? LNAME(x.ui) + ' → ' + LNAME(x.target) : c; };
   const NOTR = (text, tag) => h(tag || 'span', { 'data-notr': '' }, text);
-  const CDESC = c => ({ 'es-nl': 'uitleg in het Nederlands', 'en-nl': 'A1–C2 · uitleg in het Nederlands', 'fr-nl': 'uitleg in het Nederlands', 'de-nl': 'A1–B1 · uitleg in het Nederlands', 'tr-nl': 'uitleg in het Nederlands', 'en-es': 'explicaciones en español', 'nl-es': 'explicaciones en español' })[c] || '';
-  const CLONG = { 'es-nl': 'Spaans leren · uitleg in het Nederlands', 'en-nl': 'Engels leren (A1–C2) · uitleg in het Nederlands', 'fr-nl': 'Frans leren · uitleg in het Nederlands', 'de-nl': 'Duits leren (A1–B1) · uitleg in het Nederlands', 'tr-nl': 'Turks leren · uitleg in het Nederlands', 'en-es': 'Inglés · explicaciones en español', 'nl-es': 'Neerlandés · explicaciones en español' };
+  const CDESC = c => ({ 'es-nl': 'uitleg in het Nederlands', 'en-nl': 'A1–C2 · uitleg in het Nederlands', 'fr-nl': 'uitleg in het Nederlands', 'de-nl': 'A1–B2 · uitleg in het Nederlands', 'tr-nl': 'uitleg in het Nederlands', 'en-es': 'explicaciones en español', 'nl-es': 'explicaciones en español' })[c] || '';
+  const CLONG = { 'es-nl': 'Spaans leren · uitleg in het Nederlands', 'en-nl': 'Engels leren (A1–C2) · uitleg in het Nederlands', 'fr-nl': 'Frans leren · uitleg in het Nederlands', 'de-nl': 'Duits leren (A1–B2) · uitleg in het Nederlands', 'tr-nl': 'Turks leren · uitleg in het Nederlands', 'en-es': 'Inglés · explicaciones en español', 'nl-es': 'Neerlandés · explicaciones en español' };
   /* Eigen keuzelijst voor cursussen. Een gewone <select> tekent op Windows geen vlaggen in zijn lijst; hier wel.
      Gedraagt zich als een select: .value lezen/zetten en .onchange. isNew(c) zet er het label «nieuw» bij. */
   function coursePick({ value, ariaLabel, isNew }) {

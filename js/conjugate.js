@@ -24,7 +24,9 @@
     neg:   { es: 'imperativo negativo',    nl: 'ontkennende gebiedende wijs (no + …)', level: 'B1', tip: 'zeggen dat iemand iets níét moet doen' },
     impsubj: { es: 'imperfecto de subjuntivo', nl: 'aanvoegende wijs verleden (si tuviera…)', level: 'B2', tip: 'in \'als\'-zinnen die niet echt zijn (si tuviera…)' },
     condperf: { es: 'condicional compuesto',  nl: 'zou hebben (habría + -do)',  level: 'B2', tip: 'wat je zou hebben gedaan' },
-    plussubj: { es: 'pluscuamperfecto de subjuntivo', nl: 'had … (si hubiera + -do)', level: 'B2', tip: 'als iets anders was gegaan (si hubiera…)' }
+    plussubj: { es: 'pluscuamperfecto de subjuntivo', nl: 'had … (si hubiera + -do)', level: 'B2', tip: 'als iets anders was gegaan (si hubiera…)' },
+    perfsubj: { es: 'pretérito perfecto de subjuntivo', nl: 'aanvoegende wijs voltooid (espero que haya + -do)', level: 'B2', tip: 'na hopen, twijfel of gevoel over iets wat al gebeurd is (espero que hayas…)' },
+    futperf: { es: 'futuro perfecto', nl: 'zal hebben (habré + -do)', level: 'B2', tip: 'wat tegen een bepaald moment klaar zal zijn (para el viernes habré…)' }
   };
 
   /* stem: 'ie' | 'ue' | 'i' | 'uue' (jugar)
@@ -99,6 +101,7 @@
     abrir: { nl: 'openen', part: 'abierto' }, aprender: { nl: 'leren' }, comprender: { nl: 'begrijpen' }, llamarse: { nl: 'heten' },
     levantarse: { nl: 'opstaan' }, ducharse: { nl: 'douchen' }, bañarse: { nl: 'baden, douchen (LatAm)' }, lavarse: { nl: 'zich wassen' },
     cepillarse: { nl: 'poetsen (tanden)' }, maquillarse: { nl: 'zich opmaken' }, quedarse: { nl: 'blijven' },
+    soñar: { nl: 'dromen', stem: 'ue' }, depender: { nl: 'afhangen' }, quejarse: { nl: 'klagen' }, atreverse: { nl: 'durven' }, tardar: { nl: 'er lang over doen' }, tratar: { nl: 'proberen; behandelen' },
     llegar: { nl: 'aankomen' }, buscar: { nl: 'zoeken' }, tocar: { nl: 'aanraken, bespelen' }, practicar: { nl: 'oefenen' },
     pagar: { nl: 'betalen' }, sacar: { nl: 'halen, nemen (foto)' }, cruzar: { nl: 'oversteken' }, organizar: { nl: 'organiseren' },
     escuchar: { nl: 'luisteren' }, mirar: { nl: 'kijken' }, cocinar: { nl: 'koken' }, caminar: { nl: 'lopen, wandelen' },
@@ -248,6 +251,8 @@
       case 'impsubj': return withRefl(v, impSubjuntivo(v));
       case 'condperf': { const p = participio(v); return withRefl(v, futuro(parse('haber'), COND).map(h => h + ' ' + p)); }
       case 'plussubj': { const p = participio(v); return withRefl(v, impSubjuntivo(parse('haber')).map(h => h + ' ' + p)); }
+      case 'perfsubj': { const p = participio(v); return withRefl(v, subjuntivo(parse('haber')).map(h => h + ' ' + p)); }
+      case 'futperf': { const p = participio(v); return withRefl(v, futuro(parse('haber'), FUT).map(h => h + ' ' + p)); }
       case 'neg': {
         if (v.data.noImper) return null;
         const s = withRefl(v, subjuntivo(v));

@@ -87,6 +87,16 @@
     }
     return null;
   }
+  /** Gerichte tip bij een bekende fout (andere aanpak bij hardnekkige fouten): de oefening geeft
+      fb: [{ has: 'somos', tip: '…' }, { has: 'izquierda', not: 'a la izquierda', tip: '…' }].
+      has / not = hele woorden die (niet) in het gegeven antwoord staan, zonder accenten en leestekens; has mag ook een lijst zijn. */
+  function tipFor(user, fb) {
+    if (!fb || !user) return '';
+    const N = s => ' ' + S.check.bare(S.check.norm(s)) + ' ';
+    const u = N(user), inU = x => u.includes(N(x));
+    const hit = fb.find(f => [].concat(f.has || []).some(inU) && ![].concat(f.not || []).some(inU));
+    return hit ? hit.tip : '';
+  }
   function genderOf(full) {
     if (S.lang.gender) { const a = (String(full).match(ART) || [])[1]; return (a && S.lang.gender(a.toLowerCase(), String(full).replace(ART, ''))) || ''; }
     if (TGT === 'nl') { const a = (String(full).match(ART) || [])[1]; return a && a.toLowerCase() === 'het' ? 'een het-woord' : a && a.toLowerCase() === 'de' ? 'een de-woord' : ''; }
@@ -122,7 +132,7 @@
   /* ---------- content-oefeningen normaliseren ---------- */
   function normEx(e, unit, idx, opts = {}) {
     const id = unit && idx != null ? 'x|' + unit.id + '|' + idx : null;
-    const base = { srsId: opts.noSrs ? null : id, tag: e.tag || 'vocab', x: e.x, i: e.i, uitz: e.uitz, skill: 'grammar' };
+    const base = { srsId: opts.noSrs ? null : id, tag: e.tag || 'vocab', x: e.x, i: e.i, uitz: e.uitz, fb: e.fb, skill: 'grammar' };
     switch (e.t) {
       case 'mc': return { ...base, kind: 'mc', q: e.q, options: U.shuffle(e.o), answer: e.o[0], skill: opts.skill || base.skill };
       case 'cloze':
@@ -517,5 +527,5 @@
     return { level, next, nextFrac: nb && nb.n ? nb.ok / nb.n : 0 };
   }
 
-  S.Gen = { focusSession, half, attachSrc, difficulty, isHard, mix, easeNext, STEPS, stepSession, reviewSession, reviewCount, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, sprintPick, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART, forms, wordSynonyms, checkType };
+  S.Gen = { tipFor, focusSession, half, attachSrc, difficulty, isHard, mix, easeNext, STEPS, stepSession, reviewSession, reviewCount, levelExam, conjTraining, weakTraining, listenTraining, speakTraining, sprint, sprintPick, placementBand, levelTestBand, levelTestResult, TEST_PASS, resolve, learnedUnits, wordItem, normEx, conjItem, parts, ART, forms, wordSynonyms, checkType };
 })(window.SPT);

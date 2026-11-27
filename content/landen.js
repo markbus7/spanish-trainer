@@ -46,7 +46,7 @@
         ['¡a la gran!', 'wauw! / jeetje!', 'i'], ['la chumpa', 'de jas'], ['la camioneta', 'de bus (tussen steden)'], ['¿va?', 'oké? / afgesproken?', 'i'], ['cabal', 'precies, klopt', 'i'], ['shute', 'nieuwsgierig', 'i', 'chute'], ['muchá', 'jongens! (tegen een groep)', 'i'], ['la mara', 'de vrienden, de groep', 'i'], ['¡qué clavo!', 'wat een gedoe!', 'i'], ['¡chish!', 'bah! / gatver!', 'i'], ['el cuate', 'de vriend', 'i'], ['chucho', 'de hond (ook: gierig)', 'i'], ['la chela', 'het biertje', 'i'], ['¡a la gran puchis!', 'jeetje!', 'i']],
       fact: 'De kleurrijke «chicken buses» zijn oude Amerikaanse schoolbussen. Ze heten hier «camionetas».' },
 
-    { id: 'sv', flag: '🇸🇻', name: 'El Salvador', city: 'San Salvador', speakers: '±6 mln', group: 'noord', voice: 'SV', listen: 'es-SV', pin: [132, 236], line: true,
+    { id: 'sv', flag: '🇸🇻', name: 'El Salvador', city: 'San Salvador', speakers: '±6 mln', group: 'noord', voice: 'SV', listen: 'es-SV', pin: [132, 236], line: true, unit: 'b2-17',
       hello: ['¡Hola, vos! Bienvenido a El Salvador.', 'Hoi, jij! Welkom in El Salvador.'],
       intro: 'Het kleinste land van het Midden-Amerikaanse vasteland. Bekend om de pupusa, een gevulde maïspannenkoek.',
       sounds: [
@@ -57,7 +57,7 @@
         ['el pisto', 'het geld', 'i'], ['la pupusa', 'de gevulde maïspannenkoek'], ['vaya pues', 'oké dan'], ['¡puchica!', 'verdorie!', 'i'], ['la chamba', 'het werk', 'i'], ['bayunco', 'onnozel, gek', 'i'], ['¿qué ondas?', 'hoe is het?', 'i'], ['¡va pues!', 'oké, goed!', 'i'], ['la jaña', 'de vriendin', 'i'], ['bolo / bola', 'dronken', 'i'], ['la birria', 'het bier', 'i'], ['chucho', 'de hond (ook: gierig)', 'i'], ['chulón / chulona', 'naakt', 'i'], ['¡qué pijudo!', 'wat geweldig!', 'g']],
       fact: 'Elke tweede zondag van november is het de nationale Dag van de Pupusa.' },
 
-    { id: 'hn', flag: '🇭🇳', name: 'Honduras', city: 'Tegucigalpa', speakers: '±10 mln', group: 'noord', voice: 'HN', listen: 'es-HN', pin: [204, 158], line: true,
+    { id: 'hn', flag: '🇭🇳', name: 'Honduras', city: 'Tegucigalpa', speakers: '±10 mln', group: 'noord', voice: 'HN', listen: 'es-HN', pin: [204, 158], line: true, unit: 'b2-14',
       hello: ['¡Hola, vos! Bienvenido a Honduras.', 'Hoi, jij! Welkom in Honduras.'],
       intro: 'Hondurezen noemen zichzelf «catrachos». Aan de kust en op de eilanden hoor je ook Engels en Garifuna.',
       sounds: [
@@ -68,7 +68,7 @@
         ['alero / alera', 'beste vriend(in)', 'i'], ['la baleada', 'de gevulde tortilla met bonen'], ['¡púchica!', 'verdorie!', 'i'], ['la mara', 'de groep mensen (ook: bende)', 'i'], ['el bolo', 'de dronkaard', 'i'], ['maje', 'gast', 'i'], ['el volado', 'het ding', 'i'], ['la pulpería', 'de buurtwinkel'], ['chele / chela', 'lichthuidige, blanke', 'i'], ['chucho', 'de hond', 'i'], ['la birra', 'het bier', 'i'], ['¡qué pena!', 'sorry / wat gênant']],
       fact: 'Op de Bay Islands (Roatán, Utila) is Engels voor veel mensen de moedertaal.' },
 
-    { id: 'ni', flag: '🇳🇮', name: 'Nicaragua', city: 'Managua', speakers: '±7 mln', group: 'noord', voice: 'NI', listen: 'es-NI', pin: [244, 196], line: true,
+    { id: 'ni', flag: '🇳🇮', name: 'Nicaragua', city: 'Managua', speakers: '±7 mln', group: 'noord', voice: 'NI', listen: 'es-NI', pin: [244, 196], line: true, unit: 'b2-15',
       hello: ['¡Hola, vos! Bienvenido a Nicaragua.', 'Hoi, jij! Welkom in Nicaragua.'],
       intro: 'Land van meren en vulkanen. Nicaraguanen noemen zichzelf «nicas». Voseo hoor je hier overal, zelfs in reclames.',
       sounds: [
@@ -225,7 +225,7 @@
         ['huevón / weón', 'gast (onder vrienden; ook scheldwoord)', 'g'], ['la talla', 'de grap', 'i'], ['carretear', 'uitgaan, feesten', 'i'], ['el copete', 'het drankje (alcohol)', 'i'], ['cuático', 'heftig, apart', 'i'], ['la guagua', 'de baby'], ['¡filo!', 'laat maar, maakt niet uit', 'i'], ['el flaite', 'de straatgast', 'i'], ['¡pucha!', 'balen!', 'i'], ['¡la raja!', 'geweldig!', 'g']],
       fact: '«La once» (de elf) is een lichte maaltijd met thee en brood, rond zes uur ’s avonds.' },
 
-    { id: 'ar', flag: '🇦🇷', name: 'Argentinië', city: 'Buenos Aires', speakers: '±46 mln', group: 'zuid', voice: 'AR', listen: 'es-AR', pin: [356, 604],
+    { id: 'ar', flag: '🇦🇷', name: 'Argentinië', city: 'Buenos Aires', speakers: '±46 mln', group: 'zuid', voice: 'AR', listen: 'es-AR', pin: [356, 604], unit: 'b2-16',
       hello: ['¡Hola, che! ¿Todo bien? Bienvenido a la Argentina.', 'Hoi! Alles goed? Welkom in Argentinië.'],
       intro: 'Het Spaans van Buenos Aires klinkt het meest anders: «vos» in plaats van «tú», een «sj»-klank en een Italiaanse melodie.',
       sounds: [

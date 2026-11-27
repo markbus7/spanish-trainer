@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/landen-praten.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/begrippen-fr.js', 'js/zwak.js']) {
+for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/b2-2.js', 'content/extra.js', 'content/landen.js', 'content/landen-praten.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/begrippen-fr.js', 'js/begrippen-de.js', 'js/begrippen-tr.js', 'js/zwak.js', 'content/beslisregels.js', 'js/strategie.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -40,7 +40,8 @@ const known = {
   'ser|impsubj': 'fuera fueras fuera fuéramos fueran', 'decir|impsubj': 'dijera dijeras dijera dijéramos dijeran',
   'dormir|impsubj': 'durmiera durmieras durmiera durmiéramos durmieran', 'leer|impsubj': 'leyera leyeras leyera leyéramos leyeran',
   'saber|impsubj': 'supiera supieras supiera supiéramos supieran', 'haber|impsubj': 'hubiera hubieras hubiera hubiéramos hubieran',
-  'hacer|condperf': 'habría hecho|habrías hecho|habría hecho|habríamos hecho|habrían hecho', 'ver|plussubj': 'hubiera visto|hubieras visto|hubiera visto|hubiéramos visto|hubieran visto'
+  'hacer|condperf': 'habría hecho|habrías hecho|habría hecho|habríamos hecho|habrían hecho', 'ver|plussubj': 'hubiera visto|hubieras visto|hubiera visto|hubiéramos visto|hubieran visto',
+  'decir|perfsubj': 'haya dicho|hayas dicho|haya dicho|hayamos dicho|hayan dicho', 'volver|futperf': 'habré vuelto|habrás vuelto|habrá vuelto|habremos vuelto|habrán vuelto'
 };
 for (const [k, v] of Object.entries(known)) {
   const [verb, tense] = k.split('|');
@@ -70,7 +71,7 @@ ok(C('ano', ['año']).warn === 'enye', 'ñ-waarschuwing');
 
 /* ---------- lesstof ---------- */
 const units = S.C.all();
-ok(units.length === 45, 'aantal units = ' + units.length);
+ok(units.length === 52, 'aantal units = ' + units.length);
 const ids = new Set();
 const tags = S.C.TAGS;
 for (const u of units) {
@@ -983,7 +984,24 @@ await micTests();
     ok(hd.some(x => x.id === 'x|a1-04|5' && x.unit === 'a1-04' && x.f === 4 && x.a), 'oefenfouten: vaak fout uit de herhaling, met antwoord');
     ok(Mi.asText(Mi.report(30)).includes('[x|a1-04|5]'), 'oefenfouten: vaak fout staat in de tekst');
     ok(Mi.asText(Mi.report(30)).includes('✔ al verwerkt in v') && Mi.asText(Mi.report(30)).includes('Al verwerkt in eerdere updates'), 'verwerkt: Lupe ziet wat al in de app zit');
-    ok((S.reworked || []).every(x => (x.tag ? S.C.TAGS[x.tag] && S.C.get(x.unit) : x.ids.every(id => S.C.word(S.C.get(id.split('|')[1]), +id.split('|')[2]))) && /^\d{4}-\d\d-\d\d(T\d\d:\d\d:\d\dZ)?$/.test(x.date)), 'verwerkt: tags, units en woorden bestaan');
+    ok((S.reworked || []).every(x => (x.tag ? S.C.TAGS[x.tag] && S.C.get(x.unit) : x.ids.every(id => { const [k, a, b] = id.split('|'); return k === 'c' ? !!S.conj.table(a, b) : k === 'x' ? !!(S.C.get(a) && S.C.get(a).ex[+b]) : !!(S.C.get(a) && S.C.word(S.C.get(a), +b)); })) && /^\d{4}-\d\d-\d\d(T\d\d:\d\d:\d\dZ)?$/.test(x.date)), 'verwerkt: tags, units en woorden bestaan');
+    { // Lupe 27 nov, negende ronde: gerichte tip bij een bekende fout + nieuwe antwoorden
+      const u4b = S.C.get('a1-04'), T = S.Gen.tipFor, f = (s) => u4b.ex.find(e => (e.s === s || e.nl === s) && (e.fb || !/centro de la ciudad|Salvador/.test(s)));
+      const est = f('Nosotros ___ en el centro de la ciudad.'), sal = f('Wij reizen naar El Salvador.'), izq = f('Ga links af. (u)');
+      ok(est && /ser/.test(T('somos', est.fb)) && /est-/.test(T('esas', est.fb)) && T('estamos', est.fb) && !T('', est.fb), 'gerichte tip: ser in plaats van estar');
+      ok(/ser/.test(T('Nosotros somos en el centro.', est.fb)), 'gerichte tip: ook bij een meerkeuzezin');
+      ok(sal && sal.uitz && /Uitzondering/.test(T('Viajamos al Salvador', sal.fb)) && /plak/.test(T('Es el carro de el señor Pérez', sal.fb)) && /del señor/.test(T('Es el carro de señor Perez', sal.fb)), 'gerichte tip: al/del en de uitzondering El Salvador');
+      ok(izq && /a la/.test(T('gira izquerda', izq.fb)) && /qui/.test(T('Gire a la izquerda', izq.fb)) && /gire/.test(T('Gira a la izquierda', izq.fb)), 'gerichte tip: a la izquierda');
+      const nx = S.Gen.normEx(est, u4b, u4b.ex.indexOf(est));
+      ok(nx.fb === est.fb && !S.Gen.checkType('somos', nx).ok && S.Gen.checkType('estamos', nx).ok, 'gerichte tip: komt mee in de oefening');
+      const bus = f('Waar is het busstation?');
+      ok(C('donde esta la parada de bus', bus.a, { strict: false }).ok && C('¿Dónde está la parada de autobús?', bus.a).ok, 'busstation: parada de bus/autobús telt, ook zonder accenten');
+      ok(C('donde esta mi telefono', f('Waar is mijn telefoon?').a, { strict: false }).ok, 'telefoon: teléfono telt, ook zonder accent');
+      const post = S.Gen.wordItem(S.C.word(u4b, 35), 'type', u4b);
+      ok(S.Gen.checkType('el correo', post).ok && S.Gen.checkType('la oficina de correos', post).ok, 'postkantoor: el correo telt ook goed');
+      ok(u4b.ex.filter(e => e.t === 'match').length >= 2 && (S.Gloss.lookup('está') || {}).t === 'estar', 'koppeloefening estar verandert de tikvertaling niet');
+      ok(u4b.grammar.some(g => /eSTAr/.test(g.t) && /Uitzondering/.test(g.html)) && u4b.grammar.some(g => /twee vragen/.test(g.t) && /Uitzondering/.test(g.html) && /Reden/.test(g.html)), 'andere aanpak: ezelsbruggetje en stappenplan, uitzondering met reden');
+    }
     const md = S.md ? S.md('- **Titel** (uitleg erbij)\n  Waar: a1-04\n  Wat: iets\n- Tweede') : '';
     ok(!S.md || (md.match(/<li>/g) || []).length === 2 && md.includes('Waar: a1-04'), 'voorstellen: ingesprongen regels horen bij hetzelfde punt');
   }
@@ -1350,7 +1368,7 @@ await micTests();
       ok(ck('ich heisse anna', 'Ich heiße Anna.').ok && ck('ich heisse anna', 'Ich heiße Anna.').warn === 'accent' && ck('Schon', 'schön').warn === 'accent', w + 'ss voor ß en ontbrekende umlaut: goed met waarschuwing');
       const r = K.Gen.checkType('der Haus', { answers: ['das Haus'], articleOptional: true });
       ok(!r.ok && r.warn === 'article-wrong' && /onzijdig/.test(r.gender), w + 'fout lidwoord der/die/das met geslacht');
-      ok(K.C.all().length === 30, w + 'A1–B1 = 30 units');
+      ok(K.C.all().length === 40 && K.C.unitsOf('B2').length === 10, w + 'A1–B2 = 40 units');
       // uitzonderingen worden benoemd, met reden
       const U = K.Uitz, has = (l, re) => l.some(x => re.test(x.t + ' ' + x.html));
       ok(U.label() === '⚠️ Uitzondering' && has(U.forWord('das Mädchen'), /-chen/) && has(U.find('Ich helfe dir gern.'), /derde naamval/) && has(U.find('Ich bin zu Hause geblieben.'), /sein/) && has(U.find('Er fährt nach Berlin.'), /ä/) && has(U.find('Berlin ist größer als München.'), /Umlaut/), w + 'uitzonderingen met reden (das Mädchen, helfen + dir, ist geblieben, fährt, größer)');
@@ -1606,6 +1624,32 @@ await micTests();
     ok(G.match('De subjonctif, de passé composé, de imparfait en de gérondif.').map(x => x.id).join() === 'subjuntivo,indefinido,imperfecto,gerundio', w + 'Franse tijdnamen tikbaar');
     ok(G.search('subjonctif')[0].id === 'subjuntivo', w + 'Frans zoeken');
     S.course = c0; G.match('x'); }
+  // Duits: eigen bestand js/begrippen-de.js; Duitse blokken plus begrippen die alleen in het Duits bestaan (naamval, Umlaut …)
+  { const c0 = S.course; S.course = { target: 'de', ui: 'nl' };
+    const dl = G.list('de');
+    ok(dl.length >= 60 && !G.fits(G.get('por-para'), 'de') && !G.fits(G.get('subjuntivo'), 'de') && G.fits(G.get('de-naamval'), 'de') && !G.fits(G.get('de-naamval'), 'es') && !G.fits(G.get('de-umlaut'), 'fr'), w + 'Duits: aantal ' + dl.length + ', eigen begrippen alleen bij Duits');
+    dl.forEach(b => { const k = b.de; ok(k && k.n && k.html && k.ex && k.ex.length >= 1 && k.ex.every(([e, n]) => e && n) && b.t && b.k && b.html && G.CATS.some(c => c[0] === b.c), w + 'de ' + b.id + ' blok met voorbeelden');
+      (k.table || []).forEach(r => ok(r.length === k.table[0].length, w + 'de ' + b.id + ' tabelrij'));
+      (k.uz || []).forEach(u => ok(u[0] && /<b>Waarom\?<\/b>/.test(u[1]), w + 'de ' + b.id + ' uitzondering met reden: ' + u[0]));
+      if (/^de-/.test(b.id)) (b.rel || []).forEach(r => ok(G.get(r) && G.fits(G.get(r), 'de'), w + 'de ' + b.id + ' verwijst naar ' + r)); });
+    ok(G.title(G.get('condicional')).startsWith('Konjunktiv II') && G.title(G.get('lidwoord')) === 'Lidwoord', w + 'Duits: eigen titel');
+    ok(G.match('De Akkusativ, de derde naamval, de Konjunktiv II, een scheidbaar werkwoord en de Umlaut.').map(x => x.id).join() === 'de-akkusativ,de-dativ,condicional,de-trennbar,de-umlaut', w + 'Duitse termen tikbaar: ' + G.match('De Akkusativ, de derde naamval, de Konjunktiv II, een scheidbaar werkwoord en de Umlaut.').map(x => x.id).join());
+    ok(G.match('de Konjunktiv I en het Partizip I')[0].id === 'de-konj1' && G.match('het Partizip II')[0].id === 'deelwoord' && G.search('Dativ').some(b => b.id === 'de-dativ'), w + 'Konjunktiv I ≠ II, Partizip I ≠ II, zoeken');
+    S.course = c0; G.match('x'); }
+  // Turks: eigen bestand js/begrippen-tr.js; Turkse blokken plus begrippen die alleen in het Turks bestaan (klinkerharmonie, naamval …)
+  { const c0 = S.course; S.course = { target: 'tr', ui: 'nl' };
+    const tl = G.list('tr');
+    ok(tl.length >= 58 && !G.fits(G.get('por-para'), 'tr') && !G.fits(G.get('stamwissel'), 'tr') && G.fits(G.get('tr-klinkerharmonie'), 'tr') && !G.fits(G.get('tr-klinkerharmonie'), 'es') && !G.fits(G.get('tr-naamval'), 'de') && !G.fits(G.get('de-naamval'), 'tr'), w + 'Turks: aantal ' + tl.length + ', eigen begrippen alleen bij Turks');
+    tl.forEach(b => { const k = b.tr; ok(k && k.n && k.html && k.ex && k.ex.length >= 2 && k.ex.every(([e, n]) => e && n) && b.t && b.k && b.html && G.CATS.some(c => c[0] === b.c), w + 'tr ' + b.id + ' blok met voorbeelden');
+      (k.table || []).forEach(r => ok(r.length === k.table[0].length, w + 'tr ' + b.id + ' tabelrij'));
+      (k.uz || []).forEach(u => ok(u[0] && /<b>Waarom\?<\/b>/.test(u[1]), w + 'tr ' + b.id + ' uitzondering met reden: ' + u[0]));
+      ok(!/Lima|Quito|Mexic|Spaans/.test(JSON.stringify([G.title(b), k.k || b.k, k.gen || b.html, k])), w + 'tr ' + b.id + ' geen Spaanse resten');
+      if (/^tr-/.test(b.id)) (b.rel || []).forEach(r => ok(G.get(r) && G.fits(G.get(r), 'tr'), w + 'tr ' + b.id + ' verwijst naar ' + r)); });
+    ok(G.title(G.get('indefinido')) === 'Verleden tijd (-di)' && G.title(G.get('aanspreken')) === 'Sen en siz' && G.title(G.get('lidwoord')) === 'Lidwoord', w + 'Turks: eigen titel');
+    const tm = G.match('De klinkerharmonie, een naamval, het achtervoegsel, de brede tijd, van horen zeggen en een achterzetsel.').map(x => x.id).join();
+    ok(tm === 'tr-klinkerharmonie,tr-naamval,tr-achtervoegsel,tr-bredetijd,perfecto,tr-achterzetsel', w + 'Turkse termen tikbaar: ' + tm);
+    ok(G.search('ünlü uyumu')[0].id === 'tr-klinkerharmonie' && G.search('geniş zaman').some(b => b.id === 'tr-bredetijd'), w + 'Turks zoeken');
+    S.course = c0; G.match('x'); }
   // Engels: begrippen zonder Engels blok (por/para, stamklinkerwisseling) horen niet bij de Engelse cursus
   ok(!G.fits(G.get('por-para'), 'en') && G.fits(G.get('lidwoord'), 'en') && G.list('en').length < G.list('es').length, w + 'per doeltaal');
 }
@@ -1672,6 +1716,72 @@ const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((
   ok(ses.items.length > 1 && ses.items.some(i => i.srsId === 'w|' + u.id + '|0'), 'zwak: oefensessie met onderwerp en woord');
   S.Store.state = keep;
 }
+{ // 🧪 andere aanpak bij hardnekkige fouten: strategie kiezen, effect meten, wat werkt krijgt voorrang
+  const keep = S.Store.state; S.Store.state = JSON.parse(JSON.stringify(keep));
+  const St = S.Store.state, X = S.Strat, t0 = new Date('2026-11-20T12:00:00Z').getTime(), DAY = 864e5;
+  St.strat = {}; St.lupe = { log: [], n: 0, ex: [] }; St.srs = {};
+  St.units = { 'a1-04': { steps: { grammar: 1 }, best: 0, done: true }, 'a1-02': { steps: { grammar: 1 }, best: 0, done: true } };
+  St.tags = { contractions: { ok: 8, no: 13 }, 'hay-estar': { ok: 3, no: 9 }, articles: { ok: 9, no: 1 }, gender: { ok: 2, no: 2 }, vocab: { ok: 0, no: 30 } };
+  ok(X.isStubborn('contractions') && !X.isStubborn('articles') && !X.isStubborn('gender'), 'strategie: hardnekkig = vaak geoefend en onder 70%');
+  ok(X.keyOf({ tag: 'vocab' }) === '' && X.keyOf({ tag: 'conj', conj: { verb: 'estar', tense: 'pres' } }) === 'c|estar|pres' && X.keyOf({ tag: 'x', sk: 'y' }) === 'y', 'strategie: onderwerp van een vraag');
+  const tp = X.topics();
+  ok(tp.length === 2 && tp[0].key === 'hay-estar' && tp[1].key === 'contractions' && tp.every(t => t.next), 'strategie: hardnekkige onderwerpen, zwakste eerst, met voorstel: ' + tp.map(t => t.key));
+  ok(S.beslis && S.beslis.contractions && X.pick('contractions').id === 'regel', 'strategie: begint met de beslisregel');
+  for (const sid of ['regel', 'contrast', 'bouw', 'dictee', 'spreid']) {
+    const ses = X.session('contractions', sid, 1);
+    const q = ses ? ses.items.filter(i => i.kind !== 'info') : [];
+    ok(ses && q.length >= 3 && ses.items[0].kind === 'info' && ses.items[0].strat && q.every(i => i.sk === 'contractions' && i.st === 1 && i.tag), 'strategie ' + sid + ': ronde met intro en gemerkte vragen');
+    if (sid === 'contrast') ok(q.filter(i => i.q === 'Welke zin is goed?').length >= 3 && q.filter(i => i.q === 'Welke zin is goed?').every(i => i.options.includes(i.answer) && new Set(i.options).size === i.options.length && !/___/.test(i.answer)), 'strategie contrast: hele zinnen naast elkaar');
+    if (sid === 'dictee') ok(q.filter(i => i.kind === 'listen').length >= 3 && q.filter(i => i.kind === 'listen').every(i => !/___/.test(i.text)), 'strategie dictee: hele zinnen');
+    if (sid === 'bouw') ok(q.every(i => i.kind === 'order' || i.kind === 'type') && q.every(i => !i.options), 'strategie bouw: zonder keuzes');
+    if (sid === 'spreid') ok(q.length === 3, 'strategie spreid: 3 vragen per dag');
+    if (sid === 'regel') ok(ses.items[1].strat && /al/.test(ses.items[1].strat.html) && /Uitzondering/.test(ses.items[1].strat.html), 'strategie regel: beslisregel met uitzondering erbij');
+  }
+  ok(!X.available('contractions', 'fouten') && !X.available('contractions', 'lupe'), 'strategie: eigen fouten/docent alleen als het kan');
+  St.lupe.ex = [{ t: t0, id: 'x|a1-04|14', tag: 'contractions', q: 'q', u: 'a el', a: 'al' }, { t: t0 + 1, id: 'x|a1-04|15', tag: 'contractions', q: 'q2', u: 'de el', a: 'del' }];
+  const fs2 = X.session('contractions', 'fouten', 1);
+  ok(fs2 && /a el/.test(fs2.items[1].strat.html) && fs2.items.some(i => i.srsId === 'x|a1-04|14'), 'strategie fouten: je eigen fouten op de kaart en opnieuw gevraagd');
+  // poging 1 (regel): tijdens 4/5, daarna 2/6 → hielp niet
+  const a = X.begin('contractions', 'regel', t0);
+  ok(Math.round(a.b[0] / a.b[1] * 100) === 38, 'strategie: uitgangspunt bewaard');
+  for (let i = 0; i < 5; i++) X.answer({ tag: 'contractions', st: a.t, sk: 'contractions' }, i < 4, t0 + i);
+  ok(X.verdict(a).state === 'open' && a.in[0] === 4 && a.in[1] === 5 && a.af[1] === 0, 'strategie: vragen uit de ronde zelf tellen niet als effect');
+  for (let i = 0; i < 6; i++) X.answer({ tag: 'contractions' }, i < 2, t0 + DAY + i);
+  ok(X.verdict(a).state === 'niet' && X.verdict(a).sticks === false, 'strategie: geen verbetering = hielp niet');
+  ok(X.pick('contractions').id !== 'regel', 'strategie: wat niet hielp komt niet meteen terug');
+  // poging 2 (contrast): daarna 6/7, ook een dag later → werkt en blijft hangen
+  const b = X.begin('contractions', 'contrast', t0 + 2 * DAY);
+  for (let i = 0; i < 7; i++) X.answer({ tag: 'contractions' }, i > 0, t0 + 3 * DAY + i);
+  const vb = X.verdict(b);
+  ok(vb.state === 'werkt' && vb.sticks === true && /werkt/.test(X.tryText(b)) && /blijft hangen/.test(X.tryText(b)), 'strategie: verbetering die een dag later nog staat = werkt en blijft hangen');
+  const G = X.stats();
+  ok(G.contrast.werkt === 1 && G.regel.niet === 1 && G.contrast.score > G.dictee.score && G.regel.score < G.dictee.score, 'strategie: score per strategie');
+  ok(X.rank('hay-estar')[0].s.id === 'contrast' || !X.available('hay-estar', 'contrast'), 'strategie: wat bij jou werkt gaat voor bij een ander onderwerp');
+  ok(X.rank('hay-estar').findIndex(x => x.s.id === 'regel') > 0, 'strategie: wat niet werkte zakt');
+  const tx = X.asText();
+  ok(/al \/ del \[contractions\]/.test(tx) && /Beslisregel: 38% → 33%/.test(tx) && /hielp niet/.test(tx) && /Contrastparen/.test(tx) && /Wat bij deze leerling werkt/.test(tx) && /hay vs\. estar \[hay-estar\].*nog geen andere aanpak/.test(tx), 'strategie: tekst voor het rapport: ' + tx);
+  ok(S.Mistakes.asText(S.Mistakes.report(30)).includes('Hardnekkige onderwerpen en geprobeerde leerstrategieën'), 'strategie: staat in het rapport van de docent');
+  // werkwoordstijd
+  St.srs['c|estar|pres'] = { d: 0, i: 0, e: 2, r: 0, l: 3, f: 6, g: 3 };
+  ok(X.isStubborn('c|estar|pres') && X.label('c|estar|pres').startsWith('estar vervoegen'), 'strategie: hardnekkige werkwoordstijd');
+  for (const sid of ['regel', 'contrast', 'bouw', 'dictee', 'spreid']) { const ses = X.session('c|estar|pres', sid, 2); ok(ses && ses.items.filter(i => i.kind !== 'info').length >= 3 && ses.items.filter(i => i.kind !== 'info').every(i => i.sk === 'c|estar|pres'), 'strategie ' + sid + ': werkwoordstijd'); }
+  // elke dag een beetje: dag telt bij de eerste vraag van die dag
+  const c = X.begin('hay-estar', 'spreid', t0); St.strat['hay-estar'].drip = { t: c.t, s: S.U.dayIndex(new Date(t0)), n: 0, d: 0 };
+  X.answer({ tag: 'hay-estar', st: c.t, sk: 'hay-estar' }, true, t0); X.answer({ tag: 'hay-estar', st: c.t, sk: 'hay-estar' }, true, t0 + 5);
+  ok(St.strat['hay-estar'].drip.n === 1, 'strategie spreid: één dag geteld');
+  // synchroniseren: pogingen van beide apparaten, de volste versie per poging
+  const other = JSON.parse(JSON.stringify(St.strat)); other.contractions.tries[1].af = [1, 2]; other.contractions.tries.push({ s: 'dictee', t: t0 + 9 * DAY, b: [1, 2], in: [0, 0], af: [0, 0], ld: [0, 0] }); other.gustar = { r: '10', u: 5, tries: [] };
+  const m = X.merge(St.strat, other), m2 = X.merge(other, St.strat);
+  ok(m.contractions.tries.length === 3 && m.contractions.tries[1].af[1] === 7 && m.gustar && JSON.stringify(m.contractions.tries) === JSON.stringify(m2.contractions.tries), 'strategie: samenvoegen bij synchroniseren');
+  const files = fs.readFileSync(path.join(root, 'index.html'), 'utf8'), sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  ok(['js/strategie.js', 'content/beslisregels.js'].every(f => files.includes(f) && sw.includes(f)), 'strategie: in index.html en sw.js');
+  Object.entries(S.beslis).forEach(([k, r]) => {
+    ok(/^c\|/.test(k) ? !!S.conj.table(k.split('|')[1], k.split('|')[2]) : !!S.C.TAGS[k], 'beslisregel: bestaand onderwerp ' + k);
+    (r.html.match(/<p>[^<]*Uitzondering[\s\S]*?<\/p>/g) || []).forEach(p => ok(/Reden:/.test(p), 'beslisregel ' + k + ': uitzondering met reden'));
+    ok(!/vosotros/i.test(r.html), 'beslisregel ' + k + ': Latijns-Amerikaans');
+  });
+  S.Store.state = keep;
+}
 { // laatste unittoets overleeft synchroniseren (nieuwste wint)
   const a = { updated: 2, units: { u1: { steps: {}, best: 0.6, done: false, last: { t: 100, score: 0.6 } } } };
   const b = { updated: 1, units: { u1: { steps: {}, best: 0.7, done: false, last: { t: 200, score: 0.7 } } } };
@@ -1684,6 +1794,13 @@ const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((
   ok(/@font-face \{ font-family: 'Vlaggen'/.test(css) && /:root\.vlagfont \{ --font: 'Vlaggen'[^}]*--serif: 'Vlaggen'/.test(css), 'vlaggen: @font-face en .vlagfont in css');
   ok(html.includes("classList.add('vlagfont')") && html.indexOf('vlagfont') < html.indexOf('css/app.css'), 'vlaggen: index.html test of de browser vlaggen tekent');
   ok(!app.split('\n').some(l => /h\('select'/.test(l) && /CNAME|LNAME|\.flag/.test(l)), 'vlaggen: geen <select> met vlaggen (gebruik coursePick)');
+}
+{ // leestekst en vraag samen in beeld
+  const css = fs.readFileSync(path.join(root, 'css/app.css'), 'utf8'), ls = fs.readFileSync(path.join(root, 'js/lesson.js'), 'utf8');
+  ok(/function textSource\(\)/.test(ls) && /syncText\(\);/.test(ls) && !ls.includes('ls-src-btn'), 'tekst naast vraag: tekstvak in de les, geen losse «Lees eerst»-knop meer');
+  ok(/@container lesson \(min-width: \d+px\) \{\s*\.ls\.with-txt \{ display: grid/.test(css) && /\.ls-txt \{[^}]*overflow-y: auto/.test(css), 'tekst naast vraag: naast elkaar op breed scherm, eigen scrollvak op smal scherm');
+  const t = S.Gen.stepSession(S.C.get('a1-04'), 'test').items.find(i => i.src);
+  ok(t && t.src.reading && t.skill === 'read' && S.Gen.stepSession(S.C.get('a1-04'), 'read').items.slice(1).some(i => i.skill === 'read' && i.kind === 'mc'), 'tekst naast vraag: leesvragen herkenbaar (src of skill read)');
 }
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);
