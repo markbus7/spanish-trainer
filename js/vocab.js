@@ -178,6 +178,7 @@
     const wrap = h('div', { class: 'page voc-page' });
     const list = all(); const n = counts(list);
     wrap.append(h('a', { class: 'back', href: '#/perfil' }, '← Perfil'), h('h1', null, '📋 Mijn woordenschat'),
+      h('a', { class: 'btn ghost small voc-zwak', href: '#/zwak' }, '🎯 Al je zwakke punten (woorden én grammatica) op één plek'),
       h('p', { class: 'muted' }, 'Alles wat in je herhaling staat: ' + U.plural(n.w, 'woord', 'woorden') + ', ' + U.plural(n.x, 'zin of oefening', 'zinnen en oefeningen') + ' en ' + U.plural(n.c, 'werkwoordstijd', 'werkwoordstijden') + '. Tik op een regel voor details.'),
       h('a', { class: 'btn ghost small', href: '#/woordtoets' }, '⚡ Woordensprint met nieuwe woorden: zet wat je al kent er snel bij'));
     if (!list.length) {
@@ -228,5 +229,8 @@
     return wrap;
   }
 
-  S.Vocab = { page, all, describe, filter, counts, strength, isWeak, example, SORTS };
+  /** Open Mijn woordenschat met één groep al gekozen (bv. vanaf Zwakke punten). */
+  function show(group) { F.group = group || 'all'; F.type = 'all'; F.level = 'all'; F.q = ''; F.sort = 'weak'; location.hash = '#/woordenschat'; }
+
+  S.Vocab = { page, all, describe, filter, counts, strength, isWeak, example, SORTS, row, practice, show };
 })(window.SPT);

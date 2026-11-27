@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js']) {
+for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/zwak.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -1510,6 +1510,18 @@ const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((
   const r2 = S.Gen.checkType('debajo', S.Gen.wordItem(S.C.word(u4, 41), 'type', u4));
   ok(!r2.ok && r2.hint === '… de', '«debajo» krijgt hint «… de»');
   ok(!S.Gen.checkType('izquierda', der).hint, 'een ander woord krijgt geen hint');
+}
+{ // zwakke punten: grammatica en woorden op één plek
+  const keep = S.Store.state; S.Store.state = JSON.parse(JSON.stringify(keep));
+  const t = S.U.dayIndex(), u = S.C.all()[0];
+  S.Store.state.tags = { 'ser-estar': { ok: 2, no: 6 }, articles: { ok: 9, no: 1 }, gustar: { ok: 1, no: 1 }, vocab: { ok: 0, no: 9 } };
+  S.Store.state.srs = { ['w|' + u.id + '|0']: { d: t, i: 1, e: 2.4, r: 0, l: 2, s: Date.now() }, ['w|' + u.id + '|1']: { d: t + 30, i: 30, e: 2.8, r: 5, l: 0, s: Date.now() } };
+  const sm = S.Weak.summary();
+  ok(sm.topics.length === 1 && sm.topics[0].tag === 'ser-estar' && Math.round(sm.topics[0].pct * 100) === 25, 'zwak: alleen onderwerpen onder 80% met genoeg antwoorden, geen vocab');
+  ok(sm.words.length === 1 && sm.words[0].id === 'w|' + u.id + '|0', 'zwak: alleen zwakke kaarten');
+  const ses = S.Weak.session(['ser-estar'], ['w|' + u.id + '|0']);
+  ok(ses.items.length > 1 && ses.items.some(i => i.srsId === 'w|' + u.id + '|0'), 'zwak: oefensessie met onderwerp en woord');
+  S.Store.state = keep;
 }
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);

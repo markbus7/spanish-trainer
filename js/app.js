@@ -604,6 +604,9 @@
         bar(nb0.frac, 'var(--gold)'), h('small', { class: 'bdg-left' }, h('b', null, nb0.left), ' · ' + pct(nb0.frac))),
       h('span', { class: 'fold-chev', 'aria-hidden': 'true' }, '›'))));
 
+    // zwakke punten: woorden en grammatica die nog niet goed gaan, met één knop om ze te oefenen
+    const zc = S.Weak && S.Weak.hoyCard(); if (zc) wrap.append(section(null, zc));
+
     // Lupe zag in je gesprekken steeds dezelfde fout: kort oefenen
     const fc = lupeFocusCard(); if (fc) wrap.append(section('Uit je gesprekken met Lupe', fc));
 
@@ -613,6 +616,7 @@
 
     // snelle training
     wrap.append(section('Extra oefenen', h('div', { class: 'quick' },
+      quick('🎯', 'Zwakke punten', zc ? 'woorden en grammatica' : 'nu niets zwaks', () => { location.hash = '#/zwak'; }, null, 'Zie wat nog niet goed gaat en oefen het gericht'),
       quick('⚡', 'Woordensprint', '2 min of zelf kiezen', () => { location.hash = '#/woordtoets'; }, d.done.sprint, 'Zoveel mogelijk woorden op tijd, of test nieuwe woorden'),
       S.course.target !== 'es' ? null : quick('🧩', 'Werkwoorden', '20 vragen', () => { location.hash = '#/practica'; }, null, 'Vervoeg werkwoorden in de tijden die je kiest'),
       quick('🎧', 'Dictee', '10 zinnen', () => runSession(Gen.listenTraining(10), { desc: { kind: 'plain', mark: 'listen' } }), d.done.listen, 'Luister naar een zin en typ wat je hoort'),
@@ -1006,7 +1010,7 @@
     }
     // zwakke punten
     const weak = weakTags();
-    wrap.append(section('🎯 Zwakke punten', weak.length ? h('div', { class: 'card' },
+    wrap.append(section('🎯 Zwakke punten', h('a', { class: 'btn ghost wide zw-link', href: '#/zwak' }, '🎯 Al je zwakke punten: woorden, grammatica en uitleg'), weak.length ? h('div', { class: 'card' },
       weak.map(([t, v]) => h('div', { class: 'weak-row' }, h('span', { class: 'grow' }, C.tag(t)), h('span', { class: 'muted small' }, Math.round(v.ok / (v.ok + v.no) * 100) + '% goed'))),
       h('button', { class: 'btn primary wide', type: 'button', onclick: () => { const ses = Gen.weakTraining(weak.map(w => w[0])); if (!ses.items.length) { S.toast('Nog geen oefeningen voor deze onderwerpen'); return; } runSession(ses); } }, 'Oefen deze onderwerpen'))
       : h('p', { class: 'muted' }, 'Nog geen zwakke punten gevonden. Blijf oefenen, dan zie je hier waar je extra aandacht aan kunt geven.')));
@@ -1050,6 +1054,8 @@
   routes.tablas.tab = 'practica';
   routes.woorden = () => S.Words.page();
   routes.woorden.tab = 'practica';
+  routes.zwak = () => S.Weak.page();
+  routes.zwak.tab = 'hoy';
   routes.woordenschat = () => S.Vocab.page();
   routes.woordenschat.tab = 'perfil';
   routes.woordtoets = () => S.WordTest.page();
@@ -1685,7 +1691,9 @@
     const bv = S.Badges.view(st(), badgeEnv()), nb = bv.earned;
     wrap.append(fold('badges', '🏅', 'Badges', false, nb + ' van ' + bv.total, badgeBoard(bv)));
     wrap.append(fold('gegevens', '💾', 'Je gegevens', false, 'opslaan en terugzetten', dataTools()));
+    const zw = S.Weak ? S.Weak.summary() : { total: 0 };
     navAt.replaceWith(profNav([
+      ['🎯', 'Zwakke punten', '#/zwak', zw.total ? U.plural(zw.total, 'punt', 'punten') + ' om te oefenen' : 'woorden en grammatica', 'hot'],
       ['📋', 'Rapport van Lupe', '#/rapport', repN ? U.plural(repN, 'fout', 'fouten') : 'fouten en advies', 'hot'],
       ['💡', 'Voor de update', '#/rapport/update', rep.fix.length ? U.plural(rep.fix.length, 'antwoord', 'antwoorden') : 'voorstellen van Lupe'],
       ['🧭', 'Mijn niveau', 'niveau', est.label],
