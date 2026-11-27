@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.82.0', date: '2026-11-27',
+    nl: ['Turks: niveau B2 is er, met 10 nieuwe units: had gedaan en zou doen (-mişti, -ecekti), navertellen, vermoeden (olmalı, olamaz), zodra en sinds, elkaar en zich, werkwoorden met een vaste naamval, verbindingswoorden en ki, alsof, formeel Turks en spreektaal.', 'Turks: de niveautest gaat nu tot B2 en Lupe heeft 7 nieuwe B2-gesprekken, zoals aan het loket en bijkletsen op straat.'],
+    es: ['Turco: ya está el nivel B2, con 10 unidades nuevas: pluscuamperfecto e intención (-mişti, -ecekti), estilo indirecto, suposiciones (olmalı, olamaz), en cuanto y desde que, recíprocos y reflexivos, verbos con caso fijo, conectores y ki, como si, turco formal y lenguaje coloquial.', 'Turco: la prueba de nivel llega ahora hasta B2 y Lupe tiene 7 conversaciones B2 nuevas, como en la ventanilla y charlando en la calle.'] },
   { v: '1.81.0', date: '2026-11-27',
     nl: ['Frans: de 📖 grammaticabegrippen zijn er nu ook voor de Franse cursus. Vijftig begrippen (lidwoord, passé composé, imparfait, subjonctif, gérondif, tu en vous …) met Franse voorbeelden, tabellen en uitzonderingen met de reden erbij. Tik in de uitleg op een onderstreept woord om de korte uitleg te zien.'],
     es: ['Francés: los conceptos de gramática (📖) ahora también para el curso de francés, con ejemplos, tablas y excepciones explicadas.'] },
