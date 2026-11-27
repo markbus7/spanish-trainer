@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.86.0', date: '2026-11-27',
+    nl: ['Frans B2 compleet: tien nieuwe units. Nieuws lezen (conditionnel voor onbevestigd nieuws), subjonctif passé, voorwaarden zonder si en de ne explétif, passé simple herkennen, debatteren (bien que, malgré, avoir beau), auquel en duquel, navertellen in het verleden, y en en bij werkwoorden met à en de, futur antérieur en formele brieven. De niveautest gaat nu tot B2 en er zijn twee nieuwe gesprekken.'],
+    es: ["Francés B2 completo: diez unidades nuevas, prueba de nivel hasta B2 y dos conversaciones nuevas."] },
   { v: '1.85.0', date: '2026-11-27',
     nl: ['Duits B2 compleet: tien nieuwe units (hätte gemacht, indirecte rede met Konjunktiv I, lijdende vorm met modale werkwoorden, tweedelige voegwoorden, deelwoorden als bijvoeglijk naamwoord, dessen/deren, vaste combinaties, kleurwoordjes doch/ja/mal, naamwoordstijl, vermoedens met dürfte/soll). Nieuw voor Duits: de 📖 grammaticabegrippen, 64 begrippen met Duitse voorbeelden, tabellen en uitzonderingen met de reden erbij, waaronder naamval, Umlaut, scheidbaar werkwoord en Konjunktiv. De niveautest gaat nu tot B2.'],
     es: ['Alemán B2 completo: diez unidades nuevas, y los conceptos de gramática (📖) ahora también para el curso de alemán, con ejemplos, tablas y excepciones explicadas.'] },
