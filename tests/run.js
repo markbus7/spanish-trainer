@@ -226,7 +226,7 @@ ok(S.C.unitsOf('B1').length === 10, 'B1 heeft 10 units');
 {
   const list = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/tts-texts.js')], { maxBuffer: 64 << 20 }).toString());
   const have = new Set(list.map(x => x.k));
-  ok(list.every(x => x.k === S.Speech.clipKey(x.text, x.ns) && /^(es-[A-Z]{2}|en-[A-Z]{2}|nl-(NL|BE)|af-ZA)-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
+  ok(list.every(x => x.k === S.Speech.clipKey(x.text, x.ns) && /^(es-[A-Z]{2}|en-[A-Z]{2}|nl-(NL|BE)|af-ZA|fr-(FR|BE|CH|CA))-\w+Neural$/.test(x.voice)), 'opnames: sleutels en stemnamen');
   // invulzinnen: voorgelezen met een stilte op het gat, hints tussen haakjes niet
   ok(JSON.stringify(S.Speech.gapParts('Did you ___ the email?')) === JSON.stringify(['Did you …', null, '… the email?']), 'invulzin: stukken rond het gat');
   ok(JSON.stringify(S.Speech.gapParts('¡___ la verdad! (decir, tú)')) === JSON.stringify([null, '… la verdad!']), 'invulzin: gat vooraan, hint weg');
@@ -1228,7 +1228,7 @@ await micTests();
     .filter(f => !/(app|lesson|ai|sync|ask)\.js$/.test(f));
   const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
   // één rij per cursus met een kaart: [doeltaal, minimaal aantal landen]
-  const want = { 'es-nl': ['es', 21], 'en-nl': ['en', 12], 'nl-es': ['nl', 5] };
+  const want = { 'es-nl': ['es', 21], 'en-nl': ['en', 12], 'nl-es': ['nl', 5], 'fr-nl': ['fr', 9] };
   for (const course of Object.keys(S.COURSES)) {
     const w = 'op reis ' + course + ': ';
     const c = vm.createContext({ console, setTimeout, clearTimeout }); c.window = c; c.globalThis = c; c.self = c; c.SPT_COURSE = course;
@@ -1269,7 +1269,7 @@ await micTests();
     const K = c.SPT, tg = K.course.target;
     if (tg === 'es') { ok(TERMS.every(x => K.tl(x) === x && K.t(x) === x), w + 'Spaanse cursus houdt de Spaanse namen'); continue; }
     ok(TERMS.every(x => K.tl(x) !== x), w + 'alle namen vertaald: ' + TERMS.filter(x => K.tl(x) === x).join(', '));
-    ok(TERMS.every(x => !/[¡¿áéíóúñ]/.test(K.tl(x))), w + 'geen Spaanse tekens in de namen');
+    ok(TERMS.every(x => !(tg === 'fr' ? /[¡¿áíóúñ]/ : /[¡¿áéíóúñ]/).test(K.tl(x))), w + 'geen Spaanse tekens in de namen'); // het Frans heeft zelf een é
     ok(K.t('← Práctica') === '← ' + K.tl('Práctica') && K.t('🔎 Sopa de letras') === '🔎 ' + K.tl('Sopa de letras'), w + 'met pijltje of emoji ervoor');
     if (K.course.ui === 'nl') ok(K.t('Lupe begroet je op Hoy en in Perfil.') === 'Lupe begroet je op ' + K.tl('Hoy') + ' en in ' + K.tl('Perfil') + '.', w + 'tabnamen midden in een zin');
     else ok(K.t('Vandaag niets te herhalen') === 'Hoy no hay nada que repasar', w + '«Hoy» als gewoon woord blijft Spaans');
@@ -1282,6 +1282,23 @@ await micTests();
   // pre = begin van de unit-id's, name = taalnaam in schermteksten, lupe = Lupes «¡Una tarea menos! Sigue así.» in de doeltaal
   // (alleen als ze in die taal praat), art = [woord met lidwoord, zonder], extra(K, w) = eigen controles van die cursus.
   const NL_COURSES = {
+    'fr-nl': { pre: 'fr', name: 'Frans', lupe: 'Une tâche de moins\u00a0! Continue comme ça.', art: ['la maison', 'maison'], extra(K, w) {
+      const ck = (u, a) => K.check.check(u, [a]);
+      // Franse leestekens: spatie vóór ? ! is een vaste spatie; met of zonder typen is allebei goed
+      ok(K.C.get('fr-a1-01').vocab.some(v => v[0] === 'Comment ça va\u00a0?') && ck('comment ça va?', 'Comment ça va\u00a0?').exact && ck('Comment ça va ?', 'Comment ça va\u00a0?').exact, w + 'vaste spatie vóór het vraagteken');
+      // accenten: alle Franse accenten mogen ontbreken (bijna goed), een ander woord blijft fout
+      ok(ck('Je suis etudiant', 'Je suis étudiant.').warn === 'accent' && ck('le pere', 'le père').warn === 'accent' && ck('la foret', 'la forêt').warn === 'accent' && ck('le garcon', 'le garçon').warn === 'accent' && ck('la soeur', 'la sœur').ok && !ck('la mère', 'le père').ok, w + 'accent grave, circonflexe, cedille en œ');
+      // lidwoord: l' telt als lidwoord, fout geslacht blijft fout met uitleg
+      const it = a => ({ answers: [a], articleOptional: true });
+      ok(K.Gen.checkType('eau', it("l'eau")).ok && K.Gen.checkType('école', it('une école')).ok, w + "l' en une mogen ontbreken");
+      const r = K.Gen.checkType('le maison', it('la maison'));
+      ok(!r.ok && r.warn === 'article-wrong' && /vrouwelijk/.test(r.gender), w + 'verkeerd lidwoord le/la met geslacht');
+      // uitzonderingen worden benoemd, met reden
+      const U = K.Uitz, has = (l, re) => l.some(x => re.test(x.t + ' ' + x.html));
+      ok(U.label() === '⚠️ Uitzondering' && has(U.forWord('mon amie'), /klinker/) && has(U.forWord('au printemps'), /en été/) && has(U.forWord('soixante-dix'), /60/) && has(U.forItem({ kind: 'mc', sentence: 'Vous ___ du sport ?', answer: 'faites' }, { expected: 'faites' }), /êtes/), w + 'mon amie, au printemps, soixante-dix, vous faites');
+      ok(!U.find('Je mange une pomme rouge').length, w + 'geen valse uitzonderingen');
+      ok(K.C.all().every(u => u.grammar.some(g => /Uitzondering|Let op/.test(g.html))), w + 'elke unit benoemt uitzonderingen in de uitleg');
+    } },
     'en-nl': { pre: 'en', name: 'Engels', lupe: 'One task down! Keep it up.', art: ['the house', 'house'], extra(K, w) {
       ok(K.C.LEVELS.every(L => K.placement.filter(q => q.lv === L.id).length >= 12), w + 'niveautest: 12+ vragen voor elk niveau A1–C2');
       ok(K.scenarios.some(x => x.lv === 'C2'), w + 'gesprek op C2');

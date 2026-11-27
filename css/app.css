@@ -1722,3 +1722,8 @@ details.fold[open] > .fold-sum .fold-chev { transform: rotate(90deg); }
 .ut-prow { display: flex; align-items: baseline; gap: .5rem; font-size: .95rem; }
 .ut-focus { border-top: 1px solid var(--line); padding-top: .7rem; }
 .ut-focus p { margin: 0 0 .6rem; }
+
+/* ---------- Sfeerstrook van de doeltaal op de startpagina (js/look.js) ---------- */
+.doel-decor { height: 84px; margin: .7rem 0 1.1rem; border-radius: var(--r); overflow: hidden; background: var(--dk-sky, var(--bg2)); border: 1px solid var(--line); }
+.doel-decor svg { display: block; width: 100%; height: 100%; }
+@media (max-width: 520px) { .doel-decor { height: 66px; } }
