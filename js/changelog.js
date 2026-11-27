@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.70.1', date: '2026-11-27',
+    nl: ['Lange feedback (vervoegingstabel, uitzondering) bedekt het overtypveld niet meer: het paneel scrolt en het invulveld blijft zichtbaar, ook met toetsenbord open.', 'Uitleg bij ser en ir zegt niet meer dat «se» de regelmatige vorm zou zijn: er is geen regelmatige vorm om mee te vergelijken.'],
+    es: [] },
   { v: '1.70.0', date: '2026-11-27',
     nl: ['Nieuw: 🎯 Mijn zwakke punten. Op één plek zie je welke grammatica-onderwerpen en woorden nog niet goed gaan, waarom (hoeveel goed, fouten bij Lupe en in oefeningen) en wat je laatste fout was. Met 🎯 Oefen dit per onderwerp, 📘 Uitleg naar de les, en één knop om alles door elkaar te oefenen.', 'Je vindt het op Hoy (kaart «Je zwakke punten» en tegel bij Extra oefenen), bovenaan Perfil, bij Práctica en in Mijn woordenschat.'],
     es: [] },
