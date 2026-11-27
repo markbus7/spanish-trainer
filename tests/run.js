@@ -1228,7 +1228,7 @@ await micTests();
     .filter(f => !/(app|lesson|ai|sync|ask)\.js$/.test(f));
   const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
   // één rij per cursus met een kaart: [doeltaal, minimaal aantal landen]
-  const want = { 'es-nl': ['es', 21], 'en-nl': ['en', 12], 'nl-es': ['nl', 5] };
+  const want = { 'es-nl': ['es', 21], 'en-nl': ['en', 12], 'nl-es': ['nl', 5], 'de-nl': ['de', 5] };
   for (const course of Object.keys(S.COURSES)) {
     const w = 'op reis ' + course + ': ';
     const c = vm.createContext({ console, setTimeout, clearTimeout }); c.window = c; c.globalThis = c; c.self = c; c.SPT_COURSE = course;
@@ -1293,6 +1293,13 @@ await micTests();
       ok(!ck('our', 'or').ok && !ck('four', 'for').ok && ck('My favorite color.', 'My favorite color.').exact, w + 'Britse spelling: geen valse treffers');
       ok(K.check.parts('My favourite colour is blue', 'My favorite color is gray').k.join() === '0,1,2,3', w + 'Britse spelling telt per woord als goed');
       ok(K.check.check("I've lived here since 2015", ["I've lived here since 2015."]).ok, w + 'apostrof en punt');
+    } },
+    'de-nl': { pre: 'de', name: 'Duits', lupe: 'Eine Aufgabe weniger! Weiter so.', art: ['das Haus', 'Haus'], extra(K, w) {
+      const ck = (u, a) => K.check.check(u, [a]);
+      ok(ck('ich heisse anna', 'Ich heiße Anna.').ok && ck('ich heisse anna', 'Ich heiße Anna.').warn === 'accent' && ck('Schon', 'schön').warn === 'accent', w + 'ss voor ß en ontbrekende umlaut: goed met waarschuwing');
+      const r = K.Gen.checkType('der Haus', { answers: ['das Haus'], articleOptional: true });
+      ok(!r.ok && r.warn === 'article-wrong' && /onzijdig/.test(r.gender), w + 'fout lidwoord der/die/das met geslacht');
+      ok(us.length === 30, w + 'A1–B1 = 30 units');
     } }
   };
   ok(Object.values(S.COURSES).filter(c => c.ui === 'nl' && c.target !== 'es').every(c => NL_COURSES[c.id]), 'elke cursus met Nederlandse uitleg heeft een rij in NL_COURSES (tests/run.js)');

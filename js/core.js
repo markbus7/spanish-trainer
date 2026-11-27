@@ -64,7 +64,13 @@
       brand: 'English <em>pro</em>', title: 'English Pro', name: { nl: 'Engels', es: 'inglés' }, allLevels: true,
       // ai.style = variant die de AI-docent aanhoudt; ai.pitfalls = typische fouten van Nederlandstaligen; ai.exceptions = voorbeelden van uitzonderingen
       ai: { target: 'American English', native: 'Dutch', style: 'US spelling and vocabulary; mention the British variant when it differs and it matters',
-        pitfalls: 'false friends such as eventually/actually/sensible, since vs. for, present perfect vs. past simple, word order, make vs. do, too literal translations, "Dunglish"' } }
+        pitfalls: 'false friends such as eventually/actually/sensible, since vs. for, present perfect vs. past simple, word order, make vs. do, too literal translations, "Dunglish"' } },
+    // Duits voor Nederlandstaligen, A1 t/m B1 (Hoogduits uit Duitsland; Oostenrijk en Zwitserland in «Op reis»).
+    'de-nl': { id: 'de-nl', target: 'de', ui: 'nl', speak: 'de-DE', listen: 'de-DE', flag: '🇩🇪', ns: 'de-nl', where: 'Duitsland', hello: 'Hallo! Wie geht’s? Willkommen in deinem Deutschkurs.', device: 'Und das ist die Stimme deines Geräts.',
+      brand: 'Deutsch <em>klar</em>', title: 'Deutsch Klar', name: { nl: 'Duits', es: 'alemán' },
+      ai: { target: 'German', native: 'Dutch', style: 'standard German as spoken in Germany; current spelling with ß; use "du" unless the situation is formal, then "Sie"',
+        pitfalls: 'cases (nominative, accusative, dative) and the prepositions that trigger them, der/die/das where Dutch only has de/het, verb in second position and at the end in subordinate clauses, haben vs. sein in the Perfekt, capitalised nouns, false friends such as bellen/doof/das Meer/der See/dürfen/schlimm/die Tasse/klar, too literal translations from Dutch',
+        exceptions: 'das Mädchen is neuter because of -chen; strong verbs with a vowel change (du fährst, er liest); irregular participles; verbs that take sein in the Perfekt; weak masculine nouns (den Jungen, den Herrn); dative plural -n; two-way prepositions' } }
   };
   S.COURSES = COURSES;
 

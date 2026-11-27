@@ -158,7 +158,8 @@ for (const es of S.Tutor.lines.every(S.C.all())) for (const [v, o] of Object.ent
 
 /* Andere cursussen (uitleg in het Spaans): Amerikaans-Engelse en Nederlandse stemmen, eigen naamruimte (= cursus-id),
    en per niveau 'cursus:niveau' voor offline downloaden. */
-const OTHER = { 'en-es': ['en-US-JennyNeural', 'en-US-GuyNeural'], 'en-nl': ['en-US-AriaNeural', 'en-US-GuyNeural'], 'nl-es': ['nl-NL-FennaNeural', 'nl-NL-MaartenNeural'] };
+const OTHER = { 'en-es': ['en-US-JennyNeural', 'en-US-GuyNeural'], 'en-nl': ['en-US-AriaNeural', 'en-US-GuyNeural'], 'nl-es': ['nl-NL-FennaNeural', 'nl-NL-MaartenNeural'],
+  'de-nl': ['de-DE-KatjaNeural', 'de-DE-ConradNeural'] };
 for (const [course, [vf, vm_]] of Object.entries(OTHER)) {
   S = load(course);
   const ns = S.course.ns;
@@ -211,6 +212,9 @@ const PLACE_VOICES = {
   nl: {
     NL: ['nl-NL-FennaNeural', 'nl-NL-MaartenNeural'], BE: ['nl-BE-DenaNeural', 'nl-BE-ArnaudNeural'], SR: ['nl-NL-ColetteNeural', 'nl-NL-MaartenNeural'],
     CW: ['nl-NL-ColetteNeural', 'nl-NL-MaartenNeural'], AF: ['af-ZA-AdriNeural', 'af-ZA-WillemNeural']
+  },
+  de: {
+    DE: ['de-DE-KatjaNeural', 'de-DE-ConradNeural'], AT: ['de-AT-IngridNeural', 'de-AT-JonasNeural'], CH: ['de-CH-LeniNeural', 'de-CH-JanNeural']
   }
 };
 for (const course of Object.keys(OTHER)) {
