@@ -1178,7 +1178,8 @@
       const scs = (cur.scenario ? [unitScenario(cur)] : []).concat(S.scenarios);
       scs.forEach(sc => list.append(h('button', { class: 'scen', type: 'button', onclick: () => { startRoleplay(sc); render(); } },
         h('span', { class: 'qi' }, sc.unit && S.Icons && S.Icons.unit ? S.Icons.unit(sc.unit) : sc.icon), h('div', { class: 'grow' }, h('b', null, sc.title || sc.nl), h('small', null, (sc.place || '') + (sc.lv ? ' · ' + sc.lv : ' · huidige unit')), h('small', { class: 'muted' }, '🎯 ' + sc.goal)))));
-      wrap.append(section('Kies een situatie', h('div', null, h('p', { class: 'small muted privacy-note' }, '🔒 Je speelt altijd een verzonnen rol: Lupe vraagt niet naar je echte familie of privézaken, en geeft je zo nodig een rolkaartje met namen. Van gesprekken bewaart de app alleen je fouten (het foute stukje met de verbetering), niet wat je schreef.'), list)));
+      wrap.append(section('Kies een situatie', h('div', null, h('p', { class: 'small muted privacy-note' }, '🔒 Je speelt altijd een verzonnen rol: Lupe vraagt niet naar je echte familie of privézaken, en geeft je zo nodig een rolkaartje met namen. Van gesprekken bewaart de app alleen je fouten (het foute stukje met de verbetering), niet wat je schreef.'), list,
+        S.Mundo && S.Mundo.talks().length ? h('a', { class: 'scen scen-mundo', href: '#/mundo' }, h('span', { class: 'qi' }, '🗺️'), h('div', { class: 'grow' }, h('b', null, 'Gesprekken per land'), h('small', null, 'Op reis · ' + S.Mundo.talks().length + ' landen'), h('small', { class: 'muted' }, '🎯 Kies een land op de kaart en praat zoals ze het daar zeggen.'))) : null)));
       return wrap;
     }
     if (chat.mode === 'roleplay') wrap.append(h('div', { class: 'scen-head' }, h('span', null, (chat.scenario.icon || '🎭') + ' ' + (chat.scenario.title || chat.scenario.nl) + (chat.scenario.place ? ' · ' + chat.scenario.place : '')), h('small', null, '🎯 ' + chat.scenario.goal),
