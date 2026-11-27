@@ -1709,3 +1709,16 @@ details.fold[open] > .fold-sum .fold-chev { transform: rotate(90deg); }
 .zw-hoy { border-left: 4px solid var(--accent); }
 .zw-link, .voc-zwak { margin-bottom: .7rem; }
 @media (max-width: 520px) { .zw-top { flex-direction: column; align-items: stretch; } .zw-pct { justify-content: flex-start; } }
+
+/* ---------- Unittoets op de unitpagina (unitTestCard in js/app.js) ---------- */
+.ut-card { display: flex; flex-direction: column; gap: .75rem; }
+.ut-head { display: flex; align-items: center; gap: .8rem; }
+.ut-head .grow { display: flex; flex-direction: column; min-width: 0; }
+.ut-score { flex: none; width: 5.6rem; height: 5.6rem; text-align: center; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 4px solid var(--bad); }
+.ut-score.ok { border-color: var(--teal); }
+.ut-score b { font-size: 1.25rem; line-height: 1; } .ut-score small { font-size: .66rem; line-height: 1.1; color: var(--muted); }
+.ut-parts { display: flex; flex-direction: column; gap: .55rem; }
+.ut-part { display: flex; flex-direction: column; gap: .25rem; }
+.ut-prow { display: flex; align-items: baseline; gap: .5rem; font-size: .95rem; }
+.ut-focus { border-top: 1px solid var(--line); padding-top: .7rem; }
+.ut-focus p { margin: 0 0 .6rem; }

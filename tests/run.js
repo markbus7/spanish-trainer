@@ -1523,6 +1523,12 @@ const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((
   ok(ses.items.length > 1 && ses.items.some(i => i.srsId === 'w|' + u.id + '|0'), 'zwak: oefensessie met onderwerp en woord');
   S.Store.state = keep;
 }
+{ // laatste unittoets overleeft synchroniseren (nieuwste wint)
+  const a = { updated: 2, units: { u1: { steps: {}, best: 0.6, done: false, last: { t: 100, score: 0.6 } } } };
+  const b = { updated: 1, units: { u1: { steps: {}, best: 0.7, done: false, last: { t: 200, score: 0.7 } } } };
+  const m = S.Store.mergeStates(a, b);
+  ok(m.units.u1.last.t === 200 && m.units.u1.best === 0.7, 'unittoets: nieuwste laatste toets blijft bewaard na sync');
+}
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);
 })();

@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.71.0', date: '2026-11-27',
+    nl: ['Unitpagina: bij «Unittoets» zie je nu hoe je laatste toets ging (score, gehaald of niet, per onderdeel hoeveel goed en welke grammatica misging).', 'Nieuw op de unitpagina: 🎯 Gerichte oefentoets. Oefent de vragen die je bij de laatste toets fout had, plus woorden, zinnen en grammatica uit die unit die je vaak fout doet. Daarna kun je meteen de unittoets opnieuw doen.'],
+    es: [] },
   { v: '1.70.1', date: '2026-11-27',
     nl: ['Lange feedback (vervoegingstabel, uitzondering) bedekt het overtypveld niet meer: het paneel scrolt en het invulveld blijft zichtbaar, ook met toetsenbord open.', 'Uitleg bij ser en ir zegt niet meer dat «se» de regelmatige vorm zou zijn: er is geen regelmatige vorm om mee te vergelijken.'],
     es: [] },

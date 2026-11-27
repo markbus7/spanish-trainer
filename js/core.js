@@ -328,6 +328,7 @@
       for (const k in o.steps || {}) if (o.steps[k] && !n.steps[k]) n.steps[k] = o.steps[k];
       n.best = max(n.best, o.best); n.done = !!(n.done || o.done);
       if (o.tested || n.tested) n.tested = true;
+      if (o.last && (!n.last || (o.last.t || 0) > (n.last.t || 0))) n.last = clone(o.last); // laatste unittoets
     }
     for (const id in O.levels) {
       const o = O.levels[id], n = out.levels[id];
