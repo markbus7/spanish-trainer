@@ -49,7 +49,15 @@
     de: { nl: 'Duits', es: 'alemán', en: 'German', flag: '🇩🇪', arts: /^(der|die|das|ein|eine)\s+/i, letters: 'äöüß', fold: s => s.replace(/ß/g, 'ss'),
       gender: a => ({ der: 'mannelijk (der)', die: 'vrouwelijk of meervoud (die)', das: 'onzijdig (das)' })[a] || '' },
     fr: { nl: 'Frans', es: 'francés', en: 'French', flag: '🇫🇷', arts: /^(?:(le|la|les|un|une|des)\s+|(l)['’]\s*)/i, letters: 'àâæçéèêëîïôœùûüÿ' },
-    tr: { nl: 'Turks', es: 'turco', en: 'Turkish', flag: '🇹🇷', arts: null, letters: 'çğıöşü' }
+    // Turks heeft twee i's: İ/i (met punt) en I/ı (zonder punt). De gewone toLowerCase/toUpperCase kent die paren niet (İ → i̇, i → I).
+    // fold = vorm zonder Turkse tekens: wie «cay» typt voor «çay» krijgt «bijna goed, let op de tekens». fill = letters voor de woordzoeker.
+    tr: { nl: 'Turks', es: 'turco', en: 'Turkish', flag: '🇹🇷', arts: null, letters: 'çğıöşüâîû',
+      lower: s => s.replace(/İ/g, 'i').replace(/I/g, 'ı').toLowerCase(),
+      upper: s => s.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase(),
+      fold: s => s.replace(/[çğışöüâîû]/g, c => ({ 'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ş': 's', 'ö': 'o', 'ü': 'u', 'â': 'a', 'î': 'i', 'û': 'u' })[c]),
+      plain: s => s.normalize('NFC').replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase().replace(/[ÂÎÛ]/g, c => ({ 'Â': 'A', 'Î': 'İ', 'Û': 'U' })[c]),
+      fill: 'AAAAAAAEEEEEEİİİİİIIIKKKKLLLLNNNNRRRRMMMTTTUUYYSSDDOOBBÜÜŞŞZGÇHĞVCÖPFJ',
+      keys: ['ERTYUIOPĞÜ', 'ASDFGHJKLŞİ', 'ZCVBNMÖÇ⌫'] }
   };
   S.LANGS = LANGS;
   const COURSES = {
@@ -64,7 +72,13 @@
       brand: 'English <em>pro</em>', title: 'English Pro', name: { nl: 'Engels', es: 'inglés' }, allLevels: true,
       // ai.style = variant die de AI-docent aanhoudt; ai.pitfalls = typische fouten van Nederlandstaligen; ai.exceptions = voorbeelden van uitzonderingen
       ai: { target: 'American English', native: 'Dutch', style: 'US spelling and vocabulary; mention the British variant when it differs and it matters',
-        pitfalls: 'false friends such as eventually/actually/sensible, since vs. for, present perfect vs. past simple, word order, make vs. do, too literal translations, "Dunglish"' } }
+        pitfalls: 'false friends such as eventually/actually/sensible, since vs. for, present perfect vs. past simple, word order, make vs. do, too literal translations, "Dunglish"' } },
+    // Turks voor Nederlandstaligen (standaard-Turks van Turkije, İstanbul-uitspraak).
+    'tr-nl': { id: 'tr-nl', target: 'tr', ui: 'nl', speak: 'tr-TR', listen: 'tr-TR', flag: '🇹🇷', ns: 'tr-nl', where: 'Turkije', hello: 'Merhaba! Nasılsın? Türkçe dersine hoş geldin.', device: 'Bu da cihazının sesi.',
+      brand: 'Türkçe <em>kolay</em>', title: 'Türkçe Kolay', name: { nl: 'Turks', es: 'turco' },
+      ai: { target: 'Turkish', native: 'Dutch', style: 'standard Turkish as spoken in Türkiye (İstanbul norm); always write the Turkish letters ç, ğ, ı, İ, ö, ş, ü correctly',
+        pitfalls: 'vowel harmony in suffixes, d/t and c/ç assimilation after f-s-t-k-ç-ş-h-p, consonant softening (k→ğ, p→b, ç→c, t→d), verb-final word order, no verb "to have" (var/yok with a possessive suffix), no articles (the accusative -(y)i marks a definite object), dotted i vs. dotless ı, buçuk (üç buçuk = half past three, not "half drie"), sen vs. siz',
+        exceptions: 'saat → saatler (not saatlar), su → suyu, oğul → oğlum, gitmek → gidiyor, yemek → yiyor, ben → bana, yazın/kışın, the aorist of one-syllable verbs such as gelir/alır/olur, nationalities without -li such as Türk and Alman' } }
   };
   S.COURSES = COURSES;
 

@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.72.0', date: '2026-11-27',
+    nl: ['Nieuwe cursus: Turks voor Nederlandstaligen (🇳🇱 Nederlands → 🇹🇷 Turks), niveau A1 met 10 units: begroeten, familie, getallen en klok, bestellen, je dag, de stad, winkelen, verleden en toekomende tijd', 'Turkse letters ç, ğ, ı, İ, ö, ş, ü: eigen tekenbalk bij typen, en wie ze weglaat krijgt «bijna goed, let op de Turkse letters»', 'Uitzonderingen in het Turks (saatler, meyve suyu, oğlum, gidiyor, bana, yazın) staan er altijd bij als ⚠️ Uitzondering, met de reden', 'Op reis voor Turks: kaart met Turkije, Cyprus, de Balkan, Duitsland, Nederland en Azerbeidzjan', 'Lupe, de tabbladen en de woordspellen zijn in de Turkse cursus in het Turks'],
+    es: ['Nuevo curso: turco para hablantes de neerlandés (🇳🇱 Neerlandés → 🇹🇷 Turco), nivel A1 con 10 unidades.', 'Letras turcas ç, ğ, ı, İ, ö, ş, ü: barra propia al escribir; si faltan, la app dice «casi bien».', 'Las excepciones del turco aparecen siempre como ⚠️ excepción, con el motivo.', 'De viaje para el turco: mapa con Turquía, Chipre, los Balcanes, Alemania, Países Bajos y Azerbaiyán.', 'Lupe, las pestañas y los juegos están en turco en el curso de turco.'] },
   { v: '1.71.1', date: '2026-11-27',
     nl: ['Onder de motorkap: de app is voorbereid op nieuwe talen (Duits, Frans en Turks komen eraan). Voor je bestaande cursussen verandert er niets.'],
     es: ['Preparación interna para nuevos idiomas (alemán, francés y turco). Tus cursos siguen igual.'] },

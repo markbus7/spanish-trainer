@@ -71,8 +71,8 @@
       h('p', { class: 'muted' }, 'Zoek in alle ' + index().length.toLocaleString(S.LOC) + ' woorden uit de lessen, in het Spaans of het Nederlands. Eigen woorden komen in je herhaling.'));
 
     // eigen woord toevoegen
-    const esIn = h('input', { class: 'input', lang: 'es', placeholder: 'Spaans, bijv. ' + ({ es: 'la chamba', en: 'awesome', nl: 'gezellig' }[S.course.target] || '…'), autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
-    const nlIn = h('input', { class: 'input', placeholder: S.course.target !== 'es' && S.course.ui === 'nl' ? 'Nederlands, bijv. ' + ({ en: 'geweldig', nl: 'knus', de: 'gemütlich' }[S.course.target] || '…') : 'Nederlands, bijv. het werk (Mexico)', autocomplete: 'off' });
+    const esIn = h('input', { class: 'input', lang: 'es', placeholder: 'Spaans, bijv. ' + ({ es: 'la chamba', en: 'awesome', nl: 'gezellig', tr: 'kolay gelsin' }[S.course.target] || '…'), autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
+    const nlIn = h('input', { class: 'input', placeholder: S.course.target !== 'es' && S.course.ui === 'nl' ? 'Nederlands, bijv. ' + ({ en: 'geweldig', nl: 'knus', de: 'gemütlich', tr: 'succes met je werk' }[S.course.target] || '…') : 'Nederlands, bijv. het werk (Mexico)', autocomplete: 'off' });
     const addBtn = h('button', { class: 'btn primary', type: 'submit' }, '➕ Toevoegen');
     const form = h('form', { class: 'form words-add', onsubmit: e => {
       e.preventDefault();

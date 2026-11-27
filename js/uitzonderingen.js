@@ -270,6 +270,34 @@ verliezen verloor/verloren verloren perder`.split('\n').map(l => { const m = l.s
       html: 'Normalmente una vocal corta sigue corta en el plural (<i>bal → ballen</i>). <b>Excepción:</b> <i>dag → <b>dagen</b>, weg → <b>wegen</b>, glas → <b>glazen</b></i> tienen vocal <b>larga</b>, y <i>stad → <b>steden</b>, schip → <b>schepen</b></i> cambian de vocal. Hay que aprenderlas de memoria.' }
   ];
 
+  /* ---------- Turks (uitleg in het Nederlands): woorden die de klinkerharmonie of de gewone uitgang doorbreken ---------- */
+  const TR = [
+    { p: 'saatler\\p{L}*',
+      t: 'saat → saatler (niet saatlar)',
+      html: 'Na een <b>a</b> verwacht je <i>-lar</i>, maar het is <b>saatler</b>. <b>Waarom?</b> <i>Saat</i> komt uit het Arabisch en heeft een «lichte» a die voor in de mond wordt uitgesproken; het Turks behandelt die als voorklinker. Daarom ook <i>saati</i>, <i>saatte</i>. Zo gaan nog een paar leenwoorden: <i>harf → harfler</i>, <i>alkol → alkoller</i>.' },
+    { p: '(?:meyve|portakal|elma|maden|limon) suyu\\p{L}*|suyu(?:m|n|muz|nuz)?',
+      t: 'su → suyu (niet susu)',
+      html: 'Na een klinker krijgt «zijn/haar» normaal een <b>s</b> (<i>çorba → çorbası</i>), maar bij <i>su</i> is het <b>suyu</b>: <i>meyve suyu</i>. <b>Waarom?</b> <i>Su</i> eindigde vroeger op een medeklinker (<i>suv</i>); die is verdwenen, maar het woord gedraagt zich nog zo en krijgt een <b>y</b>. Het is het enige gewone woord dat dit doet.' },
+    { p: 'oğl(?:um|un|u|umuz|unuz)\\p{L}*',
+      t: 'oğul → oğlum (niet oğulum)',
+      html: 'Bij <i>oğul</i> (zoon) <b>valt de u weg</b> zodra er een uitgang met een klinker achter komt: <b>oğlum</b>, <b>oğlu</b>. <b>Waarom?</b> Bij een klein groepje oude woorden verdwijnt de laatste klinker omdat dat makkelijker uitspreekt. Zo ook <i>isim → ismim</i>, <i>şehir → şehrim</i>, <i>burun → burnum</i>.' },
+    { p: 'gid(?:iyor|ece|elim|in|er)\\p{L}*|ed(?:iyor|ece|elim|er)\\p{L}*',
+      t: 'gitmek → gidiyor (t wordt d)',
+      html: 'Bij <i>gitmek</i> en <i>etmek</i> wordt de <b>t een d</b> zodra er een klinker op volgt: <b>gidiyor</b>, <b>gidecek</b>, <b>ediyor</b>. <b>Waarom?</b> Bij een handvol korte, veelgebruikte stammen spreekt dat makkelijker uit. Volgt er een medeklinker, dan blijft de t: <i>gitti</i>, <i>gitmek</i>. De meeste werkwoorden doen dit niet: <i>yatmak → yatıyor</i>.' },
+    { p: 'yiyor\\p{L}*|diyor\\p{L}*|yiyece\\p{L}*|diyece\\p{L}*',
+      t: 'yemek → yiyor, demek → diyor',
+      html: 'Bij <i>yemek</i> (eten) en <i>demek</i> (zeggen) wordt de <b>e een i</b>: <b>yiyor</b>, <b>yiyecek</b>, <b>diyor</b>. <b>Waarom?</b> De y die volgt, «knijpt» de klinker ervoor dicht. Het zijn de enige twee werkwoorden die dat ook in de spelling doen.' },
+    { p: 'bana|sana',
+      t: 'ben → bana, sen → sana',
+      html: '«Aan mij» en «aan jou» zijn <b>bana</b> en <b>sana</b>, niet <s>bene</s> en <s>sene</s>. <b>Waarom?</b> Het zijn oeroude vormen waarin de e een a werd onder invloed van de uitgang. Alleen deze twee woorden doen dat; de andere naamvallen zijn regelmatig: <i>bende</i>, <i>benden</i>, <i>beni</i>.' },
+    { p: 'yazın|kışın',
+      t: 'yazın, kışın (niet yazda, kışta)',
+      html: '«In de zomer» en «in de winter» zijn <b>yazın</b> en <b>kışın</b>, met <i>-in</i> in plaats van <i>-da</i>. <b>Waarom?</b> Het zijn versteende oude vormen die als vaste bijwoorden zijn blijven bestaan. Lente en herfst zijn wel regelmatig: <i>ilkbaharda</i>, <i>sonbaharda</i>.' },
+    { p: 'reng(?:i|im|in|e|imiz|iniz)\\p{L}*',
+      t: 'renk → rengi (k wordt g)',
+      html: 'De meeste woorden van één lettergreep blijven hard (<i>süt → sütü</i>), maar <i>renk</i> wordt <b>rengi</b>. <b>Waarom?</b> Na een <b>n</b> wordt de k geen ğ maar een g, en dit woord verzacht ondanks zijn ene lettergreep. Zo ook <i>denk → dengi</i>.' }
+  ];
+
   /* ---------- extra uitzonderingen per grammaticaonderdeel (sleutel = titel) ---------- */
   const GRAMMAR = {
     'Lidwoorden en geslacht': ['<b>Uitzondering:</b> mannelijk op -a: <i>el día, el mapa, el problema, el tema, el idioma, el sistema</i>. <b>Waarom?</b> Woorden op <b>-ma</b> komen uit het Grieks (daar onzijdig, in het Spaans mannelijk). Vrouwelijk op -o: <i>la mano</i> (al vrouwelijk in het Latijn), <i>la foto, la moto</i> (kort voor <i>la fotografía, la motocicleta</i>).',
@@ -294,7 +322,7 @@ verliezen verloor/verloren verloren perder`.split('\n').map(l => { const m = l.s
   const loc = v => (v && typeof v === 'object') ? (v[UI()] || v.nl) : v;
 
   /* Regels en werkwoordnotities per doeltaal. Nieuwe doeltaal: een lijst zoals EN/NL maken en hier een rij toevoegen. */
-  const RULES = { es: ES, en: EN, nl: NL };
+  const RULES = { es: ES, en: EN, nl: NL, tr: TR };
   const VERB_NOTES = { es: (t, f) => verbNotesEs(t, f), en: (t, f) => verbNotesEn(t, f), nl: (t, f) => verbNotesNl(t, f) };
   let cache = null;
   function rules() {

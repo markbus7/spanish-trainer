@@ -1,6 +1,7 @@
 /* Maakt de kaarten van «Op reis»: content/kaarten/<taal>.js (één per doeltaal). Eenmalig, buiten de app:
    npm i world-atlas@2 topojson-client@3 topojson-simplify@3 d3-geo@3 && node tools/kaart-maken.mjs <taal> [uitvoer.js]
-   Talen: es (Latijns-Amerika + inzet Spanje/Eq.-Guinea), en (wereldkaart), nl (Nederland en België + inzetten).
+   Talen: es (Latijns-Amerika + inzet Spanje/Eq.-Guinea), en (wereldkaart), nl (Nederland en België + inzetten),
+   tr (van Nederland tot Azerbeidzjan).
    Nieuwe taal: voeg hieronder een kaart toe (landcode → ISO-nummer uit Natural Earth), en zet de vlagknoppen
    (pin) in de landenlijst van die taal (content/<cursus>/landen.js). */
 import fs from 'fs';
@@ -91,6 +92,27 @@ const MAPS = {
     const pr = d3.geoMercator().fitExtent([[box[0] + 8, box[1] + 14], [box[0] + box[2] - 8, box[1] + box[3] - 8]], both), p2 = d3.geoPath(pr);
     out.c.cw = { d: round(p2(cw) + p2(aw)), p: p2.centroid(cw).map(v => Math.round(v)), box };
     return { out, title: 'Nederland en België, met Suriname, Curaçao en Aruba en Zuid-Afrika als inzet' };
+  },
+  /* Turks: van Nederland tot Azerbeidzjan. Turkije en Cyprus, de Balkan (Bulgarije), de Turkse gemeenschap in Duitsland
+     en Nederland, en Azerbeidzjan (zustertaal Azerbeidzjaans). */
+  tr() {
+    const TR = { tr: 792, cy: 196, bg: 100, de: 276, nl: 528, az: 31 };
+    const W = 900, H = 560;
+    const bbox = { type: 'MultiPoint', coordinates: [[0.5, 55.2], [51.5, 55.2], [51.5, 33.8], [0.5, 33.8]] };
+    const proj = d3.geoMercator().fitExtent([[8, 8], [W - 8, H - 8]], bbox).clipExtent([[0, 0], [W, H]]);
+    const path = d3.geoPath(proj);
+    const nums = new Set(Object.values(TR));
+    const ncy = all.find(f => f.properties && f.properties.name === 'N. Cyprus');
+    const inView = f => { const b = d3.geoBounds(f); return b[1][0] > -6 && b[0][0] < 58 && b[1][1] > 30 && b[0][1] < 60; };
+    const bg = all.filter(f => !nums.has(+f.id) && f !== ncy && inView(f)).map(f => path(simplify(f, 3e-6))).filter(Boolean).join('');
+    const out = { w: W, h: H, bg: round(bg), c: {} };
+    const europe = p => p[0][0][0] > 0 && p[0][0][1] > 45;
+    for (const [id, n] of Object.entries(TR)) {
+      const f = id === 'nl' ? only(simplify(byNum(n), 1e-7), europe) : simplify(byNum(n), id === 'cy' ? 0 : 1e-6);
+      // Cyprus: het hele eiland (zuid en noord) als één vorm
+      out.c[id] = { d: round(path(f) + (id === 'cy' && ncy ? path(ncy) : '')), p: path.centroid(f).map(v => Math.round(v)) };
+    }
+    return { out, title: 'van Nederland tot Azerbeidzjan, met Turkije, Cyprus, Bulgarije, Duitsland, Nederland en Azerbeidzjan in kleur', k: 1.1 };
   }
 };
 

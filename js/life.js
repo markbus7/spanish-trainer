@@ -905,6 +905,7 @@
     es: (x, y, w, h) => V3('#006847', '#fff', '#ce1126')(x, y, w, h) + `<circle cx="${R(x + w / 2)}" cy="${R(y + h / 2)}" r="${R(h * .14)}" fill="#8a5a2a"/>`,
     en: (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff"/>${[0, 2, 4, 6].map(k => `<rect x="${x}" y="${R(y + k * h / 7)}" width="${w}" height="${R(h / 7)}" fill="#b22234"/>`).join('')}<rect x="${x}" y="${y}" width="${R(w * .44)}" height="${R(h * 4 / 7)}" fill="#3c3b6e"/>`,
     de: H3('#1a1a1a', '#dd0000', '#ffce00'), fr: V3('#0055a4', '#fff', '#ef4135'), nl: H3('#ae1c28', '#fff', '#21468b'), it: V3('#009246', '#fff', '#ce2b37'),
+    tr: (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#e30a17"/><circle cx="${R(x + w * .38)}" cy="${R(y + h / 2)}" r="${R(h * .27)}" fill="#fff"/><circle cx="${R(x + w * .44)}" cy="${R(y + h / 2)}" r="${R(h * .215)}" fill="#e30a17"/><circle cx="${R(x + w * .6)}" cy="${R(y + h / 2)}" r="${R(h * .09)}" fill="#fff"/>`,
     pt: (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#009c3b"/><path d="M${R(x + w / 2)} ${R(y + h * .12)}L${R(x + w * .9)} ${R(y + h / 2)}L${R(x + w / 2)} ${R(y + h * .88)}L${R(x + w * .1)} ${R(y + h / 2)}Z" fill="#ffdf00"/><circle cx="${R(x + w / 2)}" cy="${R(y + h / 2)}" r="${R(h * .2)}" fill="#002776"/>`
   };
   function langFlags(list) {

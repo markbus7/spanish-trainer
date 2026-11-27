@@ -15,7 +15,7 @@
   /** [es, nl] → spelwoord. `key` is het kale woord (zonder lidwoord), `es` de volledige vorm om voor te lezen. */
   function gameWord(w) {
     const first = String(w.es).split(/\s*\/\s*/)[0].replace(/…|\.\.\./g, '').trim();
-    const key = stripArt(first.replace(/^[¿¡]+|[?!.,]+$/g, '')).trim().toLowerCase();
+    const key = S.lower(stripArt(first.replace(/^[¿¡]+|[?!.,]+$/g, '')).trim());
     if (!key) return null;
     // "el hermano / la hermana" = "de broer / de zus": dan alleen de eerste betekenis tonen
     const esN = String(w.es).split('/').length, nlP = String(w.nl).split(/\s*\/\s*/);
@@ -31,7 +31,7 @@
   };
 
   /* ================= puzzelmakers ================= */
-  const FILL = 'AAAAAAEEEEEEOOOOOIIIIUUSSSSRRRRNNNNLLLLDDDTTTCCCMMPPBGVHFQYJZÑ';
+  const FILL = S.lang.fill || 'AAAAAAEEEEEEOOOOOIIIIUUSSSSRRRRNNNNLLLLDDDTTTCCCMMPPBGVHFQYJZÑ'; // een taal met eigen letters (Turks) heeft een eigen rij in S.LANGS
   /** Woordzoeker: woorden horizontaal, verticaal of schuin (ook achterstevoren vanaf B1). */
   function wordSearch(words, size, opts = {}) {
     const rnd = opts.rnd || Math.random;
@@ -266,7 +266,7 @@
   }
 
   /* ---------- schermtoetsenbord (groot genoeg voor vingers op de iPad) ---------- */
-  const ROWS = ['QWERTYUIOP', 'ASDFGHJKLÑ', 'ZXCVBNM⌫'];
+  const ROWS = S.lang.keys || ['QWERTYUIOP', 'ASDFGHJKLÑ', 'ZXCVBNM⌫'];
   function keyboard(onKey, opts = {}) {
     const keys = {};
     const el = h('div', { class: 'kb', role: 'group', 'aria-label': 'Toetsenbord' },
@@ -279,7 +279,8 @@
     el.set = (ch, cls) => { const b = keys[ch]; if (b) { b.classList.remove('hit', 'miss'); if (cls) b.classList.add(cls); b.disabled = !!cls; } };
     return el;
   }
-  const keyOf = e => { if (e.key === 'Backspace') return 'BACK'; const k = plain(e.key || ''); return /^[A-ZÑ]$/.test(k) ? k : null; };
+  const KEY_RE = new RegExp('^[A-ZÑ' + plain(S.lang.letters || '').replace(/[^\p{L}]/gu, '') + ']$', 'u'); // ook de eigen letters van de doeltaal (Ç, Ğ, İ, Ö, Ş, Ü)
+  const keyOf = e => { if (e.key === 'Backspace') return 'BACK'; const k = plain(e.key || ''); return KEY_RE.test(k) ? k : null; };
 
   /* =================== 1. Sopa de letras =================== */
   function sopa(g) {
@@ -519,7 +520,7 @@
       g.keys = e => {
         if (done) return;
         if (e.key === 'Backspace') { const n = slots.map((t, k) => t && !t.fixed ? k : -1).filter(k => k >= 0).pop(); if (n != null && n >= 0) { slots[n].used = false; slots[n] = null; drawR(); } e.preventDefault(); return; }
-        const k = (e.key || '').toLowerCase(); if (k.length !== 1) return;
+        const k = S.lower(e.key || ''); if (k.length !== 1) return;
         const t = tiles.find(x => !x.used && x.ch === k) || tiles.find(x => !x.used && plain(x.ch) === plain(k));
         if (t) { e.preventDefault(); place(t); }
       };
@@ -556,7 +557,7 @@
       const lava = art.querySelector('.vc-lava');
       const word = h('div', { class: 'vc-word', lang: 'es' });
       const lives = h('div', { class: 'vc-lives' });
-      const msg = h('p', { class: 'center small muted' }, 'Kies letters. Een klinker telt ook met accent: A geeft ook Á.');
+      const msg = h('p', { class: 'center small muted' }, S.lang.plain ? 'Kies letters. Elke letter telt apart: I en İ, O en Ö, S en Ş zijn verschillende letters.' : 'Kies letters. Een klinker telt ook met accent: A geeft ook Á.');
       const drawW = () => {
         word.innerHTML = '';
         chars.forEach(ch => word.append(ch === ' ' ? h('span', { class: 'vc-gap' }) : h('span', { class: 'vc-ch' + (tried.has(plain(ch)) || over ? ' open' : '') + (over && !tried.has(plain(ch)) ? ' lost' : '') }, tried.has(plain(ch)) || over ? ch : '')));
