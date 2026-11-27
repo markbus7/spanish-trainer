@@ -1,2 +1,6 @@
 Vlaggen voor «Op reis» (js/mundo.js), 120×90 px.
 Gemaakt uit flag-icons (https://github.com/lipis/flag-icons), MIT-licentie, Copyright (c) 2013 Panayiotis Lipiridis.
+
+TwemojiCountryFlags.woff2: lettertype met alleen de landvlaggen, voor browsers die vlag-emoji als letters («NL», «US») tonen (Chrome en Edge op Windows).
+Uit country-flag-emoji-polyfill (https://github.com/talkjs/country-flag-emoji-polyfill), MIT-licentie; de tekeningen zijn Twemoji (Copyright Twitter, Inc. en anderen, CC-BY 4.0).
+Aangezet in index.html (klasse «vlagfont» op <html>) en css/app.css (@font-face «Vlaggen»).
