@@ -59,7 +59,21 @@
     { lv: 'B1', q: 'Es regnet. ___ gehe ich spazieren.', o: ['Trotzdem', 'Obwohl', 'Weil'], nl: 'Het regent. Toch ga ik wandelen.' },
     { lv: 'B1', q: 'Ich habe vergessen, dich ___.', o: ['anzurufen', 'zu anrufen', 'anrufen'], nl: 'Ik ben vergeten je te bellen.' },
     { lv: 'B1', q: 'Je mehr ich lerne, ___ besser spreche ich.', o: ['desto', 'als', 'wie'], nl: 'Hoe meer ik leer, hoe beter ik spreek.' },
-    { lv: 'B1', q: 'Ich lasse mein Auto ___.', o: ['reparieren', 'repariert', 'zu reparieren'], nl: 'Ik laat mijn auto repareren.' }
+    { lv: 'B1', q: 'Ich lasse mein Auto ___.', o: ['reparieren', 'repariert', 'zu reparieren'], nl: 'Ik laat mijn auto repareren.' },
+    { lv: 'B2', q: 'Wenn ich das gewusst ___, wäre ich gekommen.', o: ['hätte', 'habe', 'würde'], nl: 'Als ik dat geweten had, was ik gekomen.' },
+    { lv: 'B2', q: 'Du hättest mich anrufen ___.', o: ['können', 'gekonnt', 'kannst'], nl: 'Je had me kunnen bellen.' },
+    { lv: 'B2', q: 'Der Minister sagte, er ___ nichts davon gewusst.', o: ['habe', 'hat', 'haben'], nl: 'De minister zei dat hij er niets van had geweten. (krantenstijl)' },
+    { lv: 'B2', q: 'Der Müll muss getrennt ___.', o: ['werden', 'worden', 'geworden'], nl: 'Het afval moet gescheiden worden.' },
+    { lv: 'B2', q: 'Das Problem ___ sich leicht lösen.', o: ['lässt', 'kann', 'wird'], nl: 'Het probleem is makkelijk op te lossen.' },
+    { lv: 'B2', q: 'Ich habe ___ Zeit noch Lust.', o: ['weder', 'entweder', 'sowohl'], nl: 'Ik heb tijd noch zin.' },
+    { lv: 'B2', q: 'Er ist müde, ___ arbeitet er weiter.', o: ['trotzdem', 'obwohl', 'sodass'], nl: 'Hij is moe, toch werkt hij door.' },
+    { lv: 'B2', q: 'Wegen der ___ Mieten ziehen viele weg.', o: ['steigenden', 'gestiegen', 'steigen'], nl: 'Vanwege de stijgende huren verhuizen velen.' },
+    { lv: 'B2', q: 'Der Forscher, ___ Studie ich gelesen habe, kommt aus Wien.', o: ['dessen', 'deren', 'der'], nl: 'De onderzoeker wiens studie ik heb gelezen, komt uit Wenen.' },
+    { lv: 'B2', q: 'Das ist alles, ___ ich weiß.', o: ['was', 'das', 'dass'], nl: 'Dat is alles wat ik weet.' },
+    { lv: 'B2', q: 'Wir müssen eine Entscheidung ___.', o: ['treffen', 'nehmen', 'tun'], nl: 'We moeten een beslissing nemen.' },
+    { lv: 'B2', q: 'Sie ist verliebt ___ ihn.', o: ['in', 'auf', 'an'], nl: 'Ze is verliefd op hem.' },
+    { lv: 'B2', q: '___ der Krise haben viele ihre Stelle verloren.', o: ['Infolge', 'Obwohl', 'Deshalb'], nl: 'Als gevolg van de crisis hebben velen hun baan verloren.' },
+    { lv: 'B2', q: 'Das Restaurant ___ sehr gut sein. (men zegt het)', o: ['soll', 'will', 'darf'], nl: 'Het restaurant schijnt heel goed te zijn.' }
   ];
 
   /* Vrije gesprekken met Profe Lupe. */
