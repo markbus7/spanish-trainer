@@ -1593,6 +1593,13 @@ const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((
   const m = S.Store.mergeStates(a, b);
   ok(m.units.u1.last.t === 200 && m.units.u1.best === 0.7, 'unittoets: nieuwste laatste toets blijft bewaard na sync');
 }
+{ // vlaggen ook op Windows: eigen vlaggenlettertype en geen <select> met cursusnamen
+  const css = fs.readFileSync(path.join(root, 'css/app.css'), 'utf8'), html = fs.readFileSync(path.join(root, 'index.html'), 'utf8'), sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8'), app = fs.readFileSync(path.join(root, 'js/app.js'), 'utf8');
+  ok(fs.existsSync(path.join(root, 'icons/vlaggen/TwemojiCountryFlags.woff2')) && sw.includes("'icons/vlaggen/TwemojiCountryFlags.woff2'"), 'vlaggen: lettertype bestaat en staat in sw.js');
+  ok(/@font-face \{ font-family: 'Vlaggen'/.test(css) && /:root\.vlagfont \{ --font: 'Vlaggen'[^}]*--serif: 'Vlaggen'/.test(css), 'vlaggen: @font-face en .vlagfont in css');
+  ok(html.includes("classList.add('vlagfont')") && html.indexOf('vlagfont') < html.indexOf('css/app.css'), 'vlaggen: index.html test of de browser vlaggen tekent');
+  ok(!app.split('\n').some(l => /h\('select'/.test(l) && /CNAME|LNAME|\.flag/.test(l)), 'vlaggen: geen <select> met vlaggen (gebruik coursePick)');
+}
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);
 })();
