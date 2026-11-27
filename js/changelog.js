@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.81.0', date: '2026-11-27',
+    nl: ['Frans: de 📖 grammaticabegrippen zijn er nu ook voor de Franse cursus. Vijftig begrippen (lidwoord, passé composé, imparfait, subjonctif, gérondif, tu en vous …) met Franse voorbeelden, tabellen en uitzonderingen met de reden erbij. Tik in de uitleg op een onderstreept woord om de korte uitleg te zien.'],
+    es: ['Francés: los conceptos de gramática (📖) ahora también para el curso de francés, con ejemplos, tablas y excepciones explicadas.'] },
   { v: '1.80.0', date: '2026-11-27',
     nl: ['Frans B1 compleet: tien nieuwe units (subjonctif, conditionnel, indirecte rede, dubbele voornaamwoorden, passief, gérondif, relatieven)'],
     es: ['Francés B1 completo: diez unidades nuevas (subjuntivo, condicional, estilo indirecto, pronombres dobles, pasiva, gerundio, relativos).'] },

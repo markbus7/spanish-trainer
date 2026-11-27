@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/landen-praten.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/zwak.js']) {
+for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/extra.js', 'content/landen.js', 'content/landen-praten.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/begrippen-fr.js', 'js/zwak.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -1574,9 +1574,10 @@ await micTests();
   G.B.forEach(b => {
     const at = w + b.id + ' ';
     ok(b.t && b.k && b.html && cats.has(b.c) && Array.isArray(b.a) && b.a.length, at + 'velden');
+    if (!G.fits(b, 'es')) return; // begrip dat alleen in een andere doeltaal bestaat (S.Begrippen.add … extra)
     ok(b.es && b.es.n && b.es.html && b.es.ex && b.es.ex.length >= 1, at + 'Spaans blok met voorbeelden');
     (b.rel || []).forEach(r => ok(ids.has(r), at + 'verwant bestaat niet: ' + r));
-    ['es', 'en'].forEach(l => (b[l] && b[l].uz || []).forEach(([t, html]) => ok(t && /waarom|reden/i.test(html), at + l + ' uitzondering zonder reden: ' + t)));
+    ['es', 'en', 'fr', 'de', 'tr'].forEach(l => (b[l] && b[l].uz || []).forEach(([t, html]) => ok(t && /waarom|reden/i.test(html), at + l + ' uitzondering zonder reden: ' + t)));
     const txt = JSON.stringify(b.es).replace(/<[^>]+>/g, '');
     ok(!/(?<!\p{L})(?:vosotros|vosotras|os|habláis|tenéis|coméis|ordenador|coche|móvil|zumo|vale)(?!\p{L})/iu.test(txt), at + 'geen Spanje-vormen');
     ok(b.es.ex.every(([e, n]) => e && n), at + 'voorbeeld met vertaling');
@@ -1596,6 +1597,15 @@ await micTests();
   ok(hit / gr.length > 0.6, w + 'begrippen in grammaticauitleg: ' + hit + '/' + gr.length);
   const files = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   ok(files.indexOf('js/begrippen.js') > 0 && files.indexOf('js/begrippen.js') < files.indexOf('js/lesson.js') && fs.readFileSync(path.join(root, 'sw.js'), 'utf8').includes('js/begrippen.js'), w + 'in index.html (vóór lesson.js) en sw.js');
+  // Frans: eigen bestand js/begrippen-fr.js; elk begrip (behalve por/para) heeft een Frans blok met voorbeelden, Franse titels en zoekwoorden
+  { const c0 = S.course; S.course = { target: 'fr', ui: 'nl' };
+    ok(!G.fits(G.get('por-para'), 'fr') && G.list('fr').length >= 48, w + 'Frans: aantal ' + G.list('fr').length);
+    G.list('fr').forEach(b => { const k = b.fr; ok(k && k.n && k.html && k.ex && k.ex.length >= 2 && k.ex.every(([e, n]) => e && n), w + 'fr ' + b.id + ' blok met voorbeelden');
+      (k.table || []).forEach(r => ok(r.length === k.table[0].length, w + 'fr ' + b.id + ' tabelrij')); });
+    ok(G.title(G.get('indefinido')) === 'Passé composé' && G.title(G.get('lidwoord')) === 'Lidwoord', w + 'Frans: eigen titel');
+    ok(G.match('De subjonctif, de passé composé, de imparfait en de gérondif.').map(x => x.id).join() === 'subjuntivo,indefinido,imperfecto,gerundio', w + 'Franse tijdnamen tikbaar');
+    ok(G.search('subjonctif')[0].id === 'subjuntivo', w + 'Frans zoeken');
+    S.course = c0; G.match('x'); }
   // Engels: begrippen zonder Engels blok (por/para, stamklinkerwisseling) horen niet bij de Engelse cursus
   ok(!G.fits(G.get('por-para'), 'en') && G.fits(G.get('lidwoord'), 'en') && G.list('en').length < G.list('es').length, w + 'per doeltaal');
 }
