@@ -23,7 +23,8 @@
     ajustes: `<path class="fill" d="${gear}"/><path d="${gear}"/><circle cx="12" cy="12" r="2.9"/>`
   };
   function line(name) {
-    const b = LINE[name]; if (!b) return '';
+    // het tabblad van de docent toont het dier van deze cursus (js/docenten.js); zonder eigen docent: Lupe de axolotl
+    const b = (name === 'docente' && S.Docent && S.Docent.icon) || LINE[name]; if (!b) return '';
     return `<svg class="ic-line" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${b}</svg>`;
   }
 
