@@ -1750,3 +1750,38 @@ details.fold[open] > .fold-sum .fold-chev { transform: rotate(90deg); }
 .cpick-opt small { color: var(--muted); font-weight: 400; }
 .cpick-new { flex: none; font-size: .72rem; font-weight: 700; color: var(--teal); border: 1.5px solid var(--teal); border-radius: 99px; padding: .05rem .45rem; }
 .cpick-chk { flex: none; color: var(--accent); font-weight: 700; }
+
+/* 🧪 Andere aanpak bij hardnekkige fouten (js/strategie.js) */
+.st-block { margin-top: .6rem; padding: .65rem .7rem; border-radius: 12px; background: var(--bg2); display: flex; flex-direction: column; gap: .5rem; }
+.st-head { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.st-chip { display: inline-block; padding: .12rem .55rem; border-radius: 999px; background: var(--bad); color: #fff; font-size: .78rem; font-weight: 700; white-space: nowrap; }
+.st-chip.ok { background: var(--blue); }
+.btn.st-go { display: flex; flex-direction: column; align-items: flex-start; gap: .15rem; text-align: left; white-space: normal; width: 100%; height: auto; padding: .65rem .85rem; line-height: 1.3; }
+.btn.st-go small { font-weight: 400; opacity: .95; }
+.btn.st-go .st-why { font-weight: 700; }
+.st-more summary { cursor: pointer; color: var(--muted); padding: .2rem 0; }
+.st-more[open] { display: flex; flex-wrap: wrap; gap: .4rem; }
+.st-more[open] summary { width: 100%; }
+.st-more .st-alt { margin: .15rem .3rem .15rem 0; white-space: normal; text-align: left; }
+.st-tries { display: flex; flex-direction: column; gap: .2rem; }
+.st-try { padding: .25rem .5rem; border-radius: 8px; background: var(--card); border-left: 3px solid var(--line); }
+.st-try.st-werkt { border-left-color: var(--good, #2e9e5b); }
+.st-try.st-niet { border-left-color: var(--bad); }
+.st-try.st-beetje { border-left-color: var(--gold); }
+.zw-topic.zw-stub { border-left-width: 6px; }
+.st-over { display: flex; flex-direction: column; gap: .55rem; }
+.st-over p { margin: 0; }
+.st-row { display: flex; align-items: center; gap: .7rem; }
+.st-row .grow { display: flex; flex-direction: column; min-width: 0; }
+.st-ic { font-size: 1.4rem; width: 2.4rem; height: 2.4rem; display: grid; place-items: center; border-radius: 10px; background: var(--bg2); flex: none; }
+.st-drip { display: flex; flex-direction: column; gap: .5rem; border-left: 4px solid var(--gold); }
+.st-drip .btn, .zw-hoy-drip .btn { white-space: normal; }
+.zw-hoy-hard { margin: 0 0 .7rem; line-height: 1.7; }
+.zw-hoy-hard .btn.link { padding: 0; white-space: normal; text-align: left; }
+.zw-hoy-drip { display: flex; flex-direction: column; gap: .4rem; margin-bottom: .7rem; }
+.st-rep { padding: .55rem 0; border-top: 1px solid var(--line); }
+.st-rep .st-tries { margin-top: .3rem; }
+.strat-card .strat-mis { list-style: none; padding: 0; display: flex; flex-direction: column; gap: .5rem; }
+.strat-card .strat-mis li { padding: .45rem .6rem; border-radius: 10px; background: var(--bg2); }
+.strat-card .strat-mis s { color: var(--bad); }
+.strat-card ol, .strat-card ul { padding-left: 1.3rem; }

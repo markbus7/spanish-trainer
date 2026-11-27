@@ -123,6 +123,7 @@
     const d = Store.today(); d.items++; if (ok) d.ok++;
     if (it.skill) Store.skill(it.skill, ok);
     if (it.tag) Store.mark(it.tag, ok);
+    if (S.Strat) S.Strat.answer(it, ok); // 🧪 hardnekkige fouten: bijhouden of een andere aanpak werkt
     if (!ok && S.Mistakes) S.Mistakes.exercise(it, r); // voor het rapport en Lupe's advies: ook fouten uit gewone oefeningen
     if (it.srsId && it.wt && (!SRS.has(it.srsId) || (r && r.override && (st().srs[it.srsId].s || 0) >= Date.now() - 864e5 && st().srs[it.srsId].i === 0))) {
       // woordtoets: nieuw woord goed = meteen bekend (interval it.wt), fout of met hint = vandaag in de herhaling
@@ -1448,6 +1449,8 @@
           t.units.length ? h('a', { class: 'btn link small', href: '#/unit/' + t.units[0].id }, '📘 Uitleg in de les: ' + t.units[0].level + ' · ' + t.units[0].icon + ' ' + t.units[0].title) : null)),
         tags.length ? h('button', { class: 'btn primary wide', type: 'button', onclick: () => practiceMistakes(tags.slice(0, 6), []) }, '🎯 Oefen deze onderwerpen') : null)));
     }
+    // 🧪 hardnekkige onderwerpen: welke andere aanpak is geprobeerd en wat deed het
+    const strc = S.Strat && S.Strat.reportCard(); if (strc) wrap.append(section('🧪 Andere aanpak geprobeerd', strc));
     // advies van Lupe
     const adv = h('div', { class: 'card rep-advice' });
     const drawAdv = a => {

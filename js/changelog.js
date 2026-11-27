@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.82.0', date: '2026-11-27',
+    nl: ['Andere aanpak bij hardnekkige fouten: blijft een onderwerp fout gaan terwijl je het al vaak oefende (bijvoorbeeld al / del of estar vervoegen), dan krijgt het bij 🎯 Mijn zwakke punten het label 🔁 Hardnekkig en stelt de app een andere leerstrategie voor: 📐 beslisregel met ezelsbruggetje, ⚖️ contrastparen, 🔍 je eigen fouten, 🧱 zelf zinnen maken, 🎧 dictee, 🗓️ elke dag een beetje, of 💬 Lupe legt het anders uit.', 'De app meet per onderwerp of het na zo\'n aanpak beter gaat en of het een dag later nog blijft hangen. Wat bij jou werkt wordt vaker ingezet, wat niet hielp komt minder terug. Bij «Wat werkt voor jou» en in het rapport van Lupe zie je wat al geprobeerd is en met welk effect, zodat nieuwe voorstellen niet meer van hetzelfde zijn.'],
+    es: ['Otro enfoque para los errores persistentes: si un tema sigue saliendo mal, la app propone otra estrategia de aprendizaje (regla de decisión, pares de contraste, tus propios errores, formar frases, dictado, un poco cada día) y mide qué funciona y qué se queda.'] },
   { v: '1.81.0', date: '2026-11-27',
     nl: ['Frans: de 📖 grammaticabegrippen zijn er nu ook voor de Franse cursus. Vijftig begrippen (lidwoord, passé composé, imparfait, subjonctif, gérondif, tu en vous …) met Franse voorbeelden, tabellen en uitzonderingen met de reden erbij. Tik in de uitleg op een onderstreept woord om de korte uitleg te zien.'],
     es: ['Francés: los conceptos de gramática (📖) ahora también para el curso de francés, con ejemplos, tablas y excepciones explicadas.'] },
