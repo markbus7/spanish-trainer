@@ -85,7 +85,7 @@
     { lv: 'B2', q: 'Başvurunuz incelen___.', o: ['mektedir', 'iyorum', 'se'], nl: 'Uw aanvraag wordt onderzocht.' }
   ];
 
-  /* Vrije gesprekken met Profe Lupe. */
+  /* Vrije gesprekken met Pamuk Öğretmen. */
   S.scenarios = [
     { id: 'tr-nl-free', icon: '💬', lv: 'A1', title: 'Vrij gesprek', place: 'Turkije 🇹🇷', role: 'You are a friendly Turkish person (choose a city and say it at the start). Have a natural conversation about daily life, family, food and plans, adapted to the learner’s level. Use standard Turkish.', goal: 'Praat over wat je wilt.' },
     { id: 'tr-nl-cay', icon: '🍵', lv: 'A1', title: 'Thee bestellen in een çay bahçesi', place: 'İstanbul 🇹🇷', role: 'You are Hakan, a cheerful waiter in a tea garden by the Bosphorus in İstanbul. Greet the guest (Hoş geldiniz), ask what they want to drink and eat (çay, Türk kahvesi, simit, tost), ask şekerli or şekersiz, and bring the bill. Use only very simple Turkish.', goal: 'Bestel iets te drinken en te eten en vraag om de rekening.' },
