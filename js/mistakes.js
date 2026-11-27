@@ -320,6 +320,9 @@
       lines.push('', 'Zwakke punten uit oefeningen en gesprekken samen:');
       weak.forEach(([k, v]) => lines.push(`- ${C.tag(k)} [${k}]: ${Math.round(v.ok / (v.ok + v.no) * 100)}% goed (${v.ok + v.no} antwoorden, totaal)${les(unitsFor(k)[0])}${reworked(k) ? ' · ✔ al verwerkt in v' + reworked(k).v + ' (' + fmtD(since(reworked(k))) + ')' : ''}`));
     }
+    // 🧪 hardnekkige onderwerpen: welke leerstrategieën de app al probeerde en met welk effect (js/strategie.js)
+    const stx = S.Strat ? S.Strat.asText() : '';
+    if (stx) lines.push('', stx);
     if ((S.reworked || []).length && opt.done !== false) {
       lines.push('', `Al verwerkt in eerdere updates van de app (niet opnieuw voorstellen, tenzij er ná die datum nieuwe fouten zijn)${hidden ? '. ' + hidden + ' punten hierboven weggelaten: al verwerkt en sindsdien geen nieuwe fouten' : ''}:`);
       S.reworked.forEach(x => lines.push(`- v${x.v} (${fmtD(since(x))}) ${x.tag ? '[' + x.tag + ']' + (x.unit ? ' ' + x.unit : '') : (x.ids || []).join(', ')}: ${x.what}`));
@@ -364,6 +367,7 @@ Write in Dutch. Give 3–6 proposals, most important first, and always finish ev
   Voorbeelden: <for answers: the exact extra accepted answer(s); for exercises: 3–5 ready-to-use items as «${ES ? 'Spanish' : S.course.ai.target} sentence» = «Dutch translation», with ___ for a gap if it is a fill-in item; otherwise leave this line out>
 
 Lines marked «✔ al verwerkt» and the list «Al verwerkt in eerdere updates» describe what the app already contains. Totals and percentages there still include old answers from before that update. Do NOT propose those things again; each example mistake shows the app version it was made in and is marked «ná vX» (made in that version or newer) or «vóór vX, negeren» (made before the fix reached the learner). Ignore mistakes marked «vóór»; only mention such a topic if there are mistakes marked «ná», and then propose something different (e.g. another exercise type), saying how many new mistakes there were.
+The section «Hardnekkige onderwerpen en geprobeerde leerstrategieën» lists topics that stay wrong although they were practised a lot, which learning strategies the app already tried there (decision rule, contrast pairs, own mistakes, building sentences, dictation, spaced mini-rounds, teacher explains differently) and the measured effect (% correct before → after; «werkt», «helpt een beetje», «hielp niet», «blijft hangen»). For such a topic NEVER propose more of the same kind of exercises. Instead propose content for a strategy that worked for this learner (see «Wat bij deze leerling werkt») or one not tried yet, and say which strategy it supports: e.g. a decision rule or mnemonic (soort: uitleg erbij), minimal contrast pairs with options, or full sentences suitable for dictation. Mention in "Waarom" what was already tried and its effect.
 Rules: only propose what the report supports, and say so in "Waarom"; if the report is thin, give fewer proposals. Prefer fixing the learner's most frequent mistakes. Don't repeat something that already exists in the course unless it should be explained or practised differently. ${ES ? 'Always Latin American Spanish norms (ustedes, never vosotros; regional vocabulary like carro, celular, computadora).' : 'Teach ' + S.course.ai.target + '.'}`;
     const text = await S.AI.ask({ system: sys, prompt: asText(r, { advice: true, proposal: false }), maxTokens: 4000 });
     db().update = { t: Date.now(), text: text.trim() };
@@ -371,17 +375,18 @@ Rules: only propose what the report supports, and say so in "Waarom"; if the rep
   }
 
   /* ---------- advies van Lupe (met AI-sleutel) ---------- */
+  const STRAT_ADV = ' If the report lists stubborn topics with learning strategies already tried, do not advise "practise more": name the strategy that worked for this learner, or one not tried yet, and tell them to use the 🧪 button on the weak-points page.';
   async function advise() {
     const r = report(30);
     const other = S.course.target !== 'es', T = S.course.ai.target;
     const sys = other && S.course.ui === 'nl'
       ? `You are ${S.Tutor.title}, a warm ${T} teacher in a learning app for a native Dutch speaker.
-Write in Dutch, max ~120 words, no headings, no tables. Based on the learner's mistake report (mistakes in conversations AND in regular exercises): name the 2–3 most important things to improve (watch for typical Dutch-speaker mistakes, false friends and unnatural collocations), explain each in one short sentence with one ${T} example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).`
+Write in Dutch, max ~120 words, no headings, no tables. Based on the learner's mistake report (mistakes in conversations AND in regular exercises): name the 2–3 most important things to improve (watch for typical Dutch-speaker mistakes, false friends and unnatural collocations), explain each in one short sentence with one ${T} example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).${STRAT_ADV}`
       : other
       ? `You are ${S.Tutor.title}, a warm ${T} teacher in a learning app for a native speaker of Latin American Spanish. When you write Spanish, use Latin American norms (ustedes, never vosotros; celular, carro, computadora).
-Write in Latin American Spanish, max ~120 words, no headings, no tables. Based on the learner's mistake report (mistakes in conversations AND in regular exercises): name the 2–3 most important things to improve, explain each in one short sentence with one ${T} example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).`
+Write in Latin American Spanish, max ~120 words, no headings, no tables. Based on the learner's mistake report (mistakes in conversations AND in regular exercises): name the 2–3 most important things to improve, explain each in one short sentence with one ${T} example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).${STRAT_ADV}`
       : `You are ${S.Tutor.title}, a warm Latin American Spanish teacher in a learning app for a Dutch speaker. Always Latin American norms (ustedes, never vosotros).
-Write in Dutch, max ~120 words, no headings, no tables. Based on the learner's mistake report (mistakes in conversations AND in regular exercises): name the 2–3 most important things to improve, explain each in one short sentence with one Latin American Spanish example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).`;
+Write in Dutch, max ~120 words, no headings, no tables. Based on the learner's mistake report (mistakes in conversations AND in regular exercises): name the 2–3 most important things to improve, explain each in one short sentence with one Latin American Spanish example in **bold**, and end with one concrete suggestion of what to practise this week (refer to the lessons named in the report when given).${STRAT_ADV}`;
     const text = await S.AI.ask({ system: sys, prompt: asText(r, { advice: false }), maxTokens: 1200 });
     db().advice = { t: Date.now(), text: text.trim() };
     return db().advice;
