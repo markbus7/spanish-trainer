@@ -1227,6 +1227,7 @@ await micTests();
   const files = [...fs.readFileSync(path.join(root, 'index.html'), 'utf8').matchAll(/src="((?:js|content)\/[^"?]+\.js)(?:\?[^"]*)?"/g)].map(m => m[1])
     .filter(f => !/(app|lesson|ai|sync|ask)\.js$/.test(f));
   const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  // één rij per cursus met een kaart: [doeltaal, minimaal aantal landen]
   const want = { 'es-nl': ['es', 21], 'en-nl': ['en', 12], 'nl-es': ['nl', 5] };
   for (const course of Object.keys(S.COURSES)) {
     const w = 'op reis ' + course + ': ';
@@ -1277,74 +1278,88 @@ await micTests();
   }
   ok(/target !== 'es' && S\.course\.ui === 'nl'/.test(src('js/app.js')) && /if \(!ES\) \{ location\.hash = '#\/practica'/.test(src('js/app.js')), 'doeltaalnamen: Docente en vervoegingstabellen per cursus');
 }
-{ // Engels voor Nederlandstaligen (en-nl): A1–C2, uitleg in het Nederlands
+{ // Cursussen met Nederlandse uitleg en een andere doeltaal dan Spaans (Engels, Duits, …): één rij per cursus.
+  // pre = begin van de unit-id's, name = taalnaam in schermteksten, lupe = Lupes «¡Una tarea menos! Sigue así.» in de doeltaal
+  // (alleen als ze in die taal praat), art = [woord met lidwoord, zonder], extra(K, w) = eigen controles van die cursus.
+  const NL_COURSES = {
+    'en-nl': { pre: 'en', name: 'Engels', lupe: 'One task down! Keep it up.', art: ['the house', 'house'], extra(K, w) {
+      ok(K.C.LEVELS.every(L => K.placement.filter(q => q.lv === L.id).length >= 12), w + 'niveautest: 12+ vragen voor elk niveau A1–C2');
+      ok(K.scenarios.some(x => x.lv === 'C2'), w + 'gesprek op C2');
+      ok(K.Gen.levelTestResult({ A1: { ok: 8, n: 8 }, A2: { ok: 8, n: 8 }, B1: { ok: 8, n: 8 }, B2: { ok: 8, n: 8 }, C1: { ok: 7, n: 8 }, C2: { ok: 2, n: 8 } }).level === 'C1', w + 'niveautest tot C1/C2');
+      // Britse spelling telt goed (alleen als de Amerikaanse vorm in het antwoord staat)
+      const ck = (u, a) => K.check.check(u, [a]);
+      ok(ck('My favourite colour is grey.', 'My favorite color is gray.').warn === 'british' && ck('We travelled to the centre.', 'We traveled to the center.').ok
+        && ck('She organised the programme.', 'She organized the program.').ok && ck('I analysed the catalogue.', 'I analyzed the catalog.').ok, w + 'Britse spelling wordt goedgerekend');
+      ok(!ck('our', 'or').ok && !ck('four', 'for').ok && ck('My favorite color.', 'My favorite color.').exact, w + 'Britse spelling: geen valse treffers');
+      ok(K.check.parts('My favourite colour is blue', 'My favorite color is gray').k.join() === '0,1,2,3', w + 'Britse spelling telt per woord als goed');
+      ok(K.check.check("I've lived here since 2015", ["I've lived here since 2015."]).ok, w + 'apostrof en punt');
+    } }
+  };
+  ok(Object.values(S.COURSES).filter(c => c.ui === 'nl' && c.target !== 'es').every(c => NL_COURSES[c.id]), 'elke cursus met Nederlandse uitleg heeft een rij in NL_COURSES (tests/run.js)');
   const list = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/tts-texts.js')], { maxBuffer: 64 << 20 }).toString());
   const have = new Set(list.map(x => x.k));
   const files = [...fs.readFileSync(path.join(root, 'index.html'), 'utf8').matchAll(/src="((?:js|content)\/[^"?]+\.js)(?:\?[^"]*)?"/g)].map(m => m[1])
     .filter(f => !/(app|lesson|ai|sync|ask)\.js$/.test(f));
-  ok(files.includes('content/en-nl/extra.js') && fs.readFileSync(path.join(root, 'sw.js'), 'utf8').includes('content/en-nl/extra.js'), 'en-nl: bestanden in index.html en sw.js');
-  const course = 'en-nl', w = course + ': ';
-  const c = vm.createContext({ console, setTimeout, clearTimeout }); c.window = c; c.globalThis = c; c.self = c; c.SPT_COURSE = course;
-  for (const f of files) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), c, { filename: f });
-  const K = c.SPT, us = K.C.all();
-  ok(K.course.id === course && K.course.ui === 'nl' && K.course.target === 'en' && !K.i18n.on && K.i18n.sub, w + 'cursus actief, Nederlandse schermteksten');
-  ok(K.t('Typ in het Spaans') === 'Typ in het Engels' && K.t('Nederlands met Spaanse samenvattingen') === 'Nederlands met Engelse samenvattingen' && K.t('Vandaag') === 'Vandaag', w + '«Spaans» wordt «Engels» in schermteksten');
-  ok(us.length >= 5 && us.every(u => u.id.startsWith('en-') && /^en-(a1|a2|b1|b2|c1|c2)-\d\d$/.test(u.id)), w + 'alleen eigen lesstof (' + us.length + ' units)');
-  ok(K.C.LEVELS.every(L => K.placement.filter(q => q.lv === L.id).length >= 12), w + 'niveautest: 12+ vragen voor elk niveau A1–C2');
-  ok(K.placement.every(q => q.o.length === 3 && new Set(q.o).size === 3 && q.q.trim()), w + 'niveautestvragen: 3 verschillende opties');
-  ok(K.scenarios.length >= 4 && K.scenarios.some(x => x.lv === 'C2') && K.phrases.length >= 10 && !K.regions.length, w + 'gesprekken en uitdrukkingen');
-  ok(K.C.LEVELS.find(L => L.id === 'B2').can.every(t => !/subjuntivo|voseo/.test(t)), w + 'eigen can-do-teksten');
-  for (const L of K.C.LEVELS) { const b = K.Gen.levelTestBand(L.id); ok(b.items.length >= 8 && b.items.every(it => it.options.includes(it.answer)), w + 'niveautest ' + L.id); }
-  ok(K.Gen.levelTestResult({ A1: { ok: 8, n: 8 }, A2: { ok: 8, n: 8 }, B1: { ok: 8, n: 8 }, B2: { ok: 8, n: 8 }, C1: { ok: 7, n: 8 }, C2: { ok: 2, n: 8 } }).level === 'C1', w + 'niveautest tot C1/C2');
-  // Britse spelling telt goed (alleen als de Amerikaanse vorm in het antwoord staat)
-  const ck = (u, a) => K.check.check(u, [a]);
-  ok(ck('My favourite colour is grey.', 'My favorite color is gray.').warn === 'british' && ck('We travelled to the centre.', 'We traveled to the center.').ok
-    && ck('She organised the programme.', 'She organized the program.').ok && ck('I analysed the catalogue.', 'I analyzed the catalog.').ok, w + 'Britse spelling wordt goedgerekend');
-  ok(!ck('our', 'or').ok && !ck('four', 'for').ok && ck('My favorite color.', 'My favorite color.').exact, w + 'Britse spelling: geen valse treffers');
-  ok(K.check.parts('My favourite colour is blue', 'My favorite color is gray').k.join() === '0,1,2,3', w + 'Britse spelling telt per woord als goed');
-  // Lupe praat Engels in deze cursus
-  ok(K.Tutor.lineLang === 'en' && K.Tutor.loc({ es: '¡Una tarea menos! Sigue así.', nl: 'x' }).es === 'One task down! Keep it up.' && K.Tutor.loc({ es: '¡Llevas 12 días seguidos! ¡Qué padre!' }).lang === 'en', w + 'Lupe zegt haar zinnen in het Engels');
-  const lupeLines = K.Tutor.lines.every(us);
-  ok(lupeLines.every(t => !/[¡¿ñ]|\b(Hoy|tienes|Llevas|Ya conoces|seguidas)\b/.test(t)), w + 'geen Spaanse Lupe-zinnen meer: ' + lupeLines.filter(t => /[¡¿ñ]/.test(t)).slice(0, 3).join(' | '));
-  ok(lupeLines.every(t => have.has(K.Speech.clipKey(t, 'lupe-girl')) && have.has(K.Speech.clipKey(t, 'lupe-woman'))), w + 'alle Engelse Lupe-zinnen worden ingesproken');
-  const ids = new Set();
-  for (const u of us) {
-    const where = w + u.id;
-    ok(!ids.has(u.id), where + ' dubbel id'); ids.add(u.id);
-    ['id', 'level', 'title', 'nl', 'icon'].forEach(k => ok(typeof u[k] === 'string' && u[k], where + ' mist ' + k));
-    ok(u.id.slice(3, 5) === u.level.toLowerCase(), where + ' niveau past bij id');
-    ok(u.goals.length >= 2 && u.vocab.length >= 20 && u.grammar.length >= 2 && u.ex.length >= 12, where + ' omvang');
-    const seen = new Set(); u.vocab.forEach(v => { ok(v.length >= 2 && v.every(x => typeof x === 'string' && x.trim()), where + ' woord ' + v[0]); ok(!seen.has(v[0]), where + ' dubbel woord ' + v[0]); seen.add(v[0]); });
-    u.grammar.forEach((g, gi) => {
-      const open = (g.html.match(/<(b|i|p|s)>/g) || []).length, close = (g.html.match(/<\/(b|i|p|s)>/g) || []).length;
-      ok(g.t && open === close, where + ' grammatica ' + gi + ' html');
-      if (g.table) ok(g.table.every(r => r.length === g.table[0].length), where + ' tabel ' + gi);
-    });
-    u.ex.forEach((e, i) => {
-      const x = where + ' ex' + i;
-      ok(e.tag && K.C.TAGS[e.tag], x + ' tag ' + e.tag);
-      if (e.t === 'mc') ok(e.o.length >= 3 && new Set(e.o).size === e.o.length, x + ' mc');
-      if (e.t === 'cloze') ok((e.s.match(/___/g) || []).length === 1 && (!e.o || (e.o[0] === e.a[0] && new Set(e.o).size === e.o.length)), x + ' cloze');
-      if (e.t === 'tr') ok(e.nl && e.a.length, x + ' tr');
-      if (e.t === 'order') ok(e.s.split(' ').length >= 3, x + ' order');
-      if (e.t === 'match') ok(e.p.length >= 3 && e.p.length <= 6, x + ' match');
-    });
-    ok(u.dialogue.lines.length >= 6 && u.dialogue.lines.every(l => l.length === 3 && l.every(Boolean)) && u.dialogue.q.length >= 3 && u.dialogue.q.every(q => new Set(q.o).size === q.o.length), where + ' dialoog');
-    ok(u.reading.p.length >= 3 && u.reading.p.every(p => p.length === 2 && p.every(x => x.trim())) && u.reading.q.length >= 3 && u.reading.q.every(q => q.t === 'mc' && new Set(q.o).size === q.o.length) && u.say.length >= 2 && u.task.model && u.task.nl && u.scenario.role && u.scenario.goal && u.culture.html, where + ' lezen/toepassen');
-    ok(!/vosotros|\b(el|la|los|las) [a-z]+ (es|son)\b/i.test(u.grammar.map(g => g.html).join(' ')), where + ' geen Spaans in de uitleg');
-    for (const st of K.Gen.STEPS) {
-      const ses = K.Gen.stepSession(u, st.id);
-      ok(ses && ses.items.length && ses.items.every(Boolean), where + ' sessie ' + st.id);
-      ses.items.forEach(it => { if (it.kind === 'mc') ok(it.options.includes(it.answer) && new Set(it.options).size === it.options.length, where + ' ' + st.id + ' mc-item ' + (it.prompt || it.q || it.sentence)); });
-      ses.items.forEach(it => { [it.audio, it.word && it.word.es].forEach(t => t && ok(have.has(K.Speech.clipKey(t, course)), where + ' opname ontbreekt: ' + t)); });
+  for (const [course, cfg] of Object.entries(NL_COURSES)) {
+    const w = course + ': ';
+    ok(files.includes('content/' + course + '/extra.js') && fs.readFileSync(path.join(root, 'sw.js'), 'utf8').includes('content/' + course + '/extra.js'), w + 'bestanden in index.html en sw.js');
+    const c = vm.createContext({ console, setTimeout, clearTimeout }); c.window = c; c.globalThis = c; c.self = c; c.SPT_COURSE = course;
+    for (const f of files) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), c, { filename: f });
+    const K = c.SPT, us = K.C.all(), tg = K.course.target;
+    const avail = K.C.LEVELS.filter(L => K.C.available(L.id));
+    ok(K.course.id === course && K.course.ui === 'nl' && tg === cfg.pre && !K.i18n.on && K.i18n.sub, w + 'cursus actief, Nederlandse schermteksten');
+    ok(K.t('Typ in het Spaans') === 'Typ in het ' + cfg.name && K.t('Nederlands met Spaanse samenvattingen') === 'Nederlands met ' + cfg.name + 'e samenvattingen' && K.t('Vandaag') === 'Vandaag', w + '«Spaans» wordt «' + cfg.name + '» in schermteksten');
+    ok(us.length >= 5 && us.every(u => new RegExp('^' + cfg.pre + '-(a1|a2|b1|b2|c1|c2)-\\d\\d$').test(u.id)), w + 'alleen eigen lesstof (' + us.length + ' units)');
+    ok(avail.length && avail[0].id === 'A1' && avail.every((L, i) => L.id === K.C.LEVELS[i].id || K.course.allLevels), w + 'niveaus op volgorde vanaf A1');
+    ok(avail.every(L => K.placement.filter(q => q.lv === L.id).length >= 12), w + 'niveautest: 12+ vragen voor elk niveau met lesstof');
+    ok(K.placement.every(q => q.o.length === 3 && new Set(q.o).size === 3 && q.q.trim()), w + 'niveautestvragen: 3 verschillende opties');
+    ok(K.scenarios.length >= 4 && K.phrases.length >= 10 && !K.regions.length, w + 'gesprekken en uitdrukkingen');
+    ok(K.C.LEVELS.every(L => L.can.every(t => !/subjuntivo|voseo|Spaans/.test(t))), w + 'eigen can-do-teksten');
+    for (const L of avail) { const b = K.Gen.levelTestBand(L.id); ok(b.items.length >= 8 && b.items.every(it => it.options.includes(it.answer)), w + 'niveautest ' + L.id); }
+    if (cfg.lupe) { // Lupe praat de doeltaal in deze cursus
+      ok(K.Tutor.lineLang === tg && K.Tutor.loc({ es: '¡Una tarea menos! Sigue así.', nl: 'x' }).es === cfg.lupe && K.Tutor.loc({ es: '¡Llevas 12 días seguidos! ¡Qué padre!' }).lang === tg, w + 'Lupe zegt haar zinnen in de doeltaal');
+      const lupeLines = K.Tutor.lines.every(us);
+      ok(lupeLines.every(t => !/[¡¿ñ]|\b(Hoy|tienes|Llevas|Ya conoces|seguidas)\b/.test(t)), w + 'geen Spaanse Lupe-zinnen meer: ' + lupeLines.filter(t => /[¡¿ñ]/.test(t)).slice(0, 3).join(' | '));
+      ok(lupeLines.every(t => have.has(K.Speech.clipKey(t, 'lupe-girl')) && have.has(K.Speech.clipKey(t, 'lupe-woman'))), w + 'alle Lupe-zinnen worden ingesproken');
+    } else ok(K.Tutor.lineLang === 'es', w + 'Lupe praat Spaans (geen vertaling)');
+    const ids = new Set();
+    for (const u of us) {
+      const where = w + u.id;
+      ok(!ids.has(u.id), where + ' dubbel id'); ids.add(u.id);
+      ['id', 'level', 'title', 'nl', 'icon'].forEach(k => ok(typeof u[k] === 'string' && u[k], where + ' mist ' + k));
+      ok(u.id.slice(cfg.pre.length + 1, cfg.pre.length + 3) === u.level.toLowerCase(), where + ' niveau past bij id');
+      ok(u.goals.length >= 2 && u.vocab.length >= 20 && u.grammar.length >= 2 && u.ex.length >= 12, where + ' omvang');
+      const seen = new Set(); u.vocab.forEach(v => { ok(v.length >= 2 && v.every(x => typeof x === 'string' && x.trim()), where + ' woord ' + v[0]); ok(!seen.has(v[0]), where + ' dubbel woord ' + v[0]); seen.add(v[0]); });
+      u.grammar.forEach((g, gi) => {
+        const open = (g.html.match(/<(b|i|p|s)>/g) || []).length, close = (g.html.match(/<\/(b|i|p|s)>/g) || []).length;
+        ok(g.t && open === close, where + ' grammatica ' + gi + ' html');
+        if (g.table) ok(g.table.every(r => r.length === g.table[0].length), where + ' tabel ' + gi);
+      });
+      u.ex.forEach((e, i) => {
+        const x = where + ' ex' + i;
+        ok(e.tag && K.C.TAGS[e.tag], x + ' tag ' + e.tag);
+        if (e.t === 'mc') ok(e.o.length >= 3 && new Set(e.o).size === e.o.length, x + ' mc');
+        if (e.t === 'cloze') ok((e.s.match(/___/g) || []).length === 1 && (!e.o || (e.o[0] === e.a[0] && new Set(e.o).size === e.o.length)), x + ' cloze');
+        if (e.t === 'tr') ok(e.nl && e.a.length, x + ' tr');
+        if (e.t === 'order') ok(e.s.split(' ').length >= 3, x + ' order');
+        if (e.t === 'match') ok(e.p.length >= 3 && e.p.length <= 6, x + ' match');
+      });
+      ok(u.dialogue.lines.length >= 6 && u.dialogue.lines.every(l => l.length === 3 && l.every(Boolean)) && u.dialogue.q.length >= 3 && u.dialogue.q.every(q => new Set(q.o).size === q.o.length), where + ' dialoog');
+      ok(u.reading.p.length >= 3 && u.reading.p.every(p => p.length === 2 && p.every(x => x.trim())) && u.reading.q.length >= 3 && u.reading.q.every(q => q.t === 'mc' && new Set(q.o).size === q.o.length) && u.say.length >= 2 && u.task.model && u.task.nl && u.scenario.role && u.scenario.goal && u.culture.html, where + ' lezen/toepassen');
+      ok(!/vosotros|\b(el|la|los|las) [a-z]+ (es|son)\b/i.test(u.grammar.map(g => g.html).join(' ')), where + ' geen Spaans in de uitleg');
+      for (const st of K.Gen.STEPS) {
+        const ses = K.Gen.stepSession(u, st.id);
+        ok(ses && ses.items.length && ses.items.every(Boolean), where + ' sessie ' + st.id);
+        ses.items.forEach(it => { if (it.kind === 'mc') ok(it.options.includes(it.answer) && new Set(it.options).size === it.options.length, where + ' ' + st.id + ' mc-item ' + (it.prompt || it.q || it.sentence)); });
+        ses.items.forEach(it => { [it.audio, it.word && it.word.es].forEach(t => t && ok(have.has(K.Speech.clipKey(t, course)), where + ' opname ontbreekt: ' + t)); });
+      }
+      u.dialogue.lines.forEach(l => ok(have.has(K.Speech.clipKey(l[1], course)), where + ' dialoog-opname: ' + l[1]));
     }
-    u.dialogue.lines.forEach(l => ok(have.has(K.Speech.clipKey(l[1], course)), where + ' dialoog-opname: ' + l[1]));
+    // elk niveau met lesstof is compleet: 10 units
+    for (const L of avail) ok(K.C.unitsOf(L.id).length === 10, w + L.id + ': 10 units (' + K.C.unitsOf(L.id).length + ')');
+    ok(K.Gen.checkType(cfg.art[1], { answers: [cfg.art[0]], articleOptional: true }).ok || !K.lang.arts, w + 'lidwoord mag ontbreken');
+    if (cfg.extra) cfg.extra(K, w);
   }
-  // elk niveau met lesstof is compleet: 10 units
-  for (const L of K.C.LEVELS.filter(L => K.C.available(L.id))) ok(K.C.unitsOf(L.id).length === 10, w + L.id + ': 10 units (' + K.C.unitsOf(L.id).length + ')');
-  ok(K.check.check("I've lived here since 2015", ["I've lived here since 2015."]).ok, w + 'apostrof en punt');
-  const it = { answers: ['the house'], articleOptional: true };
-  ok(K.Gen.checkType('house', it).ok, w + 'lidwoord mag ontbreken');
 }
 { // ⚠️ uitzonderingen altijd benoemd (js/uitzonderingen.js), in elke cursus
   const files = [...fs.readFileSync(path.join(root, 'index.html'), 'utf8').matchAll(/src="((?:js|content)\/[^"?]+\.js)(?:\?[^"]*)?"/g)].map(m => m[1])

@@ -110,7 +110,7 @@
   }
   /* Taalnamen voor de prompts, per cursus. TL = doeltaal, NL = moedertaal/uitlegtaal van de leerling. */
   const CO = () => S.course;
-  const TL = () => CO().target === 'es' ? 'Spanish' : CO().target === 'en' ? 'English' : 'Dutch';
+  const TL = () => (S.LANGS[CO().target] || S.LANGS.es).en;
   const NL = () => CO().ui === 'nl' ? 'Dutch' : 'Spanish';
   function explainLang() {
     const e = S.Store.state.settings.explain;
@@ -139,7 +139,7 @@
   const PRIVACY = () => `PRIVACY (important): never ask for the learner's real personal information: no real names of family members, partner or friends, no address, phone number, email, workplace, health, money, relationships, religion or other private matters. When a topic is personal (family, home, work, plans, feelings), treat it as fiction: talk about an invented character or invented details. If the learner shares real private details anyway, do not ask follow-up questions about them and do not repeat them.`;
 
   // Mark (2026-11-25): uitzonderingen altijd als uitzondering benoemen, met de reden
-  const EXCEPTION_RULE = () => `EXCEPTIONS: whenever something is an exception to a rule the learner knows (e.g. el problema/el tema/el idioma are masculine although they end in -a; la mano; el agua; ¿Dónde es la fiesta? with ser; irregular verb forms; irregular plurals), say explicitly that it IS an exception ("${CO().ui === 'nl' ? 'Uitzondering' : 'Excepción'}: …") and briefly explain WHY (origin or reason), in feedback, explanations and new material alike.`;
+  const EXCEPTION_RULE = () => `EXCEPTIONS: whenever something is an exception to a rule the learner knows (e.g. ${CO().target === 'es' ? 'el problema/el tema/el idioma are masculine although they end in -a; la mano; el agua; ¿Dónde es la fiesta? with ser; irregular verb forms; irregular plurals' : CO().ai.exceptions || 'irregular verb forms, irregular plurals, an unexpected gender or article, a preposition or word order that breaks the usual pattern'}), say explicitly that it IS an exception ("${CO().ui === 'nl' ? 'Uitzondering' : 'Excepción'}: …") and briefly explain WHY (origin or reason), in feedback, explanations and new material alike.`;
   function baseRules(p) { return baseRules0(p) + '\n' + EXCEPTION_RULE(); }
   function baseRules0(p) {
     if (CO().target !== 'es' && CO().ui === 'nl') {
@@ -147,7 +147,7 @@
 Learner level: ${p.level} (CEFR). ${LEVEL_GENERIC[p.level] || LEVEL_GENERIC.B1}
 Grammar the learner has studied so far: ${p.grammar.join('; ') || 'basics'}.
 ${p.weak.length ? 'Known weak points to watch for: ' + p.weak.join(', ') + '.' : ''}
-Teach ${CO().ai.target}${CO().target === 'en' ? ' (US spelling and vocabulary; mention the British variant when it differs and it matters)' : ''}. Pay close attention to typical mistakes of Dutch speakers (false friends such as eventually/actually/sensible, since vs. for, present perfect vs. past simple, word order, make vs. do, too literal translations, "Dunglish").
+Teach ${CO().ai.target}${CO().ai.style ? ' (' + CO().ai.style + ')' : ''}. Pay close attention to typical mistakes of Dutch speakers (${CO().ai.pitfalls || 'false friends, word order, too literal translations from Dutch'}).
 Whenever you explain or translate, write in natural Dutch as spoken in the Netherlands.
 ${PRIVACY()}
 Do not use Markdown headings or tables. Keep formatting minimal.`;

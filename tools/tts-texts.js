@@ -147,6 +147,9 @@ add('¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.');
    Eigen sleutel (naamruimte lupe-…), zodat dezelfde zin in de lesstof zijn gewone stem houdt. */
 const LUPE_EN = { girl: { voice: 'en-US-JennyNeural', pitch: '+30Hz', rate: '+6%' }, woman: { voice: 'en-US-JennyNeural', pitch: '+0Hz', rate: '+0%' } };
 const LUPE = { girl: { voice: 'es-MX-DaliaNeural', pitch: '+30Hz', rate: '+6%' }, woman: { voice: 'es-MX-DaliaNeural', pitch: '+0Hz', rate: '+0%' } };
+const LUPE_DE = { girl: { voice: 'de-DE-KatjaNeural', pitch: '+30Hz', rate: '+6%' }, woman: { voice: 'de-DE-KatjaNeural', pitch: '+0Hz', rate: '+0%' } };
+/* Lupes stem per doeltaal waarin ze praat (S.Tutor.lineLang). Nieuwe taal: hier een rij. */
+const LUPE_BY = { es: LUPE, en: LUPE_EN, de: LUPE_DE };
 for (const es of S.Tutor.lines.every(S.C.all())) for (const [v, o] of Object.entries(LUPE)) {
   const ns = 'lupe-' + v, k = S.Speech.clipKey(es, ns);
   if (!out.has(k)) out.set(k, { k, ns, text: S.Speech.clean(es), voice: o.voice, pitch: o.pitch, rate: o.rate, lv: ['X'] });
@@ -161,7 +164,7 @@ for (const [course, [vf, vm_]] of Object.entries(OTHER)) {
   const ns = S.course.ns;
   let lv = 'X';
   const put = (text, voice = vf) => {
-    if (!text || !/[a-z]/i.test(text)) return;
+    if (!text || !/\p{L}/u.test(text)) return;
     const k = S.Speech.clipKey(text, ns), L = course + ':' + lv;
     if (!out.has(k)) out.set(k, { k, ns, text: S.Speech.clean(text), voice, lv: [L] });
     else if (!out.get(k).lv.includes(L)) out.get(k).lv.push(L);
@@ -189,8 +192,8 @@ for (const [course, [vf, vm_]] of Object.entries(OTHER)) {
   put(S.course.hello);
   // Lupes vaste zinnen in deze cursus: in en-nl praat ze Engels (Amerikaanse stem, met unit-titels en grammaticasamenvattingen),
   // anders haar Spaanse zinnen (bijv. «tu profe de inglés») met haar Mexicaanse stem
-  const lupeV = S.Tutor.lineLang === 'en' ? LUPE_EN : LUPE;
-  for (const es of S.Tutor.lines.every(S.Tutor.lineLang === 'en' ? S.C.all() : [])) for (const [v, o] of Object.entries(lupeV)) {
+  const lupeV = LUPE_BY[S.Tutor.lineLang] || LUPE;
+  for (const es of S.Tutor.lines.every(S.Tutor.lineLang !== 'es' ? S.C.all() : [])) for (const [v, o] of Object.entries(lupeV)) {
     const lns = 'lupe-' + v, k = S.Speech.clipKey(es, lns);
     if (!out.has(k)) out.set(k, { k, ns: lns, text: S.Speech.clean(es), voice: o.voice, pitch: o.pitch, rate: o.rate, lv: ['X'] });
   }

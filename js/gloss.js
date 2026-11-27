@@ -11,7 +11,7 @@
   const bare = s => S.check.bare(String(s || ''));
   const lang = () => {
     const t = S.course.target, ui = S.course.ui;
-    return { TL: t === 'en' ? 'English' : t === 'nl' ? 'Dutch' : 'Spanish', NL: ui === 'es' ? 'Latin American Spanish' : 'Dutch' };
+    return { TL: (S.LANGS[t] || S.LANGS.es).en, NL: ui === 'es' ? 'Latin American Spanish' : 'Dutch' };
   };
 
   /* ---------- prompt ---------- */

@@ -44,7 +44,7 @@ The learner opened the "Ask Lupe" side chat from somewhere in the app to ask abo
 <screen>
 ${ctx.text}
 </screen>
-Answer the learner's question about this content directly and concretely, quoting the exact ${S.course.target === 'es' ? 'Spanish' : S.course.target === 'en' ? 'English' : 'Dutch'} words from the screen in bold. Keep it short (max ~120 words) unless they ask for more.
+Answer the learner's question about this content directly and concretely, quoting the exact ${S.lang.en} words from the screen in bold. Keep it short (max ~120 words) unless they ask for more.
 If the screen shows a question the learner has not answered yet, do not simply give away the answer: give a hint or explain the rule, unless they explicitly ask for the answer.
 If the course text itself contains a real mistake, say so honestly.`;
   }
