@@ -16,7 +16,7 @@
   /* ---------- prompt: wat Lupe onder elk antwoord zet ---------- */
   function promptRule() {
     const tags = Object.entries(C.TAGS).filter(([k]) => k !== 'conj').map(([k, v]) => k + ' (' + v + ')').join(', ');
-    const es = S.course.target !== 'es', TLn = es ? (S.course.target === 'en' ? 'English' : 'Dutch') : 'Spanish', NLn = S.course.ui === 'es' ? 'Latin American Spanish' : 'Dutch';
+    const es = S.course.target !== 'es', TLn = S.lang.en, NLn = S.course.ui === 'es' ? 'Latin American Spanish' : 'Dutch';
     return `LOGGING (required, invisible to the learner): at the very end of EVERY reply, after everything else, add one line with the learner's mistakes from their LAST message, in this exact format:
 <log>[{"w":"wrong fragment","c":"corrected fragment","why":"very short explanation in ${NLn}","tag":"topic key","es":"","nl":""}]</log>
 - One object per real mistake (max 5), the same mistakes you corrected above. Ignore missing accents, capitals and punctuation.

@@ -9,7 +9,7 @@
   /* Nederlandse schermteksten bij een andere doeltaal dan Spaans (bijv. Engels): «Spaans» wordt de doeltaal. */
   const N = course.name && course.name.nl;
   const SUBS = !on && course.ui === 'nl' && course.target !== 'es' && N ? [
-    [/Latijns-Amerikaans(?:e)? Spaans/g, N], [/Spaans \(Mexico\)/g, N + ' (VS)'], [/\bSpaanse\b/g, N + 'e'], [/\bSpaans\b/g, N], [/🇪🇸/g, course.flag]
+    [/Latijns-Amerikaans(?:e)? Spaans/g, N], [/Spaans \(Mexico\)/g, N + ' (' + (course.where || 'VS') + ')'], [/\bSpaanse\b/g, N + 'e'], [/\bSpaans\b/g, N], [/🇪🇸/g, course.flag]
   ] : null;
   const sub = s => { let r = s; for (const [re, v] of SUBS) r = r.replace(re, v); return r; };
 
@@ -28,13 +28,19 @@
       'Tu ruta': 'Jouw route', 'Juegos de palabras': 'Woordspellen',
       'Sopa de letras': 'Woordzoeker', 'Crucigrama': 'Kruiswoord', 'Revoltijo': 'Letterhusselaar', 'El volcán': 'De vulkaan', 'Parejas': 'Memory',
       '¡Perfecto!': 'Perfect!', '¡Muy bien!': 'Heel goed!', '¡Sigue así!': 'Ga zo door!', '¡Excelente!': 'Uitstekend!', '¡Buen trabajo!': 'Goed gedaan!'
+    },
+    de: {
+      'Hoy': 'Heute', 'Ruta': 'Weg', 'Práctica': 'Üben', 'Docente': 'Lehrerin', 'Perfil': 'Profil',
+      'Tu ruta': 'Dein Weg', 'Juegos de palabras': 'Wortspiele',
+      'Sopa de letras': 'Wortsuche', 'Crucigrama': 'Kreuzworträtsel', 'Revoltijo': 'Buchstabensalat', 'El volcán': 'Der Vulkan', 'Parejas': 'Paare',
+      '¡Perfecto!': 'Perfekt!', '¡Muy bien!': 'Sehr gut!', '¡Sigue así!': 'Weiter so!', '¡Excelente!': 'Ausgezeichnet!', '¡Buen trabajo!': 'Gute Arbeit!'
     }
   };
   const FLAV = course.target === 'es' ? null : FLAVORS[course.target] || (course.ui === 'nl' ? FLAVORS.nl : null);
   const TABS = ['Hoy', 'Ruta', 'Práctica', 'Docente', 'Perfil'];
   /* Eén naam in de doeltaal: S.tl('Práctica') = 'Practice' in de Engelse cursus, 'Práctica' in de Spaanse. */
   // Alleen via S.tl (niet op het scherm vervangen, want in een cursus met Spaanse uitleg is «Gramática» gewoon het woord).
-  const TL_ONLY = { en: { 'Gramática': 'Grammar' }, nl: { 'Gramática': 'Grammatica' } }[course.target] || (FLAV ? { 'Gramática': 'Grammatica' } : {});
+  const TL_ONLY = { en: { 'Gramática': 'Grammar' }, nl: { 'Gramática': 'Grammatica' }, de: { 'Gramática': 'Grammatik' } }[course.target] || (FLAV ? { 'Gramática': 'Grammatica' } : {});
   const tl = s => (FLAV && s != null && (FLAV[s] || TL_ONLY[s])) || s;
   // Hele tekst = één naam, eventueel met een pijltje of emoji ervoor («← Práctica», «🔎 Sopa de letras»).
   function flavWhole(core) {

@@ -33,7 +33,8 @@
   const LETTERS = {
     es: { grid: 'SOLMARPEZ', word: 'SOL', mix: 'LOS' },
     en: { grid: 'SUNSEACAT', word: 'SUN', mix: 'NUS' },
-    nl: { grid: 'ZONZEEVIS', word: 'ZON', mix: 'NOZ' }
+    nl: { grid: 'ZONZEEVIS', word: 'ZON', mix: 'NOZ' },
+    de: { grid: 'ZUGEISRAD', word: 'EIS', mix: 'SIE' }
   };
   const LET = LETTERS[(window.SPT && window.SPT.course && window.SPT.course.target) || 'es'] || LETTERS.es;
   const ART = {

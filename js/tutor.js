@@ -312,9 +312,8 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
   }
 
   /* ---------- Engelse cursus voor Nederlandstaligen: Lupe praat Engels ----------
-     Haar vaste zinnen staan hierboven in het Spaans; in de cursus en-nl zet loc() ze om naar Engels (lang 'en').
+     Haar vaste zinnen staan hierboven in het Spaans; loc() zet ze om naar de doeltaal van de cursus (zie LOCS onderaan).
      Zinnen met een getal of unit gaan via de patronen; de rest via de lijst. */
-  const EN_MODE = !!(S.course && S.course.target === 'en' && S.course.ui === 'nl');
   const EN = {
     '¡Hola! Te quedaste a mitad de una lección. ¿Seguimos donde ibas?': 'Hi! You stopped halfway through a lesson. Shall we pick up where you left off?',
     '¡Plan cumplido! Lo que hagas ahora es extra.': 'Plan done! Anything you do now is a bonus.',
@@ -370,20 +369,80 @@ Speak as Lupe in the first person. Do not mention being an AI or a language mode
     [/^¡Bien hecho! Tu nivel es (\w+)\./, (m, l) => `Well done! Your level is ${l}. Let’s keep practicing together.`],
     [/^¡Ya conoces (más de )?(\d+) palabras!/, (m, more, n) => `You already know ${more ? 'more than ' : ''}${n} words! I’m so proud of you.`]
   ];
-  function enText(es) {
-    if (EN[es]) return EN[es];
-    for (const [re, fn] of EN_RE) { const m = String(es).match(re); if (m) return fn(...m); }
+  /* ---------- Duitse cursus: Lupe praat Duits (zelfde opzet als Engels) ---------- */
+  const DE = {
+    '¡Hola! Te quedaste a mitad de una lección. ¿Seguimos donde ibas?': 'Hallo! Du hast mitten in einer Lektion aufgehört. Machen wir da weiter?',
+    '¡Plan cumplido! Lo que hagas ahora es extra.': 'Plan geschafft! Alles, was du jetzt machst, ist extra.',
+    '¡Plan cumplido! ¿Seguimos con la próxima lección?': 'Plan geschafft! Machen wir mit der nächsten Lektion weiter?',
+    '¡Meta del día cumplida! Estoy muy orgullosa de ti.': 'Tagesziel erreicht! Ich bin sehr stolz auf dich.',
+    '¡Órale! Ya cumpliste tu meta. Todo lo que hagas ahora es extra.': 'Super! Du hast dein Ziel erreicht. Alles ab jetzt ist extra.',
+    '¡Qué gusto verte otra vez! Empecemos con algo cortito.': 'Schön, dich wiederzusehen! Fangen wir mit etwas Kurzem an.',
+    '¡Ya casi! Solo te falta una tarea.': 'Fast geschafft! Dir fehlt nur noch eine Aufgabe.',
+    '¡Una tarea menos! Sigue así.': 'Eine Aufgabe weniger! Weiter so.',
+    '¡Hoy toca la prueba de la unidad! Tú puedes.': 'Heute ist der Test der Lektion dran! Du schaffst das.',
+    '¡Vas muy bien hoy! Un poquito más y llegas a tu meta.': 'Du machst das heute sehr gut! Noch ein bisschen, dann erreichst du dein Ziel.',
+    'Un ratito cada día hace la diferencia. ¡Vamos!': 'Jeden Tag ein bisschen macht den Unterschied. Los geht’s!',
+    '¡Hola! Te preparé un plan para hoy. ¡Vamos!': 'Hallo! Ich habe einen Plan für heute gemacht. Los geht’s!',
+    'Casi lo logras. Repasamos un poco y lo intentamos otra vez, ¿va?': 'Fast geschafft. Wir wiederholen ein bisschen und versuchen es noch einmal, okay?',
+    '¡Felicidades! Terminaste la unidad. ¡Qué orgullo!': 'Glückwunsch! Du hast die Lektion geschafft. Ich bin so stolz!',
+    '¡Listo! Buen trabajo.': 'Fertig! Gute Arbeit.',
+    '¡Perfecto! Sin ningún error. ¡Eres una estrella!': 'Perfekt! Kein einziger Fehler. Du bist ein Star!',
+    '¡Excelente trabajo! Casi sin errores.': 'Ausgezeichnete Arbeit! Fast keine Fehler.',
+    '¡Muy bien! Vas avanzando.': 'Sehr gut! Du machst Fortschritte.',
+    'Cada error te enseña algo. ¡Ánimo, vamos bien!': 'Aus jedem Fehler lernst du etwas. Nur Mut, es läuft gut!',
+    '¡Subiste de nivel! ¡Qué padre! Se nota que practicas.': 'Du bist ein Niveau höher! Toll! Man merkt, dass du übst.',
+    'No te preocupes, a veces pasa. Repasamos juntos y lo intentas otra vez.': 'Keine Sorge, das passiert. Wir wiederholen zusammen und du versuchst es noch einmal.',
+    '¡Gracias por hacer la prueba! Ahora sé por dónde empezar contigo.': 'Danke für den Test! Jetzt weiß ich, wo wir anfangen.',
+    'Aquí vas a ver todo lo que aprendes. ¡Empecemos hoy!': 'Hier siehst du alles, was du lernst. Fangen wir heute an!',
+    'Cada palabra nueva cuenta. ¡Qué padre!': 'Jedes neue Wort zählt. Toll!',
+    '¡Buen comienzo! Poco a poco se llega lejos.': 'Guter Anfang! Schritt für Schritt kommt man weit.',
+    '¡Perfecto! ¡Qué buena memoria!': 'Perfekt! Was für ein gutes Gedächtnis!',
+    '¡Muy bien jugado!': 'Sehr gut gespielt!',
+    '¡Sigue así! Las palabras difíciles vuelven pronto.': 'Weiter so! Die schwierigen Wörter kommen bald wieder.',
+    '¡Todo repasado! Nos vemos mañana.': 'Alles wiederholt! Bis morgen.',
+    '¡Terminaste tu plan de hoy! Abre tu cofre.': 'Du hast deinen Plan für heute geschafft! Öffne deine Belohnung.',
+    '¡Plan del día completado! ¡Qué padre!': 'Tagesplan geschafft! Toll!',
+    '¡Lo lograste! Estoy muy orgullosa de ti.': 'Du hast es geschafft! Ich bin sehr stolz auf dich.',
+    '¡Perfecto! Ahora te hablo en voz alta.': 'Perfekt! Jetzt spreche ich laut mit dir.',
+    '¡Hola! Soy Lupe. ¿Te gusta mi voz?': 'Hallo! Ich bin Lupe. Gefällt dir meine Stimme?',
+    '¡Platiquemos! Así veo en qué te puedo ayudar.': 'Lass uns reden! So sehe ich, wobei ich dir helfen kann.',
+    '¡Vas mejorando! Cometes menos errores que antes.': 'Du wirst besser! Du machst weniger Fehler als früher.',
+    'Mira, esto es lo que más practicaría yo.': 'Schau mal, das würde ich am meisten üben.',
+    'Hoy tienes más de cien repasos. Empecemos por ahí, así no se te olvida nada.': 'Heute hast du mehr als hundert Wiederholungen. Fangen wir damit an, dann vergisst du nichts.',
+    '¡Llevas más de cien días seguidos! ¡Qué padre!': 'Mehr als hundert Tage in Folge! Toll!',
+    'Más de cien días seguidos. ¡No rompas la racha!': 'Mehr als hundert Tage in Folge. Mach weiter so!',
+    '¡Cinco seguidas! ¡Órale!': 'Fünf richtige in Folge! Super!',
+    '¡Diez seguidas! ¡Qué padre!': 'Zehn richtige in Folge! Toll!'
+  };
+  const DE_RE = [
+    [/^¡Hola! Soy Lupe, tu profe de .+\.$/, () => 'Hallo! Ich bin Lupe, deine Deutschlehrerin.'],
+    [/^¿Empezamos\? Hoy vemos: (.+)\.$/, (m, u) => 'Fangen wir an? Heute: ' + u + '.'],
+    [/^Hoy tienes (\d+) repasos\./, (m, n) => `Heute hast du ${n} Wiederholungen. Fangen wir damit an, dann vergisst du nichts.`],
+    [/^¡Llevas (\d+) días seguidos! ¡Qué padre!$/, (m, n) => `${n} Tage in Folge! Toll!`],
+    [/^(\d+) días seguidos\. ¡No rompas la racha!$/, (m, n) => `${n} Tage in Folge. Mach weiter so!`],
+    [/^¡(\d+) seguidas! ¡Imparable!$/, (m, n) => `${n} richtige in Folge! Nicht zu stoppen!`],
+    [/^¡Plan del día completado! Llevas (\d+) días seguidos\.$/, (m, n) => `Tagesplan geschafft! Das sind ${n} Tage in Folge.`],
+    [/^¡Bien hecho! Tu nivel es (\w+)\./, (m, l) => `Gut gemacht! Dein Niveau ist ${l}. Üben wir zusammen weiter.`],
+    [/^¡Ya conoces (más de )?(\d+) palabras!/, (m, more, n) => `Du kennst schon ${more ? 'mehr als ' : ''}${n} Wörter! Ich bin sehr stolz auf dich.`]
+  ];
+  /* Per doeltaal (met Nederlandse uitleg) de vertaling van Lupes vaste zinnen. Nieuwe taal: lijst + patronen toevoegen;
+     de test controleert dat geen enkele zin Spaans blijft. Zonder rij praat Lupe Spaans. */
+  const LOCS = { en: { map: EN, re: EN_RE }, de: { map: DE, re: DE_RE } };
+  const LOC = (S.course && S.course.ui === 'nl' && LOCS[S.course.target]) || null;
+  const lineLang = LOC ? S.course.target : 'es';
+  function locText(es) {
+    if (LOC.map[es]) return LOC.map[es];
+    for (const [re, fn] of LOC.re) { const m = String(es).match(re); if (m) return fn(...m); }
     return null;
   }
   /* Een zin van Lupe in de taal van de cursus: { es, nl, lang } of een losse tekst. */
   function loc(line) {
-    if (!EN_MODE || !line) return line;
-    if (typeof line === 'string') return enText(line) || line;
+    if (!LOC || !line) return line;
+    if (typeof line === 'string') return locText(line) || line;
     if (line.lang && line.lang !== 'es') return line;
-    const en = enText(line.es);
-    return en ? Object.assign({}, line, { es: en, lang: 'en' }) : line;
+    const tx = locText(line.es);
+    return tx ? Object.assign({}, line, { es: tx, lang: lineLang }) : line;
   }
-  const lineLang = EN_MODE ? 'en' : 'es';
   /* Een losse vaste zin hardop (stemtest, stem aan). */
   const sayLine = text => say(loc(text), lineLang);
 

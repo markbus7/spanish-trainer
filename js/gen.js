@@ -6,7 +6,7 @@
   /* ---------- woorden ---------- */
   // lidwoorden van de doeltaal (Spaans: el/la…, Engels: the/a/an, Nederlands: de/het/een)
   const TGT = (S.course && S.course.target) || 'es';
-  const ART = TGT === 'en' ? /^(the|a|an)\s+/i : TGT === 'nl' ? /^(de|het|een)\s+/i : /^(el|la|los|las|un|una)\s+/i;
+  const ART = S.lang.arts || /^(?!)/;
   function parts(es) {
     return String(es).split(/\s*\/\s*/).map(x => x.replace(/…/g, '').replace(/\s*\.\.\.$/, '').trim()).filter(Boolean);
   }
@@ -88,6 +88,7 @@
     return null;
   }
   function genderOf(full) {
+    if (S.lang.gender) { const a = (String(full).match(ART) || [])[1]; return (a && S.lang.gender(a.toLowerCase(), String(full).replace(ART, ''))) || ''; }
     if (TGT === 'nl') { const a = (String(full).match(ART) || [])[1]; return a && a.toLowerCase() === 'het' ? 'een het-woord' : a && a.toLowerCase() === 'de' ? 'een de-woord' : ''; }
     if (TGT !== 'es') return '';
     const m = String(full).match(ART); if (!m) return '';

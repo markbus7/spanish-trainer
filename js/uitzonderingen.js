@@ -293,11 +293,14 @@ verliezen verloor/verloren verloren perder`.split('\n').map(l => { const m = l.s
   const TGT = () => (S.course && S.course.target) || 'es';
   const loc = v => (v && typeof v === 'object') ? (v[UI()] || v.nl) : v;
 
+  /* Regels en werkwoordnotities per doeltaal. Nieuwe doeltaal: een lijst zoals EN/NL maken en hier een rij toevoegen. */
+  const RULES = { es: ES, en: EN, nl: NL };
+  const VERB_NOTES = { es: (t, f) => verbNotesEs(t, f), en: (t, f) => verbNotesEn(t, f), nl: (t, f) => verbNotesNl(t, f) };
   let cache = null;
   function rules() {
     const k = TGT() + '|' + UI();
     if (cache && cache.k === k) return cache.r;
-    const r = compile(TGT() === 'es' ? ES : TGT() === 'en' ? EN : TGT() === 'nl' ? NL : []);
+    const r = compile(RULES[TGT()] || []);
     cache = { k, r };
     return r;
   }
@@ -447,7 +450,7 @@ verliezen verloor/verloren verloren perder`.split('\n').map(l => { const m = l.s
     }
     if (opt.verbs !== false && !(opt.sentence && !wrong)) {
       const inF = (a, b) => !strict || hit(a, b);
-      const vs = TGT() === 'es' ? verbNotesEs(tokens, inF) : TGT() === 'en' ? verbNotesEn(tokens, inF) : TGT() === 'nl' ? verbNotesNl(tokens, inF) : [];
+      const vs = (VERB_NOTES[TGT()] || (() => []))(tokens, inF);
       vs.forEach(v => { if (!out.some(o => o.k === v.k)) out.push(v); });
     }
     // eerst woorden/constructies, dan werkwoorden
@@ -498,5 +501,5 @@ verliezen verloor/verloren verloren perder`.split('\n').map(l => { const m = l.s
   const grammar = g => ((g && (g.uitz || GRAMMAR[g.t])) || []).map(x => x.replace(/^<b>Uitzondering(?: op [^<]*)?:<\/b>\s*/, ''));
   const label = () => UI() === 'es' ? '⚠️ Excepción' : '⚠️ Uitzondering';
 
-  S.Uitz = { find, forItem, forWord, forText, grammar, label, words, ES, EN, NL, GRAMMAR, EN_VERBS, NL_VERBS, _rules: rules, _reset: () => { cache = null; vIndex = null; enIdx = null; nlIdx = null; } };
+  S.Uitz = { find, forItem, forWord, forText, grammar, label, words, RULES, VERB_NOTES, ES, EN, NL, GRAMMAR, EN_VERBS, NL_VERBS, _rules: rules, _reset: () => { cache = null; vIndex = null; enIdx = null; nlIdx = null; } };
 })(window.SPT);

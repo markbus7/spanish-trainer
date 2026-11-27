@@ -36,6 +36,22 @@
   /* ================= Cursussen =================
      Een cursus is een taalpaar: target = wat je leert, ui = taal van menu's en uitleg.
      In de lesstof heten de velden historisch 'es' (doeltaal) en 'nl' (uitlegtaal); dat blijft zo voor elke cursus. */
+  /* Talen: één rij per taal (doeltaal of uitlegtaal). Een nieuwe doeltaal = hier een rij, een cursus in COURSES en lesstof in content/<cursus>/.
+     nl/es/en = naam van de taal in het Nederlands, Spaans en Engels (Engels voor de AI-opdrachten); flag = vlag bij de taalnaam;
+     arts = lidwoorden aan het begin van een woord (null = de taal heeft geen lidwoorden).
+     Optionele haken voor talen met eigen letters: lower(s) / upper(s) (bijv. Turks İ/ı), fold(s) = vorm zonder speciale tekens
+     voor «bijna goed» (bijv. Duits ß → ss), letters = extra letters naast a–z in de woordspellen, plain(s) = hoofdletters voor
+     de woordspellen (standaard: zonder accenten), gender(lidwoord, woord) = tekst bij een fout lidwoord. */
+  const LANGS = {
+    es: { nl: 'Spaans', es: 'español', en: 'Spanish', flag: '🌎', arts: /^(el|la|los|las|un|una)\s+/i, letters: 'áéíóúüñ' },
+    en: { nl: 'Engels', es: 'inglés', en: 'English', flag: '🇺🇸', arts: /^(the|a|an)\s+/i },
+    nl: { nl: 'Nederlands', es: 'neerlandés', en: 'Dutch', flag: '🇳🇱', arts: /^(de|het|een)\s+/i, letters: 'éëïöüè' },
+    de: { nl: 'Duits', es: 'alemán', en: 'German', flag: '🇩🇪', arts: /^(der|die|das|ein|eine)\s+/i, letters: 'äöüß', fold: s => s.replace(/ß/g, 'ss'),
+      gender: a => ({ der: 'mannelijk (der)', die: 'vrouwelijk of meervoud (die)', das: 'onzijdig (das)' })[a] || '' },
+    fr: { nl: 'Frans', es: 'francés', en: 'French', flag: '🇫🇷', arts: /^(?:(le|la|les|un|une|des)\s+|(l)['’]\s*)/i, letters: 'àâæçéèêëîïôœùûüÿ' },
+    tr: { nl: 'Turks', es: 'turco', en: 'Turkish', flag: '🇹🇷', arts: null, letters: 'çğıöşü' }
+  };
+  S.LANGS = LANGS;
   const COURSES = {
     'es-nl': { id: 'es-nl', target: 'es', ui: 'nl', speak: 'es-MX', listen: 'es-MX', flag: '🌎', ns: null, hello: '¡Hola! ¿Cómo estás? Bienvenido a tu clase de español.', device: 'Y esto es la voz de tu dispositivo.',
       brand: 'Español <em>latino</em>', title: 'Español Latino', name: { nl: 'Spaans', es: 'español' }, ai: { target: 'Latin American Spanish', native: 'Dutch' } },
@@ -45,7 +61,10 @@
       brand: 'Neerlandés <em>fácil</em>', title: 'Neerlandés Fácil', name: { nl: 'Nederlands', es: 'neerlandés' }, ai: { target: 'Dutch (as spoken in the Netherlands)', native: 'Latin American Spanish' } },
     // Engels voor Nederlandstaligen, A1 t/m C2 (Amerikaans Engels; Britse verschillen worden uitgelegd).
     'en-nl': { id: 'en-nl', target: 'en', ui: 'nl', speak: 'en-US', listen: 'en-US', flag: '🇺🇸', ns: 'en-nl', hello: 'Hello! How are you? Welcome to your English class.', device: 'And this is the voice of your device.',
-      brand: 'English <em>pro</em>', title: 'English Pro', name: { nl: 'Engels', es: 'inglés' }, ai: { target: 'American English', native: 'Dutch' }, allLevels: true }
+      brand: 'English <em>pro</em>', title: 'English Pro', name: { nl: 'Engels', es: 'inglés' }, allLevels: true,
+      // ai.style = variant die de AI-docent aanhoudt; ai.pitfalls = typische fouten van Nederlandstaligen; ai.exceptions = voorbeelden van uitzonderingen
+      ai: { target: 'American English', native: 'Dutch', style: 'US spelling and vocabulary; mention the British variant when it differs and it matters',
+        pitfalls: 'false friends such as eventually/actually/sensible, since vs. for, present perfect vs. past simple, word order, make vs. do, too literal translations, "Dunglish"' } }
   };
   S.COURSES = COURSES;
 
@@ -195,6 +214,10 @@
   S.course = COURSES[(typeof self !== 'undefined' && self.SPT_COURSE) || Profiles.courseOf(Profiles.activeId())] || COURSES['es-nl'];
   /* Lesstof hoort bij één cursus: contentbestanden beginnen met if (!S.isCourse('en-es')) return; */
   S.isCourse = id => S.course.id === id;
+  /* De doeltaal van de actieve cursus (rij uit LANGS) en hoofd-/kleine letters volgens die taal. */
+  S.lang = LANGS[S.course.target] || LANGS.es;
+  S.lower = s => (S.lang.lower ? S.lang.lower(String(s)) : String(s).toLowerCase());
+  S.upper = s => (S.lang.upper ? S.lang.upper(String(s)) : String(s).toUpperCase());
   S.LOC = S.course.ui === 'es' ? 'es-PA' : 'nl-NL'; // datums en getallen
 
   /* ================= Opslag ================= */
@@ -487,13 +510,13 @@
 
   /* ================= Antwoordcontrole ================= */
   const PRON = /^(yo|tú|tu|él|el|ella|usted|nosotros|nosotras|ellos|ellas|ustedes)\s+/;
-  const ARTS = S.course && S.course.target === 'nl' ? /^(de|het|een)\s+/ : S.course && S.course.target === 'en' ? /^(the|a|an)\s+/ : /^(el|la|los|las|un|una)\s+/;
+  const ARTS = S.lang.arts || /^(?!)/; // lidwoorden van de doeltaal (geen lidwoorden = past nooit)
   function norm(s) {
-    return String(s || '').toLowerCase().normalize('NFC')
+    return S.lower(String(s || '')).normalize('NFC')
       .replace(/[“”«»"]/g, '').replace(/[‘’`´]/g, "'")
       .replace(/[.,!?¡¿;:…()\-–—]/g, ' ').replace(/\s+/g, ' ').trim();
   }
-  function bare(s) { return norm(s).normalize('NFD').replace(/[́̈̃]/g, '').normalize('NFC'); }
+  function bare(s) { const b = norm(s).normalize('NFD').replace(/[́̈̃]/g, '').normalize('NFC'); return S.lang.fold ? S.lang.fold(b) : b; }
   /* Britse spelling (colour, realise, travelled …) goedrekenen in de Engelse cursus.
      Een Brits woord telt alleen als de Amerikaanse vorm ook echt in het goede antwoord staat. */
   const EN_GB = { grey: 'gray', greys: 'grays', programme: 'program', programmes: 'programs', tyre: 'tire', tyres: 'tires', cheque: 'check', cheques: 'checks', kerb: 'curb',

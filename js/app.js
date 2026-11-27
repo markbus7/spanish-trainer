@@ -7,6 +7,13 @@
   // Andere doeltaal dan Spaans met Nederlandse uitleg (bijv. Engels): geen Spaanse resten uit de Spaanse cursus.
   const NLX = S.course.target !== 'es' && S.course.ui === 'nl';
   const ES = S.course.target === 'es';
+  /* Korte vaste teksten in de doeltaal voor cursussen met Nederlandse uitleg. Nieuwe doeltaal: hier een rij (en in CHAT, ASK_EX, VOICE_TIP). */
+  const DOEL = NLX && ({
+    en: { greet: ['Good morning', 'Good afternoon', 'Good evening'], welcome: 'Welcome!', phrase: 'Phrase of the day', hi: 'Hi! I’m Lupe 👋',
+      ask: 'Hi! I’m Lupe, your English teacher. What would you like to know today?', write: 'Let’s write! Type your text and I’ll help you polish it.' },
+    de: { greet: ['Guten Morgen', 'Guten Tag', 'Guten Abend'], welcome: 'Willkommen!', phrase: 'Ausdruck des Tages', hi: 'Hallo! Ich bin Lupe 👋',
+      ask: 'Hallo! Ich bin Lupe, deine Deutschlehrerin. Was möchtest du heute wissen?', write: 'Auf geht’s, wir schreiben! Schreib deinen Text und ich helfe dir beim Korrigieren.' }
+  })[S.course.target] || null;
   const save = U.debounce(() => Store.save(), 300);
 
   /* ================= kleine UI-helpers ================= */
@@ -595,8 +602,7 @@
   function bar(frac, color) { return h('div', { class: 'pbar' }, h('i', { style: { width: Math.round(U.clamp(frac, 0, 1) * 100) + '%', background: color || '' } })); }
   function greeting() {
     const hr = new Date().getHours();
-    const en = S.course.target === 'en' && S.course.ui === 'nl';
-    const g = en ? (hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening') : hr < 12 ? '¡Buenos días' : hr < 19 ? '¡Buenas tardes' : '¡Buenas noches';
+    const g = DOEL ? DOEL.greet[hr < 12 ? 0 : hr < 18 ? 1 : 2] : hr < 12 ? '¡Buenos días' : hr < 19 ? '¡Buenas tardes' : '¡Buenas noches';
     return g + (st().name ? ', ' + st().name : '') + '!';
   }
 
@@ -610,7 +616,7 @@
       Store.save(); location.hash = '#/hoy'; render();
     });
     return h('div', { class: 'welcome' },
-      h('div', { class: 'hero' }, S.Tutor.coachOn() ? null : h('div', { class: 'hero-emoji' }, '🌎'), h('h1', null, S.course.target === 'en' && S.course.ui === 'nl' ? 'Welcome!' : '¡Bienvenido!'), h('p', null, 'Leer Latijns-Amerikaans Spaans stap voor stap: van A1 naar B1 en verder, tot C2.')),
+      h('div', { class: 'hero' }, S.Tutor.coachOn() ? null : h('div', { class: 'hero-emoji' }, '🌎'), h('h1', null, DOEL ? DOEL.welcome : '¡Bienvenido!'), h('p', null, 'Leer Latijns-Amerikaans Spaans stap voor stap: van A1 naar B1 en verder, tot C2.')),
       S.Tutor.hero(S.Tutor.lines.welcome, '🌎', { wave: true }),
       section('Hoe heet je?', name),
       section('Waar begin je?',
@@ -679,7 +685,7 @@
 
     // frase del día
     const ph = S.phrases && S.phrases.length ? S.phrases[U.dayIndex() % S.phrases.length] : null;
-    if (ph) wrap.append(section(S.course.target === 'es' ? 'La frase del día' : S.course.ui === 'nl' ? 'Phrase of the day' : 'Frase del día', h('div', { class: 'phrase' }, h('div', { class: 'es', lang: 'es' }, ph[2] + ' ' + ph[0], S.Lesson.speakBtn(ph[0])), h('div', { class: 'muted' }, ph[1]))));
+    if (ph) wrap.append(section(S.course.target === 'es' ? 'La frase del día' : S.course.ui === 'nl' ? (DOEL ? DOEL.phrase : 'Uitdrukking van de dag') : 'Frase del día', h('div', { class: 'phrase' }, h('div', { class: 'es', lang: 'es' }, ph[2] + ' ' + ph[0], S.Lesson.speakBtn(ph[0])), h('div', { class: 'muted' }, ph[1]))));
 
     // snelle training
     wrap.append(section('Extra oefenen', h('div', { class: 'quick' },
@@ -1142,7 +1148,7 @@
     if (!S.AI.enabled()) {
       wrap.append(h('h1', null, 'Docente'));
       wrap.append(h('div', { class: 'card tutor-intro' },
-        h('div', { class: 'row gap' }, S.Tutor.avatar(150, 'big', { full: true, wave: true }), h('div', null, h('h3', null, NLX ? (S.Tutor.lineLang === 'en' ? 'Hi! I’m Lupe 👋' : 'Hallo! Ik ben Lupe 👋') : '¡Hola! Soy Lupe 👋'), h('p', { class: 'small muted' }, S.Tutor.tagline))),
+        h('div', { class: 'row gap' }, S.Tutor.avatar(150, 'big', { full: true, wave: true }), h('div', null, h('h3', null, NLX ? (DOEL ? DOEL.hi : 'Hallo! Ik ben Lupe 👋') : '¡Hola! Soy Lupe 👋'), h('p', { class: 'small muted' }, S.Tutor.tagline))),
         h('p', null, NLX ? 'Ik ben een axolotl uit de kanalen van Xochimilco (Mexico-Stad) en ik wil graag je persoonlijke docent zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.'
           : 'Ik ben een ajolote uit de kanalen van Xochimilco (Mexico-Stad) en ik wil graag je persoonlijke docente zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.'),
         h('p', null, !NLX ? 'Voer echte gesprekken (rollenspellen in Mexico, Colombia, Argentinië…). Je krijgt direct correcties in het Nederlands, kunt alles over grammatica vragen en krijgt feedback op je teksten.'
@@ -1244,9 +1250,9 @@
     return wrap;
   };
   /* ---- Lupe, de docente ---- */
-  const LUPE_HELLO = S.Tutor.lineLang === 'en' && NLX ? {
-    ask: '**Hi! I’m Lupe, your English teacher. What would you like to know today?**\n\n*Vraag me alles over grammatica, woorden, uitspraak of cultuur. Nederlands mag ook.*',
-    write: '**Let’s write! Type your text and I’ll help you polish it.**\n\n*Schrijf een e-mail, appje of dagboekstukje. Ik verbeter het en leg uit waarom.*'
+  const LUPE_HELLO = DOEL && S.Tutor.lineLang !== 'es' ? {
+    ask: '**' + DOEL.ask + '**\n\n*Vraag me alles over grammatica, woorden, uitspraak of cultuur. Nederlands mag ook.*',
+    write: '**' + DOEL.write + '**\n\n*Schrijf een e-mail, appje of dagboekstukje. Ik verbeter het en leg uit waarom.*'
   } : {
     ask: '**¡Hola! Soy Lupe, tu profe de ' + S.course.name.es + '. ¿Qué quieres saber hoy?**\n\n*Vraag me alles over grammatica, woorden, uitspraak of cultuur. Nederlands mag ook.*',
     write: '**¡Órale, a escribir! Escribe tu texto y yo te ayudo a corregirlo.**\n\n*Schrijf een e-mail, appje of dagboekstukje. Ik verbeter het en leg uit waarom.*'
@@ -1254,9 +1260,10 @@
   // Teksten in het chatvenster per doeltaal (de Spaanse cursus en de cursussen met Spaanse uitleg gebruiken CHAT.es).
   const CHAT = {
     es: { type: 'Escribe en español… (Nederlands mag ook)', write: 'Escribe tu texto aquí…', send: 'Enviar', start: '(Empecemos el juego de rol. / Laten we beginnen.)' },
-    en: { type: 'Write in English… (Nederlands mag ook)', write: 'Write your text here…', send: 'Send', start: '(Let’s start the role-play. / Laten we beginnen.)' }
+    en: { type: 'Write in English… (Nederlands mag ook)', write: 'Write your text here…', send: 'Send', start: '(Let’s start the role-play. / Laten we beginnen.)' },
+    de: { type: 'Schreib auf Deutsch… (Nederlands mag ook)', write: 'Schreib deinen Text hier…', send: 'Senden', start: '(Fangen wir mit dem Rollenspiel an. / Laten we beginnen.)' }
   };
-  const ASK_EX = { en: '«Wanneer gebruik ik since en wanneer for?» of «Wat betekent “to touch base”?»' };
+  const ASK_EX = { en: '«Wanneer gebruik ik since en wanneer for?» of «Wat betekent “to touch base”?»', de: '«Wanneer gebruik ik den en wanneer dem?» of «Wat betekent “Feierabend”?»' };
   function lupeAv(size, cls) { return S.Tutor.avatar(size, cls); }
   function tutorHead() {
     const on = () => !!st().settings.tutorVoice;
@@ -2049,7 +2056,7 @@
       label('Thema', h('select', { class: 'input', onchange: e => { set('theme', e.target.value); applyTheme(); } }, [['auto', 'Automatisch'], ['light', 'Licht'], ['dark', 'Donker']].map(([v, l]) => h('option', { value: v, selected: s.theme === v ? true : null }, l)))))));
     // stem
     const voiceSel = h('select', { class: 'input', onchange: e => set('voice', e.target.value) });
-    const VOICE_TIP = { es: 'Paulina of Juan (Mexico)', en: 'bijvoorbeeld Ava of Evan (Verenigde Staten)', nl: 'bijvoorbeeld Ellen of Xander (Nederland)' };
+    const VOICE_TIP = { es: 'Paulina of Juan (Mexico)', en: 'bijvoorbeeld Ava of Evan (Verenigde Staten)', nl: 'bijvoorbeeld Ellen of Xander (Nederland)', de: 'bijvoorbeeld Anna of Markus (Duitsland)' };
     const fillVoices = () => {
       voiceSel.innerHTML = ''; voiceSel.append(h('option', { value: '' }, !NLX ? 'Automatisch (beste Latijns-Amerikaanse stem)' : 'Automatisch (beste ' + S.course.name.nl + 'e stem)'));
       Speech.voices.slice().sort((a, b) => Speech.rank(b) - Speech.rank(a)).forEach(v => voiceSel.append(h('option', { value: v.voiceURI, selected: s.voice === v.voiceURI ? true : null }, v.name + ' (' + v.lang + ')' + (/es-es/i.test(v.lang) ? ' — Spanje' : '') + (Speech.qualityLabel(v) ? ' · ' + Speech.qualityLabel(v) : ''))));
@@ -2252,8 +2259,7 @@
   }
   /* Cursusnaam met richting: van de taal die je spreekt naar de taal die je leert, bijv. «🇳🇱 Nederlands → 🌎 Spaans».
      Al in de taal van het scherm; zet hem in een element met data-notr (zie NOTR), anders maakt de vertaallaag er iets anders van. */
-  const LANGS = { nl: ['🇳🇱', 'Nederlands', 'Neerlandés'], es: ['🌎', 'Spaans', 'Español'], en: ['🇺🇸', 'Engels', 'Inglés'] };
-  const LNAME = l => { const x = LANGS[l]; return x ? x[0] + ' ' + (S.course.ui === 'es' ? x[2] : x[1]) : l; };
+  const LNAME = l => { const x = S.LANGS[l]; return x ? x.flag + ' ' + (S.course.ui === 'es' ? x.es.charAt(0).toUpperCase() + x.es.slice(1) : x.nl) : l; };
   const CNAME = c => { const x = S.COURSES[c]; return x ? LNAME(x.ui) + ' → ' + LNAME(x.target) : c; };
   const NOTR = (text, tag) => h(tag || 'span', { 'data-notr': '' }, text);
   const CDESC = c => ({ 'es-nl': 'uitleg in het Nederlands', 'en-nl': 'A1–C2 · uitleg in het Nederlands', 'en-es': 'explicaciones en español', 'nl-es': 'explicaciones en español' })[c] || '';

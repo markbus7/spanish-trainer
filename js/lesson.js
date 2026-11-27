@@ -5,22 +5,35 @@
   const h = U.h;
 
   // Engels voor Nederlanders: lof en instructies in het Engels (de doeltaal); anders in het Spaans.
-  const EN = S.course.target === 'en' && S.course.ui === 'nl';
   // Lof en «bijna» in de doeltaal (net als de tabnamen): Spaans in de Spaanse cursus, Engels bij Engels, Nederlands bij Nederlands.
   const PRAISES = {
     es: ['¡Muy bien!', '¡Excelente!', '¡Eso es!', '¡Perfecto!', '¡Bien hecho!', '¡Genial!', '¡Correcto!', '¡Así se hace!'],
     en: ['Well done!', 'Excellent!', 'Spot on!', 'Perfect!', 'Nice one!', 'Great!', 'Correct!', 'Brilliant!'],
-    nl: ['Heel goed!', 'Uitstekend!', 'Precies!', 'Perfect!', 'Goed gedaan!', 'Top!', 'Klopt!', 'Zo doe je dat!']
+    nl: ['Heel goed!', 'Uitstekend!', 'Precies!', 'Perfect!', 'Goed gedaan!', 'Top!', 'Klopt!', 'Zo doe je dat!'],
+    de: ['Sehr gut!', 'Ausgezeichnet!', 'Genau!', 'Perfekt!', 'Gut gemacht!', 'Super!', 'Richtig!', 'Toll!']
   };
-  const OOPSES = { es: ['Casi…', 'No exactamente', 'Ups…', 'Todavía no'], en: ['Almost…', 'Not quite', 'Oops…', 'Not yet'], nl: ['Bijna…', 'Niet helemaal', 'Oeps…', 'Nog niet'] };
+  const OOPSES = { es: ['Casi…', 'No exactamente', 'Ups…', 'Todavía no'], en: ['Almost…', 'Not quite', 'Oops…', 'Not yet'], nl: ['Bijna…', 'Niet helemaal', 'Oeps…', 'Nog niet'], de: ['Fast…', 'Nicht ganz', 'Hoppla…', 'Noch nicht'] };
   const PRAISE = PRAISES[S.course.target] || (S.course.ui === 'nl' ? PRAISES.nl : PRAISES.es);
   const OOPS = OOPSES[S.course.target] || (S.course.ui === 'nl' ? OOPSES.nl : OOPSES.es);
-  const T_EN = {
-    check: 'Check', next: 'Continue', skip: 'Skip', gotit: 'Got it', choose: 'Choose the right answer', fill: 'Fill in the gap', translate: 'Translate into English',
-    aslesson: 'Translate as in the lesson', order: 'Put the sentence in order', match: 'Match the pairs', listen: 'Listen and type what you hear', speak: 'Say it out loud',
-    conj: 'Conjugate the verb', type: 'Type in English', meaning: 'What does this mean?', howsay: 'How do you say this in English?', hear: 'What do you hear?',
-    newword: 'New word', correct: 'Correct answer', retype: 'Type the correct answer', write: 'Writing task'
+  /* Instructies in de doeltaal (bij «uitleg in de doeltaal», standaard vanaf B1) voor cursussen met Nederlandse uitleg.
+     Nieuwe doeltaal: hier een rij; zonder rij blijven de instructies Nederlands. */
+  const T_X = {
+    en: {
+      check: 'Check', next: 'Continue', skip: 'Skip', gotit: 'Got it', choose: 'Choose the right answer', fill: 'Fill in the gap', translate: 'Translate into English',
+      aslesson: 'Translate as in the lesson', order: 'Put the sentence in order', match: 'Match the pairs', listen: 'Listen and type what you hear', speak: 'Say it out loud',
+      conj: 'Conjugate the verb', type: 'Type in English', meaning: 'What does this mean?', howsay: 'How do you say this in English?', hear: 'What do you hear?',
+      newword: 'New word', correct: 'Correct answer', retype: 'Type the correct answer', write: 'Writing task',
+      typehere: 'Type the correct answer…', rightafter: 'It was right after all!', lessonsays: 'The lesson says: '
+    },
+    de: {
+      check: 'Prüfen', next: 'Weiter', skip: 'Überspringen', gotit: 'Verstanden', choose: 'Wähle die richtige Antwort', fill: 'Ergänze die Lücke', translate: 'Übersetze ins Deutsche',
+      aslesson: 'Übersetze wie in der Lektion', order: 'Bringe den Satz in die richtige Reihenfolge', match: 'Verbinde die Paare', listen: 'Hör zu und schreib, was du hörst', speak: 'Sag es laut',
+      conj: 'Konjugiere das Verb', type: 'Schreib auf Deutsch', meaning: 'Was bedeutet das?', howsay: 'Wie sagt man das auf Deutsch?', hear: 'Was hörst du?',
+      newword: 'Neues Wort', correct: 'Richtige Antwort', retype: 'Schreib die richtige Antwort ab', write: 'Schreibaufgabe',
+      typehere: 'Schreib die richtige Antwort…', rightafter: 'Es war doch richtig!', lessonsays: 'In der Lektion steht: '
+    }
   };
+  const T_EN = (S.course.ui === 'nl' && T_X[S.course.target]) || null, EN = !!T_EN;
 
   function esMode() {
     if (S.course.ui !== 'nl') return false; // uitleg staat al in het Spaans
@@ -96,7 +109,7 @@
   S.uitzBox = uitzBox;
 
   // Speciale tekens van de doeltaal. Engels heeft ze niet nodig: dan blijft de balk leeg en verborgen.
-  const ACCENTS = { es: ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü', '¿', '¡'], en: [], nl: ['é', 'ë', 'ï', 'ö', 'ü', 'è'] };
+  const ACCENTS = { es: ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü', '¿', '¡'], en: [], nl: ['é', 'ë', 'ï', 'ö', 'ü', 'è'], de: ['ä', 'ö', 'ü', 'ß', 'Ä', 'Ö', 'Ü'] };
   function accentBar(target) {
     const chars = ACCENTS[S.course.target] || [];
     if (!chars.length) return h('div', { class: 'accent-bar', hidden: true });
@@ -1134,7 +1147,7 @@
       const answers = [...new Set([target, ...(keep ? [keep.a] : []), ...(it.kind === 'type' && Array.isArray(r.alts) ? r.alts : [])].filter(Boolean))];
       let done = false;
       const part = keep ? partialInput(keep, { can() {} }) : null;
-      const inp = part ? null : textInput(esMode() ? (EN ? 'Type the correct answer…' : 'Escribe la respuesta correcta…') : 'Typ het juiste antwoord…');
+      const inp = part ? null : textInput(esMode() ? (EN ? T_EN.typehere : 'Escribe la respuesta correcta…') : 'Typ het juiste antwoord…');
       const value = () => (part ? part.value() : inp.value).trim();
       const focus = () => { if (part) part.focus(); else inp.focus({ preventScroll: true }); };
       const status = h('div', { class: 'retype-st small muted', 'aria-live': 'polite' }, part
@@ -1287,10 +1300,10 @@
               fix ? h('div', { class: 'small muted fb-fix' }, '📋 Genoteerd in je rapport voor de volgende update. Dit antwoord telt voortaan als goed.') : null));
             if (j.correct) {
               foot.classList.remove('bad'); foot.classList.add('ok');
-              const ft = fb.querySelector('.fb-title'); if (ft) ft.textContent = esMode() ? (EN ? 'It was right after all!' : '¡Sí estaba bien!') : 'Toch goed!';
+              const ft = fb.querySelector('.fb-title'); if (ft) ft.textContent = esMode() ? (EN ? T_EN.rightafter : '¡Sí estaba bien!') : 'Toch goed!';
               const fa = fb.querySelector('.fb-lupe'); if (fa) fa.classList.remove('sad');
               fb.querySelectorAll('.fb-wrong').forEach(x => x.remove());
-              const fe = fb.querySelector('.fb-exp'); if (fe && fe.firstChild) fe.firstChild.textContent = esMode() ? (EN ? 'The lesson says: ' : 'En la lección dice: ') : 'In de les staat: ';
+              const fe = fb.querySelector('.fb-exp'); if (fe && fe.firstChild) fe.firstChild.textContent = esMode() ? (EN ? T_EN.lessonsays : 'En la lección dice: ') : 'In de les staat: ';
               graded.set(it.orig || it, true);
               if (retypeCur) retypeCur.cancel(); // toch goed: niets over te typen
               // de herkansing blijft: dan oefen je de zin zoals hij in de les staat

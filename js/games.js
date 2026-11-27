@@ -6,21 +6,24 @@
   const { U, C } = S;
 
   /* ================= woorden geschikt maken voor spellen ================= */
-  const ART = /^(el|la|los|las|un|una|unos|unas)\s+/i;
-  const ACC = { 'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U', 'Ü': 'U' };
+  // lidwoorden van de doeltaal (Spaans ook unos/unas); de Spaanse blijven erbij zoals het altijd was
+  const ART_ES = /^(el|la|los|las|un|una|unos|unas)\s+/i, ART_T = S.lang.arts;
+  const stripArt = s => { const x = s.replace(ART_ES, ''); return x !== s || !ART_T ? x : s.replace(ART_T, ''); };
   /** Hoofdletters zonder accenten, maar Ñ blijft Ñ (zoals in Spaanse puzzels). */
-  const plain = s => String(s).normalize('NFC').toUpperCase().replace(/[ÁÉÍÓÚÜ]/g, c => ACC[c]);
+  const ACC = { 'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U', 'Ü': 'U', 'Ä': 'A', 'Ö': 'O', 'À': 'A', 'È': 'E', 'Ë': 'E', 'Ï': 'I' };
+  const plain = s => (S.lang.plain ? S.lang.plain(String(s)) : S.upper(String(s).normalize('NFC')).replace(/[ÁÉÍÓÚÜÄÖÀÈËÏ]/g, c => ACC[c]));
   /** [es, nl] → spelwoord. `key` is het kale woord (zonder lidwoord), `es` de volledige vorm om voor te lezen. */
   function gameWord(w) {
     const first = String(w.es).split(/\s*\/\s*/)[0].replace(/…|\.\.\./g, '').trim();
-    const key = first.replace(/^[¿¡]+|[?!.,]+$/g, '').replace(ART, '').trim().toLowerCase();
+    const key = stripArt(first.replace(/^[¿¡]+|[?!.,]+$/g, '')).trim().toLowerCase();
     if (!key) return null;
     // "el hermano / la hermana" = "de broer / de zus": dan alleen de eerste betekenis tonen
     const esN = String(w.es).split('/').length, nlP = String(w.nl).split(/\s*\/\s*/);
     const nl = esN > 1 && nlP.length === esN ? nlP[0] : w.nl;
     return { id: w.id, unit: w.unit, es: w.es, say: first, nl, key, plain: plain(key).replace(/\s+/g, ' '), letters: plain(key).replace(/\s+/g, '') };
   }
-  const ONE = /^[a-záéíóúüñ]+$/i, PHRASE = /^[a-záéíóúüñ]+( [a-záéíóúüñ]+)?$/i;
+  const LT = 'a-záéíóúüñ' + (S.lang.letters || ''); // letters van de doeltaal (S.LANGS in js/core.js)
+  const ONE = new RegExp('^[' + LT + ']+$', 'i'), PHRASE = new RegExp('^[' + LT + ']+( [' + LT + ']+)?$', 'i');
   const FIT = {
     grid: (g, max = 10) => ONE.test(g.key) && g.key.length >= 3 && g.key.length <= max,
     phrase: g => PHRASE.test(g.key) && g.letters.length >= 3 && g.letters.length <= 13,
