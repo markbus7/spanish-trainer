@@ -40,7 +40,7 @@
   function system(ctx) {
     return S.AI.askSystem() + `
 
-The learner opened the "Ask Lupe" side chat from somewhere in the app to ask about what they are looking at right now. Here is what is on their screen (lesson content, question, their answer, feedback):
+The learner opened the "Ask ${S.Tutor.name}" side chat from somewhere in the app to ask about what they are looking at right now. Here is what is on their screen (lesson content, question, their answer, feedback):
 <screen>
 ${ctx.text}
 </screen>
@@ -91,7 +91,7 @@ If the course text itself contains a real mistake, say so honestly.`;
       catch (e) { out.textContent = '⚠️ ' + e.message; }
     };
     return h('div', { class: 'ask-nokey' },
-      h('div', { class: 'row gap' }, S.Tutor.avatar(80), h('div', null, h('b', null, '¡Hola! Soy Lupe.'), h('p', { class: 'small muted' }, 'Ik leg alles uit wat je in de app tegenkomt.'))),
+      h('div', { class: 'row gap' }, S.Tutor.avatar(80), h('div', null, h('b', null, S.Tutor.hi ? S.Tutor.hi + (/[.!?]$/.test(S.Tutor.hi) ? '' : '.') : '¡Hola! Soy Lupe.'), h('p', { class: 'small muted' }, 'Ik leg alles uit wat je in de app tegenkomt.'))),
       h('p', null, 'Om mij vragen te stellen heb je een eigen API-sleutel van Anthropic nodig. Je betaalt per gebruik; een vraag kost meestal minder dan een cent.'),
       h('ol', { class: 'small steps-list' },
         h('li', null, 'Open ', h('a', { href: 'https://platform.claude.com/settings/keys', target: '_blank', rel: 'noopener' }, 'deze link naar Anthropic'), ' en log in.'),

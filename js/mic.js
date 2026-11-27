@@ -80,7 +80,7 @@
     const levelOut = h('p', { class: 'small' });
     const panel = live({ tip: 'Tik nog eens op de knop als je klaar bent.' });
     const recOut = h('p', { class: 'small' });
-    const PHRASE = 'Hola Lupe, ¿cómo estás?';
+    const PHRASE = (S.Docent && S.Docent.mic) || 'Hola Lupe, ¿cómo estás?'; // testzin in de taal van de cursus
 
     // Stap 1: hoort de microfoon geluid? (los van spraakherkenning, met een echte niveaumeter)
     const levelBtn = h('button', { class: 'btn ghost', type: 'button' }, '1️⃣ Hoort de microfoon mij?');

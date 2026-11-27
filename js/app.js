@@ -18,6 +18,7 @@
     tr: { greet: ['Günaydın', 'İyi günler', 'İyi akşamlar'], welcome: 'Hoş geldin!', phrase: 'Günün ifadesi', hi: 'Merhaba! Ben Lupe 👋',
       ask: 'Merhaba! Ben Lupe, Türkçe öğretmenin. Bugün ne öğrenmek istiyorsun?', write: 'Hadi yazalım! Metnini yaz, ben de düzeltmene yardım edeyim.' }
   })[S.course.target] || null;
+  if (DOEL) ['hi', 'ask'].forEach(k => { DOEL[k] = S.docentNaam(DOEL[k]); }); // de docent van deze taal stelt zich voor met haar eigen naam
   const save = U.debounce(() => Store.save(), 300);
 
   /* ================= kleine UI-helpers ================= */
@@ -1154,8 +1155,10 @@
     if (!S.AI.enabled()) {
       wrap.append(h('h1', null, 'Docente'));
       wrap.append(h('div', { class: 'card tutor-intro' },
-        h('div', { class: 'row gap' }, S.Tutor.avatar(150, 'big', { full: true, wave: true }), h('div', null, h('h3', null, NLX ? (DOEL ? DOEL.hi : 'Hallo! Ik ben Lupe 👋') : '¡Hola! Soy Lupe 👋'), h('p', { class: 'small muted' }, S.Tutor.tagline))),
-        h('p', null, NLX ? 'Ik ben een axolotl uit de kanalen van Xochimilco (Mexico-Stad) en ik wil graag je persoonlijke docent zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.'
+        h('div', { class: 'row gap' }, S.Tutor.avatar(150, 'big', { full: true, wave: true }), h('div', null, h('h3', null, S.Tutor.hi ? S.Tutor.hi + ' 👋' : NLX ? (DOEL ? DOEL.hi : 'Hallo! Ik ben Lupe 👋') : '¡Hola! Soy Lupe 👋'), h('p', { class: 'small muted' }, S.Tutor.tagline))),
+        h('p', null, S.Docent ? (S.course.ui === 'es' ? 'Soy ' + S.Tutor.what + ' y quiero ser tu profe personal. Conmigo puedes platicar de verdad, y digo mis respuestas en voz alta.'
+          : 'Ik ben ' + S.Tutor.what + ' en ik wil graag je persoonlijke docent zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.')
+          : NLX ? 'Ik ben een axolotl uit de kanalen van Xochimilco (Mexico-Stad) en ik wil graag je persoonlijke docent zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.'
           : 'Ik ben een ajolote uit de kanalen van Xochimilco (Mexico-Stad) en ik wil graag je persoonlijke docente zijn. Met mij kun je echt praten, en ik zeg mijn Spaanse antwoorden ook hardop.'),
         h('p', null, !NLX ? 'Voer echte gesprekken (rollenspellen in Mexico, Colombia, Argentinië…). Je krijgt direct correcties in het Nederlands, kunt alles over grammatica vragen en krijgt feedback op je teksten.'
           : 'Voer echte gesprekken (rollenspellen in alledaagse situaties). Je krijgt direct correcties in het Nederlands, kunt alles over grammatica vragen en krijgt feedback op je teksten.'),
@@ -1260,7 +1263,7 @@
     ask: '**' + DOEL.ask + '**\n\n*Vraag me alles over grammatica, woorden, uitspraak of cultuur. Nederlands mag ook.*',
     write: '**' + DOEL.write + '**\n\n*Schrijf een e-mail, appje of dagboekstukje. Ik verbeter het en leg uit waarom.*'
   } : {
-    ask: '**¡Hola! Soy Lupe, tu profe de ' + S.course.name.es + '. ¿Qué quieres saber hoy?**\n\n*Vraag me alles over grammatica, woorden, uitspraak of cultuur. Nederlands mag ook.*',
+    ask: '**¡Hola! Soy ' + S.Tutor.name + ', tu profe de ' + S.course.name.es + '. ¿Qué quieres saber hoy?**\n\n*Vraag me alles over grammatica, woorden, uitspraak of cultuur. Nederlands mag ook.*',
     write: '**¡Órale, a escribir! Escribe tu texto y yo te ayudo a corregirlo.**\n\n*Schrijf een e-mail, appje of dagboekstukje. Ik verbeter het en leg uit waarom.*'
   };
   // Teksten in het chatvenster per doeltaal (de Spaanse cursus en de cursussen met Spaanse uitleg gebruiken CHAT.es).
@@ -1387,7 +1390,7 @@
     return true;
   }
   async function shareReport(text, how) {
-    if (how === 'share' && navigator.share) { try { await navigator.share({ title: 'Rapport van Profe Lupe', text }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+    if (how === 'share' && navigator.share) { try { await navigator.share({ title: S.docentNaam('Rapport van Profe Lupe'), text }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
     let done = false;
     try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); done = true; } } catch (e) { /* hieronder */ }
     if (!done) { const ta = h('textarea', { style: { position: 'fixed', top: '-1000px' } }); ta.value = text; document.body.append(ta); ta.select(); try { done = document.execCommand('copy'); } catch (e) { /* */ } ta.remove(); }

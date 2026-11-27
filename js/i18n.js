@@ -82,8 +82,10 @@
     // het meest specifieke patroon eerst («Eerste {0} van {1}» vóór «{0} van {1}»)
     pats.sort((a, b) => b.lit - a.lit);
   }
-  /* Eén tekst vertalen; spaties aan begin en eind blijven staan. Onbekend = ongewijzigd. */
-  function t(text) {
+  /* Eén tekst vertalen; spaties aan begin en eind blijven staan. Onbekend = ongewijzigd.
+     Daarna wordt «Lupe» de naam van de docent van deze cursus (js/docenten.js), bijv. «Rapport van Bärbel». */
+  function t(text) { const r = t0(text); return S.Docent && typeof r === 'string' ? S.docentNaam(r) : r; }
+  function t0(text) {
     if (text == null) return text;
     const s = String(text), m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s), core = m[2];
     const fw = core && flavWhole(core);
@@ -137,7 +139,7 @@
     for (let n = w.nextNode(); n; n = w.nextNode()) doText(n);
   }
   function start() {
-    if (!(on || SUBS || FLAV) || typeof MutationObserver !== 'function') return;
+    if (!(on || SUBS || FLAV || S.Docent) || typeof MutationObserver !== 'function') return;
     document.documentElement.lang = on ? 'es' : 'nl';
     walk(document.body);
     new MutationObserver(list => {
