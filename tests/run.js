@@ -1368,7 +1368,7 @@ await micTests();
       ok(ck('ich heisse anna', 'Ich heiße Anna.').ok && ck('ich heisse anna', 'Ich heiße Anna.').warn === 'accent' && ck('Schon', 'schön').warn === 'accent', w + 'ss voor ß en ontbrekende umlaut: goed met waarschuwing');
       const r = K.Gen.checkType('der Haus', { answers: ['das Haus'], articleOptional: true });
       ok(!r.ok && r.warn === 'article-wrong' && /onzijdig/.test(r.gender), w + 'fout lidwoord der/die/das met geslacht');
-      ok(K.C.all().length === 40 && K.C.unitsOf('B2').length === 10, w + 'A1–B2 = 40 units');
+      ok(K.C.all().length === 60 && K.C.unitsOf('B2').length === 10 && K.C.unitsOf('C1').length === 10 && K.C.unitsOf('C2').length === 10, w + 'A1–C2 = 60 units');
       // uitzonderingen worden benoemd, met reden
       const U = K.Uitz, has = (l, re) => l.some(x => re.test(x.t + ' ' + x.html));
       ok(U.label() === '⚠️ Uitzondering' && has(U.forWord('das Mädchen'), /-chen/) && has(U.find('Ich helfe dir gern.'), /derde naamval/) && has(U.find('Ich bin zu Hause geblieben.'), /sein/) && has(U.find('Er fährt nach Berlin.'), /ä/) && has(U.find('Berlin ist größer als München.'), /Umlaut/), w + 'uitzonderingen met reden (das Mädchen, helfen + dir, ist geblieben, fährt, größer)');
