@@ -2285,8 +2285,8 @@
   const LNAME = l => { const x = S.LANGS[l]; return x ? x.flag + ' ' + (S.course.ui === 'es' ? x.es.charAt(0).toUpperCase() + x.es.slice(1) : x.nl) : l; };
   const CNAME = c => { const x = S.COURSES[c]; return x ? LNAME(x.ui) + ' → ' + LNAME(x.target) : c; };
   const NOTR = (text, tag) => h(tag || 'span', { 'data-notr': '' }, text);
-  const CDESC = c => ({ 'es-nl': 'uitleg in het Nederlands', 'en-nl': 'A1–C2 · uitleg in het Nederlands', 'fr-nl': 'uitleg in het Nederlands', 'de-nl': 'A1–C2 · uitleg in het Nederlands', 'tr-nl': 'uitleg in het Nederlands', 'en-es': 'explicaciones en español', 'nl-es': 'explicaciones en español' })[c] || '';
-  const CLONG = { 'es-nl': 'Spaans leren · uitleg in het Nederlands', 'en-nl': 'Engels leren (A1–C2) · uitleg in het Nederlands', 'fr-nl': 'Frans leren · uitleg in het Nederlands', 'de-nl': 'Duits leren (A1–C2) · uitleg in het Nederlands', 'tr-nl': 'Turks leren · uitleg in het Nederlands', 'en-es': 'Inglés · explicaciones en español', 'nl-es': 'Neerlandés · explicaciones en español' };
+  const CDESC = c => ({ 'es-nl': 'uitleg in het Nederlands', 'en-nl': 'A1–C2 · uitleg in het Nederlands', 'fr-nl': 'uitleg in het Nederlands', 'de-nl': 'A1–C2 · uitleg in het Nederlands', 'tr-nl': 'A1–C2 · uitleg in het Nederlands', 'en-es': 'explicaciones en español', 'nl-es': 'explicaciones en español' })[c] || '';
+  const CLONG = { 'es-nl': 'Spaans leren · uitleg in het Nederlands', 'en-nl': 'Engels leren (A1–C2) · uitleg in het Nederlands', 'fr-nl': 'Frans leren · uitleg in het Nederlands', 'de-nl': 'Duits leren (A1–C2) · uitleg in het Nederlands', 'tr-nl': 'Turks leren (A1–C2) · uitleg in het Nederlands', 'en-es': 'Inglés · explicaciones en español', 'nl-es': 'Neerlandés · explicaciones en español' };
   /* Eigen keuzelijst voor cursussen. Een gewone <select> tekent op Windows geen vlaggen in zijn lijst; hier wel.
      Gedraagt zich als een select: .value lezen/zetten en .onchange. isNew(c) zet er het label «nieuw» bij. */
   function coursePick({ value, ariaLabel, isNew }) {
