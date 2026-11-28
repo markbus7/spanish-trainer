@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/b2-2.js', 'content/extra.js', 'content/landen.js', 'content/landen-praten.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/begrippen-fr.js', 'js/begrippen-de.js', 'js/begrippen-tr.js', 'js/zwak.js', 'content/beslisregels.js', 'js/strategie.js']) {
+for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/b2-2.js', 'content/extra.js', 'content/landen.js', 'content/landen-praten.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/begrippen-fr.js', 'js/begrippen-de.js', 'js/begrippen-tr.js', 'js/zwak.js', 'content/beslisregels.js', 'js/strategie.js', 'js/methodes.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -1821,6 +1821,11 @@ const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((
   ok(/@container lesson \(min-width: \d+px\) \{\s*\.ls\.with-txt \{ display: grid/.test(css) && /\.ls-txt \{[^}]*overflow-y: auto/.test(css), 'tekst naast vraag: naast elkaar op breed scherm, eigen scrollvak op smal scherm');
   const t = S.Gen.stepSession(S.C.get('a1-04'), 'test').items.find(i => i.src);
   ok(t && t.src.reading && t.skill === 'read' && S.Gen.stepSession(S.C.get('a1-04'), 'read').items.slice(1).some(i => i.skill === 'read' && i.kind === 'mc'), 'tekst naast vraag: leesvragen herkenbaar (src of skill read)');
+}
+{ // 📖 leermethodes: elke strategie heeft een uitleg op #/methodes
+  const T = S.Methods.TXT, L = S.Strat.LIST;
+  ok(L.every(s => T[s.id] && T[s.id].hoe.length && T[s.id].waarom && T[s.id].wanneer), 'methodes: uitleg voor elke strategie: ' + L.filter(s => !T[s.id]).map(s => s.id));
+  ok(Object.keys(T).every(id => L.some(s => s.id === id)), 'methodes: geen uitleg voor een strategie die niet meer bestaat: ' + Object.keys(T).filter(id => !L.some(s => s.id === id)));
 }
 console.log(`\n${checks - fails}/${checks} controles geslaagd · ${units.length} units · ${words} woorden · ${ex} oefeningen · ${Object.keys(S.conj.VERBS).length} werkwoorden`);
 process.exit(fails ? 1 : 0);

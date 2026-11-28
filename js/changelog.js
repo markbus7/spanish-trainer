@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.97.0', date: '2026-11-28',
+    nl: ['📖 Nieuw: Leermethodes. Een uitlegpagina over de 7 andere aanpakken bij hardnekkige fouten: wat je doet, waarom het werkt (met de leerwetenschap erachter), wanneer de app een methode kiest en hoe de app meet of hij bij jou werkt.', 'Te vinden via Perfil › Leermethodes, «ⓘ Over de methodes» bij een hardnekkig onderwerp, «Wat werkt voor jou» en het rapport.'],
+    es: [] },
   { v: '1.96.0', date: '2026-11-28',
     nl: ['Turks C2 is er: tien nieuwe units over toespraken, streektalen, poëzie, humor, straattaal, oude teksten, onvertaalbare woorden, de lange zin, mediataal en registers. Daarmee loopt de Turkse cursus van A1 tot en met C2.', 'De instaptoets voor Turks gaat nu tot C2 en er zijn negen nieuwe vrije gesprekken met Pamuk Öğretmen.'],
     es: ['Turco C2: diez unidades nuevas; el curso de turco va ahora de A1 a C2.', 'Prueba de nivel hasta C2 y nueve conversaciones libres nuevas.'] },

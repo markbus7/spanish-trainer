@@ -130,6 +130,7 @@
       h('p', { class: 'small muted' }, 'Deze vervoegingen heb je al vaak geoefend en ze gaan nog steeds mis. Tijd voor een andere aanpak.'), h('div', { class: 'zw-topics' }, cr)));
     const ov = S.Strat && S.Strat.overview();
     if (ov) wrap.append(h('section', { class: 'sec', id: 'zw-werkt' }, h('h2', { class: 'sec-title' }, '🧪 Wat werkt voor jou'), ov));
+    else if (S.Methods) wrap.append(h('a', { class: 'card mt-promo', href: '#/methodes' }, h('span', { class: 'mt-promo-ic', 'aria-hidden': 'true' }, '📖'), h('div', { class: 'grow' }, h('b', null, 'Leermethodes'), h('small', { class: 'muted' }, 'Blijft iets fout gaan? Lees hoe de app het dan anders aanpakt en meet wat bij jou werkt.')), h('span', { class: 'fold-chev', 'aria-hidden': 'true' }, '›')));
     // woorden
     const wsec = h('section', { class: 'sec', id: 'zw-woord' }, h('h2', { class: 'sec-title' }, '📚 Woorden, zinnen en werkwoorden'));
     if (sm.words.length) {

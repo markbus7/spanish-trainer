@@ -424,13 +424,14 @@
       tries.slice(-4).map(t => { const v = verdict(t); return h('div', { class: 'st-try st-' + v.state }, tryText(t)); }));
   }
   /** Blok onder een zwak onderwerp: de voorgestelde andere aanpak, wat al geprobeerd is, en zelf kiezen. */
+  const mlink = (id, t) => (S.Methods ? S.Methods.link(id, t) : null);
   function block(key, opts = {}) {
     const stub = isStubborn(key), tries = ((db()[key] || {}).tries || []);
     if (!stub && !tries.length) return null;
     const wrap = h('div', { class: 'st-block' });
     if (stub) {
       const R0 = rank(key), nx = pick(key), R = nx ? [R0.find(x => x.s === nx)].concat(R0.filter(x => x.s !== nx)) : R0;
-      wrap.append(h('div', { class: 'st-head' }, h('span', { class: 'st-chip' }, '🔁 Hardnekkig'), h('small', { class: 'muted' }, tries.length ? 'Nog niet opgelost. Tijd voor weer iets anders.' : 'Gewoon oefenen hielp nog niet genoeg. Probeer het eens anders.')));
+      wrap.append(h('div', { class: 'st-head' }, h('span', { class: 'st-chip' }, '🔁 Hardnekkig'), h('small', { class: 'muted' }, tries.length ? 'Nog niet opgelost. Tijd voor weer iets anders.' : 'Gewoon oefenen hielp nog niet genoeg. Probeer het eens anders.'), mlink()));
       if (nx) {
         const G = stats()[nx.id];
         wrap.append(h('button', { class: 'btn primary st-go', type: 'button', onclick: () => start(key, nx.id) }, h('b', null, nx.icon + ' Probeer: ' + nameOf(nx)), h('small', null, S.docentNaam ? S.docentNaam(nx.what) : nx.what),
@@ -463,11 +464,11 @@
           h('li', null, '↗️ helpt een beetje: 5 tot 15 procentpunt beter'),
           h('li', null, '✖️ hielp niet: minder dan 5 procentpunt beter'),
           h('li', null, '📌 blijft hangen: op een latere dag nog minstens 75% goed (bij 3 of meer antwoorden). Zakt het weer weg, dan telt «werkt» maar voor 0,6')),
-        h('p', null, 'Een aanpak krijgt per poging punten: werkt = 1, een beetje = 0,35, niet = 0. Pas na ' + MIN_DONE + ' afgeronde metingen oordeel ik over de aanpak zelf: gemiddeld onder 0,5 = 🔻 helpt weinig en komt minder vaak terug; onder 0,25 = 🚫 uitgezet, die stel ik niet meer voor. Zelf kiezen kan altijd nog, en werkt hij later toch, dan komt hij vanzelf terug.')),
+        h('p', null, 'Een aanpak krijgt per poging punten: werkt = 1, een beetje = 0,35, niet = 0. Pas na ' + MIN_DONE + ' afgeronde metingen oordeel ik over de aanpak zelf: gemiddeld onder 0,5 = 🔻 helpt weinig en komt minder vaak terug; onder 0,25 = 🚫 uitgezet, die stel ik niet meer voor. Zelf kiezen kan altijd nog, en werkt hij later toch, dan komt hij vanzelf terug.'), mlink('meten', '📖 Lees alles over de methodes en het meten')),
       G.sort((a, b) => b.score - a.score).map(o => {
         const s = byId(o.id), open = o.n - o.done;
         const res = [o.werkt ? '✅ ' + o.werkt + '× werkt' : '', o.beetje ? '↗️ ' + o.beetje + '× een beetje' : '', o.niet ? '✖️ ' + o.niet + '× niet' : '', open ? '⏳ ' + open + '× nog bezig' : '', o.sticks ? '📌 ' + o.sticks + '× blijft hangen' : ''].filter(Boolean).join(' · ');
-        return h('div', { class: 'st-row' }, h('span', { class: 'st-ic', 'aria-hidden': 'true' }, s.icon), h('div', { class: 'grow' }, h('b', null, nameOf(s)), h('small', { class: 'muted' }, o.n + '× ingezet · ' + res),
+        return h('div', { class: 'st-row' }, h('span', { class: 'st-ic', 'aria-hidden': 'true' }, s.icon), h('div', { class: 'grow' }, S.Methods ? h('a', { class: 'st-name', href: '#/methodes/' + s.id }, h('b', null, nameOf(s))) : h('b', null, nameOf(s)), h('small', { class: 'muted' }, o.n + '× ingezet · ' + res),
           o.status === 'uit' ? h('small', { class: 'st-off' }, '🚫 Uitgezet: werkt bij jou niet, ik stel hem niet meer voor') : o.status === 'weinig' ? h('small', { class: 'st-off' }, '🔻 Helpt weinig: komt minder vaak terug') : null));
       }));
   }
@@ -485,7 +486,7 @@
     H.forEach(x => card.append(h('div', { class: 'st-rep' }, h('b', null, x.label), h('small', { class: 'muted' }, ' · nu ' + pc(x.pct) + ' goed' + (x.stubborn ? ' · 🔁 nog hardnekkig' : ' · 📈 gaat beter')), triesEl(x.tries, x.key),
       x.next ? h('div', { class: 'small' }, 'Volgende aanpak: ', h('b', null, x.next.icon + ' ' + nameOf(x.next))) : null)));
     fresh.forEach(x => card.append(h('div', { class: 'st-rep' }, h('b', null, x.label), h('small', { class: 'muted' }, ' · ' + pc(x.pct) + ' goed · nog geen andere aanpak geprobeerd'), triesEl([], x.key), x.next ? h('div', { class: 'small' }, 'Voorstel: ', h('b', null, x.next.icon + ' ' + nameOf(x.next))) : null)));
-    card.append(h('a', { class: 'btn ghost wide', href: '#/zwak' }, '🎯 Naar mijn zwakke punten'));
+    card.append(h('a', { class: 'btn ghost wide', href: '#/zwak' }, '🎯 Naar mijn zwakke punten'), S.Methods ? h('a', { class: 'btn ghost wide', href: '#/methodes' }, '📖 Over de leermethodes') : null);
     return card;
   }
 
