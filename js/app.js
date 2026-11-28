@@ -1139,6 +1139,8 @@
   routes.woorden.tab = 'practica';
   routes.zwak = () => S.Weak.page();
   routes.zwak.tab = 'hoy';
+  routes.methodes = arg => S.Methods ? S.Methods.page(arg) : routes.zwak();
+  routes.methodes.tab = 'perfil';
   routes.woordenschat = () => S.Vocab.page();
   routes.woordenschat.tab = 'perfil';
   routes.woordtoets = () => S.WordTest.page();
@@ -1792,6 +1794,7 @@
     navAt.replaceWith(profNav([
       ['🎯', 'Zwakke punten', '#/zwak', zw.total ? U.plural(zw.total, 'punt', 'punten') + ' om te oefenen' : 'woorden en grammatica', 'hot'],
       ['📋', 'Rapport van Lupe', '#/rapport', repN ? U.plural(repN, 'fout', 'fouten') : 'fouten en advies', 'hot'],
+      ['📖', 'Leermethodes', '#/methodes', 'zo pakt de app fouten aan'],
       ['💡', 'Voor de update', '#/rapport/update', rep.fix.length ? U.plural(rep.fix.length, 'antwoord', 'antwoorden') : 'voorstellen van Lupe'],
       ['🧭', 'Mijn niveau', 'niveau', est.label],
       S.Life ? ['🏡', 'Jouw leven', 'leven', 'je wereld'] : null,
