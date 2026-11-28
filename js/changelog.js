@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.92.1', date: '2026-11-27',
+    nl: ['Op de telefoon staat het versienummer nu netjes onder de naam van de app, in plaats van eroverheen', 'De kopbalk past op smalle schermen bij elke cursus; je profielknopje blijft heel'],
+    es: ['En el teléfono, el número de versión ahora queda debajo del nombre de la app, en lugar de encima.', 'La barra superior cabe en pantallas angostas en todos los cursos; el botón de tu perfil se ve completo.'] },
   { v: '1.92.0', date: '2026-11-27',
     nl: ['Op reis: bij elk land een eigen dialoog en een eigen gesprek met je docent, nu ook in de cursussen Engels, Frans, Duits, Turks en Nederlands', 'Lokale woorden staan erbij met het standaardwoord; afwijkingen heten uitzondering, met de reden'],
     es: ['De viaje: cada país tiene su propio diálogo y su propia conversación con tu docente, ahora también en los cursos de inglés, francés, alemán, turco y neerlandés.', 'Las palabras locales aparecen con la palabra estándar; lo que se aparta de la regla se llama excepción, con el motivo.'] },
