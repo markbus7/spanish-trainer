@@ -14,6 +14,7 @@
   const { U, C } = S;
   const h = U.h;
   const st = () => S.Store.state;
+  const MIN_DONE = 3; // zoveel afgeronde metingen voordat een strategie uitgezet of afgeremd wordt
   const WIN = 40, AFTER = 12, MAXTRY = 12, DRIP_DAYS = 5;
   const docent = () => (S.Tutor && S.Tutor.name) || 'Lupe';
 
@@ -109,14 +110,20 @@
   /** Per strategie, over alle onderwerpen: hoe vaak ingezet en met welk resultaat. score = kans dat het bij jou werkt (0–1). */
   function stats() {
     const out = {};
-    LIST.forEach(s => { out[s.id] = { id: s.id, n: 0, done: 0, werkt: 0, beetje: 0, niet: 0, sticks: 0, score: 0.5 }; });
+    LIST.forEach(s => { out[s.id] = { id: s.id, n: 0, done: 0, werkt: 0, beetje: 0, niet: 0, sticks: 0, sum: 0, score: 0.5, status: '' }; });
     Object.values(db()).forEach(e => (e.tries || []).forEach(t => {
       const o = out[t.s]; if (!o) return;
       const v = verdict(t); o.n++;
-      if (v.state !== 'open') { o.done++; o[v.state]++; }
+      if (v.state !== 'open') { o.done++; o[v.state]++; o.sum += v.state === 'werkt' ? (v.sticks === false ? 0.6 : 1) : v.state === 'beetje' ? 0.35 : 0; }
       if (v.sticks) o.sticks++;
     }));
-    Object.values(out).forEach(o => { o.score = (o.werkt + 0.5 * o.beetje + 1) / (o.done + 2); });
+    // Na genoeg metingen: 'uit' = werkt bij jou (bijna) nooit → niet meer voorstellen; 'weinig' = helpt maar weinig → komt minder vaak terug.
+    // Telling per poging: werkt = 1 (0,6 als het een dag later weer wegzakte), een beetje = 0,35, niet = 0.
+    Object.values(out).forEach(o => {
+      o.score = (o.sum + 1) / (o.done + 2);
+      o.rate = o.done ? o.sum / o.done : null;
+      o.status = o.done >= MIN_DONE ? (o.rate < 0.25 ? 'uit' : o.rate < 0.5 ? 'weinig' : '') : '';
+    });
     return out;
   }
   /** Welke strategie nu? Wat bij jou (bij andere onderwerpen) werkt krijgt voorrang; wat bij dít onderwerp niets deed zakt weg;
@@ -129,10 +136,15 @@
       if (!mine.length) sc += 0.3;
       mine.forEach(t => { const v = verdict(t).state; sc += v === 'niet' ? -1 : v === 'open' ? -0.6 : v === 'werkt' ? 0.15 : -0.2; });
       if (tries.length && tries[tries.length - 1].s === s.id) sc -= 0.3; // niet twee keer achter elkaar hetzelfde
-      return { s, sc, tried: mine.length };
-    }).sort((a, b) => b.sc - a.sc);
+      const status = G[s.id].status;
+      if (status === 'weinig') sc -= 0.4;
+      return { s, sc, tried: mine.length, status };
+    }).sort((a, b) => (a.status === 'uit') - (b.status === 'uit') || b.sc - a.sc); // uitgezette strategieën altijd onderaan
   }
-  function pick(key) { const r = rank(key)[0]; return r ? r.s : null; }
+  /** De strategie die de app voorstelt; een uitgezette strategie wordt nooit vanzelf voorgesteld. */
+  function pick(key) { const r = rank(key).filter(x => x.status !== 'uit')[0]; return r ? r.s : null; }
+  /** Strategieën die bij deze leerling na genoeg metingen niet of weinig werken: kandidaten om te schrappen of te vervangen. */
+  function retired() { return Object.values(stats()).filter(o => o.status); }
 
   /** Alle hardnekkige onderwerpen, zwakste eerst. */
   function topics() {
@@ -397,6 +409,8 @@
     });
     fresh.forEach(x => { lines.push(`- ${x.label} [${x.key}] · ${pc(x.pct)} goed bij ${x.n} antwoorden · nog geen andere aanpak geprobeerd${x.next ? ' · de app stelt voor: ' + x.next.icon + ' ' + nameOf(x.next) : ''}`); earlier(x.key).forEach(r => lines.push('    ' + earlierText(r) + ' — ' + r.what)); });
     const G = Object.values(stats()).filter(o => o.n);
+    const off = retired();
+    if (off.length) lines.push('Kandidaten om te schrappen of te vervangen (na ≥' + MIN_DONE + ' metingen): ' + off.map(o => { const x = byId(o.id); return `${x.icon} ${nameOf(x)} — ${o.status === 'uit' ? 'UITGEZET, de app stelt hem niet meer voor' : 'helpt weinig, komt minder vaak terug'} (${o.werkt}× werkt, ${o.beetje}× beetje, ${o.niet}× niet van ${o.done})`; }).join(' · '));
     if (G.length) lines.push('Wat bij deze leerling werkt: ' + G.sort((a, b) => b.score - a.score).map(o => { const s = byId(o.id); return `${s.icon} ${nameOf(s)} ${o.n}× ingezet (${o.werkt}× werkt, ${o.beetje}× beetje, ${o.niet}× niet${o.sticks ? ', ' + o.sticks + '× blijft hangen' : ''}${o.n - o.done ? ', ' + (o.n - o.done) + '× nog open' : ''})`; }).join(' · '));
     return lines.join('\n');
   }
@@ -415,15 +429,15 @@
     if (!stub && !tries.length) return null;
     const wrap = h('div', { class: 'st-block' });
     if (stub) {
-      const R = rank(key), nx = R[0] && R[0].s;
+      const R0 = rank(key), nx = pick(key), R = nx ? [R0.find(x => x.s === nx)].concat(R0.filter(x => x.s !== nx)) : R0;
       wrap.append(h('div', { class: 'st-head' }, h('span', { class: 'st-chip' }, '🔁 Hardnekkig'), h('small', { class: 'muted' }, tries.length ? 'Nog niet opgelost. Tijd voor weer iets anders.' : 'Gewoon oefenen hielp nog niet genoeg. Probeer het eens anders.')));
       if (nx) {
         const G = stats()[nx.id];
         wrap.append(h('button', { class: 'btn primary st-go', type: 'button', onclick: () => start(key, nx.id) }, h('b', null, nx.icon + ' Probeer: ' + nameOf(nx)), h('small', null, S.docentNaam ? S.docentNaam(nx.what) : nx.what),
           G.werkt ? h('small', { class: 'st-why' }, '✅ Werkte bij jou al ' + G.werkt + '× bij een ander onderwerp') : null));
-        if (R.length > 1) {
+        if (R.length > 1) { // zelf kiezen kan altijd, ook een uitgezette aanpak
           const more = h('details', { class: 'st-more' }, h('summary', { class: 'small' }, 'Andere aanpak kiezen'),
-            R.slice(1).map(x => h('button', { class: 'btn ghost small st-alt', type: 'button', onclick: () => start(key, x.s.id) }, x.s.icon + ' ' + nameOf(x.s) + (x.tried ? ' · ' + x.tried + '× geprobeerd' : ''))));
+            R.slice(1).map(x => h('button', { class: 'btn ghost small st-alt', type: 'button', onclick: () => start(key, x.s.id) }, x.s.icon + ' ' + nameOf(x.s) + (x.tried ? ' · ' + x.tried + '× geprobeerd' : '') + (x.status === 'uit' ? ' · 🚫 werkt bij jou niet' : x.status === 'weinig' ? ' · 🔻 helpt bij jou weinig' : ''))));
           wrap.append(more);
         }
       }
@@ -442,10 +456,19 @@
     const G = Object.values(stats()).filter(o => o.n); if (!G.length) return null;
     return h('div', { class: 'card st-over' },
       h('p', { class: 'small muted' }, 'Bij hardnekkige fouten wissel ik van aanpak en meet ik of het daarna beter gaat. Wat bij jou werkt, zet ik vaker in.'),
+      h('details', { class: 'st-info small' }, h('summary', null, 'ⓘ Hoe bepaal ik dat?'),
+        h('p', null, 'Per poging vergelijk ik je laatste 10 antwoorden vóór de aanpak met je volgende antwoorden erna (minstens 4, hooguit 12; de vragen uit de ronde zelf tellen niet mee).'),
+        h('ul', null,
+          h('li', null, '✅ werkt: daarna 80% of meer goed, of minstens 15 procentpunt beter dan ervoor'),
+          h('li', null, '↗️ helpt een beetje: 5 tot 15 procentpunt beter'),
+          h('li', null, '✖️ hielp niet: minder dan 5 procentpunt beter'),
+          h('li', null, '📌 blijft hangen: op een latere dag nog minstens 75% goed (bij 3 of meer antwoorden). Zakt het weer weg, dan telt «werkt» maar voor 0,6')),
+        h('p', null, 'Een aanpak krijgt per poging punten: werkt = 1, een beetje = 0,35, niet = 0. Pas na ' + MIN_DONE + ' afgeronde metingen oordeel ik over de aanpak zelf: gemiddeld onder 0,5 = 🔻 helpt weinig en komt minder vaak terug; onder 0,25 = 🚫 uitgezet, die stel ik niet meer voor. Zelf kiezen kan altijd nog, en werkt hij later toch, dan komt hij vanzelf terug.')),
       G.sort((a, b) => b.score - a.score).map(o => {
         const s = byId(o.id), open = o.n - o.done;
         const res = [o.werkt ? '✅ ' + o.werkt + '× werkt' : '', o.beetje ? '↗️ ' + o.beetje + '× een beetje' : '', o.niet ? '✖️ ' + o.niet + '× niet' : '', open ? '⏳ ' + open + '× nog bezig' : '', o.sticks ? '📌 ' + o.sticks + '× blijft hangen' : ''].filter(Boolean).join(' · ');
-        return h('div', { class: 'st-row' }, h('span', { class: 'st-ic', 'aria-hidden': 'true' }, s.icon), h('div', { class: 'grow' }, h('b', null, nameOf(s)), h('small', { class: 'muted' }, o.n + '× ingezet · ' + res)));
+        return h('div', { class: 'st-row' }, h('span', { class: 'st-ic', 'aria-hidden': 'true' }, s.icon), h('div', { class: 'grow' }, h('b', null, nameOf(s)), h('small', { class: 'muted' }, o.n + '× ingezet · ' + res),
+          o.status === 'uit' ? h('small', { class: 'st-off' }, '🚫 Uitgezet: werkt bij jou niet, ik stel hem niet meer voor') : o.status === 'weinig' ? h('small', { class: 'st-off' }, '🔻 Helpt weinig: komt minder vaak terug') : null));
       }));
   }
   /** Kaartje voor Hoy / zwakke punten: mini-rondes van «elke dag een beetje» die vandaag klaarstaan. */
@@ -466,6 +489,6 @@
     return card;
   }
 
-  S.Strat = { LIST, keyOf, label, answer, begin, verdict, stats, rank, pick, isStubborn, recent, topics, history, earlier, available, session, start, merge, asText, tryText, lupePrompt, dripActive, dripToday,
+  S.Strat = { LIST, keyOf, label, answer, begin, verdict, stats, rank, pick, retired, MIN_DONE, isStubborn, recent, topics, history, earlier, available, session, start, merge, asText, tryText, lupePrompt, dripActive, dripToday,
     block, conjRows, overview, dripCard, reportCard, BUILD };
 })(window.SPT);
