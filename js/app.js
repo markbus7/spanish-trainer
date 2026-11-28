@@ -2673,13 +2673,19 @@
     const t = st().settings.theme;
     if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme');
   }
+  /* Kopbalk: het icoon staat los van de naam, zodat de versie op smalle schermen netjes onder de naam past. */
+  function setLogo(ico, brand) {
+    const i = document.getElementById('tb-ico'), logo = document.querySelector('.topbar .logo');
+    if (i) i.innerHTML = ico;
+    if (logo) logo.innerHTML = brand;
+  }
   function boot() {
     if (S.i18n) S.i18n.start();
     if (S.course.id !== 'es-nl') {
-      const logo = document.querySelector('.logo'); if (logo) logo.innerHTML = S.course.flag + ' ' + S.course.brand;
+      setLogo(S.course.flag, S.course.brand);
       document.title = S.course.title;
     } else {
-      const logo = document.querySelector('.logo'); if (logo) logo.innerHTML = S.Icons.logo() + ' Español <em>latino</em>';
+      setLogo(S.Icons.logo(), 'Español <em>latino</em>');
     }
     S.Icons.decorate();
     Store.load(); migrateTests();
