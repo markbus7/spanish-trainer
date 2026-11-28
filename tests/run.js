@@ -1770,6 +1770,17 @@ const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((
     ok(/Extra oefeningen en uitleg \(.*v[\d.]+\)/.test(X.asText()), 'strategie: eerdere rondes in de rapporttekst');
     St.lupe.ex.length -= 2;
   }
+  { // strategie die na genoeg metingen niet of weinig werkt: uitgezet of afgeremd, en in het rapport als kandidaat om te schrappen
+    const save = JSON.stringify(St.strat);
+    const mk = (s, af, i) => ({ s, t: t0 + 20 * DAY + i, b: [4, 10], in: [0, 0], af, ld: [0, 0] });
+    St.strat.gustar = { r: '', u: 1, tries: [mk('dictee', [4, 10], 1), mk('dictee', [3, 10], 2), mk('dictee', [4, 10], 3), mk('bouw', [5, 10], 4), mk('bouw', [5, 10], 5), mk('bouw', [5, 10], 6)] };
+    const G2 = X.stats();
+    ok(G2.dictee.status === 'uit' && G2.bouw.status === 'weinig' && G2.contrast.status === '' && G2.regel.status === '', 'strategie: uit na 3 metingen zonder effect, weinig bij weinig effect: ' + G2.dictee.status + '/' + G2.bouw.status);
+    const R2 = X.rank('hay-estar');
+    ok(X.pick('hay-estar').id !== 'dictee' && (!R2.some(x => x.s.id === 'dictee') || R2[R2.length - 1].s.id === 'dictee'), 'strategie: uitgezette aanpak wordt niet meer voorgesteld');
+    ok(X.retired().map(o => o.id).sort().join() === 'bouw,dictee' && /Kandidaten om te schrappen[^\n]*Dictee — UITGEZET/.test(X.asText()) && /Zelf zinnen maken — helpt weinig/.test(X.asText()), 'strategie: kandidaten om te schrappen in het rapport');
+    St.strat = JSON.parse(save);
+  }
   // werkwoordstijd
   St.srs['c|estar|pres'] = { d: 0, i: 0, e: 2, r: 0, l: 3, f: 6, g: 3 };
   ok(X.isStubborn('c|estar|pres') && X.label('c|estar|pres').startsWith('estar vervoegen'), 'strategie: hardnekkige werkwoordstijd');

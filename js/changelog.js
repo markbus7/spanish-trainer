@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.92.1', date: '2026-11-27',
+    nl: ['Leerstrategieën die bij jou niet werken verdwijnen vanzelf: heeft een aanpak na drie metingen (bijna) nooit geholpen, dan stelt de app hem niet meer voor (🚫 uitgezet). Helpt hij maar weinig, dan komt hij minder vaak terug (🔻). Je ziet dit bij «Wat werkt voor jou», en in het rapport van Lupe staan zulke aanpakken als kandidaat om te schrappen of te vervangen.'],
+    es: [] },
   { v: '1.92.0', date: '2026-11-27',
     nl: ['Op reis: bij elk land een eigen dialoog en een eigen gesprek met je docent, nu ook in de cursussen Engels, Frans, Duits, Turks en Nederlands', 'Lokale woorden staan erbij met het standaardwoord; afwijkingen heten uitzondering, met de reden'],
     es: ['De viaje: cada país tiene su propio diálogo y su propia conversación con tu docente, ahora también en los cursos de inglés, francés, alemán, turco y neerlandés.', 'Las palabras locales aparecen con la palabra estándar; lo que se aparta de la regla se llama excepción, con el motivo.'] },
