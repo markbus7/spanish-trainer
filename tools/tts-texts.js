@@ -134,13 +134,14 @@ LV = 'X';
    Twee sprekers krijgen nooit dezelfde stem: de tweede valt terug op de basisstem van de cursus of op een reservestem. */
 function placeDialog(p, ns, land, base, spare, lv) {
   const d = p.dialog; if (!d) return;
+  const me = d.me || 'Mark'; // de bezoeker: Mark in de Spaanse cursus, anders dialog.me
   const who = [...new Set(d.lines.map(l => l[0]))], taken = new Set(), spec = {};
   const num = x => parseInt(x || 0, 10), sign = n => (n >= 0 ? '+' : '') + n;
   // eerst de personages en de mensen van het land, dan de bezoeker (Mark)
-  who.slice().sort((a, b) => (a === 'Mark') - (b === 'Mark')).forEach(w => {
-    const ch = S.Cast && w !== 'Mark' && S.Cast.forSpeaker(w, d.place), cv = ch && ch.voice, i = d.who[w] === 'm' ? 1 : 0;
+  who.slice().sort((a, b) => (a === me) - (b === me)).forEach(w => {
+    const ch = S.Cast && w !== me && S.Cast.forSpeaker(w, d.place), cv = ch && ch.voice, i = d.who[w] === 'm' ? 1 : 0;
     if (cv && !taken.has(cv.v)) { taken.add(cv.v); spec[w] = { voice: cv.v, p: cv.pitch, r: cv.rate }; return; }
-    const v = (w === 'Mark' ? [base[i], spare[i], land[i]] : [land[i], base[i], spare[i]]).find(x => !taken.has(x)) || land[i];
+    const v = (w === me ? [base[i], spare[i], land[i]] : [land[i], base[i], spare[i]]).find(x => !taken.has(x)) || land[i];
     taken.add(v); spec[w] = { voice: v, p: 0, r: 0 };
   });
   d.lines.forEach(([w, t]) => {

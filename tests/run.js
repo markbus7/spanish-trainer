@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, setTimeout, clearTimeout });
 ctx.window = ctx; ctx.globalThis = ctx;
-for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/b2-2.js', 'content/extra.js', 'content/landen.js', 'content/landen-praten.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/begrippen-fr.js', 'js/begrippen-de.js', 'js/zwak.js']) {
+for (const f of ['js/core.js', 'js/badges.js', 'js/i18n.js', 'js/i18n-es.js', 'js/conjugate.js', 'js/curriculum.js', 'content/a1.js', 'content/a2.js', 'content/a1-plus.js', 'content/a2-plus.js', 'content/b1.js', 'content/b2.js', 'content/b2-2.js', 'content/extra.js', 'content/landen.js', 'content/landen-praten.js', 'content/kaarten/es.js', 'content/oefeningen-plus.js', 'content/synoniemen.js', 'content/uitleg.js', 'js/uitzonderingen.js', 'content/regiowoorden.js', 'js/regio.js', 'js/gen.js', 'js/games.js', 'js/words.js', 'js/vocab.js', 'js/woordtoets.js', 'js/dagplan.js', 'js/gloss.js', 'js/mistakes.js', 'js/docenten.js', 'js/tutor.js', 'js/ai.js', 'js/mundo.js', 'js/begrippen.js', 'js/begrippen-fr.js', 'js/begrippen-de.js', 'js/begrippen-tr.js', 'js/zwak.js', 'content/beslisregels.js', 'js/strategie.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const S = ctx.SPT;
@@ -1285,7 +1285,7 @@ await micTests();
     .filter(f => !/(app|lesson|ai|sync|ask)\.js$/.test(f));
   const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
   // één rij per cursus met een kaart: [doeltaal, minimaal aantal landen]
-  const deep = ['es-nl']; // cursussen waarin elk land een dialoog en een gesprek met de docent heeft
+  const deep = ['es-nl', 'en-nl', 'fr-nl', 'de-nl', 'tr-nl', 'nl-es']; // cursussen waarin elk land een dialoog en een gesprek met de docent heeft
   const want = { 'es-nl': ['es', 21], 'en-nl': ['en', 12], 'nl-es': ['nl', 5], 'fr-nl': ['fr', 9], 'de-nl': ['de', 5], 'tr-nl': ['tr', 6] };
   for (const course of Object.keys(S.COURSES)) {
     const w = 'op reis ' + course + ': ';
@@ -1319,8 +1319,8 @@ await micTests();
         const d = p.dialog, who = [...new Set(d.lines.map(l => l[0]))];
         ok(d.t && d.nl && d.place && d.lines.length >= 7 && d.lines.every(l => l[0] && l[1] && l[2]) && who.length >= 2 && who.every(x => ['f', 'm'].includes(d.who[x])), v + 'dialoog: titel, plaats, zinnen met vertaling, stem per spreker');
         ok(d.q.length >= 3 && d.q.every(q => q.t === 'mc' && q.q && q.o.length >= 3 && new Set(q.o).size === q.o.length), v + 'dialoog: drie vragen met unieke opties');
-        ok(d.lines.filter(l => l[3]).length >= 3 && d.lines.every(l => !l[3] || /^(🗺️|⚠️ <b>Uitzondering:<\/b>)/.test(l[3])), v + 'dialoog: lokale woorden uitgelegd, afwijkingen heten uitzondering');
-        ok(d.lines.every(l => !/Uitzondering/.test(l[3] || '') || /Reden:/.test(l[3])), v + 'dialoog: elke uitzondering heeft een reden');
+        ok(d.lines.filter(l => l[3]).length >= 3 && d.lines.every(l => !l[3] || /^(🗺️|⚠️ <b>(Uitzondering|Excepción):<\/b>)/.test(l[3])), v + 'dialoog: lokale woorden uitgelegd, afwijkingen heten uitzondering');
+        ok(d.lines.every(l => !/Uitzondering|Excepción/.test(l[3] || '') || /(Reden|Motivo):/.test(l[3])), v + 'dialoog: elke uitzondering heeft een reden');
         ok(d.lines.every(l => clip(l[1], ns)) && d.q.every(q => clip(q.q, ns)), v + 'dialoog ingesproken in de naamruimte van het land');
         const vs = who.map(x => (list.find(y => y.k === K.Speech.clipKey(d.lines.find(l => l[0] === x)[1], ns)) || {}).voice);
         ok(new Set(vs).size === who.length, v + 'dialoog: elke spreker een eigen stem (' + vs.join(', ') + ')');
@@ -1636,6 +1636,20 @@ await micTests();
     ok(G.match('De Akkusativ, de derde naamval, de Konjunktiv II, een scheidbaar werkwoord en de Umlaut.').map(x => x.id).join() === 'de-akkusativ,de-dativ,condicional,de-trennbar,de-umlaut', w + 'Duitse termen tikbaar: ' + G.match('De Akkusativ, de derde naamval, de Konjunktiv II, een scheidbaar werkwoord en de Umlaut.').map(x => x.id).join());
     ok(G.match('de Konjunktiv I en het Partizip I')[0].id === 'de-konj1' && G.match('het Partizip II')[0].id === 'deelwoord' && G.search('Dativ').some(b => b.id === 'de-dativ'), w + 'Konjunktiv I ≠ II, Partizip I ≠ II, zoeken');
     S.course = c0; G.match('x'); }
+  // Turks: eigen bestand js/begrippen-tr.js; Turkse blokken plus begrippen die alleen in het Turks bestaan (klinkerharmonie, naamval …)
+  { const c0 = S.course; S.course = { target: 'tr', ui: 'nl' };
+    const tl = G.list('tr');
+    ok(tl.length >= 58 && !G.fits(G.get('por-para'), 'tr') && !G.fits(G.get('stamwissel'), 'tr') && G.fits(G.get('tr-klinkerharmonie'), 'tr') && !G.fits(G.get('tr-klinkerharmonie'), 'es') && !G.fits(G.get('tr-naamval'), 'de') && !G.fits(G.get('de-naamval'), 'tr'), w + 'Turks: aantal ' + tl.length + ', eigen begrippen alleen bij Turks');
+    tl.forEach(b => { const k = b.tr; ok(k && k.n && k.html && k.ex && k.ex.length >= 2 && k.ex.every(([e, n]) => e && n) && b.t && b.k && b.html && G.CATS.some(c => c[0] === b.c), w + 'tr ' + b.id + ' blok met voorbeelden');
+      (k.table || []).forEach(r => ok(r.length === k.table[0].length, w + 'tr ' + b.id + ' tabelrij'));
+      (k.uz || []).forEach(u => ok(u[0] && /<b>Waarom\?<\/b>/.test(u[1]), w + 'tr ' + b.id + ' uitzondering met reden: ' + u[0]));
+      ok(!/Lima|Quito|Mexic|Spaans/.test(JSON.stringify([G.title(b), k.k || b.k, k.gen || b.html, k])), w + 'tr ' + b.id + ' geen Spaanse resten');
+      if (/^tr-/.test(b.id)) (b.rel || []).forEach(r => ok(G.get(r) && G.fits(G.get(r), 'tr'), w + 'tr ' + b.id + ' verwijst naar ' + r)); });
+    ok(G.title(G.get('indefinido')) === 'Verleden tijd (-di)' && G.title(G.get('aanspreken')) === 'Sen en siz' && G.title(G.get('lidwoord')) === 'Lidwoord', w + 'Turks: eigen titel');
+    const tm = G.match('De klinkerharmonie, een naamval, het achtervoegsel, de brede tijd, van horen zeggen en een achterzetsel.').map(x => x.id).join();
+    ok(tm === 'tr-klinkerharmonie,tr-naamval,tr-achtervoegsel,tr-bredetijd,perfecto,tr-achterzetsel', w + 'Turkse termen tikbaar: ' + tm);
+    ok(G.search('ünlü uyumu')[0].id === 'tr-klinkerharmonie' && G.search('geniş zaman').some(b => b.id === 'tr-bredetijd'), w + 'Turks zoeken');
+    S.course = c0; G.match('x'); }
   // Engels: begrippen zonder Engels blok (por/para, stamklinkerwisseling) horen niet bij de Engelse cursus
   ok(!G.fits(G.get('por-para'), 'en') && G.fits(G.get('lidwoord'), 'en') && G.list('en').length < G.list('es').length, w + 'per doeltaal');
 }
@@ -1700,6 +1714,92 @@ const words = units.reduce((a, u) => a + u.vocab.length, 0), ex = units.reduce((
   ok(sm.words.length === 1 && sm.words[0].id === 'w|' + u.id + '|0', 'zwak: alleen zwakke kaarten');
   const ses = S.Weak.session(['ser-estar'], ['w|' + u.id + '|0']);
   ok(ses.items.length > 1 && ses.items.some(i => i.srsId === 'w|' + u.id + '|0'), 'zwak: oefensessie met onderwerp en woord');
+  S.Store.state = keep;
+}
+{ // 🧪 andere aanpak bij hardnekkige fouten: strategie kiezen, effect meten, wat werkt krijgt voorrang
+  const keep = S.Store.state; S.Store.state = JSON.parse(JSON.stringify(keep));
+  const St = S.Store.state, X = S.Strat, t0 = new Date('2026-11-20T12:00:00Z').getTime(), DAY = 864e5;
+  St.strat = {}; St.lupe = { log: [], n: 0, ex: [] }; St.srs = {};
+  St.units = { 'a1-04': { steps: { grammar: 1 }, best: 0, done: true }, 'a1-02': { steps: { grammar: 1 }, best: 0, done: true } };
+  St.tags = { contractions: { ok: 8, no: 13 }, 'hay-estar': { ok: 3, no: 9 }, articles: { ok: 9, no: 1 }, gender: { ok: 2, no: 2 }, vocab: { ok: 0, no: 30 } };
+  ok(X.isStubborn('contractions') && !X.isStubborn('articles') && !X.isStubborn('gender'), 'strategie: hardnekkig = vaak geoefend en onder 70%');
+  ok(X.keyOf({ tag: 'vocab' }) === '' && X.keyOf({ tag: 'conj', conj: { verb: 'estar', tense: 'pres' } }) === 'c|estar|pres' && X.keyOf({ tag: 'x', sk: 'y' }) === 'y', 'strategie: onderwerp van een vraag');
+  const tp = X.topics();
+  ok(tp.length === 2 && tp[0].key === 'hay-estar' && tp[1].key === 'contractions' && tp.every(t => t.next), 'strategie: hardnekkige onderwerpen, zwakste eerst, met voorstel: ' + tp.map(t => t.key));
+  ok(S.beslis && S.beslis.contractions && X.pick('contractions').id === 'regel', 'strategie: begint met de beslisregel');
+  for (const sid of ['regel', 'contrast', 'bouw', 'dictee', 'spreid']) {
+    const ses = X.session('contractions', sid, 1);
+    const q = ses ? ses.items.filter(i => i.kind !== 'info') : [];
+    ok(ses && q.length >= 3 && ses.items[0].kind === 'info' && ses.items[0].strat && q.every(i => i.sk === 'contractions' && i.st === 1 && i.tag), 'strategie ' + sid + ': ronde met intro en gemerkte vragen');
+    if (sid === 'contrast') ok(q.filter(i => i.q === 'Welke zin is goed?').length >= 3 && q.filter(i => i.q === 'Welke zin is goed?').every(i => i.options.includes(i.answer) && new Set(i.options).size === i.options.length && !/___/.test(i.answer)), 'strategie contrast: hele zinnen naast elkaar');
+    if (sid === 'dictee') ok(q.filter(i => i.kind === 'listen').length >= 3 && q.filter(i => i.kind === 'listen').every(i => !/___/.test(i.text)), 'strategie dictee: hele zinnen');
+    if (sid === 'bouw') ok(q.every(i => i.kind === 'order' || i.kind === 'type') && q.every(i => !i.options), 'strategie bouw: zonder keuzes');
+    if (sid === 'spreid') ok(q.length === 3, 'strategie spreid: 3 vragen per dag');
+    if (sid === 'regel') ok(ses.items[1].strat && /al/.test(ses.items[1].strat.html) && /Uitzondering/.test(ses.items[1].strat.html), 'strategie regel: beslisregel met uitzondering erbij');
+  }
+  ok(!X.available('contractions', 'fouten') && !X.available('contractions', 'lupe'), 'strategie: eigen fouten/docent alleen als het kan');
+  St.lupe.ex = [{ t: t0, id: 'x|a1-04|14', tag: 'contractions', q: 'q', u: 'a el', a: 'al' }, { t: t0 + 1, id: 'x|a1-04|15', tag: 'contractions', q: 'q2', u: 'de el', a: 'del' }];
+  const fs2 = X.session('contractions', 'fouten', 1);
+  ok(fs2 && /a el/.test(fs2.items[1].strat.html) && fs2.items.some(i => i.srsId === 'x|a1-04|14'), 'strategie fouten: je eigen fouten op de kaart en opnieuw gevraagd');
+  // poging 1 (regel): tijdens 4/5, daarna 2/6 → hielp niet
+  const a = X.begin('contractions', 'regel', t0);
+  ok(Math.round(a.b[0] / a.b[1] * 100) === 38, 'strategie: uitgangspunt bewaard');
+  for (let i = 0; i < 5; i++) X.answer({ tag: 'contractions', st: a.t, sk: 'contractions' }, i < 4, t0 + i);
+  ok(X.verdict(a).state === 'open' && a.in[0] === 4 && a.in[1] === 5 && a.af[1] === 0, 'strategie: vragen uit de ronde zelf tellen niet als effect');
+  for (let i = 0; i < 6; i++) X.answer({ tag: 'contractions' }, i < 2, t0 + DAY + i);
+  ok(X.verdict(a).state === 'niet' && X.verdict(a).sticks === false, 'strategie: geen verbetering = hielp niet');
+  ok(X.pick('contractions').id !== 'regel', 'strategie: wat niet hielp komt niet meteen terug');
+  // poging 2 (contrast): daarna 6/7, ook een dag later → werkt en blijft hangen
+  const b = X.begin('contractions', 'contrast', t0 + 2 * DAY);
+  for (let i = 0; i < 7; i++) X.answer({ tag: 'contractions' }, i > 0, t0 + 3 * DAY + i);
+  const vb = X.verdict(b);
+  ok(vb.state === 'werkt' && vb.sticks === true && /werkt/.test(X.tryText(b)) && /blijft hangen/.test(X.tryText(b)), 'strategie: verbetering die een dag later nog staat = werkt en blijft hangen');
+  const G = X.stats();
+  ok(G.contrast.werkt === 1 && G.regel.niet === 1 && G.contrast.score > G.dictee.score && G.regel.score < G.dictee.score, 'strategie: score per strategie');
+  ok(X.rank('hay-estar')[0].s.id === 'contrast' || !X.available('hay-estar', 'contrast'), 'strategie: wat bij jou werkt gaat voor bij een ander onderwerp');
+  ok(X.rank('hay-estar').findIndex(x => x.s.id === 'regel') > 0, 'strategie: wat niet werkte zakt');
+  const tx = X.asText();
+  ok(/al \/ del \[contractions\]/.test(tx) && /Beslisregel: 38% → 33%/.test(tx) && /hielp niet/.test(tx) && /Contrastparen/.test(tx) && /Wat bij deze leerling werkt/.test(tx) && /hay vs\. estar \[hay-estar\].*nog geen andere aanpak/.test(tx), 'strategie: tekst voor het rapport: ' + tx);
+  ok(S.Mistakes.asText(S.Mistakes.report(30)).includes('Hardnekkige onderwerpen en geprobeerde leerstrategieën'), 'strategie: staat in het rapport van de docent');
+  { // eerdere updaterondes (S.reworked) tellen als «al geprobeerd», met de fouten erna
+    const E = X.earlier('contractions');
+    ok(E.length >= 2 && E.every((r, i) => !i || r.t >= E[i - 1].t) && E[E.length - 1].last, 'strategie: eerdere updates over dit onderwerp, oudste eerst');
+    St.lupe.ex.push({ t: t0, v: E[0].v, id: 'x|a1-04|7', tag: 'contractions', q: 'q', u: 'a el', a: 'al' }, { t: t0, v: '99.0.0', id: 'x|a1-04|7', tag: 'contractions', q: 'q', u: 'a el', a: 'al' });
+    const E2 = X.earlier('contractions');
+    ok(E2[0].n === E[0].n + 1 && E2[E2.length - 1].n === E[E.length - 1].n + 1, 'strategie: fouten per periode na een update');
+    ok(/Extra oefeningen en uitleg \(.*v[\d.]+\)/.test(X.asText()), 'strategie: eerdere rondes in de rapporttekst');
+    St.lupe.ex.length -= 2;
+  }
+  { // strategie die na genoeg metingen niet of weinig werkt: uitgezet of afgeremd, en in het rapport als kandidaat om te schrappen
+    const save = JSON.stringify(St.strat);
+    const mk = (s, af, i) => ({ s, t: t0 + 20 * DAY + i, b: [4, 10], in: [0, 0], af, ld: [0, 0] });
+    St.strat.gustar = { r: '', u: 1, tries: [mk('dictee', [4, 10], 1), mk('dictee', [3, 10], 2), mk('dictee', [4, 10], 3), mk('bouw', [5, 10], 4), mk('bouw', [5, 10], 5), mk('bouw', [5, 10], 6)] };
+    const G2 = X.stats();
+    ok(G2.dictee.status === 'uit' && G2.bouw.status === 'weinig' && G2.contrast.status === '' && G2.regel.status === '', 'strategie: uit na 3 metingen zonder effect, weinig bij weinig effect: ' + G2.dictee.status + '/' + G2.bouw.status);
+    const R2 = X.rank('hay-estar');
+    ok(X.pick('hay-estar').id !== 'dictee' && (!R2.some(x => x.s.id === 'dictee') || R2[R2.length - 1].s.id === 'dictee'), 'strategie: uitgezette aanpak wordt niet meer voorgesteld');
+    ok(X.retired().map(o => o.id).sort().join() === 'bouw,dictee' && /Kandidaten om te schrappen[^\n]*Dictee — UITGEZET/.test(X.asText()) && /Zelf zinnen maken — helpt weinig/.test(X.asText()), 'strategie: kandidaten om te schrappen in het rapport');
+    St.strat = JSON.parse(save);
+  }
+  // werkwoordstijd
+  St.srs['c|estar|pres'] = { d: 0, i: 0, e: 2, r: 0, l: 3, f: 6, g: 3 };
+  ok(X.isStubborn('c|estar|pres') && X.label('c|estar|pres').startsWith('estar vervoegen'), 'strategie: hardnekkige werkwoordstijd');
+  for (const sid of ['regel', 'contrast', 'bouw', 'dictee', 'spreid']) { const ses = X.session('c|estar|pres', sid, 2); ok(ses && ses.items.filter(i => i.kind !== 'info').length >= 3 && ses.items.filter(i => i.kind !== 'info').every(i => i.sk === 'c|estar|pres'), 'strategie ' + sid + ': werkwoordstijd'); }
+  // elke dag een beetje: dag telt bij de eerste vraag van die dag
+  const c = X.begin('hay-estar', 'spreid', t0); St.strat['hay-estar'].drip = { t: c.t, s: S.U.dayIndex(new Date(t0)), n: 0, d: 0 };
+  X.answer({ tag: 'hay-estar', st: c.t, sk: 'hay-estar' }, true, t0); X.answer({ tag: 'hay-estar', st: c.t, sk: 'hay-estar' }, true, t0 + 5);
+  ok(St.strat['hay-estar'].drip.n === 1, 'strategie spreid: één dag geteld');
+  // synchroniseren: pogingen van beide apparaten, de volste versie per poging
+  const other = JSON.parse(JSON.stringify(St.strat)); other.contractions.tries[1].af = [1, 2]; other.contractions.tries.push({ s: 'dictee', t: t0 + 9 * DAY, b: [1, 2], in: [0, 0], af: [0, 0], ld: [0, 0] }); other.gustar = { r: '10', u: 5, tries: [] };
+  const m = X.merge(St.strat, other), m2 = X.merge(other, St.strat);
+  ok(m.contractions.tries.length === 3 && m.contractions.tries[1].af[1] === 7 && m.gustar && JSON.stringify(m.contractions.tries) === JSON.stringify(m2.contractions.tries), 'strategie: samenvoegen bij synchroniseren');
+  const files = fs.readFileSync(path.join(root, 'index.html'), 'utf8'), sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  ok(['js/strategie.js', 'content/beslisregels.js'].every(f => files.includes(f) && sw.includes(f)), 'strategie: in index.html en sw.js');
+  Object.entries(S.beslis).forEach(([k, r]) => {
+    ok(/^c\|/.test(k) ? !!S.conj.table(k.split('|')[1], k.split('|')[2]) : !!S.C.TAGS[k], 'beslisregel: bestaand onderwerp ' + k);
+    (r.html.match(/<p>[^<]*Uitzondering[\s\S]*?<\/p>/g) || []).forEach(p => ok(/Reden:/.test(p), 'beslisregel ' + k + ': uitzondering met reden'));
+    ok(!/vosotros/i.test(r.html), 'beslisregel ' + k + ': Latijns-Amerikaans');
+  });
   S.Store.state = keep;
 }
 { // laatste unittoets overleeft synchroniseren (nieuwste wint)
