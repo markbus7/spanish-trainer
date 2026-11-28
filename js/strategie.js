@@ -154,6 +154,21 @@
     }).sort((a, b) => (b.stubborn - a.stubborn) || (a.pct == null ? 1 : a.pct) - (b.pct == null ? 1 : b.pct));
   }
 
+  /* ---------- eerdere rondes (vóór de strategieën bestonden) ----------
+     Updates van de lesstof waarin dit onderwerp al extra oefeningen of uitleg kreeg (S.reworked), met het aantal
+     fouten dat daarna nog gemaakt is. Goede antwoorden per dag zijn van toen niet bewaard, dus een percentage kan niet. */
+  const cmpV = (a, b) => { const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) { const d = (x[i] || 0) - (y[i] || 0); if (d) return d; } return 0; };
+  function earlier(key) {
+    const tag = isConj(key) ? 'conj' : key, L = st().lupe || {};
+    const R = (S.reworked || []).filter(x => x.tag === tag).map(x => ({ v: x.v, t: new Date(/T/.test(x.date) ? x.date : x.date + 'T00:00:00').getTime(), what: x.what })).sort((a, b) => a.t - b.t);
+    const all = (L.ex || []).filter(e => (isConj(key) ? e.id === key : e.tag === key)).concat(isConj(key) ? [] : (L.log || []).filter(e => e.tag === key));
+    const after = (e, r) => (e.v ? cmpV(e.v, r.v) >= 0 : e.t >= r.t);
+    // fouten tussen deze update en de volgende over hetzelfde onderwerp
+    return R.map((r, i) => Object.assign(r, { n: all.filter(e => after(e, r) && !(R[i + 1] && after(e, R[i + 1]))).length, last: i === R.length - 1 }));
+  }
+  const dShort = t => new Date(t).toLocaleDateString(S.LOC, { day: 'numeric', month: 'short' });
+  const earlierText = r => '📚 Extra oefeningen en uitleg (' + dShort(r.t) + ', v' + r.v + '): ' + (r.n ? 'daarna nog ' + r.n + '× fout' + (r.last ? '' : ' tot de volgende update') : 'daarna geen fouten genoteerd');
+
   /* ---------- oefenstof per onderwerp ---------- */
   /** Alle oefeningen over dit onderwerp uit units die je gehad hebt (en de unit waar het wordt uitgelegd). */
   function pool(key) {
@@ -376,19 +391,22 @@
     lines.push('Hardnekkige onderwerpen en geprobeerde leerstrategieën (de app wisselt zelf van aanpak en meet het effect: % goed vóór → % goed in de antwoorden erna):');
     H.forEach(x => {
       lines.push(`- ${x.label} [${x.key}] · nu ${pc(x.pct)} goed (laatste antwoorden)${x.stubborn ? ' · nog hardnekkig' : ' · gaat nu goed'}`);
+      earlier(x.key).forEach(r => lines.push('    ' + earlierText(r) + ' — ' + r.what));
       x.tries.forEach(t => lines.push('    ' + new Date(t.t).toLocaleDateString(S.LOC, { day: 'numeric', month: 'short' }) + ' ' + tryText(t)));
       if (x.next) lines.push('    volgende aanpak die de app kiest: ' + x.next.icon + ' ' + nameOf(x.next));
     });
-    fresh.forEach(x => lines.push(`- ${x.label} [${x.key}] · ${pc(x.pct)} goed bij ${x.n} antwoorden · nog geen andere aanpak geprobeerd${x.next ? ' · de app stelt voor: ' + x.next.icon + ' ' + nameOf(x.next) : ''}`));
+    fresh.forEach(x => { lines.push(`- ${x.label} [${x.key}] · ${pc(x.pct)} goed bij ${x.n} antwoorden · nog geen andere aanpak geprobeerd${x.next ? ' · de app stelt voor: ' + x.next.icon + ' ' + nameOf(x.next) : ''}`); earlier(x.key).forEach(r => lines.push('    ' + earlierText(r) + ' — ' + r.what)); });
     const G = Object.values(stats()).filter(o => o.n);
     if (G.length) lines.push('Wat bij deze leerling werkt: ' + G.sort((a, b) => b.score - a.score).map(o => { const s = byId(o.id); return `${s.icon} ${nameOf(s)} ${o.n}× ingezet (${o.werkt}× werkt, ${o.beetje}× beetje, ${o.niet}× niet${o.sticks ? ', ' + o.sticks + '× blijft hangen' : ''}${o.n - o.done ? ', ' + (o.n - o.done) + '× nog open' : ''})`; }).join(' · '));
     return lines.join('\n');
   }
 
   /* ---------- scherm ---------- */
-  function triesEl(tries) {
-    if (!tries.length) return null;
+  function triesEl(tries, key) {
+    const E = key ? earlier(key) : [];
+    if (!tries.length && !E.length) return null;
     return h('div', { class: 'st-tries small' }, h('span', { class: 'muted' }, 'Al geprobeerd:'),
+      E.slice(-3).map(r => h('div', { class: 'st-try st-old', title: r.what }, earlierText(r))),
       tries.slice(-4).map(t => { const v = verdict(t); return h('div', { class: 'st-try st-' + v.state }, tryText(t)); }));
   }
   /** Blok onder een zwak onderwerp: de voorgestelde andere aanpak, wat al geprobeerd is, en zelf kiezen. */
@@ -410,7 +428,7 @@
         }
       }
     } else if (!opts.quiet) wrap.append(h('div', { class: 'st-head' }, h('span', { class: 'st-chip ok' }, '📈 Gaat beter')));
-    const te = triesEl(tries); if (te) wrap.append(te);
+    const te = triesEl(tries, key); if (te) wrap.append(te);
     return wrap;
   }
   /** Werkwoordstijden die hardnekkig fout gaan (grammatica-tags staan al in de lijst van «Mijn zwakke punten»). */
@@ -441,13 +459,13 @@
     const H = history(), fresh = topics().filter(t => !t.tries.length);
     if (!H.length && !fresh.length) return null;
     const card = h('div', { class: 'card' }, h('p', { class: 'small muted' }, 'Onderwerpen die fout bleven gaan, welke andere aanpak al geprobeerd is en wat het deed. Dit gaat mee in het rapport, zodat nieuwe voorstellen niet «meer van hetzelfde» zijn.'));
-    H.forEach(x => card.append(h('div', { class: 'st-rep' }, h('b', null, x.label), h('small', { class: 'muted' }, ' · nu ' + pc(x.pct) + ' goed' + (x.stubborn ? ' · 🔁 nog hardnekkig' : ' · 📈 gaat beter')), triesEl(x.tries),
+    H.forEach(x => card.append(h('div', { class: 'st-rep' }, h('b', null, x.label), h('small', { class: 'muted' }, ' · nu ' + pc(x.pct) + ' goed' + (x.stubborn ? ' · 🔁 nog hardnekkig' : ' · 📈 gaat beter')), triesEl(x.tries, x.key),
       x.next ? h('div', { class: 'small' }, 'Volgende aanpak: ', h('b', null, x.next.icon + ' ' + nameOf(x.next))) : null)));
-    fresh.forEach(x => card.append(h('div', { class: 'st-rep' }, h('b', null, x.label), h('small', { class: 'muted' }, ' · ' + pc(x.pct) + ' goed · nog niets anders geprobeerd'), x.next ? h('div', { class: 'small' }, 'Voorstel: ', h('b', null, x.next.icon + ' ' + nameOf(x.next))) : null)));
+    fresh.forEach(x => card.append(h('div', { class: 'st-rep' }, h('b', null, x.label), h('small', { class: 'muted' }, ' · ' + pc(x.pct) + ' goed · nog geen andere aanpak geprobeerd'), triesEl([], x.key), x.next ? h('div', { class: 'small' }, 'Voorstel: ', h('b', null, x.next.icon + ' ' + nameOf(x.next))) : null)));
     card.append(h('a', { class: 'btn ghost wide', href: '#/zwak' }, '🎯 Naar mijn zwakke punten'));
     return card;
   }
 
-  S.Strat = { LIST, keyOf, label, answer, begin, verdict, stats, rank, pick, isStubborn, recent, topics, history, available, session, start, merge, asText, tryText, lupePrompt, dripActive, dripToday,
+  S.Strat = { LIST, keyOf, label, answer, begin, verdict, stats, rank, pick, isStubborn, recent, topics, history, earlier, available, session, start, merge, asText, tryText, lupePrompt, dripActive, dripToday,
     block, conjRows, overview, dripCard, reportCard, BUILD };
 })(window.SPT);

@@ -231,7 +231,7 @@
     const sec = h('section', { class: 'sec pl-talk' }, h('h2', { class: 'sec-title' }, '🗣️ Praten in ' + p.name));
     if (d) {
       const who = [...new Set(d.lines.map(l => l[0]))];
-      const faces = who.map(w => { const c = Cast && (w === 'Mark' ? st().me && Cast.get(st().me) : Cast.forSpeaker(w, d.place)); return c ? Cast.avatar(c.id, 54, 'pl-face', { look: c.player ? st().meLook : null }) : null; }).filter(Boolean);
+      const faces = who.map(w => { const c = Cast && (w === (d.me || 'Mark') ? st().me && Cast.get(st().me) : Cast.forSpeaker(w, d.place)); return c ? Cast.avatar(c.id, 54, 'pl-face', { look: c.player ? st().meLook : null }) : null; }).filter(Boolean);
       sec.append(h('div', { class: 'card pl-talk-card' },
         h('div', { class: 'pl-talk-head' }, faces.length ? h('div', { class: 'pl-faces' }, faces) : h('span', { class: 'pl-talk-ic' }, '💬'),
           h('div', { class: 'grow' }, h('div', { class: 'eyebrow' }, 'Dialoog · ' + d.place.replace(/\s*[\u{1F1E6}-\u{1F1FF}]{2}/u, '')), h('b', { lang: meta().target }, d.t), h('small', { class: 'muted' }, d.nl || '')),
