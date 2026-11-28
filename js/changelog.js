@@ -4,9 +4,12 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
-  { v: '1.93.1', date: '2026-11-28',
+  { v: '1.94.1', date: '2026-11-28',
     nl: ['Op de telefoon staat het versienummer nu netjes onder de naam van de app, in plaats van eroverheen', 'De kopbalk past op smalle schermen bij elke cursus; je profielknopje blijft heel'],
     es: ['En el teléfono, el número de versión ahora queda debajo del nombre de la app, en lugar de encima.', 'La barra superior cabe en pantallas angostas en todos los cursos; el botón de tu perfil se ve completo.'] },
+  { v: '1.94.0', date: '2026-11-28',
+    nl: ['Frans: niveau C2 erbij, de cursus loopt nu van A1 tot en met C2. Tien nieuwe units over literaire tijden, stijlfiguren, juridisch Frans, straattaal, de lastigste accords, verzorgde toegeving, veelgemaakte fouten, zinsbouw, idioom en het precieze woord.'],
+    es: ["Francés para neerlandófonos: nivel C2 con diez unidades nuevas; el curso va ahora de A1 a C2."] },
   { v: '1.93.0', date: '2026-11-28',
     nl: ['Duits: de cursus is nu compleet van A1 tot en met C2. Nieuw zijn C1 (krantenduits, wetenschapstaal, politiek, Oostenrijk en Zwitserland, uitdrukkingen) en C2 (register, literair Duits, retorica, dialecten, ambtelijk Duits, ironie, spreekwoorden en een meesterproef met valse vrienden).', 'De niveautest voor Duits loopt nu door tot C2, en je kunt bij het starten ook bij C1 of C2 beginnen.'],
     es: ['Alemán (para hablantes de neerlandés): el curso ya está completo de A1 a C2, con los nuevos niveles C1 y C2.', 'La prueba de nivel de alemán llega ahora hasta C2.'] },
