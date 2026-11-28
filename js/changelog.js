@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.93.0', date: '2026-11-28',
+    nl: ['Turks: niveau C1 is er, met 10 nieuwe units: nieuws en krantentaal, academisch Turks, discussiëren met nuance, uitdrukkingen en verdubbelingen, zakelijk onderhandelen, literatuur, recht en contracten, oude en nieuwe woorden, wat als en bijna, en partikels en ironie', 'De niveautest Turks loopt nu door tot C1 en Pamuk Öğretmen heeft 7 nieuwe C1-gesprekken'],
+    es: ['Turco: ya está el nivel C1, con 10 unidades nuevas: noticias y lenguaje periodístico, turco académico, debatir con matices, modismos y reduplicaciones, negociar, literatura, derecho y contratos, palabras antiguas y nuevas, hipótesis y «casi», y partículas e ironía.', 'La prueba de nivel de turco llega ahora hasta C1 y Pamuk Öğretmen tiene 7 conversaciones nuevas de C1.'] },
   { v: '1.92.0', date: '2026-11-27',
     nl: ['Op reis: bij elk land een eigen dialoog en een eigen gesprek met je docent, nu ook in de cursussen Engels, Frans, Duits, Turks en Nederlands', 'Lokale woorden staan erbij met het standaardwoord; afwijkingen heten uitzondering, met de reden'],
     es: ['De viaje: cada país tiene su propio diálogo y su propia conversación con tu docente, ahora también en los cursos de inglés, francés, alemán, turco y neerlandés.', 'Las palabras locales aparecen con la palabra estándar; lo que se aparta de la regla se llama excepción, con el motivo.'] },
