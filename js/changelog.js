@@ -4,6 +4,9 @@
    Dan komt er bovenaan automatisch een blok bij. Zet daarna bij es: de Spaanse vertaling (voor de cursussen met uitleg in het Spaans);
    leeg laten mag, dan zie je daar de Nederlandse tekst. De tests controleren dat de bovenste versie gelijk is aan js/version.js. */
 self.SPT_CHANGELOG = [
+  { v: '1.94.0', date: '2026-11-28',
+    nl: ['Frans: niveau C2 erbij, de cursus loopt nu van A1 tot en met C2. Tien nieuwe units over literaire tijden, stijlfiguren, juridisch Frans, straattaal, de lastigste accords, verzorgde toegeving, veelgemaakte fouten, zinsbouw, idioom en het precieze woord.'],
+    es: ["Francés para neerlandófonos: nivel C2 con diez unidades nuevas; el curso va ahora de A1 a C2."] },
   { v: '1.93.0', date: '2026-11-28',
     nl: ['Duits: de cursus is nu compleet van A1 tot en met C2. Nieuw zijn C1 (krantenduits, wetenschapstaal, politiek, Oostenrijk en Zwitserland, uitdrukkingen) en C2 (register, literair Duits, retorica, dialecten, ambtelijk Duits, ironie, spreekwoorden en een meesterproef met valse vrienden).', 'De niveautest voor Duits loopt nu door tot C2, en je kunt bij het starten ook bij C1 of C2 beginnen.'],
     es: ['Alemán (para hablantes de neerlandés): el curso ya está completo de A1 a C2, con los nuevos niveles C1 y C2.', 'La prueba de nivel de alemán llega ahora hasta C2.'] },
